@@ -1,0 +1,56 @@
+--  @testpoint: --创建普通约束区别大小写
+drop table if exists false_2;
+SQL SUCCESS
+create table false_2(a int,b int);
+SQL SUCCESS
+alter table false_2 add constraint WMS check(B<100);
+SQL SUCCESS
+alter table false_2 add constraint WMS check(b<100);
+?.*ERROR: constraint "wms" for relation "false_2" already exists
+alter table false_2 add constraint zz check(a<100);
+SQL SUCCESS
+alter table false_2 add constraint ZZ check(A<100);
+?.*ERROR: constraint "zz" for relation "false_2" already exists
+SELECT conname,contype,condeferrable,condeferred,convalidated FROM PG_CONSTRAINT WHERE conname in ('wms','zz') order by conname;
++---------+---------+---------------+-------------+--------------+
+| conname | contype | condeferrable | condeferred | convalidated |
++---------+---------+---------------+-------------+--------------+
+| wms     | c       | false         | false       | true         |
+| zz      | c       | false         | false       | true         |
++---------+---------+---------------+-------------+--------------+
+SELECT conname,contype,condeferrable,condeferred,convalidated FROM PG_CONSTRAINT WHERE conname in ('WMS','ZZ') order by conname;
++---------+---------+---------------+-------------+--------------+
+| conname | contype | condeferrable | condeferred | convalidated |
++---------+---------+---------------+-------------+--------------+
++---------+---------+---------------+-------------+--------------+
+SELECT conname,contype,condeferrable,condeferred,convalidated FROM PG_CONSTRAINT WHERE conname='WMS';
++---------+---------+---------------+-------------+--------------+
+| conname | contype | condeferrable | condeferred | convalidated |
++---------+---------+---------------+-------------+--------------+
++---------+---------+---------------+-------------+--------------+
+SELECT conname,contype,condeferrable,condeferred,convalidated FROM PG_CONSTRAINT WHERE conname='wms';
++---------+---------+---------------+-------------+--------------+
+| conname | contype | condeferrable | condeferred | convalidated |
++---------+---------+---------------+-------------+--------------+
+| wms     | c       | false         | false       | true         |
++---------+---------+---------------+-------------+--------------+
+alter table false_2 drop constraint wms;
+SQL SUCCESS
+alter table false_2 drop constraint WMS;
+?.*ERROR: constraint "wms" of relation "false_2" does not exist
+alter table false_2 drop constraint zz;
+SQL SUCCESS
+alter table false_2 drop constraint ZZ;
+?.*ERROR: constraint "zz" of relation "false_2" does not exist
+SELECT conname,contype,condeferrable,condeferred,convalidated FROM PG_CONSTRAINT WHERE conname in ('wms','zz') order by conname;
++---------+---------+---------------+-------------+--------------+
+| conname | contype | condeferrable | condeferred | convalidated |
++---------+---------+---------------+-------------+--------------+
++---------+---------+---------------+-------------+--------------+
+SELECT conname,contype,condeferrable,condeferred,convalidated FROM PG_CONSTRAINT WHERE conname in ('WMS','ZZ') order by conname;
++---------+---------+---------------+-------------+--------------+
+| conname | contype | condeferrable | condeferred | convalidated |
++---------+---------+---------------+-------------+--------------+
++---------+---------+---------------+-------------+--------------+
+drop table if exists false_2;
+SQL SUCCESS

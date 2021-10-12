@@ -1,0 +1,27 @@
+-- @testpoint: 插入正整数
+drop table if exists smallint01;
+SQL SUCCESS
+create table smallint01 (name smallint);
+SQL SUCCESS
+insert into smallint01 values (120);
+SQL SUCCESS
+insert into smallint01 values (11111);
+SQL SUCCESS
+insert into smallint01 values (1);
+SQL SUCCESS
+insert into smallint01 values (2);
+SQL SUCCESS
+insert into smallint01 values (3);
+SQL SUCCESS
+select * from smallint01;
++-------+
+| name  |
++-------+
+| 120   |
+| 11111 |
+| 1     |
+| 2     |
+| 3     |
++-------+
+drop table smallint01;
+SQL SUCCESS

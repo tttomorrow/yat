@@ -1,0 +1,19 @@
+-- @testpoint: 设置为空串（''）的时候，系统会自动转换成一对双引号
+set search_path to '';
+SQL SUCCESS
+--查看
+show search_path;
++-------------+
+| search_path |
++-------------+
+| ""          |
++-------------+
+--恢复默认
+set search_path to "$user",public;
+SQL SUCCESS
+show search_path;
++-----------------+
+| search_path     |
++-----------------+
+| "$user", public |
++-----------------+

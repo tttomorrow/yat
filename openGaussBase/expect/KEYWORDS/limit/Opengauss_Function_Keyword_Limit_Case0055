@@ -1,0 +1,30 @@
+-- @testpoint: 与函数结合使用（参数为表的列--limit）
+drop table if exists test_limit_009;
+SQL SUCCESS
+create table test_limit_009 ("LIMIT" int,id int);
+SQL SUCCESS
+insert into test_limit_009 values (-999,1);
+SQL SUCCESS
+insert into test_limit_009 values (-10000,2);
+SQL SUCCESS
+insert into test_limit_009 values (-10000,3);
+SQL SUCCESS
+insert into test_limit_009 values (100,3);
+SQL SUCCESS
+insert into test_limit_009 values (100,2);
+SQL SUCCESS
+commit;
+SQL SUCCESS
+select abs("LIMIT") t1 from test_limit_009 order by t1;
++-------+
+| t1    |
++-------+
+| 100   |
+| 100   |
+| 999   |
+| 10000 |
+| 10000 |
++-------+
+--清理环境
+drop table if exists test_limit_009;
+SQL SUCCESS

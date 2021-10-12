@@ -1,0 +1,6 @@
+-- @testpoint: left函数无参数输入，合理报错
+select left();
+?.*ERROR: function left\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: left

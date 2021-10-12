@@ -1,0 +1,66 @@
+-- @testpoint: opengauss关键字Label(非保留)，作为同义词对象名,部分测试点合理报错
+--前置条件
+drop table if exists explain_test;
+SQL SUCCESS
+create table explain_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists Label;
+SQL SUCCESS
+create synonym Label for explain_test;
+SQL SUCCESS
+insert into Label values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update Label set Label.name='cici' where Label.id=2;
+SQL SUCCESS
+select * from Label;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--关键字带双引号-成功
+drop synonym if exists "Label";
+SQL SUCCESS
+create synonym "Label" for explain_test;
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'Label';
+?.*ERROR: syntax error at or near "'Label'".*
+?.*Position: .*
+create synonym 'Label' for explain_test;
+?.*ERROR: syntax error at or near "'Label'".*
+?.*Position: .*
+insert into 'Label' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'Label'".*
+?.*Position: .*
+update 'Label' set 'Label'.name='cici' where 'Label'.id=2;
+?.*ERROR: syntax error at or near "'Label'".*
+?.*Position: .*
+select * from 'Label';
+?.*ERROR: syntax error at or near "'Label'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop synonym if exists `Label`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create synonym `Label` for explain_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+insert into `Label` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+update `Label` set `Label`.name='cici' where `Label`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+select * from `Label`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+--清理环境
+drop synonym if exists label;
+SQL SUCCESS
+drop synonym if exists "Label";
+SQL SUCCESS
+drop table if exists explain_test;
+SQL SUCCESS

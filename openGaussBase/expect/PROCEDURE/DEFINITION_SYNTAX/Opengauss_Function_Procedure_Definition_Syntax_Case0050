@@ -1,0 +1,43 @@
+-- @testpoint:删除过程中的insert目标表
+DROP table if exists Proc_Syntax_050;
+SQL SUCCESS
+create table Proc_Syntax_050(id int,name varchar2(20));
+SQL SUCCESS
+create or replace procedure TEST_PROC_Proc_Syntax_050(
+  v_id    IN  Proc_Syntax_050.id%type,
+  v_name  IN  Proc_Syntax_050.name%type
+  ) AS
+  v_sql VARCHAR2(2000);
+BEGIN
+    insert into Proc_Syntax_050 values(v_id,v_name);
+END;
+/
+SQL SUCCESS
+select count(1) from Proc_Syntax_050;
++-------+
+| count |
++-------+
+| 0     |
++-------+
+call TEST_PROC_Proc_Syntax_050(3,'isoft');
++---------------------------+
+| test_proc_proc_syntax_050 |
++---------------------------+
+|                           |
++---------------------------+
+select count(1) from Proc_Syntax_050;
++-------+
+| count |
++-------+
+| 1     |
++-------+
+drop table Proc_Syntax_050;
+SQL SUCCESS
+call TEST_PROC_Proc_Syntax_050(4,'isoft');
+?.*ERROR: relation "proc_syntax_050" does not exist.*
+  Where: PL/pgSQL function test_proc_proc_syntax_050(integer,character varying) line 3 at SQL statement
+select count(1) from Proc_Syntax_050;
+?.*ERROR: relation "proc_syntax_050" does not exist.*
+?.*Position.*
+drop procedure TEST_PROC_Proc_Syntax_050;
+SQL SUCCESS

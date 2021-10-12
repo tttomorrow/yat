@@ -1,0 +1,48 @@
+--  @testpoint:RENAME TO：修改索引名称1-63位
+--创建表
+DROP TABLE if EXISTS test_index_table_114 CASCADE;
+SQL SUCCESS
+create table test_index_table_114(
+c_int int
+) WITH (ORIENTATION = row) ;
+SQL SUCCESS
+--无if exists 合理报错
+ALTER index index_114 RENAME TO a;
+?.*ERROR: relation "index_114" does not exist
+ALTER index if exists index_114 RENAME TO a;
+SQL SUCCESS
+--建索引
+drop index if exists index_114;
+SQL SUCCESS
+create index index_114 on test_index_table_114(c_int);
+SQL SUCCESS
+select relname from pg_class where relname like 'index_114%' order by relname;
++-----------+
+| relname   |
++-----------+
+| index_114 |
++-----------+
+--rename
+ALTER index IF EXISTS index_114 RENAME TO a;
+SQL SUCCESS
+select relname from pg_class where relname ='a';
++---------+
+| relname |
++---------+
+| a       |
++---------+
+SQL SUCCESS
++-----------------------------------------------------------------+
+| relname                                                         |
++-----------------------------------------------------------------+
++-----------------------------------------------------------------+
+SQL SUCCESS
+select relname from pg_class where relname ='index_114_$';
++-------------+
+| relname     |
++-------------+
+| index_114_$ |
++-------------+
+--清理环境
+DROP TABLE if EXISTS test_index_table_114 CASCADE;
+SQL SUCCESS

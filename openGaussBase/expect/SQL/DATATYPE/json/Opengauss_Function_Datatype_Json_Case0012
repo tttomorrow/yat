@@ -1,0 +1,15 @@
+-- @testpoint: 创建本地临时表,插入数据
+drop table if exists test_json_12;
+SQL SUCCESS
+create local temporary table test_json_12 (id json) WITH (orientation=row, compression=no);
+SQL SUCCESS
+insert into test_json_12 values ('{"f1":1,"f2":true,"f3":"Hi"}');
+SQL SUCCESS
+select * from test_json_12;
++------------------------------+
+| id                           |
++------------------------------+
+| {"f1":1,"f2":true,"f3":"Hi"} |
++------------------------------+
+drop table test_json_12;
+SQL SUCCESS

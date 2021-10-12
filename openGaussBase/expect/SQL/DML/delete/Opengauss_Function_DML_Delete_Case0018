@@ -1,0 +1,22 @@
+--  @testpoint:删除临时表数据
+--创建临时表
+create temp table tmp_test1 (id int,name varchar(20));
+SQL SUCCESS
+insert into tmp_test1 values(1,'李丽'),(2,'李小丽');
+SQL SUCCESS
+--删除表
+delete from tmp_test1;
+SQL SUCCESS
+--创建临时表
+drop table if exists tmp_test1;
+SQL SUCCESS
+create temp table tmp_test1 (id int,name varchar(20));
+SQL SUCCESS
+insert into tmp_test1 values(1,'李丽'),(2,'李小丽');
+SQL SUCCESS
+--删除临时表数据
+delete from tmp_test1;
+SQL SUCCESS
+--删除表
+drop table if exists tmp_test1;
+SQL SUCCESS

@@ -1,0 +1,19 @@
+-- @testpoint: 插入有效负整数
+drop table if exists bigint02;
+SQL SUCCESS
+create table bigint02 (name bigint);
+SQL SUCCESS
+insert into bigint02 values (-102);
+SQL SUCCESS
+insert into bigint02 values (-9999999);
+SQL SUCCESS
+SQL SUCCESS
+select * from bigint02;
++-------------+
+| name        |
++-------------+
+| -102        |
+| -9999999    |
++-------------+
+drop table bigint02;
+SQL SUCCESS

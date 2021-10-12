@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字column(保留)，作为角色名
+--关键字不带引号-失败
+drop role if exists column;
+?.*ERROR: syntax error at or near "column"
+?.*
+create role column with password 'gauss@123' valid until '2020-12-31';
+?.*ERROR: syntax error at or near "column"
+?.*
+--关键字带双引号-成功
+drop role if exists "column";
+SQL SUCCESS
+create role "column" with password 'gauss@123' valid until '2020-12-31';
+SQL SUCCESS
+drop role "column";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop role if exists 'column';
+?.*ERROR: syntax error at or near "'column'"
+?.*
+create role 'column' with password 'gauss@123' valid until '2020-12-31';
+?.*ERROR: syntax error at or near "'column'"
+?.*
+--关键字带反引号-合理报错
+drop role if exists `column`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create role `column` with password 'gauss@123' valid until '2020-12-31';
+?.*ERROR: syntax error at or near "`"
+?.*

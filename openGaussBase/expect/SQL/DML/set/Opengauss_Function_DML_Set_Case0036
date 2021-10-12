@@ -1,0 +1,13 @@
+--  @testpoint:设置xml解析方式为无效的，合理报错
+set xml option html;
+?.*ERROR: syntax error at or near "html"
+?.*
+set xml option documents;
+?.*ERROR: syntax error at or near "documents"
+?.*
+set xml option contents;
+?.*ERROR: syntax error at or near "contents"
+?.*
+set xml option csv;
+?.*ERROR: syntax error at or near "csv"
+?.*

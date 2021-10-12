@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字parameter_name(非保留)，作为用户组名
+--关键字不带引号-成功
+drop group if exists parameter_name;
+SQL SUCCESS
+create group parameter_name with password 'gauss@123';
+SQL SUCCESS
+drop group parameter_name;
+SQL SUCCESS
+--关键字带双引号-成功
+drop group if exists "parameter_name";
+SQL SUCCESS
+create group "parameter_name" with password 'gauss@123';
+SQL SUCCESS
+drop group "parameter_name";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop group if exists 'parameter_name';
+?.*ERROR: syntax error at or near "'parameter_name'".*
+?.*Position: .*
+create group 'parameter_name' with password 'gauss@123';
+?.*ERROR: syntax error at or near "'parameter_name'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop group if exists `parameter_name`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create group `parameter_name` with password 'gauss@123';
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

@@ -1,0 +1,25 @@
+-- @testpoint: 存储过程中游标使用 for 循环，绑定sql含虚拟列，子表达式
+
+drop table if exists emp;
+create table emp(empno int,ename varchar(10),job varchar(10) ,sal integer);
+insert into emp values(1,'zhangsan','doctor1',10000),(2,'zhangsan2','doctor2',10000),(123,'zhangsan3','doctor3',10000);
+insert into emp values(1,'zhansi','doctor1',10000),(2,'lisiabc','doctor2',10000),(123,'zhangwu123','doctor3',10000);
+insert into emp values(10,'abc','worker',9000);
+insert into emp values(716,'ZHANGSAN','leader',20000);
+
+create or replace procedure syscur_015()
+is
+declare
+    cursor mycursor  is select ename||' '||job as ejob ,sal*10 as exp_sal from emp order by ename DESC,exp_sal asc;
+begin
+    for a  in  mycursor
+    loop
+        raise info 'a is ejob:%',a.ejob;
+        raise info 'exp_sal:%',a.exp_sal;
+        raise info ':%',mycursor%rowcount;
+    end loop;
+end;
+/
+call syscur_015();
+drop table emp;
+drop procedure syscur_015;

@@ -1,0 +1,11 @@
+--  @testpoint:删除表字段，带column
+drop table if exists yy;
+SQL SUCCESS
+create table yy(id int);
+SQL SUCCESS
+alter table yy add ( age int,t_name char(20));
+SQL SUCCESS
+alter table yy drop column age;
+SQL SUCCESS
+drop table yy;
+SQL SUCCESS

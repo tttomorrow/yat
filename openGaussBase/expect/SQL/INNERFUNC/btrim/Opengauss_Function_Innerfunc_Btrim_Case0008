@@ -1,0 +1,12 @@
+-- @testpoint: 含有或缺失多个参数，合理报错
+SELECT btrim('123321' , 12 ,'奥法还是卡');
+?.*ERROR: function btrim\(unknown, integer, unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: btrim
+SELECT btrim('asfkjkla');
++----------+
+| btrim    |
++----------+
+| asfkjkla |
++----------+

@@ -1,0 +1,54 @@
+-- @testpoint: where条件[not] between and,[not] in,[not] null
+drop view if exists acos_view;
+SQL SUCCESS
+drop table if exists acos_test_01;
+SQL SUCCESS
+create table acos_test_01(c_decimal decimal(38,4));
+SQL SUCCESS
+insert into acos_test_01(c_decimal) values(-1),(1),(-0.6542),(0.6542),(null);
+SQL SUCCESS
+select c_decimal from acos_test_01 where acos(c_decimal) between 0 and 2 and c_decimal is not null order by c_decimal;
++-----------+
+| c_decimal |
++-----------+
+| 0.6542    |
+| 1.0000    |
++-----------+
+select c_decimal from acos_test_01 where acos(c_decimal) not between 0 and 2 and c_decimal is not null order by c_decimal;
++-----------+
+| c_decimal |
++-----------+
+| -1.0000   |
+| -0.6542   |
++-----------+
++-----------+
+| c_decimal |
++-----------+
+| -1.0000   |
+| 1.0000    |
++-----------+
++-----------+
+| c_decimal |
++-----------+
+| -0.6542   |
+| 0.6542    |
++-----------+
+select c_decimal from acos_test_01 where acos(c_decimal) is null order by c_decimal;
++-----------+
+| c_decimal |
++-----------+
+|           |
++-----------+
+select c_decimal from acos_test_01 where acos(c_decimal) is not null order by c_decimal;
++-----------+
+| c_decimal |
++-----------+
+| -1.0000   |
+| -0.6542   |
+| 0.6542    |
+| 1.0000    |
++-----------+
+drop table if exists acos_test_01;
+SQL SUCCESS
+drop view if exists acos_view;
+SQL SUCCESS

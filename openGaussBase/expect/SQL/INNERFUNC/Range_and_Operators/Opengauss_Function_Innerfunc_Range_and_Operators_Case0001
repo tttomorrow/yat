@@ -1,0 +1,31 @@
+-- @testpoint: numrange(numeric, numeric, [text]) 描述：表示一个范围
+select numrange(1.1,2.2,'[]') as result;
++-----------+
+| result    |
++-----------+
+| [1.1,2.2] |
++-----------+
+select numrange(5.1,6.7,'()') as result;
++-----------+
+| result    |
++-----------+
+| (5.1,6.7) |
++-----------+
+select numrange(5.1,6.7,'(]') as result;
++-----------+
+| result    |
++-----------+
+| (5.1,6.7] |
++-----------+
+select numrange(7.7,8.7,'[)') as result;
++-----------+
+| result    |
++-----------+
+| [7.7,8.7) |
++-----------+
+select numrange(1.1,'123','[]') as result;
++-----------+
+| result    |
++-----------+
+| [1.1,123] |
++-----------+

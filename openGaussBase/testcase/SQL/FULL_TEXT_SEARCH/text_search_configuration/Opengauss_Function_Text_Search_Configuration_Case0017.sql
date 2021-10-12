@@ -1,0 +1,12 @@
+--  @testpoint:删除文本搜索配置字串类型映射语法测试
+--创建文本搜索配置
+DROP TEXT SEARCH CONFIGURATION if exists ngram2;
+CREATE TEXT SEARCH CONFIGURATION ngram2 (parser=ngram) WITH (gram_size = 2, grapsymbol_ignore = false);
+--添加文本搜索配置映射
+ALTER TEXT SEARCH CONFIGURATION ngram2 ADD MAPPING FOR multisymbol WITH simple;
+--删除类型映射，添加if exists
+ALTER TEXT SEARCH CONFIGURATION ngram2 DROP MAPPING IF EXISTS FOR multisymbol;
+--查询文本搜索配置
+SELECT b.cfgname,a.maptokentype,a.mapseqno,a.mapdict,c.dictname FROM pg_ts_config_map a,pg_ts_config b, pg_ts_dict c WHERE a.mapcfg=b.oid AND a.mapdict=c.oid AND b.cfgname='ngram2' ORDER BY 1,2,3,4,5;
+--删除文本搜索配置
+DROP TEXT SEARCH CONFIGURATION ngram2;

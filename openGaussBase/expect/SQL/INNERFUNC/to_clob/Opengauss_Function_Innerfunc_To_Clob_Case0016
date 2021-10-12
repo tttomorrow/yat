@@ -1,0 +1,15 @@
+-- @testpoint: raw类型转换为clob类型
+drop table if exists test2;
+SQL SUCCESS
+create table test2 (d raw);
+SQL SUCCESS
+insert into test2 values('ABCDEF');
+SQL SUCCESS
+select to_clob(d) from test2;
++---------+
+| to_clob |
++---------+
+| ABCDEF  |
++---------+
+drop table if exists test2;
+SQL SUCCESS

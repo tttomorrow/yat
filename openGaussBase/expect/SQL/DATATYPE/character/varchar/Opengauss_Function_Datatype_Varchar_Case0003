@@ -1,0 +1,7 @@
+-- @testpoint: 字节长度设定为负数，合理报错
+-- @modify at: 2020-11-17
+drop table if exists test_varchar_03;
+SQL SUCCESS
+create table test_varchar_03 (name varchar(-1));
+?.*ERROR: syntax error.*
+?.*

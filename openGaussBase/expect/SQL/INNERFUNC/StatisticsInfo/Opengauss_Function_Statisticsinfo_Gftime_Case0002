@@ -1,0 +1,23 @@
+-- @testpoint: pg_stat_get_function_total_time(oid)函数的异常校验，合理报错
+select pg_stat_get_function_total_time('') from PG_PROC a where proname = 'pg_stat_reset';
++---------------------------------+
+| pg_stat_get_function_total_time |
++---------------------------------+
+|                                 |
++---------------------------------+
+select pg_stat_get_function_total_time() from PG_PROC a where proname = 'pg_stat_reset';
+?.*ERROR: function pg_stat_get_function_total_time\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_stat_get_function_total_time
+select pg_stat_get_function_total_time(a.oid,a.oid,a.oid) from PG_PROC a where proname = 'pg_stat_reset';
+?.*ERROR: function pg_stat_get_function_total_time\(oid, oid, oid\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_stat_get_function_total_time
+?.*ERROR: OID out of range
+  Where: referenced column: pg_stat_get_function_total_time
+select pg_stat_get_function_total_time('*&^%$') from PG_PROC a where proname = 'pg_stat_reset';
+?.*ERROR: invalid input syntax for type oid: \"\*\&\^\%\$\"
+?.*
+  Where: referenced column: pg_stat_get_function_total_time

@@ -1,0 +1,25 @@
+-- @testpoint: set方法设置参数default_text_search_config，无效值时，合理报错
+--查看默认
+show default_text_search_config;
++----------------------------+
+| default_text_search_config |
++----------------------------+
+| pg_catalog.english         |
++----------------------------+
+--设置，成功
+set default_text_search_config to 'pg_catalog.simple';
+SQL SUCCESS
+show default_text_search_config;
++----------------------------+
+| default_text_search_config |
++----------------------------+
+| pg_catalog.simple          |
++----------------------------+
+--设置，报错
+set default_text_search_config to 123;
+?.*ERROR: invalid value for parameter "default_text_search_config": "123"
+set default_text_search_config to 'test';
+?.*ERROR: invalid value for parameter "default_text_search_config": "test"
+set default_text_search_config to 'pg_catalog.simple%$#';
+?.*ERROR: invalid value for parameter "default_text_search_config": "pg_catalog.simple\%\$\#"
+--no need to clean

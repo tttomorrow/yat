@@ -1,0 +1,13 @@
+-- @testpoint: 数字操作符|/(平方根),数据为1或者最大值时进行开方
+drop table if exists data_01;
+SQL SUCCESS
+create table data_01 (clo1 int,clo2 BIGINT);
+SQL SUCCESS
+SQL SUCCESS
+select |/clo1,|/clo2 from data_01;
++----------+--------------------+
+| ?column? | ?column?           |
++----------+--------------------+
++----------+--------------------+
+drop table if exists data_01;
+SQL SUCCESS

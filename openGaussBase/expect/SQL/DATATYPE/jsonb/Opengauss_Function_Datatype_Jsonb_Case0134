@@ -1,0 +1,30 @@
+-- @testpoint: 创建jsonb类型字段的表，并设置缺省值为"null"
+drop table if exists tab134;
+SQL SUCCESS
+create table tab134
+(
+    sk         integer          not null,
+    id         char(16)         not null,
+    name       varchar(20),
+    state                jsonb          default '"null"'
+);
+SQL SUCCESS
+insert into  tab134 values(1,'a','xiaoming','"job"');
+SQL SUCCESS
+insert into  tab134(sk,id,name) values(2,'b','xiaohong');
+SQL SUCCESS
+insert into  tab134 values(3,'c','lihua','"job"');
+SQL SUCCESS
+insert into  tab134(sk,id,name) values(4,'d','zhangsan');
+SQL SUCCESS
+select * from tab134;
++----+------------------+----------+--------+
+| sk | id               | name     | state  |
++----+------------------+----------+--------+
+| 1  | a                | xiaoming | "job"  |
+| 2  | b                | xiaohong | "null" |
+| 3  | c                | lihua    | "job"  |
+| 4  | d                | zhangsan | "null" |
++----+------------------+----------+--------+
+drop table if exists tab134;
+SQL SUCCESS

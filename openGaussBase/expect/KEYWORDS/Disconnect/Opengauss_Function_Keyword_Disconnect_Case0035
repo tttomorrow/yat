@@ -1,0 +1,55 @@
+--  @testpoint:opengauss关键字disconnect(非保留)，自定义数据类型名为disconnect
+--关键字disconnect作为数据类型不带引号，创建成功
+drop type if exists disconnect;
+SQL SUCCESS
+CREATE TYPE disconnect AS (f1 int, f2 text);
+SQL SUCCESS
+select typname from pg_type where typname ='disconnect';
++------------+
+| typname    |
++------------+
+| disconnect |
++------------+
+drop type disconnect;
+SQL SUCCESS
+--关键字disconnect作为用户名加双引号，创建成功
+drop type if exists "disconnect";
+SQL SUCCESS
+CREATE TYPE "disconnect" AS (f1 int, f2 text);
+SQL SUCCESS
+select typname from pg_type where typname ='disconnect';
++------------+
+| typname    |
++------------+
+| disconnect |
++------------+
+drop type "disconnect";
+SQL SUCCESS
+--关键字disconnect作为用户名加单引号，合理报错
+drop type if exists 'disconnect';
+?.*ERROR: syntax error at or near "'disconnect'"
+?.*
+CREATE TYPE 'disconnect' AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "'disconnect'"
+?.*
+select * from pg_type where typname ='disconnect';
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+----------+-----------+------------+---------+----------+-----------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
+| typname | typnamespace | typowner | typlen | typbyval | typtype | typcategory | typispreferred | typisdefined | typdelim | typrelid | typelem | typarray | typinput | typoutput | typreceive | typsend | typmodin | typmodout | typanalyze | typalign | typstorage | typnotnull | typbasetype | typtypmod | typndims | typcollation | typdefaultbin | typdefault | typacl |
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+----------+-----------+------------+---------+----------+-----------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+----------+-----------+------------+---------+----------+-----------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
+drop type 'disconnect';
+?.*ERROR: syntax error at or near "'disconnect'"
+?.*
+--关键字disconnect作为用户名加反引号，合理报错
+drop type if exists `disconnect`;
+?.*ERROR: syntax error at or near "`"
+?.*
+CREATE TYPE `disconnect` AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "`"
+?.*
+select * from pg_type where typname =`disconnect`;
+?.*ERROR: column "disconnect" does not exist
+?.*
+drop type `disconnect`;
+?.*ERROR: syntax error at or near "`"
+?.*

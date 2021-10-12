@@ -1,0 +1,50 @@
+-- @testpoint: 插入正常数值，将name类型转换为VARCHAR2,char
+-- @modified at: 2020-11-13
+drop table if exists name_03;
+SQL SUCCESS
+CREATE  TABLE name_03 (id name);
+SQL SUCCESS
+insert into name_03 values (11.11);
+SQL SUCCESS
+alter table name_03 alter column id type varchar2(200);
+SQL SUCCESS
+select * from name_03;
++-------+
+| id    |
++-------+
+| 11.11 |
++-------+
+--查询字段信息是否转换成功
+SELECT format_type(a.atttypid,a.atttypmod) as type
+FROM pg_class as c,pg_attribute as a
+where c.relname = 'name_03' and a.attrelid = c.oid and a.attnum>0;
++------------------------+
+| type                   |
++------------------------+
+| character varying(200) |
++------------------------+
+drop table name_03;
+SQL SUCCESS
+CREATE TABLE name_03 (id name);
+SQL SUCCESS
+insert into name_03 values (11.11);
+SQL SUCCESS
+alter table name_03 alter column id TYPE char(10);
+SQL SUCCESS
+--查询字段信息是否转换成功
+SELECT format_type(a.atttypid,a.atttypmod) as type
+FROM pg_class as c,pg_attribute as a
+where c.relname = 'name_03' and a.attrelid = c.oid and a.attnum>0;
++---------------+
+| type          |
++---------------+
+| character(10) |
++---------------+
+select * from name_03;
++------------+
+| id         |
++------------+
+| 11.11      |
++------------+
+drop table name_03;
+SQL SUCCESS

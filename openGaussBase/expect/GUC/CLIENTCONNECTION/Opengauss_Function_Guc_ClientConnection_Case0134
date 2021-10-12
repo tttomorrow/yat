@@ -1,0 +1,13 @@
+-- @testpoint: 使用alter system set方法设置参数TimeZone，合理报错
+--查看默认值
+show TimeZone;
++---------------+
+| TimeZone      |
++---------------+
+| Asia/Shanghai |
++---------------+
+--设置，报错
+alter system set TimeZone to 'Australia/South';
+?.*ERROR: unsupport parameter: timezone
+ALTER SYSTEM SET only support POSTMASTER-level, SIGHUP-level and BACKEND-level guc variable,
+and it must be allowed to set in postgresql.conf.

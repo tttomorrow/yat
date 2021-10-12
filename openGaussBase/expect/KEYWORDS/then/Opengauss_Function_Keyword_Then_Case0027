@@ -1,0 +1,32 @@
+--  @testpoint:opengauss关键字then(保留)，作为序列名
+--关键字不带引号-失败
+drop sequence if exists then;
+?.*ERROR: syntax error at or near "then"
+?.*Position.*
+create sequence then start 100 cache 50;
+?.*ERROR: syntax error at or near "then"
+?.*Position.*
+drop sequence then;
+?.*ERROR: syntax error at or near "then"
+?.*Position.*
+--关键字带双引号-成功
+drop sequence if exists "then";
+SQL SUCCESS
+create sequence "then" start 100 cache 50;
+SQL SUCCESS
+drop sequence "then";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'then';
+?.*ERROR: syntax error at or near "'then'"
+?.*Position.*
+create sequence 'then' start 100 cache 50;
+?.*ERROR: syntax error at or near "'then'"
+?.*Position.*
+--关键字带反引号-合理报错
+drop sequence if exists `then`;
+?.*ERROR: syntax error at or near "`"
+?.*Position.*
+create sequence `then` start 100 cache 50;
+?.*ERROR: syntax error at or near "`"
+?.*Position.*

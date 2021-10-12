@@ -1,0 +1,30 @@
+-- @testpoint: 插入字符串类型数值
+drop table if exists smallint04;
+SQL SUCCESS
+create table smallint04 (name smallint);
+SQL SUCCESS
+insert into smallint04 values ('1236');
+SQL SUCCESS
+insert into smallint04 values ('11111');
+SQL SUCCESS
+insert into smallint04 values ('-1236');
+SQL SUCCESS
+insert into smallint04 values ('-1');
+SQL SUCCESS
+insert into smallint04 values ('-2');
+SQL SUCCESS
+insert into smallint04 values ('-3');
+SQL SUCCESS
+select * from smallint04;
++-------+
+| name  |
++-------+
+| 1236  |
+| 11111 |
+| -1236 |
+| -1    |
+| -2    |
+| -3    |
++-------+
+drop table smallint04;
+SQL SUCCESS

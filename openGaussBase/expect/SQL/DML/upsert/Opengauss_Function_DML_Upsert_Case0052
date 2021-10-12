@@ -1,0 +1,43 @@
+--  @testpoint:事务中，使用insert...update语句并添加关键字EXCLUDED，再使用rollback
+----预置条件enable_upsert_to_merge为off
+drop table if exists products_b5;
+SQL SUCCESS
+--建表，指定一列是主键
+CREATE TABLE products_b5 (
+    product_no integer PRIMARY KEY,
+    name text,
+    price numeric
+);
+SQL SUCCESS
+--常规insert插入一条数据
+insert into  products_b5 values(01,'grains',5.5);
+SQL SUCCESS
+select * from  products_b5;
++------------+--------+-------+
+| product_no | name   | price |
++------------+--------+-------+
+| 1          | grains | 5.5   |
++------------+--------+-------+
+--使用insert...update语句插入一条数据，主键重复，upadte name列的值为'meat'
+start transaction;
+SQL SUCCESS
+insert into  products_b5 values(01,'meat',22.8) on DUPLICATE key update name=EXCLUDED.name;
+SQL SUCCESS
+select * from  products_b5;
++------------+------+-------+
+| product_no | name | price |
++------------+------+-------+
+| 1          | meat | 5.5   |
++------------+------+-------+
+--使用rollback
+rollback;
+SQL SUCCESS
+--products_b5和使用insert...update语句前一样，name列值恢复为'grains'
+select * from  products_b5;
++------------+--------+-------+
+| product_no | name   | price |
++------------+--------+-------+
+| 1          | grains | 5.5   |
++------------+--------+-------+
+drop table products_b5;
+SQL SUCCESS

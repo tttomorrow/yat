@@ -1,0 +1,9 @@
+-- @testpoint: 测试select into语句中给bigint数据类型赋值，截取到int类型下边界，合理报错
+declare
+  v_int int4;
+begin
+    raise info 'result:% ',v_int;
+end;
+/
+?.*ERROR: integer out of range
+  Where: PL/pgSQL function inline_code_block line 3 at SQL statement

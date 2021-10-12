@@ -1,0 +1,15 @@
+-- @testpoint: 特殊符号、汉字英文数字
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values (concat_ws(' ', 'ABCDE',1,null));
+SQL SUCCESS
+SELECT * from type_char;
++------------------------------------------------------------------------------------------------------+
+| string1                                                                                              |
++------------------------------------------------------------------------------------------------------+
+| ABCDE 1                                                                                              |
++------------------------------------------------------------------------------------------------------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

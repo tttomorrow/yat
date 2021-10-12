@@ -1,0 +1,3 @@
+-- @testpoint: 6.测试add_months的应用场景，作为比较运算符的参数
+select CASE WHEN ADD_MONTHS('2018-02-28','200')>current_timestamp THEN 1 ELSE 0 END FLAG from sys_dummy;
+select CASE WHEN ADD_MONTHS('2018-02-28','20')>current_timestamp THEN 1 ELSE 0 END FLAG from sys_dummy;

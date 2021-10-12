@@ -1,0 +1,23 @@
+-- @testpoint: to_clob函数与order by联合使用
+drop table if exists test2;
+SQL SUCCESS
+create table test2 (f2 clob);
+SQL SUCCESS
+insert into test2 values(5);
+SQL SUCCESS
+insert into test2 values(6);
+SQL SUCCESS
+insert into test2 values(7);
+SQL SUCCESS
+insert into test2 values(8);
+SQL SUCCESS
+select * from test2 where f2>to_clob(5) order by to_char(f2);
++----+
+| f2 |
++----+
+| 6  |
+| 7  |
+| 8  |
++----+
+drop table if exists test2;
+SQL SUCCESS

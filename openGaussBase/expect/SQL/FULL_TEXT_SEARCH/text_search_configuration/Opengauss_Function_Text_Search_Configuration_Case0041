@@ -1,0 +1,25 @@
+--  @testpoint:删除存在的文本搜索配置，添加级联删除选项
+--创建schema
+drop schema if exists test_schema;
+SQL SUCCESS
+create schema test_schema;
+SQL SUCCESS
+--创建文本搜索配置
+drop TEXT SEARCH CONFIGURATION if exists test_schema.ngram2;
+SQL SUCCESS
+CREATE TEXT SEARCH CONFIGURATION  test_schema.ngram2 (parser=ngram) WITH (gram_size = 2, grapsymbol_ignore = false);
+SQL SUCCESS
+--删除文本搜索配置
+drop TEXT SEARCH CONFIGURATION test_schema.ngram2 RESTRICT;
+SQL SUCCESS
+--创建文本搜索配置
+drop TEXT SEARCH CONFIGURATION if exists test_schema.ngram2;
+SQL SUCCESS
+CREATE TEXT SEARCH CONFIGURATION  test_schema.ngram2 (parser=ngram) WITH (gram_size = 2, grapsymbol_ignore = false);
+SQL SUCCESS
+--删除文本搜索配置
+drop TEXT SEARCH CONFIGURATION test_schema.ngram2 cascade;
+SQL SUCCESS
+--删除schema
+drop schema test_schema;
+SQL SUCCESS

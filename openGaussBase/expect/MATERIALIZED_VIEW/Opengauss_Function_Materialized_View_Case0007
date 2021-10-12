@@ -1,0 +1,45 @@
+-- @testpoint: 测试删除物化视图，合理报错
+--删除物化视图
+drop table if exists student cascade;
+SQL SUCCESS
+create table student
+(
+    id int primary key,
+    name varchar(10) not null
+);
+SQL SUCCESS
+insert into student values (1, 'aaa');
+SQL SUCCESS
+insert into student values (2, 'bbb');
+SQL SUCCESS
+insert into student values (3, 'ccc');
+SQL SUCCESS
+insert into student values (4, 'ddd');
+SQL SUCCESS
+insert into student values (5, 'eee');
+SQL SUCCESS
+insert into student values (6, 'fff');
+SQL SUCCESS
+create materialized view student_mv (id, name) as select * from student;
+SQL SUCCESS
+create view student_mv_v (id, name) as select * from student_mv;
+SQL SUCCESS
+--删除物化视图，默认
+drop materialized view student_mv;
+?.*ERROR: cannot drop materialized view student_mv because other objects depend on it
+  Detail: view student_mv_v depends on materialized view student_mv
+  Hint: Use DROP ... CASCADE to drop the dependent objects too.
+--error
+--删除物化视图，restrict
+drop materialized view student_mv restrict;
+?.*ERROR: cannot drop materialized view student_mv because other objects depend on it
+  Detail: view student_mv_v depends on materialized view student_mv
+  Hint: Use DROP ... CASCADE to drop the dependent objects too.
+--error
+--删除物化视图，cascade
+drop materialized view student_mv cascade;
+SQL SUCCESS
+select * from student_mv_v;
+?.*ERROR: relation "student_mv_v" does not exist on ?.*
+?.*Position:?.*
+--error

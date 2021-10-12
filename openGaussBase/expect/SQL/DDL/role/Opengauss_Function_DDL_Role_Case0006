@@ -1,0 +1,11 @@
+-- @testpoint: 修改角色名称
+drop ROLE if exists sys_role;
+SQL SUCCESS
+create ROLE sys_role with SYSADMIN IDENTIFIED BY 'Bigdata@123' ;
+SQL SUCCESS
+DROP ROLE if exists jim;
+SQL SUCCESS
+ALTER ROLE sys_role RENAME TO jim;
+SQL SUCCESS
+DROP ROLE if exists jim;
+SQL SUCCESS

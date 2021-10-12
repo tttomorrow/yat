@@ -1,0 +1,13 @@
+-- @testpoint: degrees函数入参为空值
+select degrees(null);
++---------+
+| degrees |
++---------+
+|         |
++---------+
+select degrees('');
++---------+
+| degrees |
++---------+
+|         |
++---------+

@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字security非保留)，作为序列名
+--关键字不带引号-成功
+drop sequence if exists security;
+SQL SUCCESS
+create sequence security start 100 cache 50;
+SQL SUCCESS
+drop sequence security;
+SQL SUCCESS
+--关键字带双引号-成功
+drop sequence if exists "security";
+SQL SUCCESS
+create sequence "security" start 100 cache 50;
+SQL SUCCESS
+drop sequence "security";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'security';
+?.*ERROR: syntax error at or near "'security'".*
+?.*Position: .*
+create sequence 'security' start 100 cache 50;
+?.*ERROR: syntax error at or near "'security'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop sequence if exists `security`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create sequence `security` start 100 cache 50;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

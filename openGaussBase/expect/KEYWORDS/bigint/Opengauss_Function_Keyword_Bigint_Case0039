@@ -1,0 +1,15 @@
+--  @testpoint:插入负数
+drop table if exists bigint02;
+SQL SUCCESS
+create table bigint02 (name bigint);
+SQL SUCCESS
+insert into bigint02 values (-1.5);
+SQL SUCCESS
+select * from bigint02;
++------+
+| name |
++------+
+| -2   |
++------+
+drop table if exists bigint02;
+SQL SUCCESS

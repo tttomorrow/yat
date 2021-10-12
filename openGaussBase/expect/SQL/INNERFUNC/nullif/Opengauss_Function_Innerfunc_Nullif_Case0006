@@ -1,0 +1,19 @@
+-- @testpoint: 参数为特殊字符
+select nullif(#,&) from sys_dummy;
+?.*ERROR: syntax error at or near ","
+?.*
+select nullif(#,#) from sys_dummy;
+?.*ERROR: syntax error at or near ","
+?.*
+select nullif((,)) from sys_dummy;
+?.*ERROR: syntax error at or near ","
+?.*
+select nullif(@,@) from sys_dummy;
+?.*ERROR: syntax error at or near ","
+?.*
+select nullif(+,-) from sys_dummy;
+?.*ERROR: syntax error at or near ","
+?.*
+select nullif(!,~) from sys_dummy;
+?.*ERROR: syntax error at or near ","
+?.*

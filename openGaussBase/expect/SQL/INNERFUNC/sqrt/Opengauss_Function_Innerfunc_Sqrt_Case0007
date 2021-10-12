@@ -1,0 +1,22 @@
+-- @testpoint: 输入参数为特殊类型,合理报错
+SELECT  sqrt('2012.12.03') AS RESULT;
+?.*ERROR: invalid input syntax for type double precision: "2012.12.03"
+?.*
+  Where: referenced column: result
+SELECT  sqrt(Ture) AS RESULT;
+?.*ERROR: column "ture" does not exist
+?.*
+  Where: referenced column: result
+SELECT  sqrt(4>3) AS RESULT;
+?.*ERROR: function sqrt\(boolean\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: result
+SELECT  sqrt(4.00,0) AS RESULT;
+?.*ERROR: function sqrt\(numeric, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: result
+SELECT  sqrt(3++) AS RESULT;
+?.*ERROR: syntax error at or near "\)"
+?.*

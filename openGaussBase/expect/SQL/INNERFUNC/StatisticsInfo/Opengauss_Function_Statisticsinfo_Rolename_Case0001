@@ -1,0 +1,40 @@
+-- @testpoint: pg_stat_get_role_name(oid)根据用户oid获取用户名
+-- testpoint：测试当前用户
+select pg_stat_get_role_name(10) = CURRENT_USER;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select pg_stat_get_role_name(10) = CURRENT_ROLE;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+-- testpoint：新建用户名普通的用户
+DROP USER if exists kim;
+SQL SUCCESS
+CREATE USER kim IDENTIFIED BY 'Bigdata@123';
+SQL SUCCESS
+select pg_stat_get_role_name(a.oid) from PG_ROLES a where a.rolname = 'kim';
++-----------------------+
+| pg_stat_get_role_name |
++-----------------------+
+| kim                   |
++-----------------------+
+DROP USER kim CASCADE;
+SQL SUCCESS
+-- testpoint：新建用户名是最大长度以下滑线开头的用户
+DROP USER if exists ___abcd5abcd5abcd5abcd5abcd5abcd5abcd5abcd5abcd5abcd5abcd5abcd5;
+SQL SUCCESS
+CREATE USER ___abcd5abcd5abcd5abcd5abcd5abcd5abcd5abcd5abcd5abcd5abcd5abcd5 IDENTIFIED BY 'Bigdata@123';
+SQL SUCCESS
+select pg_stat_get_role_name(a.oid) from PG_ROLES a where a.rolname = '___abcd5abcd5abcd5abcd5abcd5abcd5abcd5abcd5abcd5abcd5abcd5abcd5';
++-----------------------------------------------------------------+
+| pg_stat_get_role_name                                           |
++-----------------------------------------------------------------+
+| ___abcd5abcd5abcd5abcd5abcd5abcd5abcd5abcd5abcd5abcd5abcd5abcd5 |
++-----------------------------------------------------------------+
+DROP USER ___abcd5abcd5abcd5abcd5abcd5abcd5abcd5abcd5abcd5abcd5abcd5abcd5 CASCADE;
+SQL SUCCESS

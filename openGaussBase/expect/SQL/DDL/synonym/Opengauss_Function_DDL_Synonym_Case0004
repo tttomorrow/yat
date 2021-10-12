@@ -1,0 +1,203 @@
+-- @testpoint: 创建同义词为有效标识符，创建成功
+-- @modify at: 2020-11-25
+--建表
+drop table if EXISTS test_synonym cascade;
+SQL SUCCESS
+create table test_synonym(a int,b varchar);
+SQL SUCCESS
+--同义词名为单个字母
+drop synonym if EXISTS a cascade;
+SQL SUCCESS
+create synonym a for test_synonym;
+SQL SUCCESS
+drop synonym if EXISTS "A" cascade;
+SQL SUCCESS
+create synonym "A" for test_synonym;
+SQL SUCCESS
+--同义词名为下划线
+drop synonym if EXISTS _ cascade;
+SQL SUCCESS
+create synonym _ for test_synonym;
+SQL SUCCESS
+--查询同义词信息
+select synobjname from pg_synonym WHERE synname='a';
++--------------+
+| synobjname   |
++--------------+
+| test_synonym |
++--------------+
+select synobjname from pg_synonym WHERE synname='_';
++--------------+
+| synobjname   |
++--------------+
+| test_synonym |
++--------------+
+select synobjname from pg_synonym WHERE synname='A';
++--------------+
+| synobjname   |
++--------------+
+| test_synonym |
++--------------+
+--单类型
+drop synonym if EXISTS abz cascade;
+SQL SUCCESS
+drop synonym if EXISTS "ABZ" cascade;
+SQL SUCCESS
+drop synonym if EXISTS ___ cascade;
+SQL SUCCESS
+create synonym abz for test_synonym;
+SQL SUCCESS
+create synonym "ABZ" for test_synonym;
+SQL SUCCESS
+create synonym ___ for test_synonym;
+SQL SUCCESS
+--查询同义词信息
+select synobjname from pg_synonym WHERE synname='abz';
++--------------+
+| synobjname   |
++--------------+
+| test_synonym |
++--------------+
+select synobjname from pg_synonym WHERE synname='ABZ';
++--------------+
+| synobjname   |
++--------------+
+| test_synonym |
++--------------+
+select synobjname from pg_synonym WHERE synname='___';
++--------------+
+| synobjname   |
++--------------+
+| test_synonym |
++--------------+
+--组合类型
+drop synonym if EXISTS "aA" cascade;
+SQL SUCCESS
+drop synonym if EXISTS "Bz" cascade;
+SQL SUCCESS
+drop synonym if EXISTS "_aA" cascade;
+SQL SUCCESS
+drop synonym if EXISTS _$ cascade;
+SQL SUCCESS
+drop synonym if EXISTS _0 cascade;
+SQL SUCCESS
+drop synonym if EXISTS "aA$" cascade;
+SQL SUCCESS
+drop synonym if EXISTS _$0 cascade;
+SQL SUCCESS
+drop synonym if EXISTS "_$Aa" cascade;
+SQL SUCCESS
+drop synonym if EXISTS _0$ cascade;
+SQL SUCCESS
+drop synonym if EXISTS "_A$0" cascade;
+SQL SUCCESS
+create synonym "aA" for test_synonym;
+SQL SUCCESS
+create synonym "Bz" for test_synonym;
+SQL SUCCESS
+create synonym "_aA" for test_synonym;
+SQL SUCCESS
+create synonym _$ for test_synonym;
+SQL SUCCESS
+create synonym _0 for test_synonym;
+SQL SUCCESS
+create synonym "aA$" for test_synonym;
+SQL SUCCESS
+create synonym _$0 for test_synonym;
+SQL SUCCESS
+create synonym "_$Aa" for test_synonym;
+SQL SUCCESS
+create synonym _0$ for test_synonym;
+SQL SUCCESS
+create synonym "_A$0" for test_synonym;
+SQL SUCCESS
+--查询同义词信息
+select synobjname from pg_synonym WHERE synname='aA';
++--------------+
+| synobjname   |
++--------------+
+| test_synonym |
++--------------+
+select synobjname from pg_synonym WHERE synname='Bz';
++--------------+
+| synobjname   |
++--------------+
+| test_synonym |
++--------------+
+select synobjname from pg_synonym WHERE synname='_aA';
++--------------+
+| synobjname   |
++--------------+
+| test_synonym |
++--------------+
+select synobjname from pg_synonym WHERE synname='_0';
++--------------+
+| synobjname   |
++--------------+
+| test_synonym |
++--------------+
+select synobjname from pg_synonym WHERE synname='aA$';
++--------------+
+| synobjname   |
++--------------+
+| test_synonym |
++--------------+
+select synobjname from pg_synonym WHERE synname='_$0';
++--------------+
+| synobjname   |
++--------------+
+| test_synonym |
++--------------+
+select synobjname from pg_synonym WHERE synname='_$Aa';
++--------------+
+| synobjname   |
++--------------+
+| test_synonym |
++--------------+
+select synobjname from pg_synonym WHERE synname='_0$';
++--------------+
+| synobjname   |
++--------------+
+| test_synonym |
++--------------+
+select synobjname from pg_synonym WHERE synname='_A$0';
++--------------+
+| synobjname   |
++--------------+
+| test_synonym |
++--------------+
+--清理数据
+drop table if EXISTS test_synonym cascade;
+SQL SUCCESS
+drop synonym if EXISTS a cascade;
+SQL SUCCESS
+drop synonym if EXISTS "A" cascade;
+SQL SUCCESS
+drop synonym if EXISTS _ cascade;
+SQL SUCCESS
+drop synonym if EXISTS abz cascade;
+SQL SUCCESS
+drop synonym if EXISTS "ABZ" cascade;
+SQL SUCCESS
+drop synonym if EXISTS ___ cascade;
+SQL SUCCESS
+drop synonym if EXISTS "aA" cascade;
+SQL SUCCESS
+drop synonym if EXISTS "Bz" cascade;
+SQL SUCCESS
+drop synonym if EXISTS "_aA" cascade;
+SQL SUCCESS
+drop synonym if EXISTS _$ cascade;
+SQL SUCCESS
+drop synonym if EXISTS _0 cascade;
+SQL SUCCESS
+drop synonym if EXISTS "aA$" cascade;
+SQL SUCCESS
+drop synonym if EXISTS _$0 cascade;
+SQL SUCCESS
+drop synonym if EXISTS "_$Aa" cascade;
+SQL SUCCESS
+drop synonym if EXISTS _0$ cascade;
+SQL SUCCESS
+drop synonym if EXISTS "_A$0" cascade;
+SQL SUCCESS

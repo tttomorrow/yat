@@ -1,0 +1,18 @@
+-- @testpoint: 将表空间的访问权限赋予指定的用户或角色
+drop user if exists user_015 cascade;
+SQL SUCCESS
+create user user_015 identified by 'Gauss_234';
+SQL SUCCESS
+drop tablespace if exists tbspc;
+SQL SUCCESS
+create tablespace tbspc relative location 'tablespace/tablespace_111';
+SQL SUCCESS
+grant all on tablespace tbspc to user_015;
+SQL SUCCESS
+--回收权限
+revoke all privileges on tablespace tbspc from user_015;
+SQL SUCCESS
+drop tablespace if exists tbspc;
+SQL SUCCESS
+drop user if exists user_015;
+SQL SUCCESS

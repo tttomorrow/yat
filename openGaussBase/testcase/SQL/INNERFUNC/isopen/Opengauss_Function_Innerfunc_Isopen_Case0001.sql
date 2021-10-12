@@ -1,0 +1,2 @@
+-- @testpoint: isopen函数有效值测试
+SELECT isopen(path '[(0,0),(1,1),(2,0)]') AS RESULT;

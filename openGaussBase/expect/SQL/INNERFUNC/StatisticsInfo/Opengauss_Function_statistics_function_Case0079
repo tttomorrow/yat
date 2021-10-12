@@ -1,0 +1,19 @@
+-- @testpoint: 函数pg_stat_get_backend_pid(integer)，给定的服务器线程的线程ID，入参为无效值（空、字母、特殊字符时、多参）时，合理报错
+select pg_stat_get_backend_pid();
+?.*ERROR: function pg_stat_get_backend_pid\(\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_stat_get_backend_pid
+select pg_stat_get_backend_pid('a');
+?.*ERROR: invalid input syntax for integer: "a.*
+?.*
+  Where: referenced column: pg_stat_get_backend_pid
+select pg_stat_get_backend_pid('_@&');
+?.*ERROR: invalid input syntax for integer: "_@&.*
+?.*
+  Where: referenced column: pg_stat_get_backend_pid
+select pg_stat_get_backend_pid(1,2);
+?.*ERROR: function pg_stat_get_backend_pid\(integer, integer\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_stat_get_backend_pid

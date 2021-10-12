@@ -1,0 +1,19 @@
+-- @testpoint: pg_stat_get_backend_dbid(integer) ,给定服务器进程的数据库ID，当入参为无效值（为空、字母、特殊字符、多参）时，合理报错
+select pg_stat_get_backend_dbid();
+?.*ERROR: function pg_stat_get_backend_dbid\(\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_stat_get_backend_dbid
+select pg_stat_get_backend_dbid('abc');
+?.*ERROR: invalid input syntax for integer: "abc.*
+?.*
+  Where: referenced column: pg_stat_get_backend_dbid
+select pg_stat_get_backend_dbid('@#%');
+?.*ERROR: invalid input syntax for integer: "@#%.*
+?.*
+  Where: referenced column: pg_stat_get_backend_dbid
+select pg_stat_get_backend_dbid(1,2);
+?.*ERROR: function pg_stat_get_backend_dbid\(integer, integer\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_stat_get_backend_dbid

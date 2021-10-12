@@ -1,0 +1,14 @@
+-- @testpoint: 多参，期待合理报错
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 RAW,string2 RAW,string3 RAW);
+SQL SUCCESS
+insert into type_char values ('DEADBEEF','ab','cd');
+SQL SUCCESS
+SELECT rawcat(string1,string2,string3) from type_char;
+?.*ERROR: function rawcat\(raw, raw, raw\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: rawcat
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

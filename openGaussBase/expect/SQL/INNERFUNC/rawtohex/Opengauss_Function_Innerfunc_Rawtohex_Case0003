@@ -1,0 +1,23 @@
+-- @testpoint: rawtohex函数异常校验，合理报错
+SELECT rawtohex('a','b');
+?.*ERROR: function rawtohex\(unknown, unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: rawtohex
+SELECT rawtohex();
+?.*ERROR: function rawtohex\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: rawtohex
+SELECT rawtohex('');
++----------+
+| rawtohex |
++----------+
+|          |
++----------+
+SELECT rawtohex(null);
++----------+
+| rawtohex |
++----------+
+|          |
++----------+

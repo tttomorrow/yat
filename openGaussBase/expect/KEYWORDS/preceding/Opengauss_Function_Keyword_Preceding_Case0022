@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字preceding(非保留)，作为用户组名
+--关键字不带引号-成功
+drop group if exists preceding;
+SQL SUCCESS
+create group preceding with password 'gauss@123';
+SQL SUCCESS
+drop group preceding;
+SQL SUCCESS
+--关键字带双引号-成功
+drop group if exists "preceding";
+SQL SUCCESS
+create group "preceding" with password 'gauss@123';
+SQL SUCCESS
+drop group "preceding";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop group if exists 'preceding';
+?.*ERROR: syntax error at or near "'preceding'".*
+?.*Position: .*
+create group 'preceding' with password 'gauss@123';
+?.*ERROR: syntax error at or near "'preceding'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop group if exists `preceding`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create group `preceding` with password 'gauss@123';
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

@@ -1,0 +1,173 @@
+-- @testpoint: jsonb额外支持操作函数：jsonb_eq(Equal(=)。判断两个jsonb是不是相等,输入不合理，合理报错）
+-- 比较规则:object-jsonb > array-jsonb > bool-jsonb > num-jsonb > str-jsonb > null-jsonb
+--同类型
+select jsonb_eq('"str"','"string"');
++----------+
+| jsonb_eq |
++----------+
+| false    |
++----------+
+select jsonb_eq('null','null' );
++----------+
+| jsonb_eq |
++----------+
+| true     |
++----------+
+select jsonb_eq('false','false');
++----------+
+| jsonb_eq |
++----------+
+| true     |
++----------+
+select jsonb_eq('false','true');
++----------+
+| jsonb_eq |
++----------+
+| false    |
++----------+
+select jsonb_eq('{"a":1, "b": [10,2,3],"c":{"b":"d"}}','{"b":[10,2,3]}');
++----------+
+| jsonb_eq |
++----------+
+| false    |
++----------+
+select jsonb_eq('[null, false, 123,{"a":true},"test"]','[123,{"a":false},"test",null, false]');
++----------+
+| jsonb_eq |
++----------+
+| false    |
++----------+
+select jsonb_eq('105.2e-3','1.0520e-1');
++----------+
+| jsonb_eq |
++----------+
+| true     |
++----------+
+--不同类型
+select jsonb_eq('"str"', 'null');
++----------+
+| jsonb_eq |
++----------+
+| false    |
++----------+
+select jsonb_eq('null','true' );
++----------+
+| jsonb_eq |
++----------+
+| false    |
++----------+
+select jsonb_eq('null','0' );
++----------+
+| jsonb_eq |
++----------+
+| false    |
++----------+
+select jsonb_eq('null', '{"b":[10,2,3]}');
++----------+
+| jsonb_eq |
++----------+
+| false    |
++----------+
+select jsonb_eq('null','[12,"test",null, false]');
++----------+
+| jsonb_eq |
++----------+
+| false    |
++----------+
+select jsonb_eq('true','1');
++----------+
+| jsonb_eq |
++----------+
+| false    |
++----------+
+select jsonb_eq('{"a":1, "b": [10,2,3],"c":{"b":"d"}}','[{"b":[10,2,3]},{"a":1},{"c":{"b":"d"}}]');
++----------+
+| jsonb_eq |
++----------+
+| false    |
++----------+
+select jsonb_eq('[{"a":false},{"a":true}]','{"a": true,"a": false}');
++----------+
+| jsonb_eq |
++----------+
+| false    |
++----------+
+select jsonb_eq('105.2e3','"0.1052"');
++----------+
+| jsonb_eq |
++----------+
+| false    |
++----------+
+select jsonb_eq('0','false');
++----------+
+| jsonb_eq |
++----------+
+| false    |
++----------+
+select jsonb_eq('258','{"a":258}');
++----------+
+| jsonb_eq |
++----------+
+| false    |
++----------+
+select jsonb_eq('0.369','[0.369]');
++----------+
+| jsonb_eq |
++----------+
+| false    |
++----------+
+select jsonb_eq('"true"','true' );
++----------+
+| jsonb_eq |
++----------+
+| false    |
++----------+
+select jsonb_eq('"true"','{"a":"true"}' );
++----------+
+| jsonb_eq |
++----------+
+| false    |
++----------+
+select jsonb_eq('"true"','["true"]' );
++----------+
+| jsonb_eq |
++----------+
+| false    |
++----------+
+select jsonb_eq('{"a":1, "b": [10,2,3],"c":{"b":"d"}}','true');
++----------+
+| jsonb_eq |
++----------+
+| false    |
++----------+
+select jsonb_eq('[{"a":false},{"a":true}]','false');
++----------+
+| jsonb_eq |
++----------+
+| false    |
++----------+
+--入参非jsonb
+select jsonb_eq('{a:1, b: [10,2,3],c:{b:d}}','true');
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "a" is invalid.
+?.*
+  Where: JSON data, line 1: {a...
+referenced column: jsonb_eq
+select jsonb_eq('{a:1, a: [10,2,3],a:{b:d}}','{a:1}');
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "a" is invalid.
+?.*
+  Where: JSON data, line 1: {a...
+referenced column: jsonb_eq
+select jsonb_eq('[{a:false},{a:true},123,'qwer','null']','{"a":false}');
+?.*ERROR: syntax error at or near "qwer.*
+?.*
+select jsonb_eq('[{a:false},{a:true},123,'qwer','null']','123');
+?.*ERROR: syntax error at or near "qwer.*
+?.*
+select jsonb_eq('[{a:false},{a:true},123,'qwer','null']','qwer');
+?.*ERROR: syntax error at or near "qwer.*
+?.*
+select jsonb_eq('[{a:false},{a:true},123,'"qwer"','null']','qwer');
+?.*ERROR: syntax error at or near ""qwer".*
+?.*

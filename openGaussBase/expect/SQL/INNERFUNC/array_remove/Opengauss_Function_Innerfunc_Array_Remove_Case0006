@@ -1,0 +1,70 @@
+-- @testpoint: 删除数组array中所有的anyelement元素，element用select查询结果代替，部分合理报错
+--创建数据
+drop table if exists re06;
+SQL SUCCESS
+create table re06(id int,name varchar);
+SQL SUCCESS
+insert into re06 values(1,'Joe');
+SQL SUCCESS
+insert into re06 values(2,'Jim');
+SQL SUCCESS
+insert into re06 values(3,'Jay');
+SQL SUCCESS
+insert into re06 values(4,'Janne');
+SQL SUCCESS
+insert into re06 values(5,'Bob');
+SQL SUCCESS
+insert into re06 values(6,'Cherrs');
+SQL SUCCESS
+insert into re06 values(7,'Alexs');
+SQL SUCCESS
+insert into re06 values(8,'Lily');
+SQL SUCCESS
+--查询结果类型和数组中元素数据类型一致：删除成功
+select array_remove(array[1,2,2,3],(select id from re06 where name = 'Jim'));
++--------------+
+| array_remove |
++--------------+
+| {1,3}        |
++--------------+
+select array_remove(array[4,5,6,7,8,9],(select id from re06 where name = 'Jay'));
++---------------+
+| array_remove  |
++---------------+
+| {4,5,6,7,8,9} |
++---------------+
+select array_remove(array[1,2,2,3],(select id from re06 where name = 'bob'));
++--------------+
+| array_remove |
++--------------+
+| {1,2,2,3}    |
++--------------+
+select array_remove(array['Joe','Jim','Cherrs','Lily'],((select name from re06 where id = 2)::text));
++-------------------+
+| array_remove      |
++-------------------+
+| {Joe,Cherrs,Lily} |
++-------------------+
+select array_remove(array['Joe','Jim','Cherrs','Lily'],((select name from re06 where id = 4)::text));
++-----------------------+
+| array_remove          |
++-----------------------+
+| {Joe,Jim,Cherrs,Lily} |
++-----------------------+
+--查询结果类型和数组中元素数据类型不一致：合理报错
+select array_remove(array[1,2,2,3],(select name from re06 where id = 6));
+?.*ERROR: function array_remove\(integer\[\], character varying\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: array_remove
+select array_remove(array[1,2,3,4,5,6,7,8,9],(select id from re06));
+?.*ERROR: more than one row returned by a subquery used as an expressio.*
+  Where: referenced column: array_remove
+select array_remove(array['Joe','Jim','Cherrs','Lily'],(select name from re06 where id = 7));
+?.*ERROR: function array_remove\(text\[\], character varying\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: array_remove
+--清理环境
+drop table if exists re06 cascade;
+SQL SUCCESS

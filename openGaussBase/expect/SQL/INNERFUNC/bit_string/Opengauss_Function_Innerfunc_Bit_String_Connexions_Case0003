@@ -1,0 +1,15 @@
+-- @testpoint: 操作符||，没有长度的bit
+DROP TABLE IF EXISTS bit_type_t1;
+SQL SUCCESS
+CREATE TABLE bit_type_t1(BT_COL1 BIT,BT_COL2 BIT VARYING) ;
+SQL SUCCESS
+insert into bit_type_t1 values (B'1', B'0111111');
+SQL SUCCESS
+SELECT BT_COL1 || BT_COL2 from bit_type_t1 AS RESULT;
++----------+
+| ?column? |
++----------+
+| 10111111 |
++----------+
+DROP TABLE IF EXISTS bit_type_t1;
+SQL SUCCESS

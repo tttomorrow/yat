@@ -1,0 +1,27 @@
+-- @testpoint: 模式匹配操作符SIMILAR TO,使用下划线_匹配任何单个字符
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 varchar(10));
+SQL SUCCESS
+insert into type_char values ('a_bcd');
+SQL SUCCESS
+SELECT  * from type_char  where string1 SIMILAR TO 'a_bc_';
++---------+
+| string1 |
++---------+
+| a_bcd   |
++---------+
+SELECT  * from type_char  where string1 SIMILAR TO 'a__c_';
++---------+
+| string1 |
++---------+
+| a_bcd   |
++---------+
+SELECT  * from type_char  where string1 SIMILAR TO 'a_bc_';
++---------+
+| string1 |
++---------+
+| a_bcd   |
++---------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

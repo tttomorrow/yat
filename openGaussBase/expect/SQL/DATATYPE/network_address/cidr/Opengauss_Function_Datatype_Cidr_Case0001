@@ -1,0 +1,27 @@
+-- @testpoint: 指定正常网络地址输入值
+drop table if exists test_cidr_01;
+SQL SUCCESS
+create table test_cidr_01(type cidr);
+SQL SUCCESS
+insert into test_cidr_01 values('192.168.100.128/25');
+SQL SUCCESS
+insert into test_cidr_01 values('192.168.31/24');
+SQL SUCCESS
+insert into test_cidr_01 values('10.1');
+SQL SUCCESS
+insert into test_cidr_01 values('192.168');
+SQL SUCCESS
+insert into test_cidr_01 values('0.0.0.0/24');
+SQL SUCCESS
+select * from test_cidr_01;
++--------------------+
+| type               |
++--------------------+
+| 192.168.100.128/25 |
+| 192.168.31.0/24    |
+| 10.1.0.0/16        |
+| 192.168.0.0/24     |
+| 0.0.0.0/24         |
++--------------------+
+drop table test_cidr_01;
+SQL SUCCESS

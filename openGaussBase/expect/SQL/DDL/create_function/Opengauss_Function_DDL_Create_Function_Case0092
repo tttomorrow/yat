@@ -1,0 +1,18 @@
+--  @testpoint:创建函数指定参数STABLE
+drop FUNCTION if exists func_add_sql006;
+SQL SUCCESS
+CREATE FUNCTION func_add_sql006(integer, integer) RETURNS integer
+    AS 'select $1 + $2;'
+    LANGUAGE SQL
+    STABLE
+    RETURNS NULL ON NULL INPUT;
+/
+SQL SUCCESS
+call func_add_sql006(999,1);
++-----------------+
+| func_add_sql006 |
++-----------------+
+| 1000            |
++-----------------+
+drop FUNCTION func_add_sql006;
+SQL SUCCESS

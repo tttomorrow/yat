@@ -1,0 +1,2 @@
+-- @testpoint: power函数,函数嵌套使用
+select power(power(2,2),power(2.000,2.0000)) as result from sys_dummy;

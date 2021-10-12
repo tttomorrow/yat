@@ -1,0 +1,23 @@
+-- @testpoint: 数字操作符#(二进制XOR),边界值进行二进制xor
+drop table if exists data_01;
+SQL SUCCESS
+create table data_01 (clo1 BIGINT,clo2 BIGINT);
+SQL SUCCESS
+SQL SUCCESS
+select clo1 # clo2 from data_01;
++----------+
+| ?column? |
++----------+
+| 0        |
++----------+
++--------+
+| result |
++--------+
+| -2     |
++--------+
++---------------------+
+| result              |
++---------------------+
++---------------------+
+drop table if exists data_01;
+SQL SUCCESS

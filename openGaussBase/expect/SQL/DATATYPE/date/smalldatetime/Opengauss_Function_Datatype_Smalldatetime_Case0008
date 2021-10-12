@@ -1,0 +1,15 @@
+-- @testpoint: samlldatetime日期类型与数值相加，更新新的日期
+DROP TABLE IF EXISTS test_smalldatetime08;
+SQL SUCCESS
+CREATE TABLE test_smalldatetime08 (name smalldatetime);
+SQL SUCCESS
+INSERT INTO test_smalldatetime08 VALUES (smalldatetime '2018-09-17 11:22:33.456' + 1);
+SQL SUCCESS
+select * from test_smalldatetime08;
++-------------------------------+
+| name                          |
++-------------------------------+
+?.*2018-09-18 11:23:00.*
++-------------------------------+
+DROP TABLE test_smalldatetime08;
+SQL SUCCESS

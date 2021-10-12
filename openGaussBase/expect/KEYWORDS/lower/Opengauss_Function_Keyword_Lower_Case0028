@@ -1,0 +1,64 @@
+-- @testpoint: opengauss关键字lower(非保留)，作为同义词对象名,部分测试点合理报错
+--前置条件
+drop table if exists explain_test;
+SQL SUCCESS
+create table explain_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists lower;
+SQL SUCCESS
+create synonym lower for explain_test;
+SQL SUCCESS
+insert into lower values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update lower set lower.name='cici' where lower.id=2;
+SQL SUCCESS
+select * from lower;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--关键字带双引号-成功
+drop synonym if exists "lower";
+SQL SUCCESS
+create synonym "lower" for explain_test;
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'lower';
+?.*ERROR: syntax error at or near "'lower'".*
+?.*Position: .*
+create synonym 'lower' for explain_test;
+?.*ERROR: syntax error at or near "'lower'".*
+?.*Position: .*
+insert into 'lower' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'lower'".*
+?.*Position: .*
+update 'lower' set 'lower'.name='cici' where 'lower'.id=2;
+?.*ERROR: syntax error at or near "'lower'".*
+?.*Position: .*
+select * from 'lower';
+?.*ERROR: syntax error at or near "'lower'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop synonym if exists `lower`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create synonym `lower` for explain_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+insert into `lower` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+update `lower` set `lower`.name='cici' where `lower`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+select * from `lower`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+--清理环境
+drop synonym if exists lower;
+SQL SUCCESS
+drop table if exists explain_test;
+SQL SUCCESS

@@ -1,0 +1,24 @@
+-- @testpoint: 插入浮点数
+drop table if exists real_03;
+SQL SUCCESS
+create table real_03 (name real);
+SQL SUCCESS
+insert into real_03 values (12122.12);
+SQL SUCCESS
+insert into real_03 values (0.00001);
+SQL SUCCESS
+insert into real_03 values (-12122.23);
+SQL SUCCESS
+insert into real_03 values (-0.00001);
+SQL SUCCESS
+select * from real_03;
++-----------+
+| name      |
++-----------+
+| 12122.12  |
+| 1.0E-5    |
+| -12122.23 |
+| -1.0E-5   |
++-----------+
+drop table real_03;
+SQL SUCCESS

@@ -1,0 +1,31 @@
+--  @testpoint:opengauss关键字INTERVAL 非保留,时间间隔函数
+CREATE TABLE day_type_tab (a int,b INTERVAL DAY(3) TO SECOND (4));
+SQL SUCCESS
+INSERT INTO day_type_tab VALUES (1, INTERVAL '3' DAY);
+SQL SUCCESS
+SELECT * FROM day_type_tab;
++---+------------------------------------------------+
+| a | b                                              |
++---+------------------------------------------------+
+| 1 | 0 years 0 mons 3 days 0 hours 0 mins 0.00 secs |
++---+------------------------------------------------+
+DROP TABLE day_type_tab;
+SQL SUCCESS
+CREATE TABLE year_type_tab(a int, b interval year (6));
+SQL SUCCESS
+INSERT INTO year_type_tab VALUES(1,interval '2' year);
+SQL SUCCESS
+SELECT * FROM year_type_tab;
++---+------------------------------------------------+
+| a | b                                              |
++---+------------------------------------------------+
+| 1 | 2 years 0 mons 0 days 0 hours 0 mins 0.00 secs |
++---+------------------------------------------------+
+DROP TABLE year_type_tab;
+SQL SUCCESS
+SELECT age(timestamp '2001-04-10', timestamp '1957-06-13');
++--------------------------------------------------+
+| age                                              |
++--------------------------------------------------+
+| 43 years 9 mons 27 days 0 hours 0 mins 0.00 secs |
++--------------------------------------------------+

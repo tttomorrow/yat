@@ -1,0 +1,65 @@
+-- @testpoint: opengauss关键字fetch(保留)，作为同义词对象名，部分测试点合理报错
+--前置条件
+drop table if exists fetch_test;
+SQL SUCCESS
+create table fetch_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-失败
+drop synonym if exists fetch;
+?.*ERROR: syntax error at or near "fetch"
+?.*Position: .*
+create synonym fetch for fetch_test;
+?.*ERROR: syntax error at or near "fetch"
+?.*Position: .*
+--关键字带双引号-成功
+drop synonym if exists "fetch";
+SQL SUCCESS
+create synonym "fetch" for fetch_test;
+SQL SUCCESS
+insert into "fetch" values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update "fetch" set "fetch".name='cici' where "fetch".id=2;
+SQL SUCCESS
+select * from "fetch";
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+drop synonym "fetch";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'fetch';
+?.*ERROR: syntax error at or near "'fetch'"
+?.*Position: .*
+create synonym 'fetch' for fetch_test;
+?.*ERROR: syntax error at or near "'fetch'"
+?.*Position: .*
+insert into 'fetch' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'fetch'"
+?.*Position: .*
+update 'fetch' set 'fetch'.name='cici' where 'fetch'.id=2;
+?.*ERROR: syntax error at or near "'fetch'"
+?.*Position: .*
+select * from 'fetch';
+?.*ERROR: syntax error at or near "'fetch'"
+?.*Position: .*
+--关键字带反引号-合理报错
+drop synonym if exists `fetch`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+create synonym `fetch` for fetch_test;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+insert into `fetch` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+update `fetch` set `fetch`.name='cici' where `fetch`.id=2;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+select * from `fetch`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+drop table if exists fetch_test;
+SQL SUCCESS

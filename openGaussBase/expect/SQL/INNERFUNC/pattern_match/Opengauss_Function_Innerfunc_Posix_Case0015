@@ -1,0 +1,15 @@
+-- @testpoint: 模式匹配POSIX正则表达式,对数字进行匹配
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 int);
+SQL SUCCESS
+insert into type_char values (123456);
+SQL SUCCESS
+SELECT * from type_char  where string1 ~ '[0-9]';
++---------+
+| string1 |
++---------+
+| 123456  |
++---------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

@@ -1,0 +1,23 @@
+-- @testpoint: 取消列视图列的默认值
+--建表
+drop table if exists table_view_023;
+SQL SUCCESS
+create table table_view_023(id int,name varchar(20));
+SQL SUCCESS
+--插入数据
+insert into table_view_023 values(1,'hello'),(2,'world');
+SQL SUCCESS
+--创建视图
+drop view if exists temp_view_023 cascade;
+SQL SUCCESS
+create view temp_view_023 as select * from table_view_023;
+SQL SUCCESS
+--给视图id列设置默认值
+alter view if exists temp_view_023 alter column id set default 5;
+SQL SUCCESS
+--取消默认值
+alter view if exists temp_view_023 alter column id drop default;
+SQL SUCCESS
+--删表
+drop table table_view_023 cascade;
+SQL SUCCESS

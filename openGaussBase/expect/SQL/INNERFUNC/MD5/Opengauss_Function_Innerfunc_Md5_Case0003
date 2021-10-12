@@ -1,0 +1,6 @@
+-- @testpoint: md5函数入参给二进制类型blog,合理报错
+SELECT md5(empty_blob());
+?.*ERROR: function md5\(blob\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: md5

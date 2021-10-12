@@ -1,0 +1,20 @@
+-- @testpoint: 插入错误值，合理报错
+-- @modify at: 2020-11-04
+--创建表
+DROP TABLE IF EXISTS type_bit03;
+SQL SUCCESS
+CREATE TABLE type_bit03 (name bit(3));
+SQL SUCCESS
+--插入数据
+insert into type_bit03 values (B'201');
+?.*ERROR: "2" is not a valid binary digit
+?.*
+--插入失败，查看数据
+select * from type_bit03;
++------+
+| name |
++------+
++------+
+--清理环境
+drop table type_bit03;
+SQL SUCCESS

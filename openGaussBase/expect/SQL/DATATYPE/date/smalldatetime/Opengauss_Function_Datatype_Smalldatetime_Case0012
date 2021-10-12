@@ -1,0 +1,15 @@
+-- @testpoint: 输入smalldatetime日期类型，不指定时间
+DROP TABLE IF EXISTS test_smalldatetime12;
+SQL SUCCESS
+CREATE TABLE test_smalldatetime12 (name smalldatetime);
+SQL SUCCESS
+INSERT INTO test_smalldatetime12 VALUES (smalldatetime '2018-09-16');
+SQL SUCCESS
+select * from test_smalldatetime12;
++-------------------------------+
+| name                          |
++-------------------------------+
+?.*2018-09-16 00:00:00.*
++-------------------------------+
+drop table test_smalldatetime12;
+SQL SUCCESS

@@ -1,0 +1,13 @@
+-- @testpoint: 创建带EFERRABLE INITIALLY DEFERRED约束的表，设置所有约束在事务提交时检查，有违背约束时合理报错
+START TRANSACTION;
+DROP TABLE IF EXISTS tab_18;
+CREATE TABLE IF not EXISTS tab_18
+(id   NUMBER(7)PRIMARY KEY DEFERRABLE INITIALLY DEFERRED,
+name    VARCHAR2(20)
+);
+
+insert into tab_18 values(1,'小龙');
+insert into tab_18 values(1,'小牛');
+SET CONSTRAINTS all DEFERRED;
+COMMIT;
+DROP TABLE IF EXISTS tab_18 CASCADE;

@@ -1,0 +1,70 @@
+-- @testpoint: 测试外键表对列存表的支持情况，合理报错
+
+--测试点1：父表为列存表，子表为行存表
+drop table if exists student;
+SQL SUCCESS
+drop table if exists teacher_column;
+SQL SUCCESS
+create table teacher_column
+(
+    t_id int primary key,
+    t_name varchar not null
+) with (orientation = column);
+SQL SUCCESS
+create table student
+(
+    s_id int,
+    s_name varchar not null,
+    t_id int references teacher_column on update cascade on delete set null
+);
+?.*ERROR: only b-tree indexes are supported for foreign keys?.*
+drop table if exists student;
+SQL SUCCESS
+drop table if exists teacher_column;
+SQL SUCCESS
+--测试点2：父表为行存表，子表为列存表
+drop table if exists student_column;
+SQL SUCCESS
+drop table if exists teacher;
+SQL SUCCESS
+create table teacher
+(
+    t_id int primary key,
+    t_name varchar not null
+);
+SQL SUCCESS
+create table student_column
+(
+    s_id int,
+    s_name varchar not null,
+    t_id int references teacher on update cascade on delete set null
+) with (orientation = column);
+?.*ERROR: column/timeseries store unsupport constraint "FOREIGN KEY"
+drop table if exists student_column;
+SQL SUCCESS
+drop table if exists teacher;
+SQL SUCCESS
+--测试点3：父表为列存表，子表为列存表
+drop table if exists student_column;
+SQL SUCCESS
+drop table if exists teacher_column;
+SQL SUCCESS
+create table teacher_column
+(
+    t_id int primary key,
+    t_name varchar not null
+) with (orientation = column);
+SQL SUCCESS
+create table student_column
+(
+    s_id int,
+    s_name varchar not null,
+    t_id int references teacher_column on update cascade on delete set null
+) with (orientation = column);
+?.*ERROR: column/timeseries store unsupport constraint "FOREIGN KEY"
+drop table if exists student_column;
+SQL SUCCESS
+drop table if exists teacher_column;
+SQL SUCCESS
+drop table if exists teacher;
+SQL SUCCESS

@@ -1,0 +1,78 @@
+--  @testpoint:函数ts_debug测试
+--测试一个配置
+SELECT * FROM ts_debug('english','a fat  cat sat on a mat - it ate a fat rats');
++-----------+-----------------+-------+----------------+--------------+---------+
+| alias     | description     | token | dictionaries   | dictionary   | lexemes |
++-----------+-----------------+-------+----------------+--------------+---------+
+| asciiword | Word, all ASCII | a     | {english_stem} | english_stem | {}      |
+| blank     | Space symbols   |       | {}             |              |         |
+| asciiword | Word, all ASCII | fat   | {english_stem} | english_stem | {fat}   |
+| blank     | Space symbols   |       | {}             |              |         |
+| asciiword | Word, all ASCII | cat   | {english_stem} | english_stem | {cat}   |
+| blank     | Space symbols   |       | {}             |              |         |
+| asciiword | Word, all ASCII | sat   | {english_stem} | english_stem | {sat}   |
+| blank     | Space symbols   |       | {}             |              |         |
+| asciiword | Word, all ASCII | on    | {english_stem} | english_stem | {}      |
+| blank     | Space symbols   |       | {}             |              |         |
+| asciiword | Word, all ASCII | a     | {english_stem} | english_stem | {}      |
+| blank     | Space symbols   |       | {}             |              |         |
+| asciiword | Word, all ASCII | mat   | {english_stem} | english_stem | {mat}   |
+| blank     | Space symbols   |       | {}             |              |         |
+| blank     | Space symbols   | -     | {}             |              |         |
+| asciiword | Word, all ASCII | it    | {english_stem} | english_stem | {}      |
+| blank     | Space symbols   |       | {}             |              |         |
+| asciiword | Word, all ASCII | ate   | {english_stem} | english_stem | {ate}   |
+| blank     | Space symbols   |       | {}             |              |         |
+| asciiword | Word, all ASCII | a     | {english_stem} | english_stem | {}      |
+| blank     | Space symbols   |       | {}             |              |         |
+| asciiword | Word, all ASCII | fat   | {english_stem} | english_stem | {fat}   |
+| blank     | Space symbols   |       | {}             |              |         |
+| asciiword | Word, all ASCII | rats  | {english_stem} | english_stem | {rat}   |
++-----------+-----------------+-------+----------------+--------------+---------+
+--省略english
+SELECT * FROM ts_debug('a fat  cat sat on a mat - it ate a fat rats');
++-----------+-----------------+-------+----------------+--------------+---------+
+| alias     | description     | token | dictionaries   | dictionary   | lexemes |
++-----------+-----------------+-------+----------------+--------------+---------+
+| asciiword | Word, all ASCII | a     | {english_stem} | english_stem | {}      |
+| blank     | Space symbols   |       | {}             |              |         |
+| asciiword | Word, all ASCII | fat   | {english_stem} | english_stem | {fat}   |
+| blank     | Space symbols   |       | {}             |              |         |
+| asciiword | Word, all ASCII | cat   | {english_stem} | english_stem | {cat}   |
+| blank     | Space symbols   |       | {}             |              |         |
+| asciiword | Word, all ASCII | sat   | {english_stem} | english_stem | {sat}   |
+| blank     | Space symbols   |       | {}             |              |         |
+| asciiword | Word, all ASCII | on    | {english_stem} | english_stem | {}      |
+| blank     | Space symbols   |       | {}             |              |         |
+| asciiword | Word, all ASCII | a     | {english_stem} | english_stem | {}      |
+| blank     | Space symbols   |       | {}             |              |         |
+| asciiword | Word, all ASCII | mat   | {english_stem} | english_stem | {mat}   |
+| blank     | Space symbols   |       | {}             |              |         |
+| blank     | Space symbols   | -     | {}             |              |         |
+| asciiword | Word, all ASCII | it    | {english_stem} | english_stem | {}      |
+| blank     | Space symbols   |       | {}             |              |         |
+| asciiword | Word, all ASCII | ate   | {english_stem} | english_stem | {ate}   |
+| blank     | Space symbols   |       | {}             |              |         |
+| asciiword | Word, all ASCII | a     | {english_stem} | english_stem | {}      |
+| blank     | Space symbols   |       | {}             |              |         |
+| asciiword | Word, all ASCII | fat   | {english_stem} | english_stem | {fat}   |
+| blank     | Space symbols   |       | {}             |              |         |
+| asciiword | Word, all ASCII | rats  | {english_stem} | english_stem | {rat}   |
++-----------+-----------------+-------+----------------+--------------+---------+
+SELECT ts_debug('english', 'The Brightest supernovaes');
++-----------------------------------------------------------------------------------+
+| ts_debug                                                                          |
++-----------------------------------------------------------------------------------+
+| (asciiword,"Word, all ASCII",The,{english_stem},english_stem,{})                  |
+| (blank,"Space symbols"," ",{},,)                                                  |
+| (asciiword,"Word, all ASCII",Brightest,{english_stem},english_stem,{brightest})   |
+| (blank,"Space symbols"," ",{},,)                                                  |
+| (asciiword,"Word, all ASCII",supernovaes,{english_stem},english_stem,{supernova}) |
++-----------------------------------------------------------------------------------+
+--解析器为pound，解析英文
+SELECT ts_debug('pound', 'The Brightest supernovaes');
++---------------------------------------------------------------------------------------------------------------+
+| ts_debug                                                                                                      |
++---------------------------------------------------------------------------------------------------------------+
+| (multisymbol,"multiple symbol","The Brightest supernovaes",{simple},simple,"{""the brightest supernovaes""}") |
++---------------------------------------------------------------------------------------------------------------+

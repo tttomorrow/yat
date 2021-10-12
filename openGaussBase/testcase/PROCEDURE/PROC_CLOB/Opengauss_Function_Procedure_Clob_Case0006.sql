@@ -1,0 +1,25 @@
+-- @testpoint: 存储过程clob数据类型的测试,结合字符函数
+
+--创建存储过程
+create or replace procedure proc_clob_006(p1 in clob) is
+v_lang clob;
+begin
+    v_lang := substr(p1,3000);
+    raise info 'char_length=:%',char_length(v_lang);
+    exception
+    when no_data_found then
+        raise info 'no_data_found';
+end;
+/
+--调用存储过程
+declare
+  v1 clob :='';
+begin
+  for i in 1 .. 1000 loop
+    v1:= v1||'这是一个clob类型';
+  end loop;
+  proc_clob_006(v1);
+end;
+/
+--恢复环境
+drop procedure if exists proc_clob_006;

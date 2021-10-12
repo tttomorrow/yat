@@ -1,0 +1,21 @@
+-- @testpoint: 数字操作符~(二进制NOT), 正负浮点数进行二进制not
+drop table if exists data_01;
+SQL SUCCESS
+create table data_01 (clo1 float,clo2 float);
+SQL SUCCESS
+insert into data_01 values (255.5, -32767.7);
+SQL SUCCESS
+select ~ clo1 , ~ clo2 from data_01;
++----------+----------+
+| ?column? | ?column? |
++----------+----------+
+| -257     | 32767    |
++----------+----------+
+SELECT ~91.5,~ -15.7  AS RESULT;
++----------+--------+
+| ?column? | result |
++----------+--------+
+| -93      | 15     |
++----------+--------+
+drop table if exists data_01;
+SQL SUCCESS

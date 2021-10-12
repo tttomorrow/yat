@@ -1,0 +1,21 @@
+-- @testpoint: 数字操作符~(二进制NOT), 对运算表达式进行取反
+drop table if exists data_01;
+SQL SUCCESS
+create table data_01 (clo1 INT,clo2 INT);
+SQL SUCCESS
+insert into data_01 values (92, 125);
+SQL SUCCESS
+select ~ (clo1+clo2) from data_01;
++----------+
+| ?column? |
++----------+
+| -218     |
++----------+
+SELECT ~922-20*3 AS RESULT;
++--------+
+| result |
++--------+
+| -863   |
++--------+
+drop table if exists data_01;
+SQL SUCCESS

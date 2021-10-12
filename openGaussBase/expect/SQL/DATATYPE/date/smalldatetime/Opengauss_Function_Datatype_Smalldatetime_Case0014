@@ -1,0 +1,13 @@
+-- @testpoint: 输入为特殊字符/字母/非隐式字符串，合理报错
+DROP TABLE IF EXISTS test_smalldatetime14;
+SQL SUCCESS
+CREATE TABLE test_smalldatetime14 (name smalldatetime);
+SQL SUCCESS
+INSERT INTO test_smalldatetime14 VALUES (smalldatetime 'r');
+?.*ERROR: invalid input syntax for type smalldatetime: "r"
+?.*
+INSERT INTO test_smalldatetime14 VALUES (smalldatetime '~');
+?.*ERROR: invalid input syntax for type smalldatetime: "~"
+?.*
+DROP TABLE test_smalldatetime14;
+SQL SUCCESS

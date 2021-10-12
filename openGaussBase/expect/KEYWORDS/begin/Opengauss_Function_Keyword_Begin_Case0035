@@ -1,0 +1,23 @@
+-- @testpoint: 用在存储过程中
+drop table if exists whlp_t1;
+SQL SUCCESS
+create table whlp_t1(a int);
+SQL SUCCESS
+insert into whlp_t1 values(1);
+SQL SUCCESS
+insert into whlp_t1 values(2);
+SQL SUCCESS
+insert into whlp_t1 values(3);
+SQL SUCCESS
+commit;
+SQL SUCCESS
+begin
+   for item in (select * from whlp_t1)
+   loop
+       raise info 'SQL%rowcount is ',sql%rowcount;
+   end loop;
+end;
+/
+SQL SUCCESS
+drop table if exists whlp_t1;
+SQL SUCCESS

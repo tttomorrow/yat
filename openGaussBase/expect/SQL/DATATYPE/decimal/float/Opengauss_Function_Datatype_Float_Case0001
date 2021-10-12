@@ -1,0 +1,21 @@
+-- @testpoint: 不指定精度，插入正浮点数
+drop table if exists float01;
+SQL SUCCESS
+create table float01 (name float);
+SQL SUCCESS
+insert into float01 values (120.123);
+SQL SUCCESS
+insert into float01 values (0.001);
+SQL SUCCESS
+insert into float01 values (99999.99999);
+SQL SUCCESS
+select * from float01;
++-------------+
+| name        |
++-------------+
+| 120.123     |
+| 0.001       |
+| 99999.99999 |
++-------------+
+drop table float01;
+SQL SUCCESS

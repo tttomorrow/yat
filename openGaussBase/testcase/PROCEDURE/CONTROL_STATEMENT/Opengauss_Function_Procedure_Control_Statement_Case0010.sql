@@ -1,0 +1,33 @@
+-- @testpoint: 创建存储过程并测试execute immediate 动态查询语句
+
+create or replace function f1(v_id int) return int is
+  v_num  int;
+  v_id_1 int;
+  v_id_2 int;
+begin
+  v_id_1 := v_id - 1;
+  v_id_2 := v_id - 2;
+  if v_id <3 then
+    v_num := 1;
+  else
+    execute immediate 'select f1(:1)+f1(:2) from sys_dummy'
+      into v_num using v_id_1,v_id_2;
+  end if;
+  return v_num;
+end;
+/
+select f1(9) from sys_dummy;
+
+declare
+  v_num int;
+begin
+  for i in 1 .. 5 loop
+    select f1(i) into v_num from sys_dummy;
+    raise notice '%',v_num;
+  end loop;
+end;
+/
+
+drop function f1;
+
+

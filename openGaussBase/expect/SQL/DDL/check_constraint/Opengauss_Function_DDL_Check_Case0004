@@ -1,0 +1,11 @@
+-- @testpoint: 创建重复约束，合理报错
+drop table if exists Persons;
+SQL SUCCESS
+create table Persons ( Id_P int not null check (Id_P>0), LastName varchar(255) not null,
+ FirstName varchar(255), address varchar(255), City varchar(255),check (Id_P<0) );
+SQL SUCCESS
+insert into Persons values('','Mary','','','');
+?.*ERROR: null value in column "id_p" violates not-null constraint
+  Detail: Failing row contains (null, Mary, null, null, null).
+drop table Persons cascade;
+SQL SUCCESS

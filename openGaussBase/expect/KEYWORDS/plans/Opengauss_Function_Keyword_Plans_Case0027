@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字plans非保留)，作为序列名
+--关键字不带引号-成功
+drop sequence if exists plans;
+SQL SUCCESS
+create sequence plans start 100 cache 50;
+SQL SUCCESS
+drop sequence plans;
+SQL SUCCESS
+--关键字带双引号-成功
+drop sequence if exists "plans";
+SQL SUCCESS
+create sequence "plans" start 100 cache 50;
+SQL SUCCESS
+drop sequence "plans";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'plans';
+?.*ERROR: syntax error at or near "'plans'".*
+?.*Position: .*
+create sequence 'plans' start 100 cache 50;
+?.*ERROR: syntax error at or near "'plans'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop sequence if exists `plans`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create sequence `plans` start 100 cache 50;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

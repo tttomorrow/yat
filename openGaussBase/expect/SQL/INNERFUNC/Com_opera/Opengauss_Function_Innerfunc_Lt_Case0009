@@ -1,0 +1,38 @@
+-- @testpoint: opengauss比较操作符<=，参数互换结果互斥
+-- 运算的交换性
+select 'students'::text <= 'student'::text;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select 'student'::text <= 'student'::text;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '521'::money <= '520'::money;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '520'::money <= '521'::money;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select 't'::BOOLEAN <= 'f'::BOOLEAN;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select 'f'::BOOLEAN <= 't'::BOOLEAN;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+

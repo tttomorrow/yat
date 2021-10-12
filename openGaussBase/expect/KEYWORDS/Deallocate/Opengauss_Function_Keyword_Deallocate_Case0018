@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字deallocate(非保留)，作为数据库名
+--关键字不带引号-成功
+drop database if exists deallocate;
+SQL SUCCESS
+create database deallocate;
+SQL SUCCESS
+drop database deallocate;
+SQL SUCCESS
+--关键字带双引号-成功
+drop database if exists "deallocate";
+SQL SUCCESS
+create database "deallocate";
+SQL SUCCESS
+drop database "deallocate";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop database if exists 'deallocate';
+?.*ERROR: syntax error at or near "'deallocate'"
+?.*
+create database 'deallocate';
+?.*ERROR: syntax error at or near "'deallocate'"
+?.*
+--关键字带反引号-合理报错
+drop database if exists `deallocate`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create database `deallocate`;
+?.*ERROR: syntax error at or near "`"
+?.*

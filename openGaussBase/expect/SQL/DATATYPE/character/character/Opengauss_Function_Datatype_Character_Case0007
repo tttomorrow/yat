@@ -1,0 +1,12 @@
+-- @testpoint: 插入空值
+-- @modify at: 2020-11-05
+drop table if exists test_character_07;
+SQL SUCCESS
+create table test_character_07 (id int,name character(8));
+SQL SUCCESS
+insert into test_character_07 values (1,'');
+SQL SUCCESS
+insert into test_character_07 values (1,null);
+SQL SUCCESS
+drop table test_character_07;
+SQL SUCCESS

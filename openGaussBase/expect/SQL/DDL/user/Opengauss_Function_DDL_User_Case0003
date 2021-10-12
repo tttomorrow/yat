@@ -1,0 +1,44 @@
+-- @testpoint: 创建用户，SYSADMIN | NOSYSADMIN参数测试
+--创建用户
+drop user if exists test_user003 cascade;
+SQL SUCCESS
+create user test_user003 identified by 'Tt@123456';
+SQL SUCCESS
+--查询用户，默认不是管理员用户
+select rolname,rolsystemadmin from pg_authid where rolname = 'test_user003';
++--------------+----------------+
+| rolname      | rolsystemadmin |
++--------------+----------------+
+| test_user003 | false          |
++--------------+----------------+
+--创建用户，指定为管理员用户
+drop user if exists test_user003_bak cascade;
+SQL SUCCESS
+create user test_user003_bak sysadmin identified by 'Tt@123456';
+SQL SUCCESS
+--查询用户
+select rolname,rolsystemadmin from pg_authid where rolname = 'test_user003_bak';
++------------------+----------------+
+| rolname          | rolsystemadmin |
++------------------+----------------+
+| test_user003_bak | true           |
++------------------+----------------+
+--创建用户，添加参数NOSYSADMIN
+drop user if exists test_user003_bak1 cascade;
+SQL SUCCESS
+create user test_user003_bak1 NOSYSADMIN identified by 'Tt@123456';
+SQL SUCCESS
+--查询用户
+select rolname,rolsystemadmin from pg_authid where rolname = 'test_user003_bak1';
++-------------------+----------------+
+| rolname           | rolsystemadmin |
++-------------------+----------------+
+| test_user003_bak1 | false          |
++-------------------+----------------+
+--删除用户
+drop user if exists test_user003 cascade;
+SQL SUCCESS
+drop user if exists test_user003_bak cascade;
+SQL SUCCESS
+drop user if exists test_user003_bak1 cascade;
+SQL SUCCESS

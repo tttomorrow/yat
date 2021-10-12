@@ -1,0 +1,46 @@
+
+
+-- @testpoint: 参数为''、null及0
+
+drop table if exists TEST_CHR13;
+SQL SUCCESS
+create table TEST_CHR13(COL integer);
+SQL SUCCESS
+insert into TEST_CHR13 values(null);
+SQL SUCCESS
+select chr(COL) as RESULT from TEST_CHR13;
++--------+
+| result |
++--------+
+|        |
++--------+
+drop table TEST_CHR13;
+SQL SUCCESS
+drop table if exists TEST_CHR14;
+SQL SUCCESS
+create table TEST_CHR14(COL integer);
+SQL SUCCESS
+insert into TEST_CHR14 values('');
+SQL SUCCESS
+select chr(COL) as RESULT from TEST_CHR14;
++--------+
+| result |
++--------+
+|        |
++--------+
+drop table TEST_CHR14;
+SQL SUCCESS
+drop table if exists TEST_CHR1;
+SQL SUCCESS
+create table TEST_CHR1(COL integer);
+SQL SUCCESS
+insert into TEST_CHR1 values(0);
+SQL SUCCESS
+select chr(COL) as RESULT from TEST_CHR1;
++--------+
+| result |
++--------+
+|        |
++--------+
+drop table  TEST_CHR1;
+SQL SUCCESS

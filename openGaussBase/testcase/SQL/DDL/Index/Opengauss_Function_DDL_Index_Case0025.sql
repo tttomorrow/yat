@@ -1,0 +1,48 @@
+-- @testpoint: USING method：非tsvector类型行存索引23：success 合理报错
+--非tsvector类型行存索引
+--列存表对GIN索引支持仅限于对于tsvector类型的支持，即创建列存GIN索引入参需要为to_tsvector函数（的返回值）。此方法为GIN索引比较普遍的使用方式。
+
+--创建列存表
+DROP TABLE if EXISTS test_index_table_025 CASCADE;
+CREATE TABLE test_index_table_025(id int, body text, title text, last_mod_date date) ;
+
+iNSERT INTO test_index_table_025 VALUES(1, 'China, officially the People''s Republic of China (PRC), located in Asia, is the world''s most populous state.', 'China', '2010-1-1');
+
+INSERT INTO test_index_table_025 VALUES(2, 'America is a rock band, formed in England in 1970 by multi-instrumentalists Dewey Bunnell, Dan Peek, and Gerry Beckley.', 'America', '2010-1-1');
+
+INSERT INTO test_index_table_025 VALUES(3, 'England is a country that is part of the United Kingdom. It shares land borders with Scotland to the north and Wales to the west.', 'England', '2010-1-1');
+
+INSERT INTO test_index_table_025 VALUES(4, 'Australia, officially the Commonwealth of Australia, is a country comprising the mainland of the Australian continent, the island of Tasmania, and numerous smaller islands.', 'Australia', '2010-1-1');
+
+INSERT INTO test_index_table_025 VALUES(5, 'Russia, also officially known as the Russian Federation, is a sovereign state in northern Eurasia.', 'Russia', '2010-1-1');
+
+INSERT INTO test_index_table_025 VALUES(6, 'Japan is an island country in East Asia.', 'Japan', '2010-1-1');
+
+INSERT INTO test_index_table_025 VALUES(7, 'Germany, officially the Federal Republic of Germany, is a sovereign state and federal parliamentary republic in central-western Europe.', 'Germany', '2010-1-1');
+
+INSERT INTO test_index_table_025 VALUES(8, 'France, is a sovereign state comprising territory in western Europe and several overseas regions and territories.', 'France', '2010-1-1');
+
+INSERT INTO test_index_table_025 VALUES(9, 'Italy officially the Italian Republic, is a unitary parliamentary republic in Europe.', 'Italy', '2010-1-1');
+
+INSERT INTO test_index_table_025 VALUES(10, 'India, officially the Republic of India, is a country in South Asia.', 'India', '2010-1-1');
+
+INSERT INTO test_index_table_025 VALUES(11, 'Brazil, officially the Federative Republic of Brazil, is the largest country in both South America and Latin America.', 'Brazil', '2010-1-1');
+
+INSERT INTO test_index_table_025 VALUES(12, 'Canada is a country in the northern half of North America.', 'Canada', '2010-1-1');
+
+INSERT INTO test_index_table_025 VALUES(13, 'Mexico, officially the United Mexican States, is a federal republic in the southern part of North America.', 'Mexico', '2010-1-1');
+
+
+explain SELECT id, body, title FROM test_index_table_025 WHERE to_tsvector('english', body) @@ to_tsquery('english', 'america');
+select relname from pg_class where relname='gin_index_25';
+--建立gin索引
+SHOW default_text_search_config;
+drop index if exists gin_index_25;
+CREATE INDEX gin_index_25 ON test_index_table_025 USING gin(cast(body as varchar));
+
+SELECT id, body, title FROM test_index_table_025 WHERE to_tsvector('english',body) @@ to_tsquery('english','america');
+
+DROP TABLE if EXISTS test_index_table_025 CASCADE;
+show gin_fuzzy_search_limit;
+drop index if exists gin_index_25;
+DROP TABLE if EXISTS test_index_table_025 CASCADE;

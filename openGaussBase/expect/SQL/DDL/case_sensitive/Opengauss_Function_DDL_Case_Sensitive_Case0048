@@ -1,0 +1,10 @@
+--  @testpoint: 创建表空间，验证表空间名大小写
+CREATE TABLESPACE space1 RELATIVE LOCATION 'tablespace/tablespace_1';
+SQL SUCCESS
+CREATE TABLESPACE SPACE1 RELATIVE LOCATION 'tablespace/tablespace_2';
+?.*ERROR: tablespace "space1" already exists
+--清理环境
+DROP TABLESPACE space1;
+SQL SUCCESS
+DROP TABLESPACE SPACE1;
+?.*ERROR: Tablespace "space1" does not exist.

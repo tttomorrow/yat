@@ -1,0 +1,16 @@
+--  @testpoint:cursor声明游标，使用value子句，子句类型为布尔类型；
+start transaction;
+SQL SUCCESS
+cursor cursor20 for values(TRUE,true,1,'1','TRUE','true','t','y','yes'),(FALSE,false,0,'0','FALSE','false','f','n','no');
+SQL SUCCESS
+fetch forward 2 from cursor20;
++---------+---------+---------+---------+---------+---------+---------+---------+---------+
+| column1 | column2 | column3 | column4 | column5 | column6 | column7 | column8 | column9 |
++---------+---------+---------+---------+---------+---------+---------+---------+---------+
+| true    | true    | 1       | 1       | TRUE    | true    | t       | y       | yes     |
+| false   | false   | 0       | 0       | FALSE   | false   | f       | n       | no      |
++---------+---------+---------+---------+---------+---------+---------+---------+---------+
+close cursor20;
+SQL SUCCESS
+end;
+SQL SUCCESS

@@ -1,0 +1,49 @@
+-- @testpoint: pg_partition_indexes_size(oid,oid)函数的异常校验，合理报错
+create table test (a int)
+with(orientation = column)
+partition by range (a)
+(
+        partition test_p1 values less than (88),
+        partition test_p2 values less than (99)
+);
+SQL SUCCESS
+create index test_index on test (a) local;
+SQL SUCCESS
+insert into test values (59);
+SQL SUCCESS
+insert into test values (69);
+SQL SUCCESS
+insert into test values (90);
+SQL SUCCESS
+select pg_partition_indexes_size() from pg_class a, pg_partition b where a.oid=b.parentid and a.relname='test' and b.relname='test_p1';
+?.*ERROR: function pg_partition_indexes_size\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_partition_indexes_size
+select pg_partition_indexes_size(a.oid, '') from pg_class a, pg_partition b where a.oid=b.parentid and a.relname='test' and b.relname='test_p2';
++---------------------------+
+| pg_partition_indexes_size |
++---------------------------+
+|                           |
++---------------------------+
+select pg_partition_indexes_size('', b.oid) from pg_class a, pg_partition b where a.oid=b.parentid and a.relname='test' and b.relname='test_p1';
++---------------------------+
+| pg_partition_indexes_size |
++---------------------------+
+|                           |
++---------------------------+
+select pg_partition_indexes_size(a.oid, b.oid, b.oid) from pg_class a, pg_partition b where a.oid=b.parentid and a.relname='test' and b.relname='test_p2';
+?.*ERROR: function pg_partition_indexes_size\(oid, oid, oid\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_partition_indexes_size
+select pg_partition_indexes_size(a.oid, 'hijk') from pg_class a, pg_partition b where a.oid=b.parentid and a.relname='test' and b.relname='test_p2';
+?.*ERROR: invalid input syntax for type oid: \"hijk\"
+?.*
+  Where: referenced column: pg_partition_indexes_size
+select pg_partition_indexes_size('hijk', b.oid) from pg_class a, pg_partition b where a.oid=b.parentid and a.relname='test' and b.relname='test_p2';
+?.*ERROR: invalid input syntax for type oid: \"hijk\"
+?.*
+  Where: referenced column: pg_partition_indexes_size
+drop table test;
+SQL SUCCESS

@@ -1,0 +1,50 @@
+-- @testpoint:删除匿名块中的delete目标表
+DROP table if exists  Proc_Syntax_049;
+SQL SUCCESS
+create table Proc_Syntax_049(id int,name varchar2(20));
+SQL SUCCESS
+begin
+ for v_i in 1..9 loop
+  insert into Proc_Syntax_049 values(v_i,'Xiaxia');
+ end loop;
+end;
+/
+SQL SUCCESS
+select name,count(1) from Proc_Syntax_049 group by name order by name;
++--------+-------+
+| name   | count |
++--------+-------+
+| Xiaxia | 9     |
++--------+-------+
+declare 
+  v_id      int:=8;
+  v_name    varchar2(200);
+  v_sql VARCHAR2(2000);
+BEGIN
+  delete from Proc_Syntax_049 where id=v_id;
+END;
+/
+SQL SUCCESS
+select name,count(1) from Proc_Syntax_049 group by name order by name;
++--------+-------+
+| name   | count |
++--------+-------+
+| Xiaxia | 8     |
++--------+-------+
+drop table Proc_Syntax_049;
+SQL SUCCESS
+declare 
+   v_id      int:=8;
+  v_name    varchar2(200);
+  v_sql VARCHAR2(2000);
+BEGIN
+  delete from Proc_Syntax_049 where id=v_id;
+END;
+/
+?.*ERROR: relation "proc_syntax_049" does not exist.*
+  Where: PL/pgSQL function inline_code_block line 5 at SQL statement
+select name,count(1) from Proc_Syntax_049 group by name order by name;
+?.*ERROR: relation "proc_syntax_049" does not exist.*
+?.*Position.*
+drop table Proc_Syntax_049;
+?.*ERROR: table "proc_syntax_049" does not exist.*

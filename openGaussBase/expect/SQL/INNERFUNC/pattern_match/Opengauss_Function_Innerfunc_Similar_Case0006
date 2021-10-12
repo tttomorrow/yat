@@ -1,0 +1,14 @@
+-- @testpoint: 模式匹配操作符SIMILAR TO,联合使用元字符|和%
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 varchar(10));
+SQL SUCCESS
+insert into type_char values ('abcd');
+SQL SUCCESS
+SELECT  * from type_char  where string1 SIMILAR TO '%bcr|c';
++---------+
+| string1 |
++---------+
++---------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

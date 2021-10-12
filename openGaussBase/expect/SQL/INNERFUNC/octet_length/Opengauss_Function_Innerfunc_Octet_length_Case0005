@@ -1,0 +1,9 @@
+-- @testpoint: octet_length函数参数个数验证，合理报错
+SELECT octet_length(123321，'sfsdg','gthb');
+?.*ERROR: syntax error at or near \"\，\"
+?.*
+SELECT octet_length();
+?.*ERROR: function octet_length\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: octet_length

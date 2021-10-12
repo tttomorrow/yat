@@ -1,0 +1,23 @@
+-- @testpoint: 创建列类型是序列整型-BIGSERIAL的表，超边界时合理报错
+drop table if exists table_1;
+SQL SUCCESS
+create table table_1(a BIGSERIAL);
+SQL SUCCESS
+insert into table_1 values(1);
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+
+insert into table_1 values(0);
+SQL SUCCESS
+?.*ERROR: bigint out of range.*
+  Where: referenced column: a
+select * from table_1;
++---------------------+
+| a                   |
++---------------------+
+| 1                   |
+| 0                   |
++---------------------+
+drop table if exists table_1;
+SQL SUCCESS

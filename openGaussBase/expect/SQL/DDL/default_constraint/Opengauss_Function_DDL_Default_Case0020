@@ -1,0 +1,20 @@
+-- @testpoint: default含特殊英文字符1
+drop table if exists tbl_09;
+SQL SUCCESS
+create table tbl_09(
+id int,
+c_varchar varchar(1023) not null default 'aaaaaaadddsfdsfdsfdfsfdsffffffffffff1212!@#$%^&*(_+=-');
+SQL SUCCESS
+insert into tbl_09 values(1,default);
+SQL SUCCESS
+insert into tbl_09(id) values(2);
+SQL SUCCESS
+select * from tbl_09;
++----+-------------------------------------------------------+
+| id | c_varchar                                             |
++----+-------------------------------------------------------+
+| 1  | aaaaaaadddsfdsfdsfdfsfdsffffffffffff1212!@#$%^&*(_+=- |
+| 2  | aaaaaaadddsfdsfdsfdfsfdsffffffffffff1212!@#$%^&*(_+=- |
++----+-------------------------------------------------------+
+drop table tbl_09;
+SQL SUCCESS

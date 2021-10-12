@@ -1,0 +1,15 @@
+-- @testpoint: log函数嵌套使用
+drop table if exists LOG_005;
+SQL SUCCESS
+create table LOG_005(COL_LOG int);
+SQL SUCCESS
+insert into LOG_005 values(log(log(10)));
+SQL SUCCESS
+select COL_LOG as result from LOG_005;
++--------+
+| result |
++--------+
+| 0      |
++--------+
+drop table if exists LOG_005;
+SQL SUCCESS

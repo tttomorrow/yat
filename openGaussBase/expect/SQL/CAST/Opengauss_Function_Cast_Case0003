@@ -1,0 +1,102 @@
+-- @testpoint: clob类型转换
+--查询源数据类型和目标数据类型间的转化方式：
+--'e'：表示只能进行显式转化（使用CAST或::语法）。
+--'i'：表示只能进行隐式转化。
+--'a'：表示类型间同时支持隐式和显式转化。
+--转化方法：
+--'f'：使用castfunc字段中指定的函数进行转化。
+--'b'：类型间是二进制强制转化，不使用castfunc。
+select typname,proname,castcontext,castmethod from pg_cast c
+join pg_type t on t.oid=c.casttarget
+left join pg_proc p on p.oid=c.castfunc
+where c.oid in (select oid from pg_cast
+where castsource= (select oid from pg_type where typname='clob'));
++-----------+----------------+-------------+------------+
+| typname   | proname        | castcontext | castmethod |
++-----------+----------------+-------------+------------+
+| regclass  | regclass       | i           | f          |
+| bpchar    |                | i           | b          |
+| varchar   |                | i           | b          |
+| nvarchar2 |                | i           | b          |
+| char      | char           | a           | f          |
+| name      | name           | i           | f          |
+| timestamp | text_timestamp | i           | f          |
+| xml       | xml            | e           | f          |
+| int1      | text_int1      | i           | f          |
+| int2      | text_int2      | i           | f          |
+| int4      | text_int4      | i           | f          |
+| int8      | text_int8      | i           | f          |
+| float4    | text_float4    | i           | f          |
+| float8    | text_float8    | i           | f          |
+| numeric   | text_numeric   | i           | f          |
+| text      |                | i           | b          |
++-----------+----------------+-------------+------------+
+--建表
+drop table if exists test_cast_0003 cascade;
+SQL SUCCESS
+create table test_cast_0003(
+c_regclass regclass,
+c_bpchar bpchar,
+c_varchar varchar,
+c_nvarchar2 nvarchar2,
+c_char char,
+c_name name,
+c_timestamp timestamp,
+c_date date,
+c_int1 int1,
+c_int2 int2,
+c_int4 int4,
+c_int8 int8,
+c_float4 float4,
+c_float8 float8,
+c_numeric numeric,
+c_text text
+);
+SQL SUCCESS
+--查询转换计划
+--test point：隐式转换
+explain performance insert into test_cast_0003 values(
+'test_cast_0003'::clob,
+'test_cast_0003'::clob,
+'test_cast_0003'::clob,
+'test_cast_0003'::clob,
+'t'::clob,
+'test_cast_0003'::clob,
+'2020-09-28'::clob,
+'2020-09-28'::clob,
+'3'::clob,
+'3'::clob,
+'3'::clob,
+'3'::clob,
+'1.0003'::clob,
+'1.0003'::clob,
+'1.0003'::clob,
+'test_cast_0003'::clob
+);
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*
+?.*
+?.*
+?.*
+?.*
+--test point：显式转换
+explain performance insert into test_cast_0003(c_char) values(cast('t'::clob as char));
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*
+?.*
+?.*
+?.*Output: NULL::regclass, NULL::bpchar, NULL::character varying, NULL::nvarchar2, 't'::character\(1\), NULL::name, NULL::timestamp without time zone, NULL::timestamp without time zone, NULL::tinyint, NULL::smallint, NULL::integer, NULL::bigint, NULL::real, NULL::double precision, NULL::numeric, NULL::text.*
+?.*
+?.*
+?.*
+--清理数据
+drop table if exists test_cast_0003 cascade;
+SQL SUCCESS

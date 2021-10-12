@@ -1,0 +1,45 @@
+-- @testpoint: 创建表，将“char”多次转换至VARCHAR
+drop table if exists special_char_08;
+SQL SUCCESS
+CREATE  TABLE special_char_08 (id "char");
+SQL SUCCESS
+insert into special_char_08 values ('1');
+SQL SUCCESS
+alter table special_char_08 alter column id TYPE VARCHAR(1);
+SQL SUCCESS
+alter table special_char_08 alter column id TYPE "char";
+SQL SUCCESS
+alter table special_char_08 alter column id TYPE VARCHAR(1);
+SQL SUCCESS
+--查看字段类型是否修改成功
+SELECT format_type(a.atttypid,a.atttypmod) as type
+FROM pg_class as c,pg_attribute as a
+where c.relname = 'special_char_08' and a.attrelid = c.oid and a.attnum>0;
++----------------------+
+| type                 |
++----------------------+
+| character varying(1) |
++----------------------+
+alter table special_char_08 alter column id TYPE "char";
+SQL SUCCESS
+alter table special_char_08 alter column id TYPE VARCHAR(1);
+SQL SUCCESS
+alter table special_char_08 alter column id TYPE "char";
+SQL SUCCESS
+--查看字段类型是否修改成功
+SELECT format_type(a.atttypid,a.atttypmod) as type
+FROM pg_class as c,pg_attribute as a
+where c.relname = 'special_char_08' and a.attrelid = c.oid and a.attnum>0;
++--------+
+| type   |
++--------+
+| "char" |
++--------+
+select * from special_char_08;
++----+
+| id |
++----+
+| 1  |
++----+
+drop table if exists special_char_08;
+SQL SUCCESS

@@ -1,0 +1,11 @@
+-- @testpoint: to_date函数，将文本类型的值转换为指定格式的时间戳，参数多/少输入的函数测试，合理报错
+select to_date('2018','yyyy','2018','yyyy');
+?.*ERROR: function to_date\(unknown, unknown, unknown, unknown\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position.*
+  Where: referenced column: to_date
+select to_date('2018-01-15','yyyy-mm','dd');
+?.*ERROR: function to_date\(unknown, unknown, unknown\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position.*
+  Where: referenced column: to_date

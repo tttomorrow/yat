@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字date(非保留)，作为数据库名
+--关键字不带引号-成功
+drop database if exists date;
+SQL SUCCESS
+create database date;
+SQL SUCCESS
+drop database date;
+SQL SUCCESS
+--关键字带双引号-成功
+drop database if exists "date";
+SQL SUCCESS
+create database "date";
+SQL SUCCESS
+drop database "date";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop database if exists 'date';
+?.*ERROR: syntax error at or near "'date'"
+?.*
+create database 'date';
+?.*ERROR: syntax error at or near "'date'"
+?.*
+--关键字带反引号-合理报错
+drop database if exists `date`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create database `date`;
+?.*ERROR: syntax error at or near "`"
+?.*

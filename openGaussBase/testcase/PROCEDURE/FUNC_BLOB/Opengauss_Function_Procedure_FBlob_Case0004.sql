@@ -1,0 +1,24 @@
+-- @testpoint: testpoint: 自定义函数blob数据类型的测试——自定义函数内的blob类型最大支持8k
+
+--创建自定义函数
+create or replace function fvt_func_blob_004() return int
+is
+  v_size int;
+  v_lang blob :='01011110';
+begin
+  for i in 1 .. 1999 loop
+    v_lang := v_lang || '01011110';
+  end loop;
+    raise info 'v_lang=%',v_lang;
+    return v_size;
+  exception
+  when no_data_found
+  then
+    raise info 'no_data_found';
+end;
+/
+--调用自定义函数
+select fvt_func_blob_004();
+--恢复环境
+drop function if exists fvt_func_blob_004;
+

@@ -1,0 +1,34 @@
+-- @testpoint: 函数sum(expression),所有输入行的expression总和，入参为有效值时
+drop table if exists table_test;
+SQL SUCCESS
+create table table_test(id integer,
+name varchar(10),
+age integer,
+height dec(5,2),
+hobbies text,
+tel bigint
+);
+SQL SUCCESS
+SQL SUCCESS
+--当入参为int类型时
+select sum(id) from table_test;
++-----+
+| sum |
++-----+
+| 16  |
++-----+
+--当入参为bigint类型时
+select sum(tel) from table_test;
++-------------+
+| sum         |
++-------------+
++-------------+
+--当入参为浮点数时
+select sum(height) from table_test;
++--------+
+| sum    |
++--------+
+| 633.78 |
++--------+
+drop table table_test;
+SQL SUCCESS

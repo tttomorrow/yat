@@ -1,0 +1,31 @@
+-- @testpoint: 修改列存表唯一索引,重命名索引
+
+--创建普通列存表
+drop table if exists column_tab02;
+create table column_tab02(id1 varchar,id2 int) with(orientation=column);
+
+--创建分区列存表
+drop table if exists column_part_tab02;
+create table column_part_tab02(id int,name varchar) with(orientation=column)
+partition by range(id)
+(partition part_1 values less than(1000),
+ partition part_2 values less than(2000),
+ partition part_3 values less than(maxvalue));
+
+--创建普通列存表唯一索引
+create unique index column_index02 on column_tab02 using cbtree(id1);
+
+--创建列存分区表唯一索引
+create unique index column_part_index02 on column_part_tab02 using cbtree(id) local;
+
+--重命名索引名称
+alter index column_index02 rename to new_column_index02;
+alter index column_part_index02 rename to new_column_part_index02;
+
+--查看索引名称是否修改成功
+select relname from pg_class where relname = 'new_column_index02';
+select relname from pg_class where relname = 'new_column_part_index02';
+
+--清理环境
+drop table column_tab02 cascade;
+drop table column_part_tab02 cascade;

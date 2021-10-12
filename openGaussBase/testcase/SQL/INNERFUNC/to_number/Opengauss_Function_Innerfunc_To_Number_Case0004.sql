@@ -1,0 +1,3 @@
+-- @testpoint: 类型转换函数to_number，参数为函数嵌套
+
+select to_number(to_number('12,454.8-', '99G999D9S'), '99G999D9S');

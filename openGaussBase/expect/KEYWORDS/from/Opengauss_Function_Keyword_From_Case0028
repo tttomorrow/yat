@@ -1,0 +1,67 @@
+-- @testpoint: opengauss关键字from(保留)，作为同义词对象名,部分测试点合理报错
+--前置条件
+drop table if exists from_test;
+SQL SUCCESS
+create table from_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-失败
+drop synonym if exists from;
+?.*ERROR: syntax error at or near "from".*
+?.*Position.*
+create synonym from for from_test;
+?.*ERROR: syntax error at or near "from".*
+?.*Position.*
+--关键字带双引号-成功
+drop synonym if exists "from";
+SQL SUCCESS
+create synonym "from" for from_test;
+SQL SUCCESS
+insert into "from" values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update "from" set "from".name='cici' where "from".id=2;
+SQL SUCCESS
+select * from "from";
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--清理环境
+drop synonym "from";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'from';
+?.*ERROR: syntax error at or near "'from'".*
+?.*Position.*
+create synonym 'from' for from_test;
+?.*ERROR: syntax error at or near "'from'".*
+?.*Position.*
+insert into 'from' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'from'".*
+?.*Position.*
+update 'from' set 'from'.name='cici' where 'from'.id=2;
+?.*ERROR: syntax error at or near "'from'".*
+?.*Position.*
+select * from 'from';
+?.*ERROR: syntax error at or near "'from'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop synonym if exists `from`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create synonym `from` for from_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+insert into `from` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+update `from` set `from`.name='cici' where `from`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+select * from `from`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+--清理环境
+drop table if exists from_test;
+SQL SUCCESS

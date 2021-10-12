@@ -1,0 +1,61 @@
+-- @testpoint: opengauss关键字preorder(非保留)，作为同义词对象名,部分测试点合理报错
+--前置条件
+drop table if exists preorder_test;
+SQL SUCCESS
+create table preorder_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists preorder;
+SQL SUCCESS
+create synonym preorder for preorder_test;
+SQL SUCCESS
+insert into preorder values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update preorder set preorder.name='cici' where preorder.id=2;
+SQL SUCCESS
+select * from preorder;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--关键字带双引号-成功
+drop synonym if exists "preorder";
+SQL SUCCESS
+create synonym "preorder" for preorder_test;
+SQL SUCCESS
+insert into "preorder" values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update "preorder" set "preorder".name='cici' where "preorder".id=2;
+SQL SUCCESS
+select * from "preorder";
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 1  | ada  |
+| 2  | cici |
+| 2  | cici |
++----+------+
+--关键字带单引号-合理报错
+drop synonym if exists 'preorder';
+?.*ERROR: syntax error at or near "'preorder'"
+?.*Position.*
+create synonym 'preorder' for preorder_test;
+?.*ERROR: syntax error at or near "'preorder'"
+?.*Position.*
+--关键字带反引号-合理报错
+drop synonym if exists `preorder`;
+?.*ERROR: syntax error at or near "`"
+?.*Position.*
+create synonym `preorder` for preorder_test;
+?.*ERROR: syntax error at or near "`"
+?.*Position.*
+--清理环境
+drop synonym if exists "preorder";
+SQL SUCCESS
+drop synonym if exists preorder;
+SQL SUCCESS
+drop table if exists preorder_test;
+SQL SUCCESS

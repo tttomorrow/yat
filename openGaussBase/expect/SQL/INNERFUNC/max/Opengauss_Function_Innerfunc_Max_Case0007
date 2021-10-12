@@ -1,0 +1,20 @@
+-- @testpoint: max函数参数异常校验，合理报错
+select max() from sys_dummy;
+?.*ERROR: function max\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: max
+select max(1,2) from sys_dummy;
+?.*ERROR: function max\(integer, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: max
+select max(1,'&^%') from sys_dummy;
+?.*ERROR: function max\(integer, unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: max
+select max('pst'::timestamp with time zone) from sys_dummy;
+?.*ERROR: invalid input syntax for type timestamp with time zone: "pst"
+?.*
+  Where: referenced column: max

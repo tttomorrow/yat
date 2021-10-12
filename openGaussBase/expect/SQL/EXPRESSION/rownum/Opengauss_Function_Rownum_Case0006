@@ -1,0 +1,29 @@
+-- @testpoint: 测试rownum在子查询/子链接中的表现
+drop table if exists student;
+SQL SUCCESS
+create table student
+(
+    s_id int primary key,
+    s_name varchar(10) not null
+);
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+--测试点1：两层子链接
+select * from student where s_id in (select s_id from student where rownum < 3 union select s_id from student where rownum != 5);
++------------+--------+
+| s_id       | s_name |
++------------+--------+
++------------+--------+
+--测试点2：三层子查询/子链接混用
+select * from student where s_id in (select s_id from student where rownum < 3 union select * from (select s_id from student order by 1 desc) as result where rownum != 5);
++------------+--------+
+| s_id       | s_name |
++------------+--------+
++------------+--------+
+drop table if exists student;
+SQL SUCCESS

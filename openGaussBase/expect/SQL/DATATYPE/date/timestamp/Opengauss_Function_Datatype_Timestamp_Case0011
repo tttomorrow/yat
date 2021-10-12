@@ -1,0 +1,15 @@
+-- @testpoint: 结合截取函数，返回timestamp的日期部分
+DROP TABLE IF EXISTS test_timestamp11;
+SQL SUCCESS
+CREATE TABLE test_timestamp11 (name TIMESTAMP);
+SQL SUCCESS
+insert into  test_timestamp11 values (trunc(TIMESTAMP '2018-09-16 11:22:33.456'));
+SQL SUCCESS
+select * from test_timestamp11;
++-------------------------------+
+| name                          |
++-------------------------------+
+?.*2018-09-16 00:00:00.*
++-------------------------------+
+DROP TABLE IF EXISTS test_timestamp11;
+SQL SUCCESS

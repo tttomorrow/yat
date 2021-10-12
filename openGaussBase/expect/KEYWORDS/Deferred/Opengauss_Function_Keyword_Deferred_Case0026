@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字deferred(非保留)，作为模式名
+--关键字不带引号-成功
+drop schema if exists deferred;
+SQL SUCCESS
+create schema deferred;
+SQL SUCCESS
+drop schema deferred;
+SQL SUCCESS
+--关键字带双引号-成功
+drop schema if exists "deferred";
+SQL SUCCESS
+create schema "deferred";
+SQL SUCCESS
+drop schema "deferred";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop schema if exists 'deferred';
+?.*ERROR: syntax error at or near "'deferred'"
+?.*
+create schema 'deferred';
+?.*ERROR: syntax error at or near "'deferred'"
+?.*
+--关键字带反引号-合理报错
+drop schema if exists `deferred`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create schema `deferred`;
+?.*ERROR: syntax error at or near "`"
+?.*

@@ -1,0 +1,48 @@
+-- @testpoint: 值存储的长度转换
+--建表
+drop table if exists test_cast_0027 cascade;
+SQL SUCCESS
+create table test_cast_0027(c_varchar char(20));
+SQL SUCCESS
+--查询转换计划
+--test point：长度需要转换:success
+explain performance insert into test_cast_0027 values('abcdef');
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*
+?.*
+?.*
+|         Output: 'abcdef              '::character(20)                                                       |
+?.*
+?.*
+?.*
+SELECT c_varchar,octet_length(c_varchar) FROM test_cast_0027;
++----------------------+--------------+
+| c_varchar            | octet_length |
++----------------------+--------------+
+| abcdef               | 20           |
++----------------------+--------------+
+--testpoint：长度不需要转换:success
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*
+?.*
+?.*
+?.*
+?.*
+?.*
+SELECT c_varchar,octet_length(c_varchar) FROM test_cast_0027;
++----------------------+--------------+
+| c_varchar            | octet_length |
++----------------------+--------------+
+| abcdef               | 20           |
++----------------------+--------------+
+--清理环境
+drop table if exists test_cast_0027 cascade;
+SQL SUCCESS

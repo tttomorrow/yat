@@ -1,0 +1,104 @@
+-- @testpoint: jsonb额外支持操作函数：jsonb_exists_all（同操作符 ?&，当入参不合理时，合理报错）
+--字符串数组text[]里面，是否所有的元素，都在JSON的顶层以key\elem\scalar的形式存在，
+--合理入参：存在
+select jsonb_exists_all('"str"',array['str']);
++------------------+
+| jsonb_exists_all |
++------------------+
+| true             |
++------------------+
+select jsonb_exists_all('"null"',array['null']);
++------------------+
+| jsonb_exists_all |
++------------------+
+| true             |
++------------------+
+select jsonb_exists_all('{"a":1, "b": [1,2,3],"c":{"b":"d"}}',array['a','b','c']);
++------------------+
+| jsonb_exists_all |
++------------------+
+| true             |
++------------------+
+select jsonb_exists_all('{"a":1, "b": [1,2,3],"c":{"b":"d"}}',array['b','c']);
++------------------+
+| jsonb_exists_all |
++------------------+
+| true             |
++------------------+
+select jsonb_exists_all('[null, false, "123",{"a":true},"test"]',array['test','123']);
++------------------+
+| jsonb_exists_all |
++------------------+
+| true             |
++------------------+
+--合理入参：不存在
+select jsonb_exists_all('null',array['null']);
++------------------+
+| jsonb_exists_all |
++------------------+
+| false            |
++------------------+
+select jsonb_exists_all('false',array['false']);
++------------------+
+| jsonb_exists_all |
++------------------+
+| false            |
++------------------+
+select jsonb_exists_all('true',array['true']);
++------------------+
+| jsonb_exists_all |
++------------------+
+| false            |
++------------------+
+select jsonb_exists_all('{"a":1, "b": [1,2,3],"c":{"b":"d"}}',array['c','d']);
++------------------+
+| jsonb_exists_all |
++------------------+
+| false            |
++------------------+
+select jsonb_exists_all('[null, false, 123,{"a":true},"test"]',array['123','a']);
++------------------+
+| jsonb_exists_all |
++------------------+
+| false            |
++------------------+
+select jsonb_exists_all('[null, false, 123,{"a":true},"test"]',array['{"a":true}']);
++------------------+
+| jsonb_exists_all |
++------------------+
+| false            |
++------------------+
+select jsonb_exists_all('105.2e3',array['105200']);
++------------------+
+| jsonb_exists_all |
++------------------+
+| false            |
++------------------+
+select jsonb_exists_all('[{"a":true}, null]',array['b','null']);
++------------------+
+| jsonb_exists_all |
++------------------+
+| false            |
++------------------+
+--不合理入参：报错
+select jsonb_exists_all('{"a":1, "b": [10,2,3],"c":{"b":"d"}}',(select 'b'::jsonb));
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "b" is invalid.
+?.*
+  Where: JSON data, line 1: b
+referenced column: jsonb
+referenced column: jsonb_exists_all
+select jsonb_exists_all('{"a":1, "b": [1,2,3],"c":{"b":"d"}}','{'b','d'}');
+?.*ERROR: syntax error at or near "b','.*
+?.*
+select jsonb_exists_all('[null, false, 123,{"a":true},"test"]',array'[123,'{a}']');
+?.*ERROR: syntax error at or near "'\[123,'.*
+?.*
+select jsonb_exists_all('[null, false, 123,{"a":true},"test"]',array['test',123]);
+?.*ERROR: invalid input syntax for integer: "test.*
+?.*
+  Where: referenced column: jsonb_exists_all
+select jsonb_exists_all('105.2e3','105200');
+?.*ERROR: array value must start with "\{" or dimension informatio.*
+?.*
+  Where: referenced column: jsonb_exists_all

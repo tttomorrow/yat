@@ -1,0 +1,12 @@
+-- @testpoint: 自然对数lnx输入为特殊字符/字母/非隐式字符串,合理报错
+SELECT LN(r);
+?.*ERROR: column \"r\" does not exist
+?.*
+  Where: referenced column: ln
+SELECT LN(~);
+?.*ERROR: syntax error at or near \"\)\"
+?.*
+SELECT LN('a');
+?.*ERROR: invalid input syntax for type double precision: \"a\"
+?.*
+  Where: referenced column: ln

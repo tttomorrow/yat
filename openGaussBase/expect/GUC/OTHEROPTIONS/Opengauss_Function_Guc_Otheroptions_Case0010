@@ -1,0 +1,19 @@
+-- @testpoint: 查看max_index_keys,创建表，创建超过32个字段的索引，合理报错
+--通过show方式查看
+show max_index_keys;
++----------------+
+| max_index_keys |
++----------------+
+| 32             |
++----------------+
+--创建表
+drop table if exists max_index_table;
+SQL SUCCESS
+create table max_index_table(col_1 int,col_2 int,col_3 int,col_4 int,col_5 int,col_6 int,col_7 int,col_8 int,col_9 int,col_10 int,col_11 int,col_12 int,col_13 int,col_14 int,col_15 int,col_16 int,col_17 int,col_18 int,col_19 int,col_20 int,col_21 int,col_22 int,col_23 int,col_24 int,col_25 int,col_26 int,col_27 int,col_28 int,col_29 int,col_30 int,col_31 int,col_32 int,col_33 int);
+SQL SUCCESS
+--创建索引,合理报错
+create index max_index on max_index_table(col_1,col_2,col_3,col_4,col_5,col_6,col_7,col_8,col_9,col_10,col_11,col_12,col_13,col_14,col_15,col_16,col_17,col_18,col_19,col_20,col_21,col_22,col_23,col_24,col_25,col_26,col_27,col_28,col_29,col_30,col_31,col_32,col_33);
+?.*ERROR: cannot use more than 32 columns in an index
+--清理环境
+drop table max_index_table cascade;
+SQL SUCCESS

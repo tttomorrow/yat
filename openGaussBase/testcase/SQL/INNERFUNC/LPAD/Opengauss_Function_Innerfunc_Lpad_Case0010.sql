@@ -1,0 +1,1 @@
+-- @testpoint: lpad函数入参均为数字类型

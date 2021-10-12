@@ -1,0 +1,7 @@
+-- @testpoint: pg_stat_get_xact_partition_tuples_deleted(oid)函数异常校验，合理报错
+-- 空值、多参、少参、oid错误、超范围、表不存在等
+select pg_stat_get_xact_partition_tuples_deleted('') from pg_partition  a, pg_class b where a.relname = 'p1' and b.oid=a.parentid and b.relname='sales';
+select pg_stat_get_xact_partition_tuples_deleted(a.oid,a.oid,a.oid) from pg_partition  a, pg_class b where a.relname = 'p2' and b.oid=a.parentid and b.relname='sales';
+select pg_stat_get_xact_partition_tuples_deleted() from pg_partition  a, pg_class b where a.relname = 'sys_p1' and b.oid=a.parentid and b.relname='sales';
+select pg_stat_get_xact_partition_tuples_deleted('&^%^&*') from pg_partition  a, pg_class b where a.relname = 'sys_p2' and b.oid=a.parentid and b.relname='sales';
+select pg_stat_get_xact_partition_tuples_deleted(a.oid) from pg_partition  a, pg_class b where a.relname = 'sys_p2' and b.oid=a.parentid and b.relname='sales';

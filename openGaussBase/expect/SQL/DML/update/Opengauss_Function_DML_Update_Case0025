@@ -1,0 +1,35 @@
+-- @testpoint: 修改的表名带模式修饰,修改成功
+--创建模式
+drop schema if exists test_schema;
+SQL SUCCESS
+create schema test_schema;
+SQL SUCCESS
+--建表
+drop table if exists test_schema.test_update002;
+SQL SUCCESS
+create table test_schema.test_update002(c_integer integer, c_varchar varchar(50));
+SQL SUCCESS
+--插入数据
+insert into test_schema.test_update002 values(1,'aaaaa');
+SQL SUCCESS
+insert into test_schema.test_update002 values(2,'bbbbb');
+SQL SUCCESS
+--修改数据
+update test_schema.test_update002 set c_varchar = 'new_a' where c_integer = 1;
+SQL SUCCESS
+update test_schema.test_update002 set c_integer = c_integer+ 1 where c_varchar = 'bbbbb';
+SQL SUCCESS
+--查询
+select * from test_schema.test_update002;
++-----------+-----------+
+| c_integer | c_varchar |
++-----------+-----------+
+| 1         | new_a     |
+| 3         | bbbbb     |
++-----------+-----------+
+--删表
+drop table test_schema.test_update002;
+SQL SUCCESS
+--删除模式
+drop schema test_schema;
+SQL SUCCESS

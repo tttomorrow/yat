@@ -1,0 +1,15 @@
+-- @testpoint: 模式匹配操作符SIMILAR TO,[a-z]匹配
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 varchar(100));
+SQL SUCCESS
+insert into type_char values ('abc');
+SQL SUCCESS
+SELECT  * from type_char  where string1 SIMILAR TO '[a-z]bc';
++---------+
+| string1 |
++---------+
+| abc     |
++---------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

@@ -1,0 +1,11 @@
+-- @testpoint: 插入非法空值,合理报错
+drop table if exists serial_12;
+SQL SUCCESS
+create table serial_12 (id int,name serial);
+SQL SUCCESS
+insert into serial_12 values (1,' ');
+?.*ERROR: invalid input syntax for integer: " "
+?.*
+  Where: referenced column: name
+drop table serial_12;
+SQL SUCCESS

@@ -1,0 +1,48 @@
+--  @testpoint:事务外，使用set..local命令，设置current_schema为已存在的模式不会生效
+--创建schema
+drop schema if exists myschema;
+SQL SUCCESS
+create schema myschema;
+SQL SUCCESS
+--set local to命令设置当前模式为myschema
+set local current_schema to myschema;
+SQL SUCCESS
+--查看当前模式，还是默认public模式
+select current_schema;
++----------------+
+| current_schema |
++----------------+
+| public         |
++----------------+
+--set local =命令设置当前模式为myschema
+set local current_schema = myschema;
+SQL SUCCESS
+--查看当前模式，还是默认public模式
+select current_schema;
++----------------+
+| current_schema |
++----------------+
+| public         |
++----------------+
+--set local to default命令设置当前模式为myschema
+set local current_schema to default;
+SQL SUCCESS
+--查看当前模式，还是默认public模式
+select current_schema;
++----------------+
+| current_schema |
++----------------+
+| public         |
++----------------+
+--set local = default命令设置当前模式为myschema
+set local current_schema = default;
+SQL SUCCESS
+--查看当前模式，还是默认public模式
+select current_schema;
++----------------+
+| current_schema |
++----------------+
+| public         |
++----------------+
+drop schema myschema;
+SQL SUCCESS

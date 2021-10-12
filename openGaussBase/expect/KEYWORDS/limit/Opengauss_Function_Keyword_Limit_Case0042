@@ -1,0 +1,16 @@
+--  @testpoint:关键字limit作为临时表的列名在select语句的使用
+drop table if exists #test_temporary_limit_003;
+?.*ERROR: syntax error at or near "#"
+?.*Position: .*
+create temporary table test_temporary_limit_003("limit" int);
+SQL SUCCESS
+insert into test_temporary_limit_003 values (1);
+SQL SUCCESS
+commit;
+SQL SUCCESS
+select "limit" from test_temporary_limit_003 order by "limit";
++-------+
+| limit |
++-------+
+| 1     |
++-------+

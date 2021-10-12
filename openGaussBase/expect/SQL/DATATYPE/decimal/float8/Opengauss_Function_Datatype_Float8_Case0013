@@ -1,0 +1,21 @@
+-- @testpoint: 插入0值
+drop table if exists float8_13;
+SQL SUCCESS
+create table float8_13 (name float8);
+SQL SUCCESS
+insert into float8_13 values (0);
+SQL SUCCESS
+insert into float8_13 values (0);
+SQL SUCCESS
+insert into float8_13 values (0);
+SQL SUCCESS
+select * from float8_13;
++------+
+| name |
++------+
+| 0.0  |
+| 0.0  |
+| 0.0  |
++------+
+drop table float8_13;
+SQL SUCCESS

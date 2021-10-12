@@ -1,0 +1,38 @@
+-- @testpoint: 数字操作函数，正切函数，与||结合
+drop table if exists tan_T1;
+SQL SUCCESS
+create table tan_T1(f1 int,f2 bigint,f3 integer,f4 binary_integer,f5 bigint);
+SQL SUCCESS
+insert into tan_T1(f1,f2,f3,f4,f5) values(0,22,33,44,55);
+SQL SUCCESS
+select cast(tan(1) as number(5,2))||'abc' from sys_dummy;
++----------+
+| ?column? |
++----------+
+| 1.56abc  |
++----------+
+select cast(tan(1||2+1)as number(5,2)) from sys_dummy;
++------+
+| tan  |
++------+
+| 0.46 |
++------+
+select cast(tan(f1||f2||f3)as number(5,2)) from tan_T1;
++-------+
+| tan   |
++-------+
+| -0.80 |
++-------+
+select * from tan_T1 where tan(f1)+1|| '2' = f2;
++----+----+----+----+----+
+| f1 | f2 | f3 | f4 | f5 |
++----+----+----+----+----+
++----+----+----+----+----+
+select concat(cast(tan(1)as number(5,2)),'abc') from sys_dummy;
++---------+
+| concat  |
++---------+
+| 1.56abc |
++---------+
+drop table if exists tan_T1;
+SQL SUCCESS

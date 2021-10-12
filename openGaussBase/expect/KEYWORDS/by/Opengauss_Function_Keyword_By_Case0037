@@ -1,0 +1,2 @@
+--  @testpoint:定义by为函数名
+Sql parse error: [9:16] expect token, EOF found

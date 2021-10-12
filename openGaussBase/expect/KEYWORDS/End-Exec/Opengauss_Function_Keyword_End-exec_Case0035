@@ -1,0 +1,57 @@
+--  @testpoint:opengauss关键字end-exec(非保留)，自定义数据类型名为end-exec
+--关键字end-exec作为数据类型不带引号，创建成功
+drop type if exists end-exec;
+?.*ERROR: syntax error at or near "end"
+?.*Position: .*
+CREATE TYPE end-exec AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "end"
+?.*Position: .*
+select typname from pg_type where typname ='end-exec';
++---------+
+| typname |
++---------+
++---------+
+drop type end-exec;
+?.*ERROR: syntax error at or near "end"
+?.*Position: .*
+--关键字end-exec作为数据类型名加双引号，创建成功
+drop type if exists "end-exec";
+SQL SUCCESS
+CREATE TYPE "end-exec" AS (f1 int, f2 text);
+SQL SUCCESS
+select typname from pg_type where typname ='end-exec';
++----------+
+| typname  |
++----------+
+| end-exec |
++----------+
+drop type "end-exec";
+SQL SUCCESS
+--关键字end-exec作为数据类型名加单引号，合理报错
+drop type if exists 'end-exec';
+?.*ERROR: syntax error at or near "'end-exec'"
+?.*Position: .*
+CREATE TYPE 'end-exec' AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "'end-exec'"
+?.*Position: .*
+select * from pg_type where typname ='end-exec';
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+----------+-----------+------------+---------+----------+-----------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
+| typname | typnamespace | typowner | typlen | typbyval | typtype | typcategory | typispreferred | typisdefined | typdelim | typrelid | typelem | typarray | typinput | typoutput | typreceive | typsend | typmodin | typmodout | typanalyze | typalign | typstorage | typnotnull | typbasetype | typtypmod | typndims | typcollation | typdefaultbin | typdefault | typacl |
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+----------+-----------+------------+---------+----------+-----------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+----------+-----------+------------+---------+----------+-----------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
+drop type 'end-exec';
+?.*ERROR: syntax error at or near "'end-exec'"
+?.*Position: .*
+--关键字end-exec作为数据类型名加反引号，合理报错
+drop type if exists `end-exec`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+CREATE TYPE `end-exec` AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+select * from pg_type where typname =`end-exec`;
+?.*ERROR: syntax error at or near "end"
+?.*Position: .*
+drop type `end-exec`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*

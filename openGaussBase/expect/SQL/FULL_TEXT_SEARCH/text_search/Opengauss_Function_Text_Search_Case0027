@@ -1,0 +1,27 @@
+--  @testpoint:停用词测试
+--停用词影响tsvector中的位置
+SELECT to_tsvector('english','in the list of stop words');
++----------------------------+
+| to_tsvector                |
++----------------------------+
+| 'list':3 'stop':5 'word':6 |
++----------------------------+
+SELECT to_tsvector('english','list stop words');
++----------------------------+
+| to_tsvector                |
++----------------------------+
+| 'list':1 'stop':2 'word':3 |
++----------------------------+
+--包含和不包含停用词的文档计算出的排序是完全不同的
+SELECT ts_rank_cd (to_tsvector('english','in the list of stop words'), to_tsquery('list & stop'));
++------------+
+| ts_rank_cd |
++------------+
+| 0.05       |
++------------+
+SELECT ts_rank_cd (to_tsvector('english','list stop words'), to_tsquery('list & stop'));
++------------+
+| ts_rank_cd |
++------------+
+| 0.1        |
++------------+

@@ -1,0 +1,13 @@
+-- @testpoint: 不存在的列,合理报错
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 int);
+SQL SUCCESS
+insert into type_char values (111);
+SQL SUCCESS
+SELECT quote_literal(string11) from type_char;
+?.*ERROR: column "string11" does not exist
+?.*
+  Where: referenced column: quote_literal
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

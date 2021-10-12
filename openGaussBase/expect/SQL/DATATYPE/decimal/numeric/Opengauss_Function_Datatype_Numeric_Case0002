@@ -1,0 +1,27 @@
+-- @testpoint: 不指定精度，插入负整数
+drop table if exists numeric_02;
+SQL SUCCESS
+create table numeric_02 (name numeric);
+SQL SUCCESS
+insert into numeric_02 values (-1212);
+SQL SUCCESS
+insert into numeric_02 values (-9999999);
+SQL SUCCESS
+insert into numeric_02 values (-1);
+SQL SUCCESS
+insert into numeric_02 values (-2);
+SQL SUCCESS
+insert into numeric_02 values (-3);
+SQL SUCCESS
+select * from numeric_02;
++----------+
+| name     |
++----------+
+| -1212    |
+| -9999999 |
+| -1       |
+| -2       |
+| -3       |
++----------+
+drop table numeric_02;
+SQL SUCCESS

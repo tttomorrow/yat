@@ -1,0 +1,45 @@
+-- @testpoint: 推迟检查约束，在commit时合理报错
+--建立外键表，加入推迟检查约束
+drop table if exists pstudent_table_03 cascade;
+SQL SUCCESS
+drop table if exists pteacher_table_03 cascade;
+SQL SUCCESS
+create table pteacher_table_03
+(
+    t_date timestamp primary key,
+    t_name varchar not null
+)partition by range(t_date) interval ('10 day') (
+  partition part1 values less than ('1990-02-02 00:00:00'));
+SQL SUCCESS
+create table pstudent_table_03
+(
+    s_date timestamp,
+    s_name varchar not null,
+    t_date timestamp REFERENCES pteacher_table_03 deferrable initially deferred
+)partition by range(t_date) interval ('10 day') (
+  partition part1 values less than ('1990-02-02 00:00:00'));
+SQL SUCCESS
+--添加数据
+INSERT INTO pteacher_table_03 VALUES (date '2020-09-01', '李老师');
+SQL SUCCESS
+INSERT INTO pstudent_table_03 VALUES (date '2020-09-01', '张三', date '2020-09-01');
+SQL SUCCESS
+--测试推迟检查约束，应当在commit时报错
+START TRANSACTION;
+SQL SUCCESS
+INSERT INTO pstudent_table_03 VALUES (date '2020-09-04', '李四', date '2020-09-04');
+SQL SUCCESS
+update pstudent_table_03 set s_date = date '2020-09-09';
+SQL SUCCESS
+COMMIT;
+?.*ERROR: insert or update on table "pstudent_table_03" violates foreign key constraint "pstudent_table_03_t_date_fkey"
+  Detail: Key (t_date)=(2020-09-04 00:00:00) is not present in table "pteacher_table_03".
+select * from pstudent_table_03;
++-------------------------------+--------+-------------------------------+
+| s_date                        | s_name | t_date                        |
++-------------------------------+--------+-------------------------------+
++-------------------------------+--------+-------------------------------+
+drop table if exists pstudent_table_03 cascade;
+SQL SUCCESS
+drop table if exists pteacher_table_03 cascade;
+SQL SUCCESS

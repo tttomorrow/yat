@@ -1,0 +1,51 @@
+-- @testpoint: opengauss关键字returned_sqlstate(非保留)，作为游标名，部分测试点合理报错
+--前置条件
+drop table if exists returned_sqlstate_test cascade;
+SQL SUCCESS
+create table returned_sqlstate_test(cid int,fid int);
+SQL SUCCESS
+--关键字不带引号-成功
+start transaction;
+SQL SUCCESS
+cursor returned_sqlstate for select * from returned_sqlstate_test order by 1;
+SQL SUCCESS
+close returned_sqlstate;
+SQL SUCCESS
+end;
+SQL SUCCESS
+--关键字带双引号-成功
+start transaction;
+SQL SUCCESS
+cursor "returned_sqlstate" for select * from returned_sqlstate_test order by 1;
+SQL SUCCESS
+close "returned_sqlstate";
+SQL SUCCESS
+end;
+SQL SUCCESS
+--关键字带单引号-合理报错
+start transaction;
+SQL SUCCESS
+cursor 'returned_sqlstate' for select * from returned_sqlstate_test order by 1;
+?.*ERROR: syntax error at or near "'returned_sqlstate'".*
+?.*Position: .*
+close 'returned_sqlstate';
+?.*ERROR: syntax error at or near "'returned_sqlstate'".*
+?.*Position: .*
+end;
+SQL SUCCESS
+--关键字带反引号-合理报错
+start transaction;
+SQL SUCCESS
+cursor `returned_sqlstate` for select * from returned_sqlstate_test order by 1;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+close `returned_sqlstate`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+end;
+SQL SUCCESS
+--清理环境
+drop table returned_sqlstate_test;
+SQL SUCCESS
+drop table if exists returned_sqlstate_test cascade;
+SQL SUCCESS

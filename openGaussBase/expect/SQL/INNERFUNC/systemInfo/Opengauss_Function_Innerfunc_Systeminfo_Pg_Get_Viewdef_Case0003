@@ -1,0 +1,19 @@
+-- @testpoint: 为视图获取底层的SELECT命令；行字段被换到指定的列数，打印是隐含的
+drop table if exists test_view CASCADE;
+SQL SUCCESS
+create table test_view(a varchar);
+SQL SUCCESS
+insert into  test_view values('default');
+SQL SUCCESS
+CREATE VIEW myview AS SELECT * FROM test_view WHERE a = 'pg_default';
+SQL SUCCESS
+select pg_get_viewdef(oid,1) from PG_CLASS where relname='myview' ;
++------------------------------------------------------------------------------+
+| pg_get_viewdef                                                               |
++------------------------------------------------------------------------------+
+|  SELECT  *
+   FROM test_view
+  WHERE test_view.a::text = 'pg_default'::text; |
++------------------------------------------------------------------------------+
+drop table if exists test_view CASCADE;
+SQL SUCCESS

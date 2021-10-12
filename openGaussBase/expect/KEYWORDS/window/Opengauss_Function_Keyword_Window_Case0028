@@ -1,0 +1,66 @@
+-- @testpoint: opengauss关键字window(保留)，作为同义词对象名，部分测试点合理报错
+--前置条件
+drop table if exists window_test;
+SQL SUCCESS
+create table window_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-失败
+drop synonym if exists window;
+?.*ERROR: syntax error at or near "window".*
+?.*Position.*
+create synonym window for window_test;
+?.*ERROR: syntax error at or near "window".*
+?.*Position.*
+--关键字带双引号-成功
+drop synonym if exists "window";
+SQL SUCCESS
+create synonym "window" for window_test;
+SQL SUCCESS
+insert into "window" values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update "window" set "window".name='cici' where "window".id=2;
+SQL SUCCESS
+select * from "window";
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--清理环境
+drop synonym "window";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'window';
+?.*ERROR: syntax error at or near "'window'".*
+?.*Position.*
+create synonym 'window' for window_test;
+?.*ERROR: syntax error at or near "'window'".*
+?.*Position.*
+insert into 'window' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'window'".*
+?.*Position.*
+update 'window' set 'window'.name='cici' where 'window'.id=2;
+?.*ERROR: syntax error at or near "'window'".*
+?.*Position.*
+select * from 'window';
+?.*ERROR: syntax error at or near "'window'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop synonym if exists `window`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create synonym `window` for window_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+insert into `window` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+update `window` set `window`.name='cici' where `window`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+select * from `window`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+drop table if exists window_test;
+SQL SUCCESS

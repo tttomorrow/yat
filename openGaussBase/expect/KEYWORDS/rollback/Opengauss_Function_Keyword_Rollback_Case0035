@@ -1,0 +1,52 @@
+--  @testpoint:opengauss关键字rollback(非保留)，回滚当前事务并取消当前事务中的所有更新
+--创建表
+drop table if exists test_035;
+SQL SUCCESS
+create table test_035(id int, name char(20));
+SQL SUCCESS
+--开启事务并回滚
+START TRANSACTION ;
+SQL SUCCESS
+SELECT * FROM test_035;
++----+------+
+| id | name |
++----+------+
++----+------+
+insert into test_035 values(2,'lisi');
+SQL SUCCESS
+SELECT * FROM test_035;
++----+----------------------+
+| id | name                 |
++----+----------------------+
+| 2  | lisi                 |
++----+----------------------+
+--回滚
+ROLLBACK;
+SQL SUCCESS
+--查看表数据
+SELECT * FROM test_035;
++----+------+
+| id | name |
++----+------+
++----+------+
+--开启事务并提交
+START TRANSACTION ;
+SQL SUCCESS
+SELECT * FROM test_035;
++----+------+
+| id | name |
++----+------+
++----+------+
+insert into test_035 values(2,'lisi');
+SQL SUCCESS
+SELECT * FROM test_035;
++----+----------------------+
+| id | name                 |
++----+----------------------+
+| 2  | lisi                 |
++----+----------------------+
+COMMIT;
+SQL SUCCESS
+--清理环境
+drop table test_035;
+SQL SUCCESS

@@ -1,0 +1,61 @@
+-- @testpoint: 创建列类型为字符类型char、CHARACTER(n)、NCHAR(n)的表，插入数据超过n时合理报错
+drop table if exists table_1;
+SQL SUCCESS
+create table table_1(a char(20));
+SQL SUCCESS
+insert into table_1 values('zhangxiaox');
+SQL SUCCESS
+insert into table_1 values('张三');
+SQL SUCCESS
+insert into table_1 values('qwertyuiopqwe');
+SQL SUCCESS
+select * from table_1;
++----------------------+
+| a                    |
++----------------------+
+| zhangxiaox           |
+| 张三                   |
+| qwertyuiopqwe        |
++----------------------+
+drop table if exists table_1;
+SQL SUCCESS
+drop table if exists table_2;
+SQL SUCCESS
+create table table_2(a character(10));
+SQL SUCCESS
+insert into table_2 values('zhangxiaox');
+SQL SUCCESS
+insert into table_2 values('张三');
+SQL SUCCESS
+insert into table_2 values('qwertyuiopqwe');
+?.*ERROR: value too long for type.*
+  Where: referenced column: a
+select * from table_2;
++------------+
+| a          |
++------------+
+| zhangxiaox |
+| 张三         |
++------------+
+drop table if exists table_2;
+SQL SUCCESS
+drop table if exists table_3;
+SQL SUCCESS
+create table table_3(a nchar);
+SQL SUCCESS
+insert into table_3 values('z');
+SQL SUCCESS
+insert into table_3 values('张');
+?.*ERROR: value too long for type.*
+  Where: referenced column: a
+insert into table_3 values('qwertyu');
+?.*ERROR: value too long for type.*
+  Where: referenced column: a
+select * from table_3;
++---+
+| a |
++---+
+| z |
++---+
+drop table if exists table_3;
+SQL SUCCESS

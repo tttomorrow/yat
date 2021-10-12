@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字output非保留)，作为序列名
+--关键字不带引号-成功
+drop sequence if exists output;
+SQL SUCCESS
+create sequence output start 100 cache 50;
+SQL SUCCESS
+drop sequence output;
+SQL SUCCESS
+--关键字带双引号-成功
+drop sequence if exists "output";
+SQL SUCCESS
+create sequence "output" start 100 cache 50;
+SQL SUCCESS
+drop sequence "output";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'output';
+?.*ERROR: syntax error at or near "'output'".*
+?.*Position: .*
+create sequence 'output' start 100 cache 50;
+?.*ERROR: syntax error at or near "'output'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop sequence if exists `output`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create sequence `output` start 100 cache 50;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

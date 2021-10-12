@@ -1,0 +1,66 @@
+-- @testpoint: opengauss关键字As(保留)，作为同义词对象名，部分测试点合理报错
+--前置条件
+drop table if exists As_test;
+SQL SUCCESS
+create table As_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-失败
+drop synonym if exists As;
+?.*ERROR: syntax error at or near "As".*
+?.*Position.*
+create synonym As for As_test;
+?.*ERROR: syntax error at or near "As".*
+?.*Position.*
+--关键字带双引号-成功
+drop synonym if exists "As";
+SQL SUCCESS
+create synonym "As" for As_test;
+SQL SUCCESS
+insert into "As" values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update "As" set "As".name='cici' where "As".id=2;
+SQL SUCCESS
+select * from "As";
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--清理环境
+drop synonym "As";
+SQL SUCCESS
+drop table if exists As_test;
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'As';
+?.*ERROR: syntax error at or near "'As'".*
+?.*Position.*
+create synonym 'As' for As_test;
+?.*ERROR: syntax error at or near "'As'".*
+?.*Position.*
+insert into 'As' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'As'".*
+?.*Position.*
+update 'As' set 'As'.name='cici' where 'As'.id=2;
+?.*ERROR: syntax error at or near "'As'".*
+?.*Position.*
+select * from 'As';
+?.*ERROR: syntax error at or near "'As'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop synonym if exists `As`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create synonym `As` for As_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+insert into `As` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+update `As` set `As`.name='cici' where `As`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+select * from `As`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*

@@ -1,0 +1,5 @@
+--  @testpoint:验证cast函数是否能将整型数据转换为日期数据
+select cast(2018 as  date);
+?.*ERROR: cannot cast type integer to timestamp without time zone
+?.*Position.*
+  Where: referenced column: timestamp

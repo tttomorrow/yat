@@ -1,0 +1,4 @@
+-- @testpoint: INSERT语句后带优化器full,不存在的表名   --error
+?.*ERROR: invalid input syntax for type numeric: "a".*
+?.*Position:.*
+?.*Where: referenced column: c_numeric.*

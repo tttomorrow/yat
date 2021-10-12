@@ -1,0 +1,19 @@
+-- @testpoint: 关键字within，用作函数名
+drop function if exists within;
+SQL SUCCESS
+create function within(num1 integer,num2 integer)
+return integer
+as
+begin
+    return num1+num2;
+end;
+/
+SQL SUCCESS
+select * from within(56,78);
++--------+
+| within |
++--------+
+| 134    |
++--------+
+drop function if exists within;
+SQL SUCCESS

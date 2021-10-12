@@ -1,0 +1,34 @@
+-- @testpoint: opengauss关键字false(保留)，自定义数据类型名为false，作为数据类型加单引号或反引号时合理报错
+--关键字false作为数据类型不带引号，合理报错
+drop type if exists public.false;
+SQL SUCCESS
+CREATE TYPE false AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "false".*
+?.*Position.*
+--关键字false作为数据类型加双引号，创建成功
+drop type if exists public."false";
+SQL SUCCESS
+CREATE TYPE "false" AS (f1 int, f2 text);
+SQL SUCCESS
+select typname from pg_type where typname ='false';
++---------+
+| typname |
++---------+
+| false   |
++---------+
+drop type public."false";
+SQL SUCCESS
+--关键字false作为数据类型加单引号，合理报错
+drop type if exists public.'false';
+?.*ERROR: syntax error at or near "'false'".*
+?.*Position.*
+CREATE TYPE 'false' AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "'false'".*
+?.*Position.*
+--关键字false作为数据类型加反引号，合理报错
+drop type if exists public.`false`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+CREATE TYPE `false` AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*

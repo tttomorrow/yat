@@ -1,0 +1,23 @@
+--  @testpoint:ngram类型解析器，配置参数测试
+--punctuation_ignore和grapsymbol_ignore分别取t和f
+DROP TEXT SEARCH CONFIGURATION if exists ngram2;
+SQL SUCCESS
+CREATE TEXT SEARCH CONFIGURATION ngram2 (parser=ngram) WITH (gram_size = 2, punctuation_ignore= t,grapsymbol_ignore = f);
+SQL SUCCESS
+--punctuation_ignore和grapsymbol_ignore分别取0和1
+DROP TEXT SEARCH CONFIGURATION if exists ngram3;
+SQL SUCCESS
+CREATE TEXT SEARCH CONFIGURATION ngram3 (parser=ngram) WITH (gram_size = 2, punctuation_ignore= 0,grapsymbol_ignore = 1);
+SQL SUCCESS
+--punctuation_ignore和grapsymbol_ignore分别取y和n
+DROP TEXT SEARCH CONFIGURATION if exists ngram4;
+SQL SUCCESS
+CREATE TEXT SEARCH CONFIGURATION ngram4 (parser=ngram) WITH (gram_size = 2, punctuation_ignore= y,grapsymbol_ignore = n);
+SQL SUCCESS
+--删除文本搜索配置
+DROP TEXT SEARCH CONFIGURATION ngram2;
+SQL SUCCESS
+DROP TEXT SEARCH CONFIGURATION ngram3;
+SQL SUCCESS
+DROP TEXT SEARCH CONFIGURATION ngram4;
+SQL SUCCESS

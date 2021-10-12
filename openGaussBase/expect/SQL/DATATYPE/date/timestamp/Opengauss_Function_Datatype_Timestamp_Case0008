@@ -1,0 +1,15 @@
+-- @testpoint: timestamp日期类型与数值相加更新新的日期
+DROP TABLE IF EXISTS test_timestamp08;
+SQL SUCCESS
+CREATE TABLE test_timestamp08 (name TIMESTAMP);
+SQL SUCCESS
+INSERT INTO test_timestamp08 VALUES (timestamp '2018-09-17 11:22:33.456'+ 1);
+SQL SUCCESS
+select * from test_timestamp08;
++-------------------------------+
+| name                          |
++-------------------------------+
+?.*2018-09-18 11:22:33.456.*
++-------------------------------+
+DROP TABLE IF EXISTS test_timestamp08;
+SQL SUCCESS

@@ -1,0 +1,71 @@
+-- @testpoint: opengauss关键字read(非保留)，合理报错
+drop table if exists test_035;
+SQL SUCCESS
+create table test_035(id int, name char(20));
+SQL SUCCESS
+--以隔离级别为READ COMMITTED，只读方式启动事务,insert语句报错
+START TRANSACTION ISOLATION LEVEL READ COMMITTED READ ONLY;
+SQL SUCCESS
+SELECT * FROM test_035;
++----+------+
+| id | name |
++----+------+
++----+------+
+insert into test_035 values(1,'zhangsan');
+?.*ERROR: cannot execute INSERT in a read-only transaction.*
+SELECT * FROM test_035;
+?.*ERROR: current transaction is aborted, commands ignored until end of transaction block.*
+COMMIT;
+SQL SUCCESS
+--以隔离级别为READ COMMITTED，读/写方式启动事务    读写成功
+START TRANSACTION ISOLATION LEVEL READ COMMITTED READ WRITE;
+SQL SUCCESS
+SELECT * FROM test_035;
++----+------+
+| id | name |
++----+------+
++----+------+
+insert into test_035 values(2,'lisi');
+SQL SUCCESS
+SELECT * FROM test_035;
++----+----------------------+
+| id | name                 |
++----+----------------------+
+| 2  | lisi                 |
++----+----------------------+
+COMMIT;
+SQL SUCCESS
+--开启一个事务，设置事务的隔离级别为READ COMMITTED，访问模式为READ ONLY,insert语句报错
+START TRANSACTION;
+SQL SUCCESS
+SET LOCAL TRANSACTION ISOLATION LEVEL READ COMMITTED READ ONLY;
+SQL SUCCESS
+SELECT * FROM test_035;
++----+----------------------+
+| id | name                 |
++----+----------------------+
+| 2  | lisi                 |
++----+----------------------+
+insert into test_035 values(3,'wangwu');
+?.*ERROR: cannot execute INSERT in a read-only transaction.*
+COMMIT;
+SQL SUCCESS
+--开启一个事务，设置事务的隔离级别为READ COMMITTED，访问模式为READ WRITE  读写成功
+START TRANSACTION;
+SQL SUCCESS
+SET LOCAL TRANSACTION ISOLATION LEVEL READ COMMITTED READ WRITE;
+SQL SUCCESS
+insert into test_035 values(3,'wangwu');
+SQL SUCCESS
+SELECT * FROM test_035;
++----+----------------------+
+| id | name                 |
++----+----------------------+
+| 2  | lisi                 |
+| 3  | wangwu               |
++----+----------------------+
+COMMIT;
+SQL SUCCESS
+--清理环境
+drop table test_035;
+SQL SUCCESS

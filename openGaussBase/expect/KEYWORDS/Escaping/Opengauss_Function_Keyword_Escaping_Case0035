@@ -1,0 +1,54 @@
+-- @testpoint: opengauss关键字escaping(非保留)，自定义数据类型名为escaping 合理报错
+--关键字escaping作为数据类型不带引号，创建成功
+drop type if exists public.escaping;
+SQL SUCCESS
+CREATE TYPE public.escaping AS (f1 int, f2 text);
+SQL SUCCESS
+select typname from pg_type where typname ='public.escaping';
++---------+
+| typname |
++---------+
++---------+
+drop type public.escaping;
+SQL SUCCESS
+--关键字escaping作为数据类型加双引号，创建成功
+drop type if exists "public.escaping";
+SQL SUCCESS
+CREATE TYPE "public.escaping" AS (f1 int, f2 text);
+SQL SUCCESS
+select typname from pg_type where typname ='public.escaping';
++-----------------+
+| typname         |
++-----------------+
+| public.escaping |
++-----------------+
+drop type "public.escaping";
+SQL SUCCESS
+--关键字escaping作为数据类型加单引号，合理报错
+drop type if exists 'public.escaping';
+?.*ERROR: syntax error at or near "'public.escaping'"
+?.*
+CREATE TYPE 'public.escaping' AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "'public.escaping'"
+?.*
+select * from pg_type where typname ='public.escaping';
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+----------+-----------+------------+---------+----------+-----------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
+| typname | typnamespace | typowner | typlen | typbyval | typtype | typcategory | typispreferred | typisdefined | typdelim | typrelid | typelem | typarray | typinput | typoutput | typreceive | typsend | typmodin | typmodout | typanalyze | typalign | typstorage | typnotnull | typbasetype | typtypmod | typndims | typcollation | typdefaultbin | typdefault | typacl |
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+----------+-----------+------------+---------+----------+-----------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+----------+-----------+------------+---------+----------+-----------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
+drop type 'public.escaping';
+?.*ERROR: syntax error at or near "'public.escaping'"
+?.*
+--关键字escaping作为数据类型加反引号，合理报错
+drop type if exists `public.escaping`;
+?.*ERROR: syntax error at or near "`"
+?.*
+CREATE TYPE `public.escaping` AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "`"
+?.*
+select * from pg_type where typname =`public.escaping`;
+?.*ERROR: missing FROM-clause entry for table "public"
+?.*
+drop type `public.escaping`;
+?.*ERROR: syntax error at or near "`"
+?.*

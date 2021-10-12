@@ -1,0 +1,27 @@
+-- @testpoint: json格式校验：bool-json（不符合格式合理报错）
+--符合格式
+select 'false'::json;
++-------+
+| json  |
++-------+
+| false |
++-------+
+select 'true'::json;
++------+
+| json |
++------+
+| true |
++------+
+--不符合格式
+select 'FALSE'::json;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "FALSE" is invalid.
+?.*
+  Where: JSON data, line 1: FALSE
+referenced column: json
+select 'TRUE'::json;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "TRUE" is invalid.
+?.*
+  Where: JSON data, line 1: TRUE
+referenced column: json

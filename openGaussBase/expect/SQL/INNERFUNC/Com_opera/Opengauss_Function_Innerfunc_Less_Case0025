@@ -1,0 +1,15 @@
+-- @testpoint: opengauss比较操作符<,比较类型:box
+drop table if exists ts_zhparser;
+SQL SUCCESS
+CREATE TABLE ts_zhparser(col box, col1 box);
+SQL SUCCESS
+INSERT INTO ts_zhparser VALUES(box'(1,1),(2,2)',box'(1,1),(2,3)');
+SQL SUCCESS
+select * from ts_zhparser where col < col1;
++---------------------+---------------------+
+| col                 | col1                |
++---------------------+---------------------+
+| (2.0,2.0),(1.0,1.0) | (2.0,3.0),(1.0,1.0) |
++---------------------+---------------------+
+drop table if exists ts_zhparser;
+SQL SUCCESS

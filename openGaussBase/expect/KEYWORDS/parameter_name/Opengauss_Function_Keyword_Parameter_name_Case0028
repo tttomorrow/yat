@@ -1,0 +1,66 @@
+-- @testpoint: opengauss关键字parameter_name(非保留)，作为同义词对象名,部分测试点合理报错
+--前置条件
+drop table if exists explain_test;
+SQL SUCCESS
+create table explain_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists parameter_name;
+SQL SUCCESS
+create synonym parameter_name for explain_test;
+SQL SUCCESS
+insert into parameter_name values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update parameter_name set parameter_name.name='cici' where parameter_name.id=2;
+SQL SUCCESS
+select * from parameter_name;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--关键字带双引号-成功
+drop synonym if exists "parameter_name";
+SQL SUCCESS
+create synonym "parameter_name" for explain_test;
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'parameter_name';
+?.*ERROR: syntax error at or near "'parameter_name'".*
+?.*Position: .*
+create synonym 'parameter_name' for explain_test;
+?.*ERROR: syntax error at or near "'parameter_name'".*
+?.*Position: .*
+insert into 'parameter_name' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'parameter_name'".*
+?.*Position: .*
+update 'parameter_name' set 'parameter_name'.name='cici' where 'parameter_name'.id=2;
+?.*ERROR: syntax error at or near "'parameter_name'".*
+?.*Position: .*
+select * from 'parameter_name';
+?.*ERROR: syntax error at or near "'parameter_name'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop synonym if exists `parameter_name`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create synonym `parameter_name` for explain_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+insert into `parameter_name` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+update `parameter_name` set `parameter_name`.name='cici' where `parameter_name`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+select * from `parameter_name`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+--清理环境
+drop synonym if exists "parameter_name";
+SQL SUCCESS
+drop synonym if exists parameter_name;
+SQL SUCCESS
+drop table if exists explain_test;
+SQL SUCCESS

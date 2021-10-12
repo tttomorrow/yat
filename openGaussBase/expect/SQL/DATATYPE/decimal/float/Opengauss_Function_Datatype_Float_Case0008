@@ -1,0 +1,15 @@
+-- @testpoint: 插入右边界范围值
+drop table if exists float06;
+SQL SUCCESS
+create table float06 (name float);
+SQL SUCCESS
+insert into float06 values (1E+308);
+SQL SUCCESS
+select * from float06;
++---------+
+| name    |
++---------+
+| 1.0E308 |
++---------+
+drop table float06;
+SQL SUCCESS

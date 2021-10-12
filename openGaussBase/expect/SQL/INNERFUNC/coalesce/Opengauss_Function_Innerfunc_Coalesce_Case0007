@@ -1,0 +1,13 @@
+-- @testpoint:函数之间的嵌套使用
+select coalesce(exp(0),null,3);
++----------+
+| coalesce |
++----------+
+| 1.0      |
++----------+
+select exp(coalesce(null,null,0,2,3));
++-----+
+| exp |
++-----+
+| 1.0 |
++-----+

@@ -1,0 +1,47 @@
+-- @testpoint: interval分区,ALTER TABLE MOVE PARTITION表空间大小不足时合理报错
+drop table if exists table1;
+SQL SUCCESS
+drop tablespace if exists mytsp_11;
+SQL SUCCESS
+drop tablespace if exists mytsp_13;
+SQL SUCCESS
+create tablespace mytsp_11 relative location 'partition_table_space/mytsp_11' maxsize '52k';
+SQL SUCCESS
+create tablespace mytsp_13 relative location 'partition_table_space/mytsp_13' maxsize '1k';
+SQL SUCCESS
+create table table1(
+col_1 smallint,
+col_2 char(30),
+col_3 int,
+col_4 date,
+col_5 boolean,
+col_6 nchar(30),
+col_7 float
+)partition by range (col_4) interval ('1 year')
+(partition table1_p1 values less than ('5020-03-01') tablespace mytsp_11);
+SQL SUCCESS
+-- 插入数据将mytsp_11填快满
+begin
+        for i in 1..452 loop
+          insert into table1(col_4) select date '2020-03-01' + i ;
+        end loop;
+end;
+/
+SQL SUCCESS
+select relname, boundaries, spcname from pg_partition p join pg_tablespace t on p.reltablespace
+= t.oid where p.parentid = (select oid from pg_class where relname = 'table1') order by relname;
++-----------+--------------+----------+
+| relname   | boundaries   | spcname  |
++-----------+--------------+----------+
+| table1_p1 | {5020-03-01} | mytsp_11 |
++-----------+--------------+----------+
+-- 将预定义分区在分区mytsp_11的数据（快52k）移动至只有1K大小的表空间mytsp_13
+alter table table1 move partition table1_p1 tablespace mytsp_13;
+?.*ERROR: Insufficient storage space for tablespace "mytsp_13"
+?.*
+drop table if exists table1;
+SQL SUCCESS
+drop tablespace if exists mytsp_11;
+SQL SUCCESS
+drop tablespace if exists mytsp_13;
+SQL SUCCESS

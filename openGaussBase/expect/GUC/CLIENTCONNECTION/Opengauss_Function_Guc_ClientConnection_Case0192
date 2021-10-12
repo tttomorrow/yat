@@ -1,0 +1,13 @@
+-- @testpoint: set方法设置参数max_pred_locks_per_transaction,合理报错
+--查看默认
+show max_pred_locks_per_transaction;
++--------------------------------+
+| max_pred_locks_per_transaction |
++--------------------------------+
+| 64                             |
++--------------------------------+
+--设置，报错
+?.*ERROR: parameter "max_pred_locks_per_transaction" cannot be changed without restarting the server
+set max_pred_locks_per_transaction to 10;
+?.*ERROR: parameter "max_pred_locks_per_transaction" cannot be changed without restarting the server
+--no need to clean

@@ -1,0 +1,117 @@
+-- @testpoint: jsonb额外支持操作函数：jsonb_exists（字符串text是否以key\elem\scalar的形式存在JSON的顶层，同操作符 ?，当入参不合理时，合理报错）
+--合理入参：存在
+select jsonb_exists('"188"',188);
++--------------+
+| jsonb_exists |
++--------------+
+| true         |
++--------------+
+select jsonb_exists('{"a":1, "b":2}','b');
++--------------+
+| jsonb_exists |
++--------------+
+| true         |
++--------------+
+select jsonb_exists('["abcdefg",1,{"db":"test"},null,"true",false]','true');
++--------------+
+| jsonb_exists |
++--------------+
+| true         |
++--------------+
+select jsonb_exists('["abcdefg",138,{"db":"test"},null,"true",false]','abcdefg');
++--------------+
+| jsonb_exists |
++--------------+
+| true         |
++--------------+
+select jsonb_exists('["abcdefg","138",{"db":"test"},null,"true",false]','138');
++--------------+
+| jsonb_exists |
++--------------+
+| true         |
++--------------+
+select jsonb_exists('["abcdefg","138",{"db":"test"},"null","true",false]','null');
++--------------+
+| jsonb_exists |
++--------------+
+| true         |
++--------------+
+select jsonb_exists('["abcdefg",138,"{\"db\":\"test\"}",null,"true",false]','{"db":"test"}');
++--------------+
+| jsonb_exists |
++--------------+
+| true         |
++--------------+
+select jsonb_exists('["abcdefg",1,{"db":"test"},null,"true",false]',(select true ::text));
++--------------+
+| jsonb_exists |
++--------------+
+| true         |
++--------------+
+--合理入参：不存在
+select jsonb_exists( '"188.8"','"188"');
++--------------+
+| jsonb_exists |
++--------------+
+| false        |
++--------------+
+select jsonb_exists('{"a":1, "b":2}','"ab"');
++--------------+
+| jsonb_exists |
++--------------+
+| false        |
++--------------+
+select jsonb_exists('188','(select "188" ::jsonb)');
++--------------+
+| jsonb_exists |
++--------------+
+| false        |
++--------------+
+select jsonb_exists('["abcdefg",1,{"db":"test"},null,"true",false]', ' ');
++--------------+
+| jsonb_exists |
++--------------+
+| false        |
++--------------+
+select jsonb_exists('["abcdefg",138,{"db":"test"},null,"true",false]',(select 138 ::text));
++--------------+
+| jsonb_exists |
++--------------+
+| false        |
++--------------+
+select jsonb_exists('{"db":{"test":"111"}}','{"db":"test"}');
++--------------+
+| jsonb_exists |
++--------------+
+| false        |
++--------------+
+select jsonb_exists('["abcdefg",1,{"db":"test"},null,"true",false]','(select false ::text)');
++--------------+
+| jsonb_exists |
++--------------+
+| false        |
++--------------+
+--不合理入参：报错
+select jsonb_exists('{"a":1, "b":2}', (select '"b"'::jsonb));
+?.*ERROR: function jsonb_exists\(unknown, jsonb\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: jsonb_exists
+select jsonb_exists('["abcdefg",1,{"db":"test"},null,"true",false]', (select 'true'::jsonb));
+?.*ERROR: function jsonb_exists\(unknown, jsonb\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: jsonb_exists
+select jsonb_exists('["abcdefg",138,{"db":"test"},null,"true",false]', abcdefg);
+?.*ERROR: column "abcdefg" does not exist.*
+?.*
+  Where: referenced column: jsonb_exists
+select jsonb_exists('["abcdefg",138,"{\"db\":\"test\"}",null,"true",false]', "db");
+?.*ERROR: column "db" does not exist.*
+?.*
+  Where: referenced column: jsonb_exists
+select jsonb_exists('["abcdefg","138",{"db":"test"},"null","true",false]',(select 'true'::string));
+?.*ERROR: type "string" does not exist.*
+?.*
+  Where: referenced column: string
+referenced column: jsonb_exists

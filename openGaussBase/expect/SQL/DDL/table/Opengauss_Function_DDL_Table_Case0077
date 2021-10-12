@@ -1,0 +1,23 @@
+-- @testpoint: 创建表设置(表级)外键，外键不支持
+DROP TABLE IF EXISTS example;
+SQL SUCCESS
+DROP TABLE IF EXISTS t1 ;
+SQL SUCCESS
+CREATE TABLE example (
+        a integer,
+        b integer,
+        c integer,
+        PRIMARY KEY (b, c)
+    );
+SQL SUCCESS
+CREATE TABLE t1 (
+        a integer PRIMARY KEY,
+        b integer,
+        c integer,
+        FOREIGN KEY (b, c) REFERENCES example (b, c)
+    );
+SQL SUCCESS
+DROP TABLE IF EXISTS example CASCADE;
+SQL SUCCESS
+DROP TABLE IF EXISTS t1 ;
+SQL SUCCESS

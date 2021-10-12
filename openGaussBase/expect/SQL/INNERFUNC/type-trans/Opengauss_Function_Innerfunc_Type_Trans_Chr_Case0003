@@ -1,0 +1,73 @@
+-- @testpoint: 类型转换函数to_char(interval, text)时间间隔类型的值转换为指定格式的字符串，入参为有效值
+select to_char(interval '2' year ,'yyyy');
++---------+
+| to_char |
++---------+
+| 0002    |
++---------+
+select to_char(interval '15h 2m 12s', 'hh24:mi:ss');
++----------+
+| to_char  |
++----------+
+| 15:02:12 |
++----------+
+select to_char(interval '34:05:06','hh12:mi:ss');
++----------+
+| to_char  |
++----------+
+| 10:05:06 |
++----------+
+select to_char(interval '34:05:06','hh24:mi:ss');
++----------+
+| to_char  |
++----------+
+| 34:05:06 |
++----------+
+select to_char(interval '3' day ,'ddd');
++---------+
+| to_char |
++---------+
+| 003     |
++---------+
+select to_char(interval '3' day ,'dd');
++---------+
+| to_char |
++---------+
+| 03      |
++---------+
+select to_char(interval '1 year 2 months 3 days 4 hours 5 minutes 6 seconds','mi');
++---------+
+| to_char |
++---------+
+| 05      |
++---------+
+select to_char(interval '1 year 2 months 3 days 4 hours 5 minutes 6 seconds','yyyy-mm-dd hh:mi:ss');
++---------------------+
+| to_char             |
++---------------------+
+| 0001-02-03 04:05:06 |
++---------------------+
+select to_char(interval '34:05:06','ww');
++---------+
+| to_char |
++---------+
+| 01      |
++---------+
+select to_char(interval '3' day ,'天');
++---------+
+| to_char |
++---------+
+| 天       |
++---------+
+select to_char(interval '1 year 2 months 3 days 4 hours 5 minutes 6 seconds','yyyy&mm*dd hh——mi#ss');
++----------------------+
+| to_char              |
++----------------------+
+| 0001&02*03 04——05#06 |
++----------------------+
+select to_char(interval '2' year ,'dd');
++---------+
+| to_char |
++---------+
+| 00      |
++---------+

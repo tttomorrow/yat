@@ -1,0 +1,15 @@
+-- @testpoint: 正常值插入补齐空格
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (stringv char(20));
+SQL SUCCESS
+insert into type_char values ('ou mygod');
+SQL SUCCESS
+select bit_length(stringv) from type_char;
++------------+
+| bit_length |
++------------+
+| 64         |
++------------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

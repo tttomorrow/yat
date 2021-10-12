@@ -1,0 +1,2 @@
+-- @testpoint: 自然对数lnx输入为函数表达式
+select ln(replace('10','0',''));

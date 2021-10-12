@@ -1,0 +1,18 @@
+-- @testpoint: 插入空值
+drop table if exists integer13;
+SQL SUCCESS
+create table integer13 (id dec,name integer);
+SQL SUCCESS
+insert into integer13 values (1,'');
+SQL SUCCESS
+insert into integer13 values (1,null);
+SQL SUCCESS
+select * from integer13;
++----+------+
+| id | name |
++----+------+
+| 1  |      |
+| 1  |      |
++----+------+
+drop table integer13;
+SQL SUCCESS

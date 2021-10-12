@@ -1,0 +1,194 @@
+-- @testpoint: 验证【范围】分区表【truncate partition】时，update global index关键字对【btree】类型【普通索引】的重建作用
+--创建分区表，插入样例数据，建立全局索引
+drop table if exists test_ugi_085;
+SQL SUCCESS
+create table test_ugi_085
+(
+    c_id integer not null,
+    c_name varchar(16) default 'omm',
+    c_class varchar(20) not null
+)
+partition by range(c_id)
+(
+    partition p1 values less than (1001), 
+    partition p2 values less than (2001), 
+    partition p3 values less than (3001),
+    partition p4 values less than (4001),
+    partition p5 values less than (5001),
+    partition p6 values less than (6001)
+);
+SQL SUCCESS
+insert into test_ugi_085(c_id, c_class) select r, '1-1' from generate_series(1,1000) as r;
+SQL SUCCESS
+insert into test_ugi_085(c_id, c_class) select r, '1-2' from generate_series(1001,2000) as r;
+SQL SUCCESS
+insert into test_ugi_085(c_id, c_class) select r, '1-3' from generate_series(2001,3000) as r;
+SQL SUCCESS
+insert into test_ugi_085(c_id, c_class) select r, '1-4' from generate_series(3001,4000) as r;
+SQL SUCCESS
+insert into test_ugi_085(c_id, c_class) select r, '1-5' from generate_series(4001,5000) as r;
+SQL SUCCESS
+insert into test_ugi_085(c_id, c_class) select r, '1-6' from generate_series(5001,6000) as r;
+SQL SUCCESS
+create index global_index_id_085 on test_ugi_085(c_id) global;
+SQL SUCCESS
+create index global_index_class_085 on test_ugi_085(c_class) global;
+SQL SUCCESS
+--收集统计信息
+analyse test_ugi_085;
+SQL SUCCESS
+--确认清空分区可以破坏全局索引，并使用alter index xxx rebuild重建索引global_index_id_085
+--表test_ugi_085中数据量为6000行
+select count(*) from test_ugi_085;
++-------+
+| count |
++-------+
+| 6000  |
++-------+
+--查看执行计划，确认走index scan
+explain analyse select * from test_ugi_085 where c_id = 5333;
++-----------------------------------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                                                        |
++-----------------------------------------------------------------------------------------------------------------------------------+
+?.*Index Scan using global_index_id_085 on test_ugi_085?.*
+|   Index Cond: (c_id = 5333)                                                                                                       |
+?.*Total runtime:?.*
++-----------------------------------------------------------------------------------------------------------------------------------+
+--清空分区p2，破坏全局索引
+alter table test_ugi_085 truncate partition p2;
+SQL SUCCESS
+--分区p2已被清空，表中数据为5000行
+select count(*) from test_ugi_085;
++-------+
+| count |
++-------+
+| 5000  |
++-------+
+--查看索引可用情况，索引已不可用
+select c.relname, i.indisusable from pg_index i join pg_class c on i.indexrelid = c.oid 
+where i.indrelid = 'test_ugi_085'::regclass order by c.relname;
++------------------------+-------------+
+| relname                | indisusable |
++------------------------+-------------+
+| global_index_class_085 | false       |
+| global_index_id_085    | false       |
++------------------------+-------------+
+--查看执行计划，走seq scan
+explain analyse select * from test_ugi_085 where c_id = 5333;
++--------------------------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                                               |
++--------------------------------------------------------------------------------------------------------------------------+
+?.*Partition Iterator?.*
+|   Iterations: 1                                                                                                          |
+?.*->  Partitioned Seq Scan on test_ugi_085?.*
+|         Filter: (c_id = 5333)                                                                                            |
+|         Rows Removed by Filter: 999                                                                                      |
+|         Selected Partitions:  6                                                                                          |
+?.*Total runtime:?.*
++--------------------------------------------------------------------------------------------------------------------------+
+--使用alter index xxx rebuild重建索引
+alter index global_index_id_085 rebuild;
+SQL SUCCESS
+--查看索引可用情况，global_index_id_085可用，global_index_class_085不可用，可用索引查看执行计划确走index scan
+select c.relname, i.indisusable from pg_index i join pg_class c on i.indexrelid = c.oid 
+where i.indrelid = 'test_ugi_085'::regclass order by c.relname;
++------------------------+-------------+
+| relname                | indisusable |
++------------------------+-------------+
+| global_index_class_085 | false       |
+| global_index_id_085    | true        |
++------------------------+-------------+
+explain analyse select * from test_ugi_085 where c_id = 5333;
++-----------------------------------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                                                        |
++-----------------------------------------------------------------------------------------------------------------------------------+
+?.*Index Scan using global_index_id_085 on test_ugi_085?.*
+|   Index Cond: (c_id = 5333)                                                                                                       |
+?.*Total runtime:?.*
++-----------------------------------------------------------------------------------------------------------------------------------+
+vacuum analyse;
+SQL SUCCESS
+--清空分区p3，破坏全局索引，带update global index关键字
+alter table test_ugi_085 truncate partition p3 update global index;
+SQL SUCCESS
+select count(*) from test_ugi_085;
++-------+
+| count |
++-------+
+| 4000  |
++-------+
+--此时，global_index_id_085可用，global_index_class_085不可用
+select c.relname, i.indisusable from pg_index i join pg_class c on i.indexrelid = c.oid 
+where i.indrelid = 'test_ugi_085'::regclass order by c.relname;
++------------------------+-------------+
+| relname                | indisusable |
++------------------------+-------------+
+| global_index_class_085 | false       |
+| global_index_id_085    | true        |
++------------------------+-------------+
+--查看执行计划，c_id走index scan，c_class走seq scan
+explain analyse select * from test_ugi_085 where c_id = 5333;
++-----------------------------------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                                                        |
++-----------------------------------------------------------------------------------------------------------------------------------+
+?.*Index Scan using global_index_id_085 on test_ugi_085?.*
+|   Index Cond: (c_id = 5333)                                                                                                       |
+?.*Total runtime:?.*
++-----------------------------------------------------------------------------------------------------------------------------------+
+explain analyse select * from test_ugi_085 where c_class = '5-2';
++--------------------------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                                               |
++--------------------------------------------------------------------------------------------------------------------------+
+?.*Partition Iterator?.*
+|   Iterations: 6                                                                                                          |
+?.*->  Partitioned Seq Scan on test_ugi_085?.*
+|         Filter: ((c_class)::text = '5-2'::text)                                                                          |
+|         Rows Removed by Filter: 4000                                                                                     |
+|         Selected Partitions:  1..6                                                                                       |
+?.*Total runtime:?.*
++--------------------------------------------------------------------------------------------------------------------------+
+--表test_ugi_085应当包含"wait_clean_gpi=y"
+select a.relname,a.parttype,a.reloptions from pg_partition a, pg_class b 
+where a.parentid = b.oid and b.relname = 'test_ugi_085' and a.reloptions[3] like '%wait_clean_gpi=y%' order by 1,2,3;
++--------------+----------+---------------------------------------------------+
+| relname      | parttype | reloptions                                        |
++--------------+----------+---------------------------------------------------+
+| p3           | p        | {orientation=row,compression=no,wait_clean_gpi=y} |
+| test_ugi_085 | r        | {orientation=row,compression=no,wait_clean_gpi=y} |
++--------------+----------+---------------------------------------------------+
+--执行清理
+vacuum analyse;
+SQL SUCCESS
+--表test_ugi_085不再包含"wait_clean_gpi=y"
+select a.relname,a.parttype,a.reloptions from pg_partition a, pg_class b 
+where a.parentid = b.oid and b.relname = 'test_ugi_085' and a.reloptions[3] like '%wait_clean_gpi=y%' order by 1,2,3;
++---------+----------+------------+
+| relname | parttype | reloptions |
++---------+----------+------------+
++---------+----------+------------+
+--执行insert、update、delete等操作
+insert into test_ugi_085(c_id, c_class) select r, '1-1' from generate_series(1005,1020) as r;
+SQL SUCCESS
+update test_ugi_085 set c_class = '2-1' where c_id = 5005;
+SQL SUCCESS
+delete from test_ugi_085 where c_id = 4830;
+SQL SUCCESS
+--查看执行计划，c_id走index scan
+explain analyse select * from test_ugi_085 where c_id = 5333;
++-----------------------------------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                                                        |
++-----------------------------------------------------------------------------------------------------------------------------------+
+?.*Index Scan using global_index_id_085 on test_ugi_085?.*
+|   Index Cond: (c_id = 5333)                                                                                                       |
+?.*Total runtime:?.*
++-----------------------------------------------------------------------------------------------------------------------------------+
+--确认test_ugi_085表中数据量正确，4015行
+select count(*) from test_ugi_085;
++-------+
+| count |
++-------+
+| 4015  |
++-------+
+--清理表
+drop table test_ugi_085;
+SQL SUCCESS

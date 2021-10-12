@@ -1,0 +1,7 @@
+-- @testpoint: 查看segment_size,报告当前数据库所使用的段文件大小
+
+--通过show方式查看
+show segment_size;
+
+--通过系统视图pg_settings查看
+select setting from pg_settings where name='segment_size';

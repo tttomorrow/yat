@@ -1,0 +1,66 @@
+-- @testpoint: opengauss关键字next(非保留)，作为同义词对象名,部分测试点合理报错
+--前置条件
+drop table if exists explain_test;
+SQL SUCCESS
+create table explain_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists next;
+SQL SUCCESS
+create synonym next for explain_test;
+SQL SUCCESS
+insert into next values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update next set next.name='cici' where next.id=2;
+SQL SUCCESS
+select * from next;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--关键字带双引号-成功
+drop synonym if exists "next";
+SQL SUCCESS
+create synonym "next" for explain_test;
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'next';
+?.*ERROR: syntax error at or near "'next'".*
+?.*Position: .*
+create synonym 'next' for explain_test;
+?.*ERROR: syntax error at or near "'next'".*
+?.*Position: .*
+insert into 'next' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'next'".*
+?.*Position: .*
+update 'next' set 'next'.name='cici' where 'next'.id=2;
+?.*ERROR: syntax error at or near "'next'".*
+?.*Position: .*
+select * from 'next';
+?.*ERROR: syntax error at or near "'next'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop synonym if exists `next`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create synonym `next` for explain_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+insert into `next` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+update `next` set `next`.name='cici' where `next`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+select * from `next`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+--清理环境
+drop synonym if exists "next";
+SQL SUCCESS
+drop synonym if exists next;
+SQL SUCCESS
+drop table if exists explain_test;
+SQL SUCCESS

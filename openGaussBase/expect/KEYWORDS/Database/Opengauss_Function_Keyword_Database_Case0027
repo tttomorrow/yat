@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字database(非保留)，作为序列名
+--关键字不带引号-成功
+drop sequence if exists database;
+SQL SUCCESS
+create sequence database start 100 cache 50;
+SQL SUCCESS
+drop sequence database;
+SQL SUCCESS
+--关键字带双引号-成功
+drop sequence if exists "database";
+SQL SUCCESS
+create sequence "database" start 100 cache 50;
+SQL SUCCESS
+drop sequence "database";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'database';
+?.*ERROR: syntax error at or near "'database'"
+?.*
+create sequence 'database' start 100 cache 50;
+?.*ERROR: syntax error at or near "'database'"
+?.*
+--关键字带反引号-合理报错
+drop sequence if exists `database`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create sequence `database` start 100 cache 50;
+?.*ERROR: syntax error at or near "`"
+?.*

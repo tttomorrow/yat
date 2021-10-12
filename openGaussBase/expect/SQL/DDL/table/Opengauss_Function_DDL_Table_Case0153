@@ -1,0 +1,18 @@
+-- @testpoint: 创建列类型是JSON类型的表
+drop table if exists table_2;
+SQL SUCCESS
+create table table_2(a json);
+SQL SUCCESS
+insert into table_2 values('{"col1":1,"col2":"francs","col3":"male"}');
+SQL SUCCESS
+insert into table_2 values('{"col1":2,"col2":"fp","col3":"female"}');
+SQL SUCCESS
+select * from table_2;
++------------------------------------------+
+| a                                        |
++------------------------------------------+
+| {"col1":1,"col2":"francs","col3":"male"} |
+| {"col1":2,"col2":"fp","col3":"female"}   |
++------------------------------------------+
+drop table if exists table_2;
+SQL SUCCESS

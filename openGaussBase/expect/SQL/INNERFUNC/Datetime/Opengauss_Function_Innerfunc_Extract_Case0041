@@ -1,0 +1,21 @@
+-- @testpoint: 从IME类型数据（am/pm）中获取hour
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (clo1 TIME with time zone);
+SQL SUCCESS
+insert into test_date01 values ('11:00:00+08 AM');
+SQL SUCCESS
+select EXTRACT(HOUR FROM clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| 11.0      |
++-----------+
+SELECT EXTRACT(HOUR FROM TIME '8:00:00 PM');
++-----------+
+| date_part |
++-----------+
+| 20.0      |
++-----------+
+drop table if exists test_date01;
+SQL SUCCESS

@@ -1,0 +1,38 @@
+-- @testpoint: 插入其他类型，合理报错
+drop table if exists test_json_07;
+SQL SUCCESS
+create  table test_json_07 (id json);
+SQL SUCCESS
+insert into test_json_07 values ('test');
+?.*ERROR: invalid input syntax for type json
+  Detail: Token "test" is invalid.
+?.*
+  Where: JSON data, line 1: test
+referenced column: id
+insert into test_json_07 values (10000);
+?.*ERROR: column "id" is of type json but expression is of type integer
+  Hint: You will need to rewrite or cast the expression.
+?.*
+  Where: referenced column: id
+insert into test_json_07 values (100.999);
+?.*ERROR: column "id" is of type json but expression is of type numeric
+  Hint: You will need to rewrite or cast the expression.
+?.*
+  Where: referenced column: id
+insert into test_json_07 values (date'2020-02-02');
+?.*ERROR: column "id" is of type json but expression is of type timestamp without time zone
+  Hint: You will need to rewrite or cast the expression.
+?.*
+  Where: referenced column: id
+insert into test_json_07 values (TRUE);
+?.*ERROR: column "id" is of type json but expression is of type boolean
+  Hint: You will need to rewrite or cast the expression.
+?.*
+  Where: referenced column: id
+insert into test_json_07 values (HEXTORAW('DEADBEEF'));
+?.*ERROR: column "id" is of type json but expression is of type raw
+  Hint: You will need to rewrite or cast the expression.
+?.*
+  Where: referenced column: id
+drop table  test_json_07;
+SQL SUCCESS

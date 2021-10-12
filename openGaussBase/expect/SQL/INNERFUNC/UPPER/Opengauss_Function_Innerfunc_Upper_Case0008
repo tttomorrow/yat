@@ -1,0 +1,14 @@
+-- @testpoint: 字符处理函数，入参为bool类型,合理报错
+drop table if exists t_nvl_rca_tab;
+SQL SUCCESS
+create table t_nvl_rca_tab(col_1 boolean);
+SQL SUCCESS
+insert  into t_nvl_rca_tab values (true);
+SQL SUCCESS
+select upper(col_1) from t_nvl_rca_tab;
+?.*ERROR: function upper\(boolean\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position.*
+  Where: referenced column: upper
+drop table t_nvl_rca_tab;
+SQL SUCCESS

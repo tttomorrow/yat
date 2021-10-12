@@ -1,0 +1,15 @@
+-- @testpoint: 创建列类型是数值类型的列存表
+drop table if exists table_1;
+SQL SUCCESS
+create table table_1(a integer,b decimal,c serial)with (ORIENTATION=COLUMN);
+SQL SUCCESS
+insert into table_1 values(123,253,963);
+SQL SUCCESS
+select * from table_1;
++-----+-----+-----+
+| a   | b   | c   |
++-----+-----+-----+
+| 123 | 253 | 963 |
++-----+-----+-----+
+drop table if exists table_1;
+SQL SUCCESS

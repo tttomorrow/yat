@@ -1,0 +1,37 @@
+--  @testpoint: insert3W数据再建索引
+--建普通表
+DROP TABLE if EXISTS test_index_table_182 CASCADE;
+SQL SUCCESS
+create table test_index_table_182(c_char2000 char(2000),c_varchar1900 varchar(1900) );
+SQL SUCCESS
+begin
+    for i in 0..30000 loop
+        insert into test_index_table_182 values(i,i);
+    end loop;
+end;
+/
+SQL SUCCESS
+drop index if exists index_182_01;
+SQL SUCCESS
+create index index_182_01 on test_index_table_182(c_char2000,c_varchar1900);
+SQL SUCCESS
+select relname from pg_class where relname like 'index_182_%';
++--------------+
+| relname      |
++--------------+
+| index_182_01 |
++--------------+
+explain select * from test_index_table_182 where c_char2000 = '50' group by c_char2000,c_varchar1900;
++-----------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                              |
++-----------------------------------------------------------------------------------------+
+?.*
+?.*
+?.*Bitmap.*
+?.*
+?.*Bitmap.*
+?.*
++-----------------------------------------------------------------------------------------+
+--清理环境
+DROP TABLE if EXISTS test_index_table_182 CASCADE;
+SQL SUCCESS

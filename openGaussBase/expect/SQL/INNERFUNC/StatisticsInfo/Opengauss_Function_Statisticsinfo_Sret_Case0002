@@ -1,0 +1,12 @@
+-- @testpoint: pg_stat_reset()函数的异常校验，合理报错
+-- 多参
+select pg_stat_reset('*&^%');
+?.*ERROR: function pg_stat_reset\(unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_stat_reset
+select pg_stat_reset(61888);
+?.*ERROR: function pg_stat_reset\(integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_stat_reset

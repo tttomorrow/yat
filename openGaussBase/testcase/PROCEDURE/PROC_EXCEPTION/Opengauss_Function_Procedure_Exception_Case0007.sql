@@ -1,0 +1,18 @@
+-- @testpoint: 验证存储过程是否支持抛出用户自定义异常
+
+create or replace procedure employee_income(salary number)
+is
+ low_income exception;
+begin
+  if salary<30000 then
+    raise low_income;
+    end if;
+exception
+  when low_income then
+    raise info 'low_income%',salary;
+ end;
+ /
+--调用存储过程
+call employee_income(10000);
+--清理环境
+drop procedure employee_income;

@@ -1,0 +1,27 @@
+-- @testpoint: pg_stat_get_backend_userid(integer)，给定服务器进程的用户ID，当入参为无效值时，合理报错
+--入参为有效值时
+select pg_stat_get_backend_userid(1);
++----------------------------+
+| pg_stat_get_backend_userid |
++----------------------------+
+| 0                          |
++----------------------------+
+--当入参为无效值（为空、字母、特殊字符、多参）时
+select pg_stat_get_backend_userid();
+?.*ERROR: function pg_stat_get_backend_userid\(\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_stat_get_backend_userid
+select pg_stat_get_backend_userid('abc');
+?.*ERROR: invalid input syntax for integer: "abc.*
+?.*
+  Where: referenced column: pg_stat_get_backend_userid
+select pg_stat_get_backend_userid('@#%');
+?.*ERROR: invalid input syntax for integer: "@#%.*
+?.*
+  Where: referenced column: pg_stat_get_backend_userid
+select pg_stat_get_backend_userid(1,2);
+?.*ERROR: function pg_stat_get_backend_userid\(integer, integer\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_stat_get_backend_userid

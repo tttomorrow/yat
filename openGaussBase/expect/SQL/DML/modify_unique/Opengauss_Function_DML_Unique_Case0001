@@ -1,0 +1,18 @@
+-- @testpoint: 创建列为tab1_unique的测试表，并修改其约束为unique，再次更新唯一约束列,约束名已存在，合理报错
+drop table if exists tab1;
+SQL SUCCESS
+create table tab1(tab1_unique  int);
+SQL SUCCESS
+alter table tab1 add constraint un unique (tab1_unique);
+SQL SUCCESS
+alter table tab1 add  column  tab1_id  char(30);
+SQL SUCCESS
+select * from  tab1;
++-------------+---------+
+| tab1_unique | tab1_id |
++-------------+---------+
++-------------+---------+
+alter table tab1 add constraint un unique(tab1_id );
+?.*ERROR: relation "un" already exists.*
+drop table tab1;
+SQL SUCCESS

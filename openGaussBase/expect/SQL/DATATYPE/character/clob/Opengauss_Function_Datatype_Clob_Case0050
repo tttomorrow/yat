@@ -1,0 +1,16 @@
+-- @testpoint: 插入正常值
+-- @modified at: 2020-11-13
+drop table if exists test_clob_050;
+SQL SUCCESS
+create table test_clob_050(c_clob clob);
+SQL SUCCESS
+insert into test_clob_050 values('ffffffffffffffefqwefqfqwefqweqw');
+SQL SUCCESS
+select * from test_clob_050;
++---------------------------------+
+| c_clob                          |
++---------------------------------+
+| ffffffffffffffefqwefqfqwefqweqw |
++---------------------------------+
+drop table test_clob_050;
+SQL SUCCESS

@@ -1,0 +1,12 @@
+-- @testpoint: power函数,幂为1
+select power(2,1) as result from sys_dummy;
++--------+
+| result |
++--------+
+| 2.0    |
++--------+
+select power(25.0,1) as result from sys_dummy;
++---------------------+
+| result              |
++---------------------+
++---------------------+

@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字nvarchar2(非保留)，作为数据库名
+--关键字不带引号-成功
+drop database if exists nvarchar2;
+SQL SUCCESS
+create database nvarchar2;
+SQL SUCCESS
+drop database nvarchar2;
+SQL SUCCESS
+--关键字带双引号-成功
+drop database if exists "nvarchar2";
+SQL SUCCESS
+create database "nvarchar2";
+SQL SUCCESS
+drop database "nvarchar2";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop database if exists 'nvarchar2';
+?.*ERROR: syntax error at or near "'nvarchar2'".*
+?.*Position: .*
+create database 'nvarchar2';
+?.*ERROR: syntax error at or near "'nvarchar2'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop database if exists `nvarchar2`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create database `nvarchar2`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

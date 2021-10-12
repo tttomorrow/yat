@@ -1,0 +1,17 @@
+-- @testpoint: alter system set方法设置参数值，合理报错
+--查看默认
+show session_replication_role;
++--------------------------+
+| session_replication_role |
++--------------------------+
+| origin                   |
++--------------------------+
+--修改，报错
+alter system set session_replication_role to local;
+?.*ERROR: unsupport parameter: session_replication_role
+ALTER SYSTEM SET only support POSTMASTER-level, SIGHUP-level and BACKEND-level guc variable,
+and it must be allowed to set in postgresql.conf.
+alter system set session_replication_role to replica;
+?.*ERROR: unsupport parameter: session_replication_role
+ALTER SYSTEM SET only support POSTMASTER-level, SIGHUP-level and BACKEND-level guc variable,
+and it must be allowed to set in postgresql.conf.

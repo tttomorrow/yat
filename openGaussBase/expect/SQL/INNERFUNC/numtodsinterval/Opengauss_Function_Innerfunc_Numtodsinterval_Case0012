@@ -1,0 +1,9 @@
+-- @testpoint: numtodsinterval函数interval_unit为'HOUR',兼容格式输出
+SET intervalstyle = a;
+SQL SUCCESS
+SELECT numtodsinterval(100, 'HOUR') from sys_dummy;
++------------------------------------------------+
+| numtodsinterval                                |
++------------------------------------------------+
+| 0 years 0 mons 0 days 0 hours 0 mins 0.00 secs |
++------------------------------------------------+

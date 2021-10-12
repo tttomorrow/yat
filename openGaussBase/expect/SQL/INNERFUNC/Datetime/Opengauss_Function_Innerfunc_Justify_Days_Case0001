@@ -1,0 +1,21 @@
+--  @testpoint: justify_days 不足一个月的天数
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (clo1 interval );
+SQL SUCCESS
+insert into test_date01 values ('1 year 33 months 29 days 1.5 hours 3 m 4 s');
+SQL SUCCESS
+select justify_days(clo1) from test_date01;
++--------------------------------------------------+
+| justify_days                                     |
++--------------------------------------------------+
+| 3 years 9 mons 29 days 1 hours 33 mins 4.00 secs |
++--------------------------------------------------+
+SELECT justify_days(interval  '1 year 33 months 29 days 1.5 hours 3 m 4 s');
++--------------------------------------------------+
+| justify_days                                     |
++--------------------------------------------------+
+| 3 years 9 mons 29 days 1 hours 33 mins 4.00 secs |
++--------------------------------------------------+
+drop table if exists test_date01;
+SQL SUCCESS

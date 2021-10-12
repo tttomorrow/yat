@@ -1,0 +1,37 @@
+-- @testpoint: 函数current_setting(setting_name)，用于以查询形式获取setting_name的当前值.与show方式查看结果等效
+show datestyle;
++-----------+
+| DateStyle |
++-----------+
+| ISO, MDY  |
++-----------+
+select current_setting('datestyle');
++-----------------+
+| current_setting |
++-----------------+
+| ISO, MDY        |
++-----------------+
+show geqo_threshold;
++----------------+
+| geqo_threshold |
++----------------+
+| 12             |
++----------------+
+select current_setting('geqo_threshold');
++-----------------+
+| current_setting |
++-----------------+
+| 12              |
++-----------------+
+show track_activities;
++------------------+
+| track_activities |
++------------------+
+| on               |
++------------------+
+select current_setting('track_activities');
++-----------------+
+| current_setting |
++-----------------+
+| on              |
++-----------------+

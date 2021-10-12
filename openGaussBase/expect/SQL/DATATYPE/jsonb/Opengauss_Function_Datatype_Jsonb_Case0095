@@ -1,0 +1,173 @@
+-- @testpoint: jsonb额外支持操作函数：jsonb_cmp(比较两个jsonb的大小,输入不合理，合理报错）
+-- 比较规则:object-jsonb > array-jsonb > bool-jsonb > num-jsonb > str-jsonb > null-jsonb
+--同类型
+select jsonb_cmp('"str"','"string"');
++-----------+
+| jsonb_cmp |
++-----------+
+| -1        |
++-----------+
+select jsonb_cmp('null','null' );
++-----------+
+| jsonb_cmp |
++-----------+
+| 0         |
++-----------+
+select jsonb_cmp('false','false');
++-----------+
+| jsonb_cmp |
++-----------+
+| 0         |
++-----------+
+select jsonb_cmp('false','true');
++-----------+
+| jsonb_cmp |
++-----------+
+| -1        |
++-----------+
+select jsonb_cmp('{"a":1, "b": [10,2,3],"c":{"b":"d"}}','{"b":[10,2,3]}');
++-----------+
+| jsonb_cmp |
++-----------+
+| 1         |
++-----------+
+select jsonb_cmp('[null, false, 123,{"a":true},"test"]','[123,{"a":false},"test",null, false]');
++-----------+
+| jsonb_cmp |
++-----------+
+| -1        |
++-----------+
+select jsonb_cmp('105.2e-3','1.0520e-1');
++-----------+
+| jsonb_cmp |
++-----------+
+| 0         |
++-----------+
+--不同类型
+select jsonb_cmp('"str"', 'null');
++-----------+
+| jsonb_cmp |
++-----------+
+| 1         |
++-----------+
+select jsonb_cmp('null','true' );
++-----------+
+| jsonb_cmp |
++-----------+
+| -1        |
++-----------+
+select jsonb_cmp('null','0' );
++-----------+
+| jsonb_cmp |
++-----------+
+| -1        |
++-----------+
+select jsonb_cmp('null', '{"b":[10,2,3]}');
++-----------+
+| jsonb_cmp |
++-----------+
+| -1        |
++-----------+
+select jsonb_cmp('null','[12,"test",null, false]');
++-----------+
+| jsonb_cmp |
++-----------+
+| -1        |
++-----------+
+select jsonb_cmp('true','1');
++-----------+
+| jsonb_cmp |
++-----------+
+| 1         |
++-----------+
+select jsonb_cmp('{"a":1, "b": [10,2,3],"c":{"b":"d"}}','[{"b":[10,2,3]},{"a":1},{"c":{"b":"d"}}]');
++-----------+
+| jsonb_cmp |
++-----------+
+| 1         |
++-----------+
+select jsonb_cmp('[{"a":false},{"a":true}]','{"a": true,"a": false}');
++-----------+
+| jsonb_cmp |
++-----------+
+| -1        |
++-----------+
+select jsonb_cmp('105.2e3','"0.1052"');
++-----------+
+| jsonb_cmp |
++-----------+
+| 1         |
++-----------+
+select jsonb_cmp('0','false');
++-----------+
+| jsonb_cmp |
++-----------+
+| -1        |
++-----------+
+select jsonb_cmp('258','{"a":258}');
++-----------+
+| jsonb_cmp |
++-----------+
+| -1        |
++-----------+
+select jsonb_cmp('0.369','[0.369]');
++-----------+
+| jsonb_cmp |
++-----------+
+| -1        |
++-----------+
+select jsonb_cmp('"true"','true' );
++-----------+
+| jsonb_cmp |
++-----------+
+| -1        |
++-----------+
+select jsonb_cmp('"true"','{"a":"true"}' );
++-----------+
+| jsonb_cmp |
++-----------+
+| -1        |
++-----------+
+select jsonb_cmp('"true"','["true"]' );
++-----------+
+| jsonb_cmp |
++-----------+
+| -1        |
++-----------+
+select jsonb_cmp('{"a":1, "b": [10,2,3],"c":{"b":"d"}}','true');
++-----------+
+| jsonb_cmp |
++-----------+
+| 1         |
++-----------+
+select jsonb_cmp('[{"a":false},{"a":true}]','false');
++-----------+
+| jsonb_cmp |
++-----------+
+| 1         |
++-----------+
+--入参非jsonb
+select jsonb_cmp('{a:1, b: [10,2,3],c:{b:d}}','true');
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "a" is invalid.
+?.*
+  Where: JSON data, line 1: {a...
+referenced column: jsonb_cmp
+select jsonb_cmp('{a:1, a: [10,2,3],a:{b:d}}','{a:1}');
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "a" is invalid.
+?.*
+  Where: JSON data, line 1: {a...
+referenced column: jsonb_cmp
+select jsonb_cmp('[{a:false},{a:true},123,'qwer','null']','{"a":false}');
+?.*ERROR: syntax error at or near "qwer.*
+?.*
+select jsonb_cmp('[{a:false},{a:true},123,'qwer','null']','123');
+?.*ERROR: syntax error at or near "qwer.*
+?.*
+select jsonb_cmp('[{a:false},{a:true},123,'qwer','null']','qwer');
+?.*ERROR: syntax error at or near "qwer.*
+?.*
+select jsonb_cmp('[{a:false},{a:true},123,'"qwer"','null']','qwer');
+?.*ERROR: syntax error at or near ""qwer".*
+?.*

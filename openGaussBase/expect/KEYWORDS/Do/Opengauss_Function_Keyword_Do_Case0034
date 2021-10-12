@@ -1,0 +1,50 @@
+-- @testpoint: opengauss关键字do(保留)，作为游标名，部分测试点合理报错
+--前置条件
+drop table if exists do_test cascade;
+SQL SUCCESS
+create table do_test(cid int,fid int);
+SQL SUCCESS
+--关键字不带引号-失败
+start transaction;
+SQL SUCCESS
+cursor do for select * from do_test order by 1;
+?.*ERROR: syntax error at or near "do"
+?.*Position: .*
+close do;
+?.*ERROR: syntax error at or near "do"
+?.*Position: .*
+end;
+SQL SUCCESS
+--关键字带双引号-成功
+start transaction;
+SQL SUCCESS
+cursor "do" for select * from do_test order by 1;
+SQL SUCCESS
+close "do";
+SQL SUCCESS
+end;
+SQL SUCCESS
+--关键字带单引号-合理报错
+start transaction;
+SQL SUCCESS
+cursor 'do' for select * from do_test order by 1;
+?.*ERROR: syntax error at or near "'do'"
+?.*Position: .*
+close 'do';
+?.*ERROR: syntax error at or near "'do'"
+?.*Position: .*
+end;
+SQL SUCCESS
+--关键字带反引号-合理报错
+start transaction;
+SQL SUCCESS
+cursor `do` for select * from do_test order by 1;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+close `do`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+end;
+SQL SUCCESS
+drop table if exists do_test cascade;
+SQL SUCCESS

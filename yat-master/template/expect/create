@@ -1,0 +1,2 @@
+create table aaaa(id int, name varchar(128), xa timestamp(0), beep varchar(128) null)
+create  index index_xxx on aaaa(id)

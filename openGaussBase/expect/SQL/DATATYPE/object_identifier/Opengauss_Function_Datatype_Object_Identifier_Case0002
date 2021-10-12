@@ -1,0 +1,28 @@
+-- @testpoint:数据插入；
+drop table if exists object_identifier_002;
+SQL SUCCESS
+CREATE  TABLE object_identifier_002(
+	c1 OID,
+	c2 CID,
+	c3 XID,
+	c4 TID,
+	c5 REGCONFIG,
+	c6 REGDICTIONARY,
+	c7 REGOPER,
+	c8 REGOPERATOR,
+	c9 REGPROC,
+	c10 REGPROCEDURE,
+	c11 REGCLASS,
+	c12 REGTYPE
+);
+SQL SUCCESS
+insert into object_identifier_002 values (564182,null,null,null,'english','simple',null,'*(integer,integer)',null,'sum(int4)','pg_type','integer');
+SQL SUCCESS
+select * from object_identifier_002;
++--------+----+----+----+---------+--------+----+--------------------+----+--------------+---------+---------+
+| c1     | c2 | c3 | c4 | c5      | c6     | c7 | c8                 | c9 | c10          | c11     | c12     |
++--------+----+----+----+---------+--------+----+--------------------+----+--------------+---------+---------+
+| 564182 |    |    |    | english | simple |    | *(integer,integer) |    | sum(integer) | pg_type | integer |
++--------+----+----+----+---------+--------+----+--------------------+----+--------------+---------+---------+
+drop table if exists object_identifier_002;
+SQL SUCCESS

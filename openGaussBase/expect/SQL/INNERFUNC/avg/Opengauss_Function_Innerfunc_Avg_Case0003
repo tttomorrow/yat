@@ -1,0 +1,16 @@
+
+
+-- @testpoint: null值
+
+select avg(null) from sys_dummy order by 1;
++-----+
+| avg |
++-----+
+|     |
++-----+
+select avg('') from sys_dummy order by 1;
++-----+
+| avg |
++-----+
+|     |
++-----+

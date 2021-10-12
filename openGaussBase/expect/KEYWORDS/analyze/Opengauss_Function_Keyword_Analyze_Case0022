@@ -1,0 +1,30 @@
+--  @testpoint:opengauss关键字Analyze(保留)，作为用户组名
+--关键字不带引号-合理报错
+drop group if exists Analyze;
+?.*ERROR: syntax error at or near "Analyze".*
+?.*Position.*
+create group Analyze with password 'gauss@123';
+?.*ERROR: syntax error at or near "Analyze".*
+?.*Position.*
+--关键字带双引号-成功
+drop group if exists "Analyze";
+SQL SUCCESS
+create group "Analyze" with password 'gauss@123';
+SQL SUCCESS
+--清理环境
+drop group "Analyze";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop group if exists 'Analyze';
+?.*ERROR: syntax error at or near "'Analyze'".*
+?.*Position.*
+create group 'Analyze' with password 'gauss@123';
+?.*ERROR: syntax error at or near "'Analyze'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop group if exists `Analyze`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create group `Analyze` with password 'gauss@123';
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*

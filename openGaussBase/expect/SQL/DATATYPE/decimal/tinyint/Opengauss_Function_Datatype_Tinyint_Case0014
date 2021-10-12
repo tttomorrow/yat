@@ -1,0 +1,18 @@
+-- @testpoint: 插入空值
+drop table if exists tinyint14;
+SQL SUCCESS
+create table tinyint14 (id int,name tinyint);
+SQL SUCCESS
+insert into tinyint14 values (1,null);
+SQL SUCCESS
+insert into tinyint14 values (2,'');
+SQL SUCCESS
+select * from tinyint14;
++----+------+
+| id | name |
++----+------+
+| 1  |      |
+| 2  |      |
++----+------+
+drop table tinyint14;
+SQL SUCCESS

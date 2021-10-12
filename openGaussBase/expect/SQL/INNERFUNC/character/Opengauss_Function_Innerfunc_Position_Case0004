@@ -1,0 +1,15 @@
+-- @testpoint: 空格检索
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (stringv char(20));
+SQL SUCCESS
+insert into type_char values ('str inging');
+SQL SUCCESS
+SELECT position(' ' in stringv) from type_char;
++----------+
+| position |
++----------+
+| 4        |
++----------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

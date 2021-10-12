@@ -1,0 +1,66 @@
+-- @testpoint: opengauss关键字using(保留)，作为同义词对象名，部分测试点合理报错
+--前置条件
+drop table if exists using_test;
+SQL SUCCESS
+create table using_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-失败
+drop synonym if exists using;
+?.*ERROR: syntax error at or near "using".*
+?.*Position.*
+create synonym using for using_test;
+?.*ERROR: syntax error at or near "using".*
+?.*Position.*
+--关键字带双引号-成功
+drop synonym if exists "using";
+SQL SUCCESS
+create synonym "using" for using_test;
+SQL SUCCESS
+insert into "using" values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update "using" set "using".name='cici' where "using".id=2;
+SQL SUCCESS
+select * from "using";
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--清理环境
+drop synonym "using";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'using';
+?.*ERROR: syntax error at or near "'using'".*
+?.*Position.*
+create synonym 'using' for using_test;
+?.*ERROR: syntax error at or near "'using'".*
+?.*Position.*
+insert into 'using' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'using'".*
+?.*Position.*
+update 'using' set 'using'.name='cici' where 'using'.id=2;
+?.*ERROR: syntax error at or near "'using'".*
+?.*Position.*
+select * from 'using';
+?.*ERROR: syntax error at or near "'using'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop synonym if exists `using`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create synonym `using` for using_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+insert into `using` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+update `using` set `using`.name='cici' where `using`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+select * from `using`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+drop table if exists using_test;
+SQL SUCCESS

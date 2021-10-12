@@ -1,0 +1,39 @@
+-- @testpoint: 关键字xmlattributes，用作字符串
+drop table if exists xmlattributes_test cascade;
+SQL SUCCESS
+create table xmlattributes_test(id int,name varchar(20));
+SQL SUCCESS
+create or replace procedure xmlattributes_insert
+as
+begin
+ for i in 1..10 loop
+    insert into xmlattributes_test values(i,'xmlattributes'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call xmlattributes_insert();
++----------------------+
+| xmlattributes_insert |
++----------------------+
+|                      |
++----------------------+
+select * from xmlattributes_test;
++----+-----------------+
+| id | name            |
++----+-----------------+
+| 1  | xmlattributes1  |
+| 2  | xmlattributes2  |
+| 3  | xmlattributes3  |
+| 4  | xmlattributes4  |
+| 5  | xmlattributes5  |
+| 6  | xmlattributes6  |
+| 7  | xmlattributes7  |
+| 8  | xmlattributes8  |
+| 9  | xmlattributes9  |
+| 10 | xmlattributes10 |
++----+-----------------+
+drop table if exists xmlattributes_test cascade;
+SQL SUCCESS
+drop procedure xmlattributes_insert;
+SQL SUCCESS

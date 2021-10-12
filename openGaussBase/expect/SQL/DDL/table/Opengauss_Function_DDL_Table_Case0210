@@ -1,0 +1,29 @@
+-- @testpoint: alter table对多个列设置联合主键，合理报错
+drop table if exists alter_table_tb008;
+SQL SUCCESS
+create table alter_table_tb008(col1 int, col2 int,col3 int,col4 int);
+SQL SUCCESS
+create unique index test_hsf on alter_table_tb008(col1,col2);
+SQL SUCCESS
+ALTER TABLE alter_table_tb008 ADD CONSTRAINT CON_HSF PRIMARY KEY(col1,col2);
+SQL SUCCESS
+ALTER TABLE alter_table_tb008 ADD CONSTRAINT CON_HSF2 PRIMARY KEY(col1,col2,col3);
+?.*ERROR: multiple primary keys for table "alter_table_tb008" are not allowed
+--error
+ALTER TABLE alter_table_tb008  DROP CONSTRAINT  CON_HSF;
+SQL SUCCESS
+ALTER TABLE alter_table_tb008  DROP CONSTRAINT  CON_HSF2;
+?.*ERROR: constraint "con_hsf2" of relation "alter_table_tb008" does not exist
+--error
+ALTER TABLE alter_table_tb008 ADD CONSTRAINT CON_HSF3 PRIMARY KEY(col1,col2);
+SQL SUCCESS
+ALTER TABLE alter_table_tb008 ADD CONSTRAINT CON_HSF4 PRIMARY KEY(col1,col2,col3);
+?.*ERROR: multiple primary keys for table "alter_table_tb008" are not allowed
+--error
+select * from ALTER_TABLE_TB008 order by 1,2;
++------+------+------+------+
+| col1 | col2 | col3 | col4 |
++------+------+------+------+
++------+------+------+------+
+drop table if exists alter_table_tb008;
+SQL SUCCESS

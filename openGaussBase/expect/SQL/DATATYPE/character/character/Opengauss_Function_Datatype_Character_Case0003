@@ -1,0 +1,7 @@
+-- @testpoint: 字节长度设定为负数，合理报错
+-- @modify at: 2020-11-05
+drop table if exists test_character_03;
+SQL SUCCESS
+create table test_character_03 (name character(-1));
+?.*ERROR: syntax error at or near "-"
+?.*

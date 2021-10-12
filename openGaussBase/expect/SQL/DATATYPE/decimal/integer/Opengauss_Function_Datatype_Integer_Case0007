@@ -1,0 +1,24 @@
+-- @testpoint: 插入指数形式值
+drop table if exists integer07;
+SQL SUCCESS
+create table integer07 (name integer);
+SQL SUCCESS
+insert into integer07 values (exp(3));
+SQL SUCCESS
+insert into integer07 values (exp(1.23));
+SQL SUCCESS
+insert into integer07 values (exp(-5));
+SQL SUCCESS
+insert into integer07 values (exp(-1.5));
+SQL SUCCESS
+select * from integer07;
++------+
+| name |
++------+
+| 20   |
+| 3    |
+| 0    |
+| 0    |
++------+
+drop table integer07;
+SQL SUCCESS

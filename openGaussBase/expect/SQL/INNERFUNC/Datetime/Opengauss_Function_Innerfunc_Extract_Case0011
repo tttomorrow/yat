@@ -1,0 +1,63 @@
+--  @testpoint: EXTRACT 时间格式为date(只有时分秒、有时区无时区、边界值)年份除以10
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (clo1 date);
+SQL SUCCESS
+insert into test_date01 values ('0001-01-01 00:00:00');
+SQL SUCCESS
+insert into test_date01 values ('2001-01-01 pst');
+SQL SUCCESS
+insert into test_date01 values ('1998-01-01');
+SQL SUCCESS
+insert into test_date01 values ('1830-01-01 23:00:00 pst');
+SQL SUCCESS
+insert into test_date01 values ('2505-01-01 00:00:00+8');
+SQL SUCCESS
+select EXTRACT(DECADE FROM clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| 0.0       |
+| 200.0     |
+| 199.0     |
+| 183.0     |
+| 250.0     |
++-----------+
+SELECT EXTRACT(DECADE FROM date '0001-01-01 00:00:00');
++-----------+
+| date_part |
++-----------+
+| 0.0       |
++-----------+
+SELECT EXTRACT(DECADE FROM date '0101-01-01 00:00:00');
++-----------+
+| date_part |
++-----------+
+| 10.0      |
++-----------+
+SELECT EXTRACT(DECADE FROM date '0218-01-01 pst');
++-----------+
+| date_part |
++-----------+
+| 21.0      |
++-----------+
+SELECT EXTRACT(DECADE FROM date '1998-01-01');
++-----------+
+| date_part |
++-----------+
+| 199.0     |
++-----------+
+SELECT EXTRACT(DECADE FROM date '1830-01-01 23:00:00 pst');
++-----------+
+| date_part |
++-----------+
+| 183.0     |
++-----------+
+SELECT EXTRACT(DECADE FROM date '9999-12-31 00:00:00+8');
++-----------+
+| date_part |
++-----------+
+| 999.0     |
++-----------+
+drop table if exists test_date01;
+SQL SUCCESS

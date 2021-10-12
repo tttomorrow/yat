@@ -1,0 +1,83 @@
+-- @testpoint: 修改表并重命名索引，合理报错
+drop table if exists table_alter_029;
+SQL SUCCESS
+CREATE TABLE table_alter_029 (c1 VARCHAR(255),c2 int);
+SQL SUCCESS
+insert into table_alter_029 values ('ddd',1);
+SQL SUCCESS
+insert into table_alter_029 values ('',2);
+SQL SUCCESS
+insert into table_alter_029 values (null,3);
+SQL SUCCESS
+insert into table_alter_029 values ('',4);
+SQL SUCCESS
+insert into table_alter_029 values (null,5);
+SQL SUCCESS
+ALTER TABLE table_alter_029 add constraint con_table_alter_029_1 check(c1 != '');
+SQL SUCCESS
+ALTER TABLE table_alter_029 add constraint con_table_alter_029_2 check(c2 != '');
+SQL SUCCESS
+insert into table_alter_029 values ('',7);
+SQL SUCCESS
+insert into table_alter_029 values ('','');
+SQL SUCCESS
+ALTER TABLE table_alter_029 rename constraint con_table_alter_029_2 to con_table_alter_029_3;
+SQL SUCCESS
+ALTER TABLE table_alter_029 add constraint con_table_alter_029_4 check(c1 !='');
+SQL SUCCESS
+--defult '84'
+drop table if exists table_alter_029;
+SQL SUCCESS
+CREATE TABLE table_alter_029 (c1 VARCHAR(255) default '4',c2 int default 4);
+SQL SUCCESS
+insert into table_alter_029 values ('ddd',1);
+SQL SUCCESS
+insert into table_alter_029 values ('',2);
+SQL SUCCESS
+insert into table_alter_029 values (null,3);
+SQL SUCCESS
+insert into table_alter_029 values ('',4);
+SQL SUCCESS
+insert into table_alter_029 values (null,5);
+SQL SUCCESS
+ALTER TABLE table_alter_029 add constraint con_table_alter_029_1 check(c1 !='');
+SQL SUCCESS
+ALTER TABLE table_alter_029 add constraint con_table_alter_029_2 check(c2 !='');
+SQL SUCCESS
+insert into table_alter_029 values ('84',7);
+SQL SUCCESS
+insert into table_alter_029 values ('',4);
+SQL SUCCESS
+ALTER TABLE table_alter_029 rename constraint con_table_alter_029_2 to con_table_alter_029_3;
+SQL SUCCESS
+ALTER TABLE table_alter_029 add constraint con_table_alter_029_4 check(c1 !='');
+SQL SUCCESS
+--参数
+drop table if exists table_alter_029;
+SQL SUCCESS
+CREATE TABLE table_alter_029 (c1 VARCHAR(255) default '4',c2 int default 4);
+SQL SUCCESS
+insert into table_alter_029 values ('ddd',1);
+SQL SUCCESS
+insert into table_alter_029 values ('',2);
+SQL SUCCESS
+insert into table_alter_029 values (null,3);
+SQL SUCCESS
+insert into table_alter_029 values ('',4);
+SQL SUCCESS
+insert into table_alter_029 values (null,5);
+SQL SUCCESS
+ALTER TABLE table_alter_029 add constraint con_table_alter_029_1 check(c1 !='');
+SQL SUCCESS
+ALTER TABLE table_alter_029 add constraint con_table_alter_029_2 check(c2 !='');
+SQL SUCCESS
+insert into table_alter_029 values ('84',7);
+SQL SUCCESS
+insert into table_alter_029 values ('',4);
+SQL SUCCESS
+ALTER TABLE table_alter_029 rename constraint con_table_alter_029_2 to con_table_alter_029_3;
+SQL SUCCESS
+ALTER TABLE table_alter_029 add constraint con_table_alter_029_4 check(c1 !='');
+SQL SUCCESS
+drop table if exists table_alter_029;
+SQL SUCCESS

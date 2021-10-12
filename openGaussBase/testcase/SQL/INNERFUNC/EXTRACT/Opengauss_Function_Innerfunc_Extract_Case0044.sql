@@ -1,0 +1,5 @@
+-- @testpoint: extract(field from timestamp)从给定的时间戳里获取day的值（field的取值范围：day)
+-- day 如果source为timestamp，表示月份里的日期（1-31）
+select extract(day from timestamp '2001-02-16 20:38:40') from sys_dummy;
+-- day 如果source为interval，表示天数
+select extract(day from interval '40 days 1 minute') from sys_dummy;

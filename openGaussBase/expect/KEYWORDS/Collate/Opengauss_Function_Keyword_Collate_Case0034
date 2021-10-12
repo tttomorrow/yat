@@ -1,0 +1,50 @@
+-- @testpoint: opengauss关键字collate(保留)，作为游标名，部分测试点合理报错
+--前置条件
+drop table if exists collate_test cascade;
+SQL SUCCESS
+create table collate_test(cid int,fid int);
+SQL SUCCESS
+--关键字不带引号-失败
+start transaction;
+SQL SUCCESS
+cursor collate for select * from collate_test order by 1;
+?.*ERROR: syntax error at or near "collate"
+?.*Position: .*
+close collate;
+?.*ERROR: syntax error at or near "collate"
+?.*Position: .*
+end;
+SQL SUCCESS
+--关键字带双引号-成功
+start transaction;
+SQL SUCCESS
+cursor "collate" for select * from collate_test order by 1;
+SQL SUCCESS
+close "collate";
+SQL SUCCESS
+end;
+SQL SUCCESS
+--关键字带单引号-合理报错
+start transaction;
+SQL SUCCESS
+cursor 'collate' for select * from collate_test order by 1;
+?.*ERROR: syntax error at or near "'collate'"
+?.*Position: .*
+close 'collate';
+?.*ERROR: syntax error at or near "'collate'"
+?.*Position: .*
+end;
+SQL SUCCESS
+--关键字带反引号-合理报错
+start transaction;
+SQL SUCCESS
+cursor `collate` for select * from collate_test order by 1;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+close `collate`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+end;
+SQL SUCCESS
+drop table if exists collate_test cascade;
+SQL SUCCESS

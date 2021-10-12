@@ -1,0 +1,15 @@
+-- @testpoint: lengthb函数入参为数值类型
+drop table if exists t_nvl_rca_tab;
+SQL SUCCESS
+create table t_nvl_rca_tab(COL_1 bigint);
+SQL SUCCESS
+insert into t_nvl_rca_tab values(12345678);
+SQL SUCCESS
+select distinct LENGTHB(COL_1) from t_nvl_rca_tab;
++---------+
+| lengthb |
++---------+
+| 8       |
++---------+
+drop table t_nvl_rca_tab;
+SQL SUCCESS

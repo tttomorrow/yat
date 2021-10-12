@@ -1,0 +1,27 @@
+
+
+-- @testpoint: 与WHERE联用
+
+drop table if exists t_ascii;
+SQL SUCCESS
+create table t_ascii(id int,v_char varchar(10));
+SQL SUCCESS
+insert into t_ascii values(1,'a');
+SQL SUCCESS
+insert into t_ascii values(2,'b');
+SQL SUCCESS
+insert into t_ascii values(3,'c');
+SQL SUCCESS
+insert into t_ascii values(4,'A');
+SQL SUCCESS
+insert into t_ascii values(5,'A');
+SQL SUCCESS
+select id,v_char from t_ascii where ascii(v_char) in (97,98) order by id;
++----+--------+
+| id | v_char |
++----+--------+
+| 1  | a      |
+| 2  | b      |
++----+--------+
+drop table if exists t_ascii;
+SQL SUCCESS

@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字delete(非保留)，作为表空间名
+--关键字不带引号，创建成功
+drop tablespace if exists delete;
+SQL SUCCESS
+CREATE TABLESPACE delete RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+SQL SUCCESS
+drop tablespace delete;
+SQL SUCCESS
+--关键字带双引号，创建成功
+drop tablespace if exists "delete";
+SQL SUCCESS
+CREATE TABLESPACE "delete" RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+SQL SUCCESS
+drop tablespace "delete";
+SQL SUCCESS
+--关键字带单引号，合理报错
+drop tablespace if exists 'delete';
+?.*ERROR: syntax error at or near "'delete'"
+?.*
+CREATE TABLESPACE 'delete' RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+?.*ERROR: syntax error at or near "'delete'"
+?.*
+--关键字带反引号，合理报错
+drop tablespace if exists `delete`;
+?.*ERROR: syntax error at or near "`"
+?.*
+CREATE TABLESPACE `delete` RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+?.*ERROR: syntax error at or near "`"
+?.*

@@ -1,0 +1,15 @@
+-- @testpoint: 大小写匹配
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (stringv char(20));
+SQL SUCCESS
+insert into type_char values ('stringing');
+SQL SUCCESS
+SELECT position('ING' in stringv) from type_char;
++----------+
+| position |
++----------+
+| 0        |
++----------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

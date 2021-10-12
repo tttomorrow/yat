@@ -1,0 +1,14 @@
+-- @testpoint: 模式匹配操作符SIMILAR TO,使用元字符?，不匹配
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 varchar(100));
+SQL SUCCESS
+insert into type_char values ('aaabababcd');
+SQL SUCCESS
+SELECT  * from type_char  where string1 SIMILAR TO 'a?bababcd';
++---------+
+| string1 |
++---------+
++---------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

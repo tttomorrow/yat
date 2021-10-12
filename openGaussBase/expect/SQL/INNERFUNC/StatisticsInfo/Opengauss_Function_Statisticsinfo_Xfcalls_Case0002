@@ -1,0 +1,17 @@
+-- @testpoint: pg_stat_get_xact_function_calls(oid)函数的异常校验，合理报错
+select pg_stat_get_xact_function_calls() from PG_PROC b where proname = 'pg_stat_get_tuples_inserted';
+?.*ERROR: function pg_stat_get_xact_function_calls\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_stat_get_xact_function_calls
+select pg_stat_get_xact_function_calls(b.oid,b.oid,b.oid) from PG_PROC b where proname = 'pg_stat_get_tuples_inserted';
+?.*ERROR: function pg_stat_get_xact_function_calls\(oid, oid, oid\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_stat_get_xact_function_calls
+select pg_stat_get_xact_function_calls('*&^%') from PG_PROC b where b.proname = 'pg_stat_get_tuples_inserted';
+?.*ERROR: invalid input syntax for type oid: \"\*\&\^\%\"
+?.*
+  Where: referenced column: pg_stat_get_xact_function_calls
+?.*ERROR: OID out of range
+  Where: referenced column: pg_stat_get_xact_function_calls

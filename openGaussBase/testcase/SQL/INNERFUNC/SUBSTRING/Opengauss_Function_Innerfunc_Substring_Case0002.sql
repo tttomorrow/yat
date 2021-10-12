@@ -1,0 +1,2 @@
+-- @testpoint: substring函数参数2给负数
+select substring('jjslfhaha' from -10 for 6) as text1;

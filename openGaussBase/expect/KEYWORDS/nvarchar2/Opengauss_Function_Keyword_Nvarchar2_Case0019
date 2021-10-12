@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字nvarchar2(非保留)，作为外部数据源名
+--关键字不带引号-成功
+drop data source if exists nvarchar2;
+SQL SUCCESS
+create data source nvarchar2;
+SQL SUCCESS
+drop data source nvarchar2;
+SQL SUCCESS
+--关键字带双引号-成功
+drop data source if exists "nvarchar2";
+SQL SUCCESS
+create data source "nvarchar2";
+SQL SUCCESS
+drop data source "nvarchar2";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop data source if exists 'nvarchar2';
+?.*ERROR: syntax error at or near "'nvarchar2'".*
+?.*Position: .*
+create data source 'nvarchar2';
+?.*ERROR: syntax error at or near "'nvarchar2'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop data source if exists `nvarchar2`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create data source `nvarchar2`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

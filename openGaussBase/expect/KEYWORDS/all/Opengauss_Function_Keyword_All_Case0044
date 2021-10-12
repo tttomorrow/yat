@@ -1,0 +1,18 @@
+-- @testpoint: 排序时，使用all列
+drop table if exists student_tb1;
+SQL SUCCESS
+create table student_tb1 ("All" char(20),stu_age int,sex char(10),score int,address char(10));
+SQL SUCCESS
+insert into student_tb1 ("All",stu_age)values('zhangsan',20);
+SQL SUCCESS
+insert into student_tb1 ("All",stu_age)values('lisi',25);
+SQL SUCCESS
+select * from student_tb1 order by "All";
++----------------------+---------+-----+-------+---------+
+| All                  | stu_age | sex | score | address |
++----------------------+---------+-----+-------+---------+
+| lisi                 | 25      |     |       |         |
+| zhangsan             | 20      |     |       |         |
++----------------------+---------+-----+-------+---------+
+drop table if exists student_tb1;
+SQL SUCCESS

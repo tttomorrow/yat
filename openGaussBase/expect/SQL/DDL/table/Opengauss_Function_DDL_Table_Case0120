@@ -1,0 +1,25 @@
+-- @testpoint: 创建列类型是浮点类型DOUBLE PRECISION、FLOAT8的表
+drop table if exists table_1;
+SQL SUCCESS
+create table table_1(a DOUBLE PRECISION);
+SQL SUCCESS
+SQL SUCCESS
+select * from table_1;
++------------------------+
+| a                      |
++------------------------+
++------------------------+
+drop table if exists table_1;
+SQL SUCCESS
+drop table if exists table_2;
+SQL SUCCESS
+create table table_2(a FLOAT8);
+SQL SUCCESS
+SQL SUCCESS
+select * from table_2;
++-----------------------+
+| a                     |
++-----------------------+
++-----------------------+
+drop table if exists table_2;
+SQL SUCCESS

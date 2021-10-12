@@ -1,0 +1,69 @@
+-- @testpoint: opengauss关键字not(保留)，作为同义词对象名,部分测试点合理报错
+--前置条件
+drop table if exists not_test;
+SQL SUCCESS
+create table not_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-失败
+drop synonym if exists not;
+?.*ERROR: syntax error at or near "not".*
+?.*Position.*
+create synonym not for not_test;
+?.*ERROR: syntax error at or near "not for".*
+?.*Position.*
+--关键字带双引号-成功
+drop synonym if exists "not";
+SQL SUCCESS
+create synonym "not" for not_test;
+SQL SUCCESS
+insert into "not" values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update "not" set "not".name='cici' where "not".id=2;
+SQL SUCCESS
+select * from "not";
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--清理环境
+drop synonym "not";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'not';
+?.*ERROR: syntax error at or near "'not'".*
+?.*Position.*
+create synonym 'not' for not_test;
+?.*ERROR: syntax error at or near "'not'".*
+?.*Position.*
+insert into 'not' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'not'".*
+?.*Position.*
+update 'not' set 'not'.name='cici' where 'not'.id=2;
+?.*ERROR: syntax error at or near "'not'".*
+?.*Position.*
+select * from 'not';
+?.*ERROR: syntax error at or near "'not'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop synonym if exists `not`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create synonym `not` for not_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+insert into `not` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+update `not` set `not`.name='cici' where `not`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+select * from `not`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+--清理环境
+drop synonym if exists "not";
+SQL SUCCESS
+drop table if exists not_test;
+SQL SUCCESS

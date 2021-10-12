@@ -1,0 +1,31 @@
+-- @testpoint: pg_total_relation_size(regclass)函数的异常校验，合理报错
+create table test (a int)
+with(orientation = column)
+partition by range (a)
+(
+        partition test_p1 values less than (88),
+        partition test_p2 values less than (99)
+);
+SQL SUCCESS
+select pg_total_relation_size('test'::regclass,'test'::regclass,'test'::regclass);
+?.*ERROR: function pg_total_relation_size\(regclass, regclass, regclass\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_total_relation_size
+select pg_total_relation_size() from pg_class a where a.relname='test';
+?.*ERROR: function pg_total_relation_size\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_total_relation_size
+select pg_total_relation_size(''::regclass);
++------------------------+
+| pg_total_relation_size |
++------------------------+
+|                        |
++------------------------+
+select pg_total_relation_size('*&^%$'::regclass) from pg_class a where a.relname='test';
+?.*ERROR: relation \"\*\&\^\%\$\" does not exist
+?.*
+  Where: referenced column: pg_total_relation_size
+drop table test;
+SQL SUCCESS

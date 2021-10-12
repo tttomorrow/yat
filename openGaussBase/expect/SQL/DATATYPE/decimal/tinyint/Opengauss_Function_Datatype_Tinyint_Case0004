@@ -1,0 +1,27 @@
+-- @testpoint: 插入字符串类型整数
+drop table if exists tinyint04;
+SQL SUCCESS
+create table tinyint04 (name tinyint);
+SQL SUCCESS
+insert into tinyint04 values ('12');
+SQL SUCCESS
+insert into tinyint04 values ('123');
+SQL SUCCESS
+insert into tinyint04 values ('1');
+SQL SUCCESS
+insert into tinyint04 values ('2');
+SQL SUCCESS
+insert into tinyint04 values ('3');
+SQL SUCCESS
+select * from tinyint04;
++------+
+| name |
++------+
+| 12   |
+| 123  |
+| 1    |
+| 2    |
+| 3    |
++------+
+drop table tinyint04;
+SQL SUCCESS

@@ -1,0 +1,61 @@
+-- @testpoint: 输出CASE_NOT_FOUND异常（一般case语句，不捕捉异常，合理报错;捕捉异常，执行成功。）
+drop table if exists CASE_TEST;
+SQL SUCCESS
+CREATE TABLE CASE_TEST
+(
+    ID INTEGER NOT NULL,
+    NAME VARCHAR2(20) NOT NULL,
+    job INTEGER NOT NULL
+);
+SQL SUCCESS
+insert into CASE_TEST(ID,NAME,job)values(20,'zz',1);
+SQL SUCCESS
+insert into CASE_TEST(ID,NAME,job)values(30,'zz',2);
+SQL SUCCESS
+insert into CASE_TEST(ID,NAME,job)values(40,'zz',3);
+SQL SUCCESS
+create or replace procedure test_case_procedure(str boolean)  as
+v_sex CASE_TEST.job%TYPE;
+begin
+   select job into v_sex from CASE_TEST where ID=40;
+   case v_sex
+   when '1' then
+    raise info 'teacher';
+   when '2' then
+      raise info 'IT';
+   end case;
+end;
+/
+SQL SUCCESS
+call test_case_procedure(true);
+?.*ERROR: case not found.*
+  Hint: CASE statement is missing ELSE part.
+  Where: PL/pgSQL function test_case_procedure(boolean) line 5 at CASE
+create or replace procedure test_case_procedure(str boolean)  as
+v_sex CASE_TEST.job%TYPE;
+begin
+   select job into v_sex from CASE_TEST where ID=40;
+   case v_sex
+   when '1' then
+    raise info 'teacher';
+   when '2' then
+    raise info 'IT';
+   end case;
+ EXCEPTION
+    WHEN CASE_NOT_FOUND THEN
+     raise info 'case not found';
+    WHEN OTHERS THEN
+     raise info 'ERROR CODE:%',SQLCODE,'ERROR CODE:%',CHR(10),'ERROR MSG:%',SQLERRM;
+END;
+/
+SQL SUCCESS
+call test_case_procedure(true);
++---------------------+
+| test_case_procedure |
++---------------------+
+|                     |
++---------------------+
+drop procedure test_case_procedure;
+SQL SUCCESS
+drop table CASE_TEST;
+SQL SUCCESS

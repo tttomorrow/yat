@@ -1,0 +1,20 @@
+-- @testpoint: 输入超出上限，合理报错
+-- @modified at: 2020-11-18
+drop table if exists test_time02;
+SQL SUCCESS
+create table test_time02 (name time);
+SQL SUCCESS
+insert into test_time02 values ('25:00:00');
+?.*ERROR: date/time field value out of range: "25:00:00"
+?.*
+  Where: referenced column: name
+insert into test_time02 values ('23:60:00');
+?.*ERROR: date/time field value out of range: "23:60:00"
+?.*
+  Where: referenced column: name
+insert into test_time02 values ('23:23:61');
+?.*ERROR: date/time field value out of range: "23:23:61"
+?.*
+  Where: referenced column: name
+drop table test_time02;
+SQL SUCCESS

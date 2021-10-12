@@ -1,0 +1,17 @@
+--  @testpoint:指定列按降序排序,name列按字母排序降序排列
+drop table if exists test_1;
+SQL SUCCESS
+create table test_1 (id int ,name char(20));
+SQL SUCCESS
+insert into test_1  values(1,'lily'),(2,'wilian'),(3,'karia');
+SQL SUCCESS
+select * from test_1 order by name desc;
++----+----------------------+
+| id | name                 |
++----+----------------------+
+| 2  | wilian               |
+| 1  | lily                 |
+| 3  | karia                |
++----+----------------------+
+drop table test_1;
+SQL SUCCESS

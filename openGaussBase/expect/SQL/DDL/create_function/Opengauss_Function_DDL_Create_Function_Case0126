@@ -1,0 +1,28 @@
+--  @testpoint:package函数和非package函数进行重载，合理报错
+drop FUNCTION if EXISTS  package_func_overload4;
+SQL SUCCESS
+--创建重载函数
+create function  package_func_overload4(col int, col2  int)
+RETURNS int
+    AS 'select $1 + $2;'
+    LANGUAGE SQL
+    RETURNS NULL ON NULL INPUT
+    package;
+    /
+SQL SUCCESS
+select proname from pg_proc where proname='package_func_overload4';
++------------------------+
+| proname                |
++------------------------+
+| package_func_overload4 |
++------------------------+
+--创建非package函数重载package函数，合理报错
+create function  package_func_overload4(col int, col2  smallint)
+RETURNS int
+    AS 'select $1 + $2;'
+    LANGUAGE SQL
+    RETURNS NULL ON NULL INPUT;
+/
+?.*ERROR: Do not allow package function overload not package function.
+drop FUNCTION   package_func_overload4;
+SQL SUCCESS

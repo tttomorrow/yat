@@ -1,0 +1,15 @@
+--  @testpoint:opengauss关键字owner(非保留)，表空间模式指定为用户,改变表空间所有者
+CREATE ROLE joe IDENTIFIED BY 'Bigdata@123';
+SQL SUCCESS
+CREATE ROLE jay IDENTIFIED BY 'Bigdata@123';
+SQL SUCCESS
+CREATE TABLESPACE ds_location2 OWNER joe RELATIVE LOCATION 'tablespace/tablespace_1';
+SQL SUCCESS
+ALTER TABLESPACE ds_location2 OWNER TO jay;
+SQL SUCCESS
+DROP TABLESPACE ds_location2;
+SQL SUCCESS
+DROP ROLE joe;
+SQL SUCCESS
+DROP ROLE jay;
+SQL SUCCESS

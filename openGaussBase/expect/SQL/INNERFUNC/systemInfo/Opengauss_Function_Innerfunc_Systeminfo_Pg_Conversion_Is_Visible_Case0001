@@ -1,0 +1,21 @@
+-- @testpoint: 该转换是否在搜索路径中可见
+drop SCHEMA if exists my_tpcds;
+SQL SUCCESS
+CREATE SCHEMA my_tpcds;
+SQL SUCCESS
+SET SEARCH_PATH TO my_tpcds, public;
+SQL SUCCESS
+show search_path;
++------------------+
+| search_path      |
++------------------+
+| my_tpcds, public |
++------------------+
+select pg_conversion_is_visible(oid) from PG_CONVERSION where conname ='ascii_to_mic';
++--------------------------+
+| pg_conversion_is_visible |
++--------------------------+
+| true                     |
++--------------------------+
+drop SCHEMA if exists my_tpcds;
+SQL SUCCESS

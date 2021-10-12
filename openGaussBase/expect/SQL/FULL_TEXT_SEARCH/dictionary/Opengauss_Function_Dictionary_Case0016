@@ -1,0 +1,52 @@
+--  @testpoint:创建并使用词典synonym，结合tsvector函数
+drop TEXT SEARCH DICTIONARY if exists syn;
+SQL SUCCESS
+CREATE TEXT SEARCH DICTIONARY syn (
+    TEMPLATE = synonym,
+    SYNONYMS = synonym_sample
+);
+SQL SUCCESS
+--测试一个数据字典，返回字串原型
+SELECT ts_lexize('syn','indices');
++-----------+
+| ts_lexize |
++-----------+
+| {index}   |
++-----------+
+--创建文本搜索配置
+drop TEXT SEARCH CONFIGURATION if exists tst;
+SQL SUCCESS
+CREATE TEXT SEARCH CONFIGURATION tst (copy=simple);
+SQL SUCCESS
+--增加映射
+ALTER TEXT SEARCH CONFIGURATION tst ALTER MAPPING FOR asciiword WITH syn;
+SQL SUCCESS
+--使用to_tsvector函数，指定文本搜索配置为自定义的tst
+SELECT to_tsvector('tst','indices');
++-------------+
+| to_tsvector |
++-------------+
+| 'index':1   |
++-------------+
+--使用::tsvector函数，原样输出
+SELECT 'indexes:2A are very useful'::tsvector;
++------------------------------------+
+| tsvector                           |
++------------------------------------+
+| 'are' 'indexes':2A 'useful' 'very' |
++------------------------------------+
+--::tsvector对indexes返回index，to_tsquery('tst','indices')返回'index':*，故返回t
+SELECT 'indexes are very useful'::tsvector @@ to_tsquery('tst','indices');
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+--删除词典，合理报错（文本搜索配置依赖于词典）
+drop TEXT SEARCH DICTIONARY syn;
+?.*ERROR: cannot drop text search dictionary syn because other objects depend on it
+  Detail: text search configuration tst depends on text search dictionary syn
+  Hint: Use DROP ... CASCADE to drop the dependent objects too.
+--删除词典，添加cascade参数
+drop TEXT SEARCH DICTIONARY syn cascade;
+SQL SUCCESS

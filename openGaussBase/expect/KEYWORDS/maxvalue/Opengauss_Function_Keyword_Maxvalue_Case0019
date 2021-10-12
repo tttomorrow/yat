@@ -1,0 +1,26 @@
+--  @testpoint:opengauss关键字maxvalue(保留)，作为外部数据源名
+--关键字不带引号-合理报错
+create data source maxvalue;
+?.*ERROR: syntax error at or near "maxvalue".*
+?.*Position.*
+--关键字带双引号-成功
+drop data source if exists "maxvalue";
+SQL SUCCESS
+create data source "maxvalue";
+SQL SUCCESS
+drop data source "maxvalue";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop data source if exists 'maxvalue';
+?.*ERROR: syntax error at or near "'maxvalue'".*
+?.*Position.*
+create data source 'maxvalue';
+?.*ERROR: syntax error at or near "'maxvalue'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop data source if exists `maxvalue`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create data source `maxvalue`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*

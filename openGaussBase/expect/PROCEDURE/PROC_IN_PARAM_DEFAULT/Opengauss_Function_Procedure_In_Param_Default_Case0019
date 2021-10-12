@@ -1,0 +1,61 @@
+-- @testpoint: 测试入参为date default的存储过程
+drop table if exists test_001;
+SQL SUCCESS
+create table test_001(
+  t1 int,
+  t2 integer not null,
+  t3 bigint,
+  t4 number default 0.2332,
+  t5 number(12,2),
+  t6 number(12,6),
+  t7 binary_double,
+  t8 decimal,
+  t9 decimal(8,2),
+  t10 decimal(8,4),
+  t11 real,
+  t12 char(4000),
+  t13 char(100),
+  t14 varchar(4000),
+  t15 varchar(100),
+  t16 varchar2(4000),
+  t17 numeric,
+  t19 date,
+  t20 timestamp,
+  t21 timestamp(6),
+  t22 bool
+) ;
+SQL SUCCESS
+create unique index  indx_t1 on test_001(t1);
+SQL SUCCESS
+create index indx_t2 on test_001(t2,t17,t20);
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+--创建存储过程
+create or replace procedure proc_in_param_default_019(p1 in date default '2012-08-08 00:00:00')
+as
+v1 test_001.t1%type;
+begin
+	select t1 into v1 from test_001 where t19=p1;
+	raise info 'v1:%',v1;
+	exception
+	when no_data_found 
+	then 
+		raise info 'no_data_found';
+end;
+/
+SQL SUCCESS
+--调用存储过程
+begin
+	proc_in_param_default_019();
+end;
+/
+SQL SUCCESS
+--清理环境
+drop table if exists test_001;
+SQL SUCCESS
+drop procedure proc_in_param_default_019;
+SQL SUCCESS

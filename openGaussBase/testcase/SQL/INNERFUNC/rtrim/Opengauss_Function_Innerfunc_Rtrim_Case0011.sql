@@ -1,0 +1,2 @@
+-- @testpoint: rtrim函数入参为字符串
+SELECT rtrim('trimxxxx', 'x');

@@ -1,0 +1,57 @@
+-- @testpoint: date_part函数入参给reltime类型的时间段,取值采用ISO-8601格式表示，包含日期和时间部分
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (clo1 reltime);
+SQL SUCCESS
+insert into test_date01 values ('P-1.1Y10M');
+SQL SUCCESS
+select date_part('month', clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| -3.0      |
++-----------+
+SELECT date_part('month', reltime 'P-1.1Y10M');
++-----------+
+| date_part |
++-----------+
+| -3.0      |
++-----------+
+select date_part('day', clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| -5.0      |
++-----------+
+SELECT date_part('day', reltime 'P-1.1Y10M');
++-----------+
+| date_part |
++-----------+
+| -5.0      |
++-----------+
+select date_part('year', clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| 0.0       |
++-----------+
+SELECT date_part('year', reltime 'P-1.1Y10M');
++-----------+
+| date_part |
++-----------+
+| 0.0       |
++-----------+
+select date_part('hour', clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| -6.0      |
++-----------+
+SELECT date_part('hour', reltime 'P-1.1Y10M');
++-----------+
+| date_part |
++-----------+
+| -6.0      |
++-----------+
+drop table if exists test_date01;
+SQL SUCCESS

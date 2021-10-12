@@ -1,0 +1,36 @@
+-- @testpoint: lower函数，union all的使用
+drop table if exists TEST_LOWER_008;
+SQL SUCCESS
+create table TEST_LOWER_008(COL1 varchar2(20));
+SQL SUCCESS
+insert into TEST_LOWER_008 values ('aHGGFGFaabn');
+SQL SUCCESS
+insert into TEST_LOWER_008 values ('aldjfGHJJK');
+SQL SUCCESS
+insert into TEST_LOWER_008 values ('FGGHFfsjds');
+SQL SUCCESS
+drop table if exists TEST_LOWER_009;
+SQL SUCCESS
+create table TEST_LOWER_009(COL1 varchar2(20));
+SQL SUCCESS
+insert into TEST_LOWER_009 values ('aHGGFGFaabn');
+SQL SUCCESS
+insert into TEST_LOWER_009 values ('asjfGHJKSL');
+SQL SUCCESS
+insert into TEST_LOWER_009 values ('xkcjdjHJKKL');
+SQL SUCCESS
+select lower(COL1) from TEST_LOWER_008 union all select lower(COL1) from TEST_LOWER_009 order by 1;
++-------------+
+| lower       |
++-------------+
+| ahggfgfaabn |
+| ahggfgfaabn |
+| aldjfghjjk  |
+| asjfghjksl  |
+| fgghffsjds  |
+| xkcjdjhjkkl |
++-------------+
+drop table if exists TEST_LOWER_008;
+SQL SUCCESS
+drop table if exists TEST_LOWER_009;
+SQL SUCCESS

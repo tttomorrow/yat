@@ -1,0 +1,23 @@
+-- @testpoint: sign函数在创建视图时使用
+drop view if exists v_sign;
+SQL SUCCESS
+drop table if exists test_sign;
+SQL SUCCESS
+create table test_sign(a int,b float);
+SQL SUCCESS
+insert into test_sign values(1,-0.1),(2,123.986),(3,-6999.7);
+SQL SUCCESS
+create or replace view v_sign as select a,sign(b) from test_sign;
+SQL SUCCESS
+select * from v_sign order by a;
++---+------+
+| a | sign |
++---+------+
+| 1 | -1.0 |
+| 2 | 1.0  |
+| 3 | -1.0 |
++---+------+
+drop view v_sign;
+SQL SUCCESS
+drop table test_sign;
+SQL SUCCESS

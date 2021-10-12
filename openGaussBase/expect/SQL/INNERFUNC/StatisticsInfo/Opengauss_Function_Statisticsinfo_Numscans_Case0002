@@ -1,0 +1,28 @@
+-- @testpoint: pg_stat_get_numscans(oid)函数的异常校验，合理报错
+-- -- testpoint：空值、多参、少参、oid错误、超范围、表不存在
+select pg_stat_get_numscans('') from PG_CLASS a where a.relname = 'sales';
++----------------------+
+| pg_stat_get_numscans |
++----------------------+
++----------------------+
+select pg_stat_get_numscans(a.oid,a.oid,a.oid) from PG_CLASS a where a.relname = 'sales';
+?.*ERROR: function pg_stat_get_numscans\(oid, oid, oid\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_stat_get_numscans
+select pg_stat_get_numscans() from PG_CLASS a where a.relname = 'sales';
+?.*ERROR: function pg_stat_get_numscans\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_stat_get_numscans
+select pg_stat_get_numscans('&^%^&*') from PG_CLASS a where a.relname = 'sales';
+?.*ERROR: invalid input syntax for type oid: \"\&\^\%\^\&\*\"
+?.*
+  Where: referenced column: pg_stat_get_numscans
+?.*ERROR: OID out of range
+  Where: referenced column: pg_stat_get_numscans
+select pg_stat_get_numscans(a.oid) from PG_CLASS a where a.relname = 'sales';
++----------------------+
+| pg_stat_get_numscans |
++----------------------+
++----------------------+

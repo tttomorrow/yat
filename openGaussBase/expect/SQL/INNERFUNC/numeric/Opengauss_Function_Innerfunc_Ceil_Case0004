@@ -1,0 +1,13 @@
+-- @testpoint: ceil函数入参为空值
+select ceil('');
++------+
+| ceil |
++------+
+|      |
++------+
+select ceil(null);
++------+
+| ceil |
++------+
+|      |
++------+

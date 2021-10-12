@@ -1,0 +1,18 @@
+-- @testpoint: 创建表，插入布尔类型值
+drop table if exists test_text_05;
+SQL SUCCESS
+create table test_text_05(id int,c_text text);
+SQL SUCCESS
+insert into test_text_05 values(1,true);
+SQL SUCCESS
+insert into test_text_05 values(1,false);
+SQL SUCCESS
+select * from test_text_05;
++----+--------+
+| id | c_text |
++----+--------+
+| 1  | true   |
+| 1  | false  |
++----+--------+
+drop table test_text_05;
+SQL SUCCESS

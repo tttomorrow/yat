@@ -1,0 +1,44 @@
+-- @testpoint: interval分区,EXCHANGE PARTITION分区表和普通表索引信息不一致，合理报错
+drop table if exists pt1;
+SQL SUCCESS
+drop table if exists common_table1;
+SQL SUCCESS
+create table pt1(
+col_1 smallint,
+col_2 char(30),
+col_3 int,
+col_4 date not null,
+col_5 boolean,
+col_6 nchar(30),
+col_7 float
+)
+partition by range (col_4)
+interval ('1 month')
+(
+partition pt1_p1 values less than ('2020-01-01'));
+SQL SUCCESS
+create unique index idx_001 on pt1(col_4);
+SQL SUCCESS
+create unique index idx_002 on pt1(col_2);
+SQL SUCCESS
+create table common_table1(
+col_1 smallint,
+col_2 char(30),
+col_3 int,
+col_4 date not null,
+col_5 boolean,
+col_6 nchar(30),
+col_7 float);
+SQL SUCCESS
+create unique index idx_003 on common_table1(col_3);
+SQL SUCCESS
+insert into pt1 values (1,'aaa',1,'2019-12-31',true,'aaa',1.1);
+SQL SUCCESS
+insert into common_table1 values (1,'aaa',1,'2019-12-15',true,'aaa',1.1);
+SQL SUCCESS
+alter table pt1 exchange partition (pt1_p1) with table common_table1;
+?.*ERROR: tables in ALTER TABLE EXCHANGE PARTITION must have the same number of indexs
+drop table if exists pt1;
+SQL SUCCESS
+drop table if exists common_table1;
+SQL SUCCESS

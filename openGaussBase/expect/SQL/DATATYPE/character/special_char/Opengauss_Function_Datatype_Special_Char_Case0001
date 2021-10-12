@@ -1,0 +1,15 @@
+-- @testpoint: 创建行存表，插入数据
+drop table if exists special_char_01;
+SQL SUCCESS
+CREATE  TABLE special_char_01 (id "char") WITH (orientation=row, compression=no);
+SQL SUCCESS
+insert into special_char_01 values ('t');
+SQL SUCCESS
+select * from special_char_01;
++----+
+| id |
++----+
+| t  |
++----+
+drop table special_char_01;
+SQL SUCCESS

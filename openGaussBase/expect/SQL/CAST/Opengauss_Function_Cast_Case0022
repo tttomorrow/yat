@@ -1,0 +1,23 @@
+-- @testpoint: 输入参数类型完全匹配
+-- @testpoint：输入参数类型完全匹配：success
+-- @lengthb(string)
+explain performance SELECT lengthb('hello'::text);
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: 5                                                                        |
+?.*
+?.*
+?.*
+explain performance SELECT lengthb('hello'::bpchar);
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: 5                                                                        |
+?.*
+?.*
+?.*
+--清理环境
+--no need to clean

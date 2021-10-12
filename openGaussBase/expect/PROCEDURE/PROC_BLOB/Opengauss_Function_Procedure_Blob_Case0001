@@ -1,0 +1,23 @@
+-- @testpoint: 存储过程结合blob数据类型的测试-特殊类型 测试blob类型为空
+--创建存储过程
+create or replace procedure proc_blob_001() is
+v1 blob;
+begin
+    if v1 is null then
+        raise info 'v1 is null';
+    else
+        raise info 'v1 is not null';
+    end if;
+end;
+/
+SQL SUCCESS
+--调用存储过程
+call proc_blob_001();
++---------------+
+| proc_blob_001 |
++---------------+
+|               |
++---------------+
+--恢复环境
+drop procedure if exists proc_blob_001;
+SQL SUCCESS

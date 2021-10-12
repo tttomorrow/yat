@@ -1,0 +1,15 @@
+-- @testpoint: 第一位不是搜索字符
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('xxxxTRIM');
+SQL SUCCESS
+SELECT ltrim(string1,'a') from type_char;
++----------+
+| ltrim    |
++----------+
+| xxxxTRIM |
++----------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

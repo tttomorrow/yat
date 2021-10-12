@@ -1,0 +1,27 @@
+-- @testpoint: 创建列类型为整数类型INT1,插入数据超过边界时合理报错
+drop table if exists table_2;
+SQL SUCCESS
+create table table_2(a INT1);
+SQL SUCCESS
+insert into table_2 values(0);
+SQL SUCCESS
+insert into table_2 values(125);
+SQL SUCCESS
+insert into table_2 values(255);
+SQL SUCCESS
+insert into table_2 values(-1);
+?.*ERROR: tinyint out of range
+  Where: referenced column: a
+insert into table_2 values(256);
+?.*ERROR: tinyint out of range
+  Where: referenced column: a
+select * from table_2;
++-----+
+| a   |
++-----+
+| 0   |
+| 125 |
+| 255 |
++-----+
+drop table if exists table_2;
+SQL SUCCESS

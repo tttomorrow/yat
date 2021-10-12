@@ -1,0 +1,66 @@
+-- @testpoint: opengauss关键字true(保留)，作为同义词对象名,部分测试点合理报错
+--前置条件
+drop table if exists true_test;
+SQL SUCCESS
+create table true_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-失败
+drop synonym if exists true;
+?.*ERROR: syntax error at or near "true"
+?.*Position: .*
+create synonym true for true_test;
+?.*ERROR: syntax error at or near "true"
+?.*Position: .*
+--关键字带双引号-成功
+drop synonym if exists "true";
+SQL SUCCESS
+create synonym "true" for true_test;
+SQL SUCCESS
+insert into "true" values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update "true" set "true".name='cici' where "true".id=2;
+SQL SUCCESS
+select * from "true";
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+drop synonym "true";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'true';
+?.*ERROR: syntax error at or near "'true'"
+?.*Position: .*
+create synonym 'true' for true_test;
+?.*ERROR: syntax error at or near "'true'"
+?.*Position: .*
+insert into 'true' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'true'"
+?.*Position: .*
+update 'true' set 'true'.name='cici' where 'true'.id=2;
+?.*ERROR: syntax error at or near "'true'"
+?.*Position: .*
+select * from 'true';
+?.*ERROR: syntax error at or near "'true'"
+?.*Position: .*
+--关键字带反引号-合理报错
+drop synonym if exists `true`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+create synonym `true` for true_test;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+insert into `true` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+update `true` set `true`.name='cici' where `true`.id=2;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+select * from `true`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+--清理环境
+drop table if exists true_test;
+SQL SUCCESS

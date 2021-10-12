@@ -1,0 +1,24 @@
+-- @testpoint: radians函数入参为特殊值
+select radians('Infinity');
++----------+
+| radians  |
++----------+
+| Infinity |
++----------+
+select radians('-Infinity');
++-----------+
+| radians   |
++-----------+
+| -Infinity |
++-----------+
+select radians(-12.98);
++----------------------+
+| radians              |
++----------------------+
++----------------------+
+select radians(0);
++---------+
+| radians |
++---------+
+| 0.0     |
++---------+

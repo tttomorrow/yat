@@ -1,0 +1,22 @@
+-- @testpoint: 插入MAC地址0值，合理报错
+drop table if exists test_macaddr_04;
+SQL SUCCESS
+create table test_macaddr_04(id int,type macaddr);
+SQL SUCCESS
+insert into test_macaddr_04 values(1,0);
+?.*ERROR: column "type" is of type macaddr but expression is of type integer
+  Hint: You will need to rewrite or cast the expression.
+?.*
+  Where: referenced column: type
+insert into test_macaddr_04 values(2,0);
+?.*ERROR: column "type" is of type macaddr but expression is of type integer
+  Hint: You will need to rewrite or cast the expression.
+?.*
+  Where: referenced column: type
+insert into test_macaddr_04 values(3,0);
+?.*ERROR: column "type" is of type macaddr but expression is of type integer
+  Hint: You will need to rewrite or cast the expression.
+?.*
+  Where: referenced column: type
+drop table test_macaddr_04;
+SQL SUCCESS

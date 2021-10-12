@@ -1,0 +1,69 @@
+-- @testpoint: opengauss关键字modify(保留)，作为同义词对象名,部分测试点合理报错
+--前置条件
+drop table if exists modify_test;
+SQL SUCCESS
+create table modify_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-失败
+drop synonym if exists modify;
+?.*ERROR: syntax error at or near "modify".*
+?.*Position.*
+create synonym modify for modify_test;
+?.*ERROR: syntax error at or near "modify for".*
+?.*Position.*
+--关键字带双引号-成功
+drop synonym if exists "modify";
+SQL SUCCESS
+create synonym "modify" for modify_test;
+SQL SUCCESS
+insert into "modify" values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update "modify" set "modify".name='cici' where "modify".id=2;
+SQL SUCCESS
+select * from "modify";
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--清理环境
+drop synonym "modify";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'modify';
+?.*ERROR: syntax error at or near "'modify'".*
+?.*Position.*
+create synonym 'modify' for modify_test;
+?.*ERROR: syntax error at or near "'modify'".*
+?.*Position.*
+insert into 'modify' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'modify'".*
+?.*Position.*
+update 'modify' set 'modify'.name='cici' where 'modify'.id=2;
+?.*ERROR: syntax error at or near "'modify'".*
+?.*Position.*
+select * from 'modify';
+?.*ERROR: syntax error at or near "'modify'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop synonym if exists `modify`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create synonym `modify` for modify_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+insert into `modify` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+update `modify` set `modify`.name='cici' where `modify`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+select * from `modify`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+--清理环境
+drop synonym if exists "modify";
+SQL SUCCESS
+drop table if exists modify_test;
+SQL SUCCESS

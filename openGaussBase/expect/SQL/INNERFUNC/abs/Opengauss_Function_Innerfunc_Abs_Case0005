@@ -1,0 +1,40 @@
+-- @testpoint: 与distinct,count结合使用
+drop table if exists t_abs;
+SQL SUCCESS
+create table t_abs(c_id int);
+SQL SUCCESS
+insert into t_abs VALUES(002);
+SQL SUCCESS
+insert into t_abs VALUES(125);
+SQL SUCCESS
+insert into t_abs VALUES(056);
+SQL SUCCESS
+insert into t_abs VALUES(089);
+SQL SUCCESS
+insert into t_abs VALUES(256);
+SQL SUCCESS
+insert into t_abs VALUES(089);
+SQL SUCCESS
+insert into t_abs VALUES(256);
+SQL SUCCESS
+insert into t_abs VALUES(123);
+SQL SUCCESS
+select distinct abs(c_id) t1 from t_abs where c_id is not null order by t1;
++-----+
+| t1  |
++-----+
+| 2   |
+| 56  |
+| 89  |
+| 123 |
+| 125 |
+| 256 |
++-----+
+select count(abs(c_id)) from t_abs;
++-------+
+| count |
++-------+
+| 8     |
++-------+
+drop table if exists t_abs;
+SQL SUCCESS

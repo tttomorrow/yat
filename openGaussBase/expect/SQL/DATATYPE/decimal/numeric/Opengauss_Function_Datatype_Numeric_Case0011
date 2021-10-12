@@ -1,0 +1,20 @@
+-- @testpoint: 插入指数形式值
+drop table if exists numeric_11;
+SQL SUCCESS
+create table numeric_11 (name numeric);
+SQL SUCCESS
+insert into numeric_11 values (exp(33));
+SQL SUCCESS
+insert into numeric_11 values (exp(1.23));
+SQL SUCCESS
+insert into numeric_11 values (exp(-15));
+SQL SUCCESS
+insert into numeric_11 values (exp(-1.56));
+SQL SUCCESS
+select * from numeric_11;
++---------------------+
+| name                |
++---------------------+
++---------------------+
+drop table numeric_11;
+SQL SUCCESS

@@ -1,0 +1,33 @@
+*, html,div,p,pre,a {
+    font-family: "Courier New", "华文楷体", serif;
+    font-size: 15px;
+}
+
+.rst-content pre code {
+    font-family: "Courier New", "华文楷体", serif;
+    font-size: 13px;
+}
+
+.wy-nav-content {
+    max-width: 1000px;
+}
+
+h1 {
+    font-family: "Courier New", "华文楷体", serif;
+    font-size: 20px;
+}
+
+h2 {
+    font-family: "Courier New", "华文楷体", serif;
+    font-size: 18px;
+}
+
+h3 {
+    font-family: "Courier New", "华文楷体", serif;
+    font-size: 16px;
+}
+
+h4,h5,h6 {
+    font-family: "Courier New", "华文楷体", serif;
+    font-size: 14px;
+}

@@ -1,0 +1,114 @@
+-- @testpoint: 一维数组时，array和element的类型一致，element存在于array中：删除数组中对应元素
+--数值型
+select array_remove(array[1,2,2,3], 2);
++--------------+
+| array_remove |
++--------------+
+| {1,3}        |
++--------------+
+select array_remove(array[1.223,2,3.145], 3.145);
++--------------+
+| array_remove |
++--------------+
+| {1.223,2}    |
++--------------+
+select array_remove(array[1.223,2,3.145], 3.1450);
++--------------+
+| array_remove |
++--------------+
+| {1.223,2}    |
++--------------+
+select array_remove(array[0.3,2,3.145], 0.3);
++--------------+
+| array_remove |
++--------------+
+| {2,3.145}    |
++--------------+
+select array_remove(array[-1.2,2,3.145], -1.2);
++--------------+
+| array_remove |
++--------------+
+| {2,3.145}    |
++--------------+
+select array_remove(array[-1.223,-2,-3.145], -3.145);
++--------------+
+| array_remove |
++--------------+
+| {-1.223,-2}  |
++--------------+
+select array_remove(array[-1.2,2,3],3.0);
++--------------+
+| array_remove |
++--------------+
+| {-1.2,2}     |
++--------------+
+--布尔型
+select array_remove(array[true,false,null], 't');
++--------------+
+| array_remove |
++--------------+
+| {false,}     |
++--------------+
+select array_remove(array[TRUE,false,NULL], 'f');
++--------------+
+| array_remove |
++--------------+
+| {true,}      |
++--------------+
+select array_remove(array[true,false,null], '1');
++--------------+
+| array_remove |
++--------------+
+| {false,}     |
++--------------+
+select array_remove(array[true,false], 'yes');
++--------------+
+| array_remove |
++--------------+
+| {false}      |
++--------------+
+select array_remove(array[FALSE,TRUE], '0');
++--------------+
+| array_remove |
++--------------+
+| {true}       |
++--------------+
+select array_remove(array[true,false,null], 'true');
++--------------+
+| array_remove |
++--------------+
+| {false,}     |
++--------------+
+--字符型
+select array_remove(array['abc','efg','null'], 'efg');
++--------------+
+| array_remove |
++--------------+
+| {abc,null}   |
++--------------+
+select array_remove(array['TABLE','EFG','NULL'], 'EFG');
++--------------+
+| array_remove |
++--------------+
+| {TABLE,NULL} |
++--------------+
+--日期时间型
+select array_remove(array[date'2010-12-10 00:00:00
+',date'2010/12/10 16:40',date'2010-12-10 pst'], (date '12-10-2010'));
++---------------------------------+
+| array_remove                    |
++---------------------------------+
++---------------------------------+
+select array_remove(array[TIMESTAMP'2010-12-10 00:00:00
+',TIMESTAMP'2010/12/10 16:40',TIMESTAMP'2010-12-10 pst'], (TIMESTAMP '12-10-2010'));
++---------------------------------+
+| array_remove                    |
++---------------------------------+
++---------------------------------+
+--JSON类型
+select array_remove(array['{qq,123,null,true,false}'], '{qq,123,null,true,false}');
++--------------+
+| array_remove |
++--------------+
+| {}           |
++--------------+

@@ -1,0 +1,66 @@
+-- @testpoint: opengauss关键字constructor(非保留)，作为同义词对象名，部分测试点合理报错
+--前置条件
+drop table if exists constructor_test;
+SQL SUCCESS
+create table constructor_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists constructor;
+SQL SUCCESS
+create synonym constructor for constructor_test;
+SQL SUCCESS
+insert into constructor values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update constructor set constructor.name='cici' where constructor.id=2;
+SQL SUCCESS
+select * from constructor;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--关键字带双引号-成功
+drop synonym if exists "constructor";
+SQL SUCCESS
+create synonym "constructor" for constructor_test;
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'constructor';
+?.*ERROR: syntax error at or near "'constructor'"
+?.*
+create synonym 'constructor' for constructor_test;
+?.*ERROR: syntax error at or near "'constructor'"
+?.*
+insert into 'constructor' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'constructor'"
+?.*
+update 'constructor' set 'constructor'.name='cici' where 'constructor'.id=2;
+?.*ERROR: syntax error at or near "'constructor'"
+?.*
+select * from 'constructor';
+?.*ERROR: syntax error at or near "'constructor'"
+?.*
+--关键字带反引号-合理报错
+drop synonym if exists `constructor`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create synonym `constructor` for constructor_test;
+?.*ERROR: syntax error at or near "`"
+?.*
+insert into `constructor` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`"
+?.*
+update `constructor` set `constructor`.name='cici' where `constructor`.id=2;
+?.*ERROR: syntax error at or near "`"
+?.*
+select * from `constructor`;
+?.*ERROR: syntax error at or near "`"
+?.*
+--清理环境
+drop table if exists constructor_test;
+SQL SUCCESS
+drop synonym if exists constructor;
+SQL SUCCESS
+drop synonym if exists "constructor";
+SQL SUCCESS

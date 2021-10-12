@@ -1,0 +1,37 @@
+-- @testpoint: 函数bit_or(expression),所有非NULL输入值的按位或(OR)，如果全部输入值皆为NULL，那么结果也为NULL.
+drop table if exists table_test;
+SQL SUCCESS
+create table table_test(id integer,
+name varchar(10),
+age integer,
+height decimal(5,2),
+hobbies text,
+tel bigint
+);
+SQL SUCCESS
+SQL SUCCESS
+select bit_or(id)from  table_test where id <5;
++--------+
+| bit_or |
++--------+
+| 3      |
++--------+
+select bit_or(height)from  table_test where id <5;
++--------+
+| bit_or |
++--------+
+| 189    |
++--------+
+select bit_or(age)from  table_test where id <9;
++--------+
+| bit_or |
++--------+
+|        |
++--------+
+select bit_or(tel)from  table_test where id <9;
++-------------+
+| bit_or      |
++-------------+
++-------------+
+drop table table_test;
+SQL SUCCESS

@@ -1,0 +1,263 @@
+-- @testpoint: first函数返回第一个输入，若无输入，则返回一个空行：行存表
+--建表
+--学生表
+drop table if exists student;
+SQL SUCCESS
+drop table if exists score;
+SQL SUCCESS
+create table student(
+s_id integer(20),
+s_name varchar(20) ,
+s_birth date,
+s_sex varchar(10) );
+SQL SUCCESS
+--成绩表
+create table score(
+s_id integer(20),
+c_id  integer(20),
+s_score float(3));
+SQL SUCCESS
+--表中未插入数据，使用first函数，返回一个空行
+select first(s_name) from student;
++-------+
+| first |
++-------+
+|       |
++-------+
+select first(s_name), first(s_id) from student;
++-------+-------+
+| first | first |
++-------+-------+
+|       |       |
++-------+-------+
+select first(s_score) from score;
++-------+
+| first |
++-------+
+|       |
++-------+
+select first(c_id), first(s_score) from score;
++-------+-------+
+| first | first |
++-------+-------+
+|       |       |
++-------+-------+
+--表中插入数据，使用first函数，返回第一个输入
+insert into student values (1,'zhaolei',null,'男');
+SQL SUCCESS
+insert into student values (2,'zhoumei','1991-12-01','女');
+SQL SUCCESS
+insert into student values (3,'zhuzhu','1991-06-01','男');
+SQL SUCCESS
+insert into student values (4,'lilei','1992-05-01','男');
+SQL SUCCESS
+insert into student values (null,'lihua','1991-03-01','男');
+SQL SUCCESS
+insert into student values (1,'zhangsan','1992-08-01','男');
+SQL SUCCESS
+insert into student values (2,'sunjin','1991-09-01','女');
+SQL SUCCESS
+insert into student values (3,'wangwu','1992-10-01','女');
+SQL SUCCESS
+insert into student values (4,null,'1990-11-01','女');
+SQL SUCCESS
+insert into student values (5,'ninghao','1993-12-01','女');
+SQL SUCCESS
+insert into score values(1, 101, 69.5),(1, 101, 80);
+SQL SUCCESS
+insert into score values(2, 102, 70),(2, 102, 82);
+SQL SUCCESS
+insert into score values(3, 103, 71),(3, 103, 93);
+SQL SUCCESS
+insert into score values(4, 104, 85),(4, 104, 85);
+SQL SUCCESS
+insert into score values(5, 105, 73),(5, 105, 91);
+SQL SUCCESS
+insert into score values(1, 106, null);
+SQL SUCCESS
+insert into score values(2, 107, 75);
+SQL SUCCESS
+insert into score values(3, null, 78);
+SQL SUCCESS
+insert into score values(4, 109, 86);
+SQL SUCCESS
+insert into score values(null, 110, 99);
+SQL SUCCESS
+--与group by，order by，having  结合使用
+select  first(s_name order by s_id) from student;
++---------+
+| first   |
++---------+
+| zhaolei |
++---------+
+select s_name, first(s_id) as id from student group by s_name order by s_name;
++----------+----+
+| s_name   | id |
++----------+----+
+| lihua    |    |
+| lilei    | 4  |
+| ninghao  | 5  |
+| sunjin   | 2  |
+| wangwu   | 3  |
+| zhangsan | 1  |
+| zhaolei  | 1  |
+| zhoumei  | 2  |
+| zhuzhu   | 3  |
+|          | 4  |
++----------+----+
+select s_birth, first(s_id ) from student group by s_birth order by s_birth;
++-------------------------------+-------+
+| s_birth                       | first |
++-------------------------------+-------+
+|                               | 1     |
++-------------------------------+-------+
+select s_id, first(s_name) from student group by s_id having s_id > 5 order by s_id;
++------+-------+
+| s_id | first |
++------+-------+
++------+-------+
+select first(s_name order by s_id) from student group by s_name;
++----------+
+| first    |
++----------+
+| lihua    |
+| lilei    |
+| ninghao  |
+| sunjin   |
+| wangwu   |
+| zhangsan |
+| zhaolei  |
+| zhoumei  |
+| zhuzhu   |
+|          |
++----------+
+select s_sex,first(s_birth) from student group by s_sex order by s_sex;
++-------+-------------------------------+
+| s_sex | first                         |
++-------+-------------------------------+
++-------+-------------------------------+
+select  first(s_score order by s_score) from score;
++-------+
+| first |
++-------+
+| 69.5  |
++-------+
+select s_score, first(s_score) from score group by s_score order by s_score;
++---------+-------+
+| s_score | first |
++---------+-------+
+| 69.5    | 69.5  |
+| 70.0    | 70.0  |
+| 71.0    | 71.0  |
+| 73.0    | 73.0  |
+| 75.0    | 75.0  |
+| 78.0    | 78.0  |
+| 80.0    | 80.0  |
+| 82.0    | 82.0  |
+| 85.0    | 85.0  |
+| 86.0    | 86.0  |
+| 91.0    | 91.0  |
+| 93.0    | 93.0  |
+| 99.0    | 99.0  |
+|         |       |
++---------+-------+
+select st.s_id,first(sc.s_score) as chenji from score as sc ,student as st where st.s_sex = '女' group by st.s_id  order by st.s_id;
++------+--------+
+| s_id | chenji |
++------+--------+
+| 2    | 69.5   |
+| 3    | 69.5   |
+| 4    | 69.5   |
+| 5    | 69.5   |
++------+--------+
+select sc.s_id,first(sc.s_score) from score as sc ,student as st where st.s_sex = '女' group by sc.s_id order by sc.s_id;
++------+-------+
+| s_id | first |
++------+-------+
+| 1    | 69.5  |
+| 2    | 70.0  |
+| 3    | 71.0  |
+| 4    | 85.0  |
+| 5    | 73.0  |
+|      | 99.0  |
++------+-------+
+select sc.s_id,first(st.s_name) from score as sc inner join student as st on sc.s_id = st.s_id
+where st.s_sex = '女'group by sc.s_id order by sc.s_id;
++------+---------+
+| s_id | first   |
++------+---------+
+| 2    | zhoumei |
+| 3    | wangwu  |
+| 4    |         |
+| 5    | ninghao |
++------+---------+
+--输入包含null，并排序(nulls first)      
+select first(s_name order by s_id nulls first) from student;
++-------+
+| first |
++-------+
+| lihua |
++-------+
+select s_name, first(s_birth order by s_birth  nulls first) from student group by s_name order by s_name;
++----------+-------------------------------+
+| s_name   | first                         |
++----------+-------------------------------+
+| zhaolei  |                               |
++----------+-------------------------------+
+select s_id, first(s_score order by s_score desc  NULLS first) from score group by s_id;
++------+-------+
+| s_id | first |
++------+-------+
+| 1    | 80.0  |
+| 2    | 82.0  |
+| 3    | 93.0  |
+| 4    | 86.0  |
+| 5    | 91.0  |
+|      | 99.0  |
++------+-------+
+select c_id, first(s_score order by s_score desc  NULLS first) from score group by c_id having c_id > 102 order by c_id;
++------+-------+
+| c_id | first |
++------+-------+
+| 103  | 93.0  |
+| 104  | 85.0  |
+| 105  | 91.0  |
+| 106  |       |
+| 107  | 75.0  |
+| 109  | 86.0  |
+| 110  | 99.0  |
++------+-------+
+select st.s_id,first(s_score order by s_score NULLS first) from score as sc inner join student as st on sc.s_id = st.s_id
+where st.s_sex = '女' group by st.s_id order by st.s_id;
++------+-------+
+| s_id | first |
++------+-------+
+| 2    | 70.0  |
+| 3    | 71.0  |
+| 4    | 85.0  |
+| 5    | 73.0  |
++------+-------+
+--与函数嵌套使用
+select char_length(first(s_name order by s_name)) from student;
++-------------+
+| char_length |
++-------------+
+| 5           |
++-------------+
+select isfinite(first(s_birth order by s_birth)) from student;
++----------+
+| isfinite |
++----------+
+| true     |
++----------+
+select ceil(first(s_score order by s_score)) from score;
++------+
+| ceil |
++------+
+| 70.0 |
++------+
+--清理环境
+drop table if exists student cascade;
+SQL SUCCESS
+drop table if exists score cascade;
+SQL SUCCESS

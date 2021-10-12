@@ -1,0 +1,12 @@
+-- @testpoint: 序列名为63位
+drop  SEQUENCE if exists SAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBB63;
+SQL SUCCESS
+CREATE SEQUENCE  SAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBB63 START WITH 10;
+SQL SUCCESS
+SELECT * FROM SAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBB63;
++-----------------------------------------------------------------+------------+-------------+--------------+---------------------+-----------+-------------+---------+-----------+-----------+------+
+| sequence_name                                                   | last_value | start_value | increment_by | max_value           | min_value | cache_value | log_cnt | is_cycled | is_called | uuid |
++-----------------------------------------------------------------+------------+-------------+--------------+---------------------+-----------+-------------+---------+-----------+-----------+------+
++-----------------------------------------------------------------+------------+-------------+--------------+---------------------+-----------+-------------+---------+-----------+-----------+------+
+DROP SEQUENCE if exists  SAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBB63;
+SQL SUCCESS

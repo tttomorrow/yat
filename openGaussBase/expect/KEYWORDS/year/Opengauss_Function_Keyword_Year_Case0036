@@ -1,0 +1,49 @@
+-- @testpoint: 关键字year，用作字符串
+drop table if exists year_test cascade;
+SQL SUCCESS
+create table year_test(id int,name varchar(20));
+SQL SUCCESS
+create or replace procedure year_insert
+as
+begin
+ for i in 1..20 loop
+    insert into year_test values(i,'year'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call year_insert();
++-------------+
+| year_insert |
++-------------+
+|             |
++-------------+
+select * from year_test;
++----+--------+
+| id | name   |
++----+--------+
+| 1  | year1  |
+| 2  | year2  |
+| 3  | year3  |
+| 4  | year4  |
+| 5  | year5  |
+| 6  | year6  |
+| 7  | year7  |
+| 8  | year8  |
+| 9  | year9  |
+| 10 | year10 |
+| 11 | year11 |
+| 12 | year12 |
+| 13 | year13 |
+| 14 | year14 |
+| 15 | year15 |
+| 16 | year16 |
+| 17 | year17 |
+| 18 | year18 |
+| 19 | year19 |
+| 20 | year20 |
++----+--------+
+drop table if exists year_test cascade;
+SQL SUCCESS
+drop procedure year_insert;
+SQL SUCCESS

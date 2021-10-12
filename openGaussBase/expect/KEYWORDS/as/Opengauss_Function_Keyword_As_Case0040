@@ -1,0 +1,9 @@
+-- @testpoint: 插入时，使用as列
+drop table if exists test_as_006;
+SQL SUCCESS
+create table test_as_006 ("as" char(20),stu_age int,sex char(10),score int,address char(10) default 'gauss');
+SQL SUCCESS
+insert into test_as_006("as") values('zhangsan');
+SQL SUCCESS
+drop table if exists test_as_006;
+SQL SUCCESS

@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字stdin(非保留)，作为外部数据源名
+--关键字不带引号-成功
+drop data source if exists stdin;
+SQL SUCCESS
+create data source stdin;
+SQL SUCCESS
+drop data source stdin;
+SQL SUCCESS
+--关键字带双引号-成功
+drop data source if exists "stdin";
+SQL SUCCESS
+create data source "stdin";
+SQL SUCCESS
+drop data source "stdin";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop data source if exists 'stdin';
+?.*ERROR: syntax error at or near "'stdin'".*
+?.*Position: .*
+create data source 'stdin';
+?.*ERROR: syntax error at or near "'stdin'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop data source if exists `stdin`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create data source `stdin`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

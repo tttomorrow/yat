@@ -1,0 +1,26 @@
+-- @testpoint: substr函数与having联合使用
+drop table if exists test;
+SQL SUCCESS
+create table test(id int, name text);
+SQL SUCCESS
+insert into test values(122,'university students');
+SQL SUCCESS
+insert into test values(21,'university labary');
+SQL SUCCESS
+insert into test values(35,'university playground');
+SQL SUCCESS
+insert into test values(411,'university classroom');
+SQL SUCCESS
+insert into test values(5,'kindergarten child');
+SQL SUCCESS
+select name from test group by name having substr(name,1,10) = 'university';
++-----------------------+
+| name                  |
++-----------------------+
+| university students   |
+| university playground |
+| university labary     |
+| university classroom  |
++-----------------------+
+drop table test;
+SQL SUCCESS

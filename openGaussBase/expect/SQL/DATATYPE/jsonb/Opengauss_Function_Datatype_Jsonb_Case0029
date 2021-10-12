@@ -1,0 +1,69 @@
+-- @testpoint: Jsonb额外支持的操作符:@>左边的JSON的顶层包含右边JSON的顶层所有JSON项
+--1.左右两侧类型相同
+select '"ffff"'::jsonb @> '"ffff"'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '{"a":1, "b": [1,2,3]}'::jsonb @>  '{ "b":    [1,  2,3]}'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '[null, false,     "test"]'::jsonb @> '["test"         , null ]'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '[105.2e3, "test", {"a":1}]'::jsonb @> '["test", 1.052e5 , {"a":1},   "test"]'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '{"a":1 ,"test":[1,2,3], "a":2}'::jsonb @> '{"a":2 ,"test":[1,2,3], "a":2}'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select 'null'::jsonb @> ''::jsonb;
++----------+
+| ?column? |
++----------+
+|          |
++----------+
+--2.左右两侧类型不相同
+select '[{"a":true}, null]'::jsonb @>  'null'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '[{"a":true}, "null"]'::jsonb @>  '"null"'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '[ "",  1]'::jsonb @> '""'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '[105.2e-3, "test "    ]'::jsonb @> '1.0520e-1'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '["ddd", 1, "ddd"]'::jsonb @> '"ddd"'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+

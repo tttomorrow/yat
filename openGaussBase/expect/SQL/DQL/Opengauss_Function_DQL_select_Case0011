@@ -1,0 +1,28 @@
+-- @testpoint: DQL语法，结合order by后跟clob列
+drop table if exists test_clob;
+SQL SUCCESS
+create table test_clob(id int,c_clob clob);
+SQL SUCCESS
+insert into test_clob values(1,'abcdeee');
+SQL SUCCESS
+insert into test_clob values(2,'abcd');
+SQL SUCCESS
+insert into test_clob values(3,'abc');
+SQL SUCCESS
+insert into test_clob values(4,'bcdefg');
+SQL SUCCESS
+insert into test_clob values(5,'中国abc');
+SQL SUCCESS
+insert into test_clob values(6,'abc中国');
+SQL SUCCESS
+select * from test_clob where c_clob like 'abc%' order by c_clob;
++----+---------+
+| id | c_clob  |
++----+---------+
+| 3  | abc     |
+| 2  | abcd    |
+| 1  | abcdeee |
+| 6  | abc中国   |
++----+---------+
+drop table test_clob;
+SQL SUCCESS

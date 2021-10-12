@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字validator(非保留)，作为外部数据源名
+--关键字不带引号-成功
+drop data source if exists validator;
+SQL SUCCESS
+create data source validator;
+SQL SUCCESS
+drop data source validator;
+SQL SUCCESS
+--关键字带双引号-成功
+drop data source if exists "validator";
+SQL SUCCESS
+create data source "validator";
+SQL SUCCESS
+drop data source "validator";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop data source if exists 'validator';
+?.*ERROR: syntax error at or near "'validator'".*
+?.*Position: .*
+create data source 'validator';
+?.*ERROR: syntax error at or near "'validator'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop data source if exists `validator`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create data source `validator`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

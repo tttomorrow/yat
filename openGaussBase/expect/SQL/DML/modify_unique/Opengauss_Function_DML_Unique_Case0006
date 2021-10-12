@@ -1,0 +1,13 @@
+-- @testpoint: 改变列的数据类型为blob和clob型，并添加unique约束，合理报错
+drop table if exists t1;
+SQL SUCCESS
+create table t1(a int);
+SQL SUCCESS
+alter table t1 modify a blob unique;
+?.*ERROR: syntax error at or near "unique".*
+?.*Position.*
+alter table t1 modify a clob unique;
+?.*ERROR: syntax error at or near "unique".*
+?.*Position.*
+drop table if exists t1;
+SQL SUCCESS

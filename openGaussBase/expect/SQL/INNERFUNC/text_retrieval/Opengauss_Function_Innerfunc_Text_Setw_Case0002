@@ -1,0 +1,16 @@
+-- @testpoint: 文本检索函数setweight给setweight类型的元素分配权值a
+drop table if exists ts_zhparser;
+SQL SUCCESS
+create table ts_zhparser(id int, body text);
+SQL SUCCESS
+insert into ts_zhparser values(2, 'a:1 fat:2');
+SQL SUCCESS
+select setweight(body :: tsvector, 'a') from ts_zhparser;
++-----------------+
+| setweight       |
++-----------------+
+| 'a':1A 'fat':2A |
++-----------------+
+--清理环境
+drop table if exists ts_zhparser;
+SQL SUCCESS

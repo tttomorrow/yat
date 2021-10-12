@@ -1,0 +1,15 @@
+-- @testpoint: 字符本身含有%
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('AA%BBCC');
+SQL SUCCESS
+SELECT  (string1 LIKE '%A@%B%' ESCAPE '@') from type_char AS RESULT;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

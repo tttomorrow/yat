@@ -1,0 +1,97 @@
+--  @testpoint:创建函数指定参数数据类型是布尔类型
+drop FUNCTION if EXISTS z_testfun1;
+SQL SUCCESS
+CREATE FUNCTION z_testfun1 (c_BOOLEAN  BOOLEAN) RETURNS BOOLEAN  AS $$
+        BEGIN
+                RETURN c_BOOLEAN;
+        END;
+$$ LANGUAGE plpgsql;
+/
+SQL SUCCESS
+call z_testfun1('y');
++------------+
+| z_testfun1 |
++------------+
+| true       |
++------------+
+call z_testfun1('true');
++------------+
+| z_testfun1 |
++------------+
+| true       |
++------------+
+call z_testfun1('TRUE');
++------------+
+| z_testfun1 |
++------------+
+| true       |
++------------+
+call z_testfun1('t');
++------------+
+| z_testfun1 |
++------------+
+| true       |
++------------+
+call z_testfun1('YES');
++------------+
+| z_testfun1 |
++------------+
+| true       |
++------------+
+call z_testfun1(1);
++------------+
+| z_testfun1 |
++------------+
+| true       |
++------------+
+call z_testfun1(3);
++------------+
+| z_testfun1 |
++------------+
+| true       |
++------------+
+--调用函数，boolean值为假
+call z_testfun1('FALSE');
++------------+
+| z_testfun1 |
++------------+
+| false      |
++------------+
+call z_testfun1('false');
++------------+
+| z_testfun1 |
++------------+
+| false      |
++------------+
+call z_testfun1(0);
++------------+
+| z_testfun1 |
++------------+
+| false      |
++------------+
+call z_testfun1('n');
++------------+
+| z_testfun1 |
++------------+
+| false      |
++------------+
+call z_testfun1('no');
++------------+
+| z_testfun1 |
++------------+
+| false      |
++------------+
+call z_testfun1(-1);
++------------+
+| z_testfun1 |
++------------+
+| true       |
++------------+
+call z_testfun1(null);
++------------+
+| z_testfun1 |
++------------+
+|            |
++------------+
+drop FUNCTION z_testfun1;
+SQL SUCCESS

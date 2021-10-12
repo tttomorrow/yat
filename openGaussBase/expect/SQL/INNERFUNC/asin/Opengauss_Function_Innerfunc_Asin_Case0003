@@ -1,0 +1,13 @@
+-- @testpoint: 输入为特殊字符/字母/非隐式字符串,合理报错
+
+select asin('Infinity');
+?.*ERROR: input is out of range
+  Where: referenced column: asin
+select asin('~');
+?.*ERROR: invalid input syntax for type double precision: "~"
+?.*
+  Where: referenced column: asin
+select asin('a');
+?.*ERROR: invalid input syntax for type double precision: "a"
+?.*
+  Where: referenced column: asin

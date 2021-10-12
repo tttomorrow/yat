@@ -1,0 +1,37 @@
+-- @testpoint: 自定义函数BLOB数据类型的测试———非二进制类型 合理报错
+--创建自定义函数
+create or replace function FVT_FUNC_BINARY_008(P1 BLOB) return BLOB
+is
+begin
+  return P1;
+  EXCEPTION
+  WHEN NO_DATA_FOUND
+  THEN
+raise info 'NO_DATA_FOUND';
+end;
+/
+SQL SUCCESS
+--调用自定义函数-int
+select FVT_FUNC_BINARY_008(245);
+?.*ERROR: function fvt\_func\_binary\_008\(integer\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position.*
+  Where: referenced column: fvt_func_binary_008
+--调用自定义函数-real
+select FVT_FUNC_BINARY_008(245.1235);
+?.*ERROR: function fvt\_func\_binary\_008\(numeric\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position.*
+  Where: referenced column: fvt_func_binary_008
+--调用自定义函数-char
+select FVT_FUNC_BINARY_008('ajkf*^&^&35GFFS');
+?.*ERROR: invalid hexadecimal digit: "j".*
+?.*Position.*
+  Where: referenced column: fvt_func_binary_008
+--调用自定义函数-非法的十六进制字符串
+select FVT_FUNC_BINARY_008(2XFA278FA);
+?.*ERROR: syntax error at or near "XFA278FA"
+?.*Position.*
+--恢复环境
+drop function if exists FVT_FUNC_BINARY_008;
+SQL SUCCESS

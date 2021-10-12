@@ -1,0 +1,72 @@
+-- @testpoint: json类型的分区表上创建索引:不支持，合理报错
+--分区表：Json类型分区表创建成功
+drop table if exists tab110;
+SQL SUCCESS
+create table tab110(id int,name varchar,message json)
+partition by range(id)
+(partition part_1 values less than(20),
+ partition part_2 values less than(30),
+ partition part_3 values less than(maxvalue));
+SQL SUCCESS
+insert into tab110 values(001,'Jane','{"age":18,"city":"xianyang"}');
+SQL SUCCESS
+insert into tab110 values(012,'Joy','{"age":19,"city":"qingdao"}');
+SQL SUCCESS
+insert into tab110 values(023,'Jack','{"age":20,"city":"xiamen"}');
+SQL SUCCESS
+insert into tab110 values(024,'Json','{"age":23,"city":"shenzhen"}');
+SQL SUCCESS
+insert into tab110 values(035,'Jim','{"age":21,"city":"shanghai"}');
+SQL SUCCESS
+select * from tab110 partition (part_1);
++----+------+------------------------------+
+| id | name | message                      |
++----+------+------------------------------+
+| 1  | Jane | {"age":18,"city":"xianyang"} |
+| 12 | Joy  | {"age":19,"city":"qingdao"}  |
++----+------+------------------------------+
+select * from tab110 partition (part_2);
++----+------+------------------------------+
+| id | name | message                      |
++----+------+------------------------------+
+| 23 | Jack | {"age":20,"city":"xiamen"}   |
+| 24 | Json | {"age":23,"city":"shenzhen"} |
++----+------+------------------------------+
+select * from tab110 partition (part_3);
++----+------+------------------------------+
+| id | name | message                      |
++----+------+------------------------------+
+| 35 | Jim  | {"age":21,"city":"shanghai"} |
++----+------+------------------------------+
+--创建索引
+drop index if exists index1101;
+SQL SUCCESS
+drop index if exists index1102;
+SQL SUCCESS
+drop index if exists index1103;
+SQL SUCCESS
+drop index if exists index1104;
+SQL SUCCESS
+drop index if exists index1105;
+SQL SUCCESS
+drop index if exists index1106;
+SQL SUCCESS
+create index index1101 on tab110(message);
+?.*ERROR: data type json has no default operator class for access method "btree.*
+  Hint: You must specify an operator class for the index or define a default operator class for the data type.
+create index index1102 on tab110 using gist(message)global;
+?.*ERROR: Global partition index only support btree.*
+create index index1103 on tab110 using gist(message)local;
+?.*ERROR: data type json has no default operator class for access method "gist.*
+  Hint: You must specify an operator class for the index or define a default operator class for the data type.
+create index index1104 on tab110 using gin(message)global;
+?.*ERROR: Global partition index only support btree.*
+create index index1105 on tab110 using gin(message)local;
+?.*ERROR: data type json has no default operator class for access method "gin.*
+  Hint: You must specify an operator class for the index or define a default operator class for the data type.
+create unique index index1106 on tab110 using btree(message asc);
+?.*ERROR: data type json has no default operator class for access method "btree.*
+  Hint: You must specify an operator class for the index or define a default operator class for the data type.
+--清理数据
+drop table if exists tab110;
+SQL SUCCESS

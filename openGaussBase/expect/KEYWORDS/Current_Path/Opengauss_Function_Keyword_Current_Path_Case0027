@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字current_path(非保留)，作为序列名
+--关键字不带引号-成功
+drop sequence if exists current_path;
+SQL SUCCESS
+create sequence current_path start 100 cache 50;
+SQL SUCCESS
+drop sequence current_path;
+SQL SUCCESS
+--关键字带双引号-成功
+drop sequence if exists "current_path";
+SQL SUCCESS
+create sequence "current_path" start 100 cache 50;
+SQL SUCCESS
+drop sequence "current_path";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'current_path';
+?.*ERROR: syntax error at or near "'current_path'"
+?.*
+create sequence 'current_path' start 100 cache 50;
+?.*ERROR: syntax error at or near "'current_path'"
+?.*
+--关键字带反引号-合理报错
+drop sequence if exists `current_path`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create sequence `current_path` start 100 cache 50;
+?.*ERROR: syntax error at or near "`"
+?.*

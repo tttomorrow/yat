@@ -1,0 +1,21 @@
+-- @testpoint: reltimeISO-8601格式表示的负号时间段与整数、浮点数相除
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (col1 reltime);
+SQL SUCCESS
+insert into test_date01 values ('-12H');
+SQL SUCCESS
+select col1 / double precision '1.5' from test_date01;
++--------------------------------------------------+
+| ?column?                                         |
++--------------------------------------------------+
+| 0 years 0 mons 0 days -8 hours 0 mins -0.00 secs |
++--------------------------------------------------+
+select col1/2  from test_date01;
++--------------------------------------------------+
+| ?column?                                         |
++--------------------------------------------------+
+| 0 years 0 mons 0 days -6 hours 0 mins -0.00 secs |
++--------------------------------------------------+
+drop table if exists test_date01;
+SQL SUCCESS

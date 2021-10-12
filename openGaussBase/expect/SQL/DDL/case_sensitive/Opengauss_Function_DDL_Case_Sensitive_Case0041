@@ -1,0 +1,43 @@
+-- @testpoint: --创建主键约束区别大小写 合理报错
+drop table if exists false_2;
+SQL SUCCESS
+create table false_2(a int,b int);
+SQL SUCCESS
+drop table if exists false_3;
+SQL SUCCESS
+create table false_3(a int,b int);
+SQL SUCCESS
+--字段大小写不同
+alter table false_2 add constraint qq primary key(B);
+SQL SUCCESS
+alter table false_2 add constraint qq primary key(b);
+?.*ERROR: multiple primary keys for table "false_2" are not allowed
+--约束名称大小写不同
+alter table false_3 add constraint PP primary key(a);
+SQL SUCCESS
+alter table false_3 add constraint pp primary key(a);
+?.*ERROR: multiple primary keys for table "false_3" are not allowed
+SELECT conname,contype,condeferrable,condeferred,convalidated FROM PG_CONSTRAINT WHERE conname in ('qq','pp');
++---------+---------+---------------+-------------+--------------+
+| conname | contype | condeferrable | condeferred | convalidated |
++---------+---------+---------------+-------------+--------------+
+| qq      | p       | false         | false       | true         |
+| pp      | p       | false         | false       | true         |
++---------+---------+---------------+-------------+--------------+
+alter table false_2 drop constraint qq;
+SQL SUCCESS
+alter table false_2 drop constraint QQ;
+?.*ERROR: constraint "qq" of relation "false_2" does not exist
+alter table false_3 drop constraint pp;
+SQL SUCCESS
+alter table false_3 drop constraint PP;
+?.*ERROR: constraint "pp" of relation "false_3" does not exist
+SELECT conname,contype,condeferrable,condeferred,convalidated FROM PG_CONSTRAINT WHERE conname in ('qq','pp');
++---------+---------+---------------+-------------+--------------+
+| conname | contype | condeferrable | condeferred | convalidated |
++---------+---------+---------------+-------------+--------------+
++---------+---------+---------------+-------------+--------------+
+drop table if exists false_2;
+SQL SUCCESS
+drop table if exists false_3;
+SQL SUCCESS

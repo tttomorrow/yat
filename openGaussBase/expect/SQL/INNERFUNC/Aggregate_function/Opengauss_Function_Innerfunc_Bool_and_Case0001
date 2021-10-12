@@ -1,0 +1,49 @@
+-- @testpoint: 函数bool_and，如果所有输入值都是真，则为真，否则为假
+select bool_and(100 <2500);
++----------+
+| bool_and |
++----------+
+| true     |
++----------+
+select bool_and(array[1.1,2.1,3.1]::int[] = array[1,2,3]);
++----------+
+| bool_and |
++----------+
+| true     |
++----------+
+select bool_and('a'='a');
++----------+
+| bool_and |
++----------+
+| true     |
++----------+
+select bool_and('a'>'a');
++----------+
+| bool_and |
++----------+
+| false    |
++----------+
+select bool_and('a'>'b');
++----------+
+| bool_and |
++----------+
+| false    |
++----------+
+select bool_and('a'<'b');
++----------+
+| bool_and |
++----------+
+| true     |
++----------+
+select bool_and('a=b'='b=a');
++----------+
+| bool_and |
++----------+
+| false    |
++----------+
+select bool_and(0);
++----------+
+| bool_and |
++----------+
+| false    |
++----------+

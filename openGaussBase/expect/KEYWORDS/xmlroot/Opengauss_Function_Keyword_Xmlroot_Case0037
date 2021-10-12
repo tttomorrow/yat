@@ -1,0 +1,49 @@
+-- @testpoint: 关键字xmlroot，用作字符串
+drop table if exists xmlroot_test cascade;
+SQL SUCCESS
+create table xmlroot_test(id int,xmlroot varchar(20));
+SQL SUCCESS
+create or replace procedure xmlroot_insert
+as
+begin
+ for i in 1..20 loop
+    insert into xmlroot_test values(i,'xmlroot'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call xmlroot_insert();
++----------------+
+| xmlroot_insert |
++----------------+
+|                |
++----------------+
+select * from xmlroot_test;
++----+-----------+
+| id | xmlroot   |
++----+-----------+
+| 1  | xmlroot1  |
+| 2  | xmlroot2  |
+| 3  | xmlroot3  |
+| 4  | xmlroot4  |
+| 5  | xmlroot5  |
+| 6  | xmlroot6  |
+| 7  | xmlroot7  |
+| 8  | xmlroot8  |
+| 9  | xmlroot9  |
+| 10 | xmlroot10 |
+| 11 | xmlroot11 |
+| 12 | xmlroot12 |
+| 13 | xmlroot13 |
+| 14 | xmlroot14 |
+| 15 | xmlroot15 |
+| 16 | xmlroot16 |
+| 17 | xmlroot17 |
+| 18 | xmlroot18 |
+| 19 | xmlroot19 |
+| 20 | xmlroot20 |
++----+-----------+
+drop table if exists xmlroot_test cascade;
+SQL SUCCESS
+drop procedure xmlroot_insert;
+SQL SUCCESS

@@ -1,0 +1,18 @@
+-- @testpoint: 结合日期函数，在DATE增加月份得到新日期
+DROP TABLE IF EXISTS test_date08;
+SQL SUCCESS
+CREATE TABLE test_date08 (name date);
+SQL SUCCESS
+INSERT INTO test_date08 VALUES (ADD_MONTHS(date '2018-09-18', +1));
+SQL SUCCESS
+INSERT INTO test_date08 VALUES (ADD_MONTHS(date '2018-09-11', -1));
+SQL SUCCESS
+SELECT * FROM test_date08;
++-------------------------------+
+| name                          |
++-------------------------------+
+?.*2018-10-18 00:00:00.*
+?.*2018-08-11 00:00:00.*
++-------------------------------+
+DROP TABLE test_date08;
+SQL SUCCESS

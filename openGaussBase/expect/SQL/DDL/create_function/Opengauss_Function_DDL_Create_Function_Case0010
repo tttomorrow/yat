@@ -1,0 +1,8 @@
+--  @testpoint:创建函数指定模式名（模式名不存在），合理报错
+CREATE FUNCTION self1.sum_two(integer, integer) RETURNS integer
+    AS 'select $1 + $2;'
+    LANGUAGE SQL
+    IMMUTABLE
+    RETURNS NULL ON NULL INPUT;
+/
+?.*ERROR: schema "self1" does not exist

@@ -1,0 +1,14 @@
+-- @testpoint: pg_stat_get_backend_start(integer) 给定服务器进程启动的时间，入参为为空、字母、特殊字符时，合理报错
+select pg_stat_get_backend_start();
+?.*ERROR: function pg_stat_get_backend_start\(\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position.*
+  Where: referenced column: pg_stat_get_backend_start
+select pg_stat_get_backend_start('a');
+?.*ERROR: invalid input syntax for integer: "a".*
+?.*Position.*
+  Where: referenced column: pg_stat_get_backend_start
+select pg_stat_get_backend_start('@#$');
+?.*ERROR: invalid input syntax for integer: "\@\#\$".*
+?.*Position.*
+  Where: referenced column: pg_stat_get_backend_start

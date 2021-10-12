@@ -1,0 +1,9 @@
+-- @testpoint: 修改角色权限
+drop ROLE if exists miriam;
+SQL SUCCESS
+create ROLE miriam with SYSADMIN IDENTIFIED BY 'Bigdata@123' ;
+SQL SUCCESS
+ALTER ROLE miriam  WITH AUDITADMIN;
+SQL SUCCESS
+drop ROLE if exists miriam;
+SQL SUCCESS

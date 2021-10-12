@@ -1,0 +1,44 @@
+--  @testpoint:declare声明动态游标，定义游标类型，类型名为无效值，合理报错；
+--前置条件
+drop table if exists cur_test_68;
+SQL SUCCESS
+create table cur_test_68(c_id int,c_num int,c_name varchar(10),c_city varchar(10),c_add varchar(20));
+SQL SUCCESS
+insert into cur_test_68 values(1,18,'Allen','Beijing','AAAAABAAAAA'),(2,368,'Bob','Shanghai','AAAAACAAAAA'),
+                           (3,59,'Cathy','Shenzhen','AAAAADAAAAA'),(4,96,'David','Suzhou','AAAAAEAAAAA'),
+                           (5,17,'Edrwd','Fenghuang','AAAAAFAAAAA'),(6,253,'Fendi','Changsha','AAAAAGAAAAA');
+SQL SUCCESS
+--以特殊字符开头
+drop procedure if exists cursor_ftest_68_01;
+SQL SUCCESS
+create or replace procedure cursor_ftest_68_01()
+as
+declare
+    type cursor_type is ref cursor;
+    @C1 cursor_type;
+    sql_str varchar(100);
+begin
+    sql_str := 'select c_name from cur_test_68 where c_id=6;';
+    open @C1 for sql_str;
+    close @C1;
+end;
+/
+?.*ERROR: syntax error at or near "@"
+--以数字开头
+drop procedure if exists cursor_ftest_68_02;
+SQL SUCCESS
+create or replace procedure cursor_ftest_68_02()
+as
+declare
+    type cursor_type is ref cursor;
+    1c cursor_type;
+    sql_str varchar(100);
+begin
+    sql_str = 'select c_name from cur_test_68 where c_id=6;';
+    open 1c for sql_str;
+    close 1c;
+end;
+/
+?.*ERROR: syntax error at or near "1"
+drop table cur_test_68;
+SQL SUCCESS

@@ -1,0 +1,61 @@
+-- @testpoint: 函数hll_hash_boolean(bool)，对bool类型数据计算哈希值
+select hll_hash_boolean(true);
++---------------------+
+| hll_hash_boolean    |
++---------------------+
++---------------------+
+select hll_hash_boolean('t');
++---------------------+
+| hll_hash_boolean    |
++---------------------+
++---------------------+
+select hll_hash_boolean(1);
++---------------------+
+| hll_hash_boolean    |
++---------------------+
++---------------------+
+select hll_hash_boolean('y');
++---------------------+
+| hll_hash_boolean    |
++---------------------+
++---------------------+
+select hll_hash_boolean('yes');
++---------------------+
+| hll_hash_boolean    |
++---------------------+
++---------------------+
+select hll_hash_boolean('1');
++---------------------+
+| hll_hash_boolean    |
++---------------------+
++---------------------+
+select hll_hash_boolean(false);
++---------------------+
+| hll_hash_boolean    |
++---------------------+
++---------------------+
+select hll_hash_boolean('f');
++---------------------+
+| hll_hash_boolean    |
++---------------------+
++---------------------+
+select hll_hash_boolean(0);
++---------------------+
+| hll_hash_boolean    |
++---------------------+
++---------------------+
+select hll_hash_boolean('0');
++---------------------+
+| hll_hash_boolean    |
++---------------------+
++---------------------+
+select hll_hash_boolean('n');
++---------------------+
+| hll_hash_boolean    |
++---------------------+
++---------------------+
+select hll_hash_boolean('no');
++---------------------+
+| hll_hash_boolean    |
++---------------------+
++---------------------+

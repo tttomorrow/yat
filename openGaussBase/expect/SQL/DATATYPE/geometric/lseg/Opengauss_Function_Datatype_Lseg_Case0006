@@ -1,0 +1,22 @@
+-- @testpoint: lseg类型，使用[(x1,y1),(x2,y2)]方式插入无效坐标值，合理报错
+drop table if exists test_lseg06;
+SQL SUCCESS
+create table test_lseg06 (name lseg);
+SQL SUCCESS
+insert into test_lseg06 values (lseg '[(a,b),(a,b)]');
+?.*ERROR: invalid input syntax for type lseg: "\[\(a,b\),\(a,b\)\]"
+?.*
+insert into test_lseg06 values (lseg '[(~,~),(~,~)]');
+?.*ERROR: invalid input syntax for type lseg: "\[\(~,~\),\(~,~\)\]"
+?.*
+insert into test_lseg06 values (lseg '[(@,@),(@,@)]');
+?.*ERROR: invalid input syntax for type lseg: "\[\(@,@\),\(@,@\)\]"
+?.*
+insert into test_lseg06 values (lseg '[(#,#),(#,#)]');
+?.*ERROR: invalid input syntax for type lseg: "\[\(#,#\),\(#,#\)\]"
+?.*
+insert into test_lseg06 values (lseg '[(,),(,)]');
+?.*ERROR: invalid input syntax for type lseg: "\[\(,\),\(,\)\]"
+?.*
+drop table test_lseg06;
+SQL SUCCESS

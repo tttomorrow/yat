@@ -1,0 +1,52 @@
+--  @testpoint:使用SET CONSTRAINTS语句设置当前事务检查行为的约束条件（外键约束）
+--创建主键表
+drop table if exists products;
+SQL SUCCESS
+--建表，指定一列是主键
+create table products(
+products_no integer primary key,
+name varchar(50),
+price numeric
+);
+SQL SUCCESS
+--插入数据
+insert into products values(1,'a',8.9);
+SQL SUCCESS
+--创建外键表，指定外键orders.products_no和products.products_no是外键和主键的关系
+drop table if exists orders;
+SQL SUCCESS
+create table  orders(
+order_id integer  primary key ,
+products_no integer references products(products_no),
+quantity integer
+);
+SQL SUCCESS
+--开启事务
+start transaction;
+SQL SUCCESS
+--设置约束为immediate
+set CONSTRAINTS all immediate;
+SQL SUCCESS
+--给外键表插入数据,合理报错
+insert into orders values(2,3,100);
+?.*ERROR: insert or update on table "orders" violates foreign key constraint "orders_products_no_fkey"
+  Detail: Key (products_no)=(3) is not present in table "products".
+end;
+SQL SUCCESS
+--开启事务
+start transaction;
+SQL SUCCESS
+--设置约束为DEFERRED
+set CONSTRAINTS all DEFERRED;
+SQL SUCCESS
+--给外键表插入数据,合理报错
+insert into orders values(2,3,100);
+?.*ERROR: insert or update on table "orders" violates foreign key constraint "orders_products_no_fkey"
+  Detail: Key (products_no)=(3) is not present in table "products".
+end;
+SQL SUCCESS
+--删表
+drop table products cascade;
+SQL SUCCESS
+drop table orders cascade;
+SQL SUCCESS

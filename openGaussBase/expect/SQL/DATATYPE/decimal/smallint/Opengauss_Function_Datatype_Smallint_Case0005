@@ -1,0 +1,14 @@
+-- @testpoint: 插入特殊字符，合理报错
+drop table if exists smallint05;
+SQL SUCCESS
+create table smallint05 (name smallint);
+SQL SUCCESS
+insert into smallint05 values (@);
+?.*ERROR: syntax error at or near "\)"
+?.*
+insert into smallint05 values ('#');
+?.*ERROR: invalid input syntax for integer: "#"
+?.*
+  Where: referenced column: name
+drop table smallint05;
+SQL SUCCESS

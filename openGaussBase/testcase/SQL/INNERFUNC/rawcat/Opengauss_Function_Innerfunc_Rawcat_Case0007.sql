@@ -1,0 +1,2 @@
+-- @testpoint: rawcat函数入参为''
+SELECT rawcat('ab','');

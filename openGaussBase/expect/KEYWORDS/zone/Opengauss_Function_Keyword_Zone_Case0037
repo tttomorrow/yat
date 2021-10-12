@@ -1,0 +1,49 @@
+-- @testpoint: 关键字zone，用作字段名
+drop table if exists zone_test cascade;
+SQL SUCCESS
+create table zone_test(id int,zone varchar(20));
+SQL SUCCESS
+create or replace procedure zone_insert
+as
+begin
+ for i in 1..20 loop
+    insert into zone_test values(i,'zone'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call zone_insert();
++-------------+
+| zone_insert |
++-------------+
+|             |
++-------------+
+select * from zone_test;
++----+--------+
+| id | zone   |
++----+--------+
+| 1  | zone1  |
+| 2  | zone2  |
+| 3  | zone3  |
+| 4  | zone4  |
+| 5  | zone5  |
+| 6  | zone6  |
+| 7  | zone7  |
+| 8  | zone8  |
+| 9  | zone9  |
+| 10 | zone10 |
+| 11 | zone11 |
+| 12 | zone12 |
+| 13 | zone13 |
+| 14 | zone14 |
+| 15 | zone15 |
+| 16 | zone16 |
+| 17 | zone17 |
+| 18 | zone18 |
+| 19 | zone19 |
+| 20 | zone20 |
++----+--------+
+drop table if exists zone_test cascade;
+SQL SUCCESS
+drop procedure zone_insert;
+SQL SUCCESS

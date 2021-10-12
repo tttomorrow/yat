@@ -1,0 +1,54 @@
+-- @testpoint: opengauss关键字existing(非保留)，自定义数据类型名为existing 合理报错
+--关键字existing作为数据类型不带引号，创建成功
+drop type if exists public.existing;
+SQL SUCCESS
+CREATE TYPE public.existing AS (f1 int, f2 text);
+SQL SUCCESS
+select typname from pg_type where typname ='public.existing';
++---------+
+| typname |
++---------+
++---------+
+drop type public.existing;
+SQL SUCCESS
+--关键字existing作为数据类型加双引号，创建成功
+drop type if exists "public.existing";
+SQL SUCCESS
+CREATE TYPE "public.existing" AS (f1 int, f2 text);
+SQL SUCCESS
+select typname from pg_type where typname ='public.existing';
++-----------------+
+| typname         |
++-----------------+
+| public.existing |
++-----------------+
+drop type "public.existing";
+SQL SUCCESS
+--关键字existing作为数据类型加单引号，合理报错
+drop type if exists 'public.existing';
+?.*ERROR: syntax error at or near "'public.existing'"
+?.*
+CREATE TYPE 'public.existing' AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "'public.existing'"
+?.*
+select * from pg_type where typname ='public.existing';
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+----------+-----------+------------+---------+----------+-----------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
+| typname | typnamespace | typowner | typlen | typbyval | typtype | typcategory | typispreferred | typisdefined | typdelim | typrelid | typelem | typarray | typinput | typoutput | typreceive | typsend | typmodin | typmodout | typanalyze | typalign | typstorage | typnotnull | typbasetype | typtypmod | typndims | typcollation | typdefaultbin | typdefault | typacl |
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+----------+-----------+------------+---------+----------+-----------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+----------+-----------+------------+---------+----------+-----------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
+drop type 'public.existing';
+?.*ERROR: syntax error at or near "'public.existing'"
+?.*
+--关键字existing作为数据类型加反引号，合理报错
+drop type if exists `public.existing`;
+?.*ERROR: syntax error at or near "`"
+?.*
+CREATE TYPE `public.existing` AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "`"
+?.*
+select * from pg_type where typname =`public.existing`;
+?.*ERROR: missing FROM-clause entry for table "public"
+?.*
+drop type `public.existing`;
+?.*ERROR: syntax error at or near "`"
+?.*

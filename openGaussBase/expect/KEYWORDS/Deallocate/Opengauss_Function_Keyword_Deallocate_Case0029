@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字deallocate(非保留)，作为表空间名
+--关键字不带引号，创建成功
+drop tablespace if exists deallocate;
+SQL SUCCESS
+CREATE TABLESPACE deallocate RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+SQL SUCCESS
+drop tablespace deallocate;
+SQL SUCCESS
+--关键字带双引号，创建成功
+drop tablespace if exists "deallocate";
+SQL SUCCESS
+CREATE TABLESPACE "deallocate" RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+SQL SUCCESS
+drop tablespace "deallocate";
+SQL SUCCESS
+--关键字带单引号，合理报错
+drop tablespace if exists 'deallocate';
+?.*ERROR: syntax error at or near "'deallocate'"
+?.*
+CREATE TABLESPACE 'deallocate' RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+?.*ERROR: syntax error at or near "'deallocate'"
+?.*
+--关键字带反引号，合理报错
+drop tablespace if exists `deallocate`;
+?.*ERROR: syntax error at or near "`"
+?.*
+CREATE TABLESPACE `deallocate` RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+?.*ERROR: syntax error at or near "`"
+?.*

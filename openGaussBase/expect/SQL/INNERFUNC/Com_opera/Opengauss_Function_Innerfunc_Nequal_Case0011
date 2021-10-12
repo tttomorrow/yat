@@ -1,0 +1,152 @@
+-- @testpoint: opengauss比较操作符!=,可以隐式转换的不同类型
+-- 可以隐式转换的不同类型间比较
+select '123'::CHAR != '125'::VARCHAR2 as result;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select '125'::CHAR != '125'::VARCHAR2 as result;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select '126'::CHAR != '125'::VARCHAR2 as result;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select '012'::CHAR != '125'::VARCHAR2 as result;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select '2129'::CHAR != '125'::VARCHAR2 as result;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select '1129'::CHAR != '125'::VARCHAR2 as result;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select '123'::CHAR != '125'::NUMBER as result;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select '16'::CHAR != '10'::RAW as result;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select '17'::CHAR != '10'::RAW as result;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select '123'::CHAR != '125'::CLOB as result;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select '123'::VARCHAR2 != '123'::CHAR as result;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select '123'::VARCHAR2 != '123'::NUMBER as result;
++--------+
+| result |
++--------+
+| false  |
++--------+
+select '123'::VARCHAR2 != '123'::CLOB as result;
++--------+
+| result |
++--------+
+| false  |
++--------+
+select '123'::NUMBER != '123'::CHAR as result;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select '123'::NUMBER != '123'::VARCHAR2 as result;
++--------+
+| result |
++--------+
+| false  |
++--------+
+select '123'::RAW != '123'::CHAR as result;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select '123'::RAW != '123'::VARCHAR2 as result;
++--------+
+| result |
++--------+
+| false  |
++--------+
+select '123'::CLOB != '123'::CHAR as result;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select '123'::CLOB != '123'::VARCHAR2 as result;
++--------+
+| result |
++--------+
+| false  |
++--------+
+select '123'::CLOB != '123'::NUMBER as result;
++--------+
+| result |
++--------+
+| false  |
++--------+
+select '123'::INT4 != '123'::CHAR as result;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select '123'::INT4 != '1'::BOOLEAN as result;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select '1'::BOOLEAN != '123'::INT4 as result;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select '2001-09-28'::VARCHAR2 != '2001-09-27'::DATE as result;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select '2001-09-28'::DATE != '2001-09-28'::VARCHAR2 as result;
++--------+
+| result |
++--------+
+| false  |
++--------+

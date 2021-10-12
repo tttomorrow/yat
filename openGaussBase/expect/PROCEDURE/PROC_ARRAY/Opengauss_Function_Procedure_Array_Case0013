@@ -1,0 +1,36 @@
+-- @describe:存储过程中数组函数的使用 array_cat
+--创建存储过程
+CREATE OR REPLACE procedure pro_record_013() AS
+declare
+sqlstr varchar(1024);
+begin
+DROP TABLE IF EXISTS test_array_013;
+create table test_array_013(
+items text,
+id int
+);
+sqlstr := 'insert into test_array_013(SELECT array_cat(ARRAY[1,2,3], ARRAY[4,5]) AS RESULT,5)';
+execute immediate sqlstr;
+end;
+/
+SQL SUCCESS
+--调用存储过程
+call  pro_record_013();
++----------------+
+| pro_record_013 |
++----------------+
+|                |
++----------------+
+--查看表数据
+select * from test_array_013;
++-------------+----+
+| items       | id |
++-------------+----+
+| {1,2,3,4,5} | 5  |
++-------------+----+
+--删除表
+drop table test_array_013;
+SQL SUCCESS
+--删除存储过程
+drop procedure pro_record_013;
+SQL SUCCESS

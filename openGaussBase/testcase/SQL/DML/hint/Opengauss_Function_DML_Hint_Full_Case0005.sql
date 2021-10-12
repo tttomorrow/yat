@@ -1,0 +1,1 @@
+-- @testpoint: INSERT语句后带优化器index，不存在的索引   error

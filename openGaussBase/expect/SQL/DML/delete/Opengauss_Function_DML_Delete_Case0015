@@ -1,0 +1,27 @@
+-- @testpoint: 删除表数据，目标表名有模式修饰，部分测试点合理报错
+--创建schema
+drop schema if exists test_schema cascade;
+SQL SUCCESS
+create schema test_schema;
+SQL SUCCESS
+--建表
+drop table if exists test_schema.test_1t cascade;
+SQL SUCCESS
+create table test_schema.test_1t (id int,name varchar(20));
+SQL SUCCESS
+--插入数据
+insert into test_schema.test_1t values(generate_series(1,100),'liyu');
+SQL SUCCESS
+--删除数据，表名不带模式，合理报错
+delete from test_1t;
+?.*ERROR: relation "test_1t" does not exist on.*
+?.*
+--删除数据，表名带模式，删除成功
+delete from test_schema.test_1t;
+SQL SUCCESS
+--删除表
+drop table test_schema.test_1t;
+SQL SUCCESS
+--删除schema
+drop schema if exists test_schema cascade;
+SQL SUCCESS

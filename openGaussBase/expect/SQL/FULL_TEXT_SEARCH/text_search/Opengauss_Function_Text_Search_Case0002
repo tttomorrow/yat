@@ -1,0 +1,31 @@
+--  @testpoint:to_tsvector函数结合表测试
+---创建schema
+drop SCHEMA if EXISTS tsearch cascade;
+SQL SUCCESS
+CREATE SCHEMA tsearch;
+SQL SUCCESS
+--建表
+drop TABLE if EXISTS tt;
+SQL SUCCESS
+CREATE TABLE tsearch.tt (id int, title text, keyword text, abstract text, body text, ti tsvector);
+SQL SUCCESS
+INSERT INTO tsearch.tt(id, title, keyword, abstract, body) VALUES (1, 'China', 'Beijing', 'China','China, officially the People''s Republic of China (PRC), located in Asia, is the world''s most populous state.');
+SQL SUCCESS
+UPDATE tsearch.tt SET ti =
+    setweight(to_tsvector(coalesce(title,'')), 'A')    ||
+    setweight(to_tsvector(coalesce(keyword,'')), 'B')  ||
+    setweight(to_tsvector(coalesce(abstract,'')), 'C') ||
+    setweight(to_tsvector(coalesce(body,'')), 'D');
+SQL SUCCESS
+SELECT ti from tsearch.tt WHERE to_tsquery('officially') @@ ti;
++-----------------------------------------------------------------------------------------------------------------------------+
+| ti                                                                                                                          |
++-----------------------------------------------------------------------------------------------------------------------------+
+| 'asia':15 'beij':2B 'china':1A,3C,4,11 'locat':13 'offici':5 'peopl':7 'popul':21 'prc':12 'republ':9 'state':22 'world':18 |
++-----------------------------------------------------------------------------------------------------------------------------+
+--删除表
+drop TABLE tsearch.tt;
+SQL SUCCESS
+--删除schema
+drop SCHEMA tsearch;
+SQL SUCCESS

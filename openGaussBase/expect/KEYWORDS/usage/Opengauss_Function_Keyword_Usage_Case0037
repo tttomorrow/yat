@@ -1,0 +1,39 @@
+-- @testpoint: 关键字usage，作为字段名
+drop table if exists usage_test cascade;
+SQL SUCCESS
+create table usage_test(id int,usage varchar(20));
+SQL SUCCESS
+create or replace procedure usage_insert
+as
+begin
+ for i in 1..10 loop
+    insert into usage_test values(i,'usa+'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call usage_insert();
++--------------+
+| usage_insert |
++--------------+
+|              |
++--------------+
+select * from usage_test;
++----+--------+
+| id | usage  |
++----+--------+
+| 1  | usa+1  |
+| 2  | usa+2  |
+| 3  | usa+3  |
+| 4  | usa+4  |
+| 5  | usa+5  |
+| 6  | usa+6  |
+| 7  | usa+7  |
+| 8  | usa+8  |
+| 9  | usa+9  |
+| 10 | usa+10 |
++----+--------+
+drop table if exists usage_test cascade;
+SQL SUCCESS
+drop procedure usage_insert;
+SQL SUCCESS

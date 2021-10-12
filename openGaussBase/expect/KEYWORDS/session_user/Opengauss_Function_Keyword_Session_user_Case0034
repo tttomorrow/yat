@@ -1,0 +1,51 @@
+--  @testpoint:opengauss关键字session_user(保留)，作为游标名
+--前置条件
+drop table if exists session_user_test cascade;
+SQL SUCCESS
+create table session_user_test(cid int,fid int);
+SQL SUCCESS
+--关键字不带引号-失败
+start transaction;
+SQL SUCCESS
+cursor session_user for select * from session_user_test order by 1;
+?.*ERROR: syntax error at or near "session_user".*
+?.*Position.*
+close session_user;
+?.*ERROR: syntax error at or near "session_user".*
+?.*Position.*
+end;
+SQL SUCCESS
+--关键字带双引号-成功
+start transaction;
+SQL SUCCESS
+cursor "session_user" for select * from session_user_test order by 1;
+SQL SUCCESS
+close "session_user";
+SQL SUCCESS
+end;
+SQL SUCCESS
+--关键字带单引号-合理报错
+start transaction;
+SQL SUCCESS
+cursor 'session_user' for select * from session_user_test order by 1;
+?.*ERROR: syntax error at or near "'session_user'".*
+?.*Position.*
+close 'session_user';
+?.*ERROR: syntax error at or near "'session_user'".*
+?.*Position.*
+end;
+SQL SUCCESS
+--关键字带反引号-合理报错
+start transaction;
+SQL SUCCESS
+cursor `session_user` for select * from session_user_test order by 1;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+close `session_user`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+end;
+SQL SUCCESS
+--清理环境
+drop table session_user_test cascade;
+SQL SUCCESS

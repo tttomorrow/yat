@@ -1,0 +1,2 @@
+-- @testpoint: 验证cast函数是否能将小数型数据转换为整数
+select cast(1-0.2 as  int) from sys_dummy;

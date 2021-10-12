@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字domain(非保留)，作为外部数据源名
+--关键字不带引号-成功
+drop data source if exists domain;
+SQL SUCCESS
+create data source domain;
+SQL SUCCESS
+drop data source domain;
+SQL SUCCESS
+--关键字带双引号-成功
+drop data source if exists "domain";
+SQL SUCCESS
+create data source "domain";
+SQL SUCCESS
+drop data source "domain";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop data source if exists 'domain';
+?.*ERROR: syntax error at or near "'domain'"
+?.*Position.*
+create data source 'domain';
+?.*ERROR: syntax error at or near "'domain'"
+?.*Position.*
+--关键字带反引号-合理报错
+drop data source if exists `domain`;
+?.*ERROR: syntax error at or near "`"
+?.*Position.*
+create data source `domain`;
+?.*ERROR: syntax error at or near "`"
+?.*Position.*

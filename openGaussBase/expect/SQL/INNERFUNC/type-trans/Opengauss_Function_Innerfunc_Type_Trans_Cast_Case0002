@@ -1,0 +1,72 @@
+-- @testpoint: 类型转换函数cast(x as y)函数异常校验，合理报错
+-- 时间/日期型
+select cast('35-oct-1997' as timestamp with time zone);
+?.*ERROR: date/time field value out of range: "35-oct-1997".*
+  Hint: Perhaps you need a different "datestyle" setting.
+?.*
+  Where: referenced column: timestamptz
+select cast('shi' as date);
+?.*ERROR: invalid input syntax for type timestamp: "shi".*
+?.*
+  Where: referenced column: timestamp
+select cast('10.123000' as timestamp with time zone);
+?.*ERROR: invalid input syntax for type timestamp with time zone: "10.123000".*
+?.*
+  Where: referenced column: timestamptz
+-- 字符型
+select cast(interval  as text);
+?.*ERROR: column "interval" does not exist.*
+?.*
+  Where: referenced column: interval
+select cast(-125.8 as int1);
+?.*ERROR: tinyint out of range.*
+  Where: referenced column: int1
+select cast('h'::raw as char);
+?.*ERROR: invalid hexadecimal digit: "h"
+?.*
+  Where: referenced column: bpchar
+-- 数值类型
+select cast('32.5' as tinyint);
+?.*ERROR: invalid input syntax for integer: "32.5".*
+?.*
+  Where: referenced column: int1
+select cast('32.0' as smallint);
+?.*ERROR: invalid input syntax for integer: "32.0".*
+?.*
+  Where: referenced column: int2
+select cast('-32769' as tinyint);
+?.*ERROR: value "-32769" is out of range for 8-bit integer.*
+?.*
+  Where: referenced column: int1
+?.*
+  Where: referenced column: int2
+select cast('hjk' as decimal);
+?.*ERROR: invalid input syntax for type numeric: "hjk".*
+?.*
+  Where: referenced column: numeric
+select cast('999.8788' as decimal(3,1));
+?.*ERROR: numeric field overflow.*
+  Detail: A field with precision 3, scale 1 must round to an absolute value less than 10^2.
+  Where: referenced column: numeric
+select cast('7.ghjk' as real);
+?.*ERROR: invalid input syntax for type real: "7.ghjk".*
+?.*
+  Where: referenced column: float4
+select cast('@#$$%' as double precision);
+?.*ERROR: invalid input syntax for type double precision: \"@\#\$\$\%".*
+?.*
+  Where: referenced column: float8
+-- 布尔型
+select cast('1368'::varchar as boolean);
+?.*ERROR: invalid input syntax for type boolean: "1368".*
+  Where: referenced column: bool
+select cast(9::nchar as boolean);
+?.*ERROR: invalid input syntax for type boolean: "9".*
+  Where: referenced column: bool
+select cast('ok' as boolean);
+?.*ERROR: invalid input syntax for type boolean: "ok".*
+?.*
+  Where: referenced column: bool
+select cast('pass'::clob as boolean);
+?.*ERROR: invalid input syntax for type boolean: "pass".*
+  Where: referenced column: bool

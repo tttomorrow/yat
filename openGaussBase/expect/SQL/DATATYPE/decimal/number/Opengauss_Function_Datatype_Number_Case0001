@@ -1,0 +1,27 @@
+-- @testpoint: 不指定精度，插入正整数
+drop table if exists number_01;
+SQL SUCCESS
+create table number_01 (name number);
+SQL SUCCESS
+insert into number_01 values (123);
+SQL SUCCESS
+insert into number_01 values (9999999);
+SQL SUCCESS
+insert into number_01 values (1);
+SQL SUCCESS
+insert into number_01 values (2);
+SQL SUCCESS
+insert into number_01 values (3);
+SQL SUCCESS
+select * from number_01;
++---------+
+| name    |
++---------+
+| 123     |
+| 9999999 |
+| 1       |
+| 2       |
+| 3       |
++---------+
+drop table number_01;
+SQL SUCCESS

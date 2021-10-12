@@ -1,0 +1,22 @@
+-- @testpoint: 匿名块使用数字操作函数  log(x)
+DROP TABLE IF EXISTS test_procedure_insert_119;
+SQL SUCCESS
+create table test_procedure_insert_119(id int,
+name varchar2(20));
+SQL SUCCESS
+declare
+sqlstr varchar(1024);
+begin
+sqlstr := 'insert into test_procedure_insert_119 (SELECT log(100.0),44)';
+execute immediate sqlstr;
+end;
+/
+SQL SUCCESS
+select * from test_procedure_insert_119;
++----+------+
+| id | name |
++----+------+
+| 2  | 44   |
++----+------+
+drop table test_procedure_insert_119;
+SQL SUCCESS

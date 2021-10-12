@@ -1,0 +1,25 @@
+--  @testpoint: --查看视图时子查询区分大小写
+drop view if exists VIEW_2 cascade;
+SQL SUCCESS
+create view VIEW_2 as select * from false_2;
+SQL SUCCESS
+insert into false_2 values(1,1);
+SQL SUCCESS
+select * from view_3 where f in (select A from view_2);
++---+---+
+| a | f |
++---+---+
+| 0 | 1 |
++---+---+
+select * from view_3 where f in (select B from view_2);
++---+---+
+| a | f |
++---+---+
+| 0 | 1 |
++---+---+
+select * from view_3 where f in (select b from view_2);
++---+---+
+| a | f |
++---+---+
+| 0 | 1 |
++---+---+

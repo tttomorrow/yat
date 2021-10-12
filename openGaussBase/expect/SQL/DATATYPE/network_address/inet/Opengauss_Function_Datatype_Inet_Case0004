@@ -1,0 +1,22 @@
+-- @testpoint: 指定网络地址为0，合理报错
+drop table if exists test_inet_04;
+SQL SUCCESS
+create table test_inet_04(id int,type inet);
+SQL SUCCESS
+insert into test_inet_04 values(1,0);
+?.*ERROR: column "type" is of type inet but expression is of type integer
+  Hint: You will need to rewrite or cast the expression.
+?.*
+  Where: referenced column: type
+insert into test_inet_04 values(2,0);
+?.*ERROR: column "type" is of type inet but expression is of type integer
+  Hint: You will need to rewrite or cast the expression.
+?.*
+  Where: referenced column: type
+select * from test_inet_04;
++----+------+
+| id | type |
++----+------+
++----+------+
+drop table test_inet_04;
+SQL SUCCESS

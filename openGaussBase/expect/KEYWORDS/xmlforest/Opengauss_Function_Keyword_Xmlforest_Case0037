@@ -1,0 +1,39 @@
+-- @testpoint: 关键字xmlforest，用作字段名
+drop table if exists xmlforest_test cascade;
+SQL SUCCESS
+create table xmlforest_test(id int,xmlforest varchar(20));
+SQL SUCCESS
+create or replace procedure xmlforest_insert
+as
+begin
+ for i in 1..10 loop
+    insert into xmlforest_test values(i,'values'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call xmlforest_insert();
++------------------+
+| xmlforest_insert |
++------------------+
+|                  |
++------------------+
+select * from xmlforest_test;
++----+-----------+
+| id | xmlforest |
++----+-----------+
+| 1  | values1   |
+| 2  | values2   |
+| 3  | values3   |
+| 4  | values4   |
+| 5  | values5   |
+| 6  | values6   |
+| 7  | values7   |
+| 8  | values8   |
+| 9  | values9   |
+| 10 | values10  |
++----+-----------+
+drop table if exists xmlforest_test cascade;
+SQL SUCCESS
+drop procedure xmlforest_insert;
+SQL SUCCESS

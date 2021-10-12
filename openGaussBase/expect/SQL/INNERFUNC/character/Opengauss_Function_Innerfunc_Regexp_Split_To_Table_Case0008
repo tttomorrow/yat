@@ -1,0 +1,14 @@
+-- @testpoint: 切割符为空
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('hello World');
+SQL SUCCESS
+SELECT regexp_split_to_table(string1,'') from type_char;
++-----------------------+
+| regexp_split_to_table |
++-----------------------+
++-----------------------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

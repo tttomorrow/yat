@@ -1,0 +1,53 @@
+-- @testpoint: jsonb格式校验：Null-jsonb（不符合格式合理报错）
+--jsonb格式校验：Null-jsonb
+--符合格式
+--1.Null-jsonb格式
+select 'null'::jsonb;
++-------+
+| jsonb |
++-------+
+| null  |
++-------+
+--2.空值
+select ''::jsonb;
++-------+
+| jsonb |
++-------+
+|       |
++-------+
+select null::jsonb;
++-------+
+| jsonb |
++-------+
+|       |
++-------+
+--3.字符串null
+select '"null"'::jsonb;
++--------+
+| jsonb  |
++--------+
+| "null" |
++--------+
+--4.空字符串""
+select '""'::jsonb;
++-------+
+| jsonb |
++-------+
+| ""    |
++-------+
+--不符合格式
+select 'NULL'::jsonb;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "NULL" is invalid.
+?.*
+  Where: JSON data, line 1: NULL
+referenced column: jsonb
+select ''null''::jsonb;
+?.*ERROR: syntax error at or near "null.*
+?.*
+select '''null'''::jsonb;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "'" is invalid.
+?.*
+  Where: JSON data, line 1: '...
+referenced column: jsonb

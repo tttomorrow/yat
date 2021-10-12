@@ -1,0 +1,7 @@
+-- @testpoint: 数组操作符<>，判断两个数组是否不相等
+
+--两数组不相等时返回true
+select array[1,2,3] <> array[1,2,4] as result;
+
+--两数组相等时返回false
+select array[1,2,3] <> array[1,2,3] as result;

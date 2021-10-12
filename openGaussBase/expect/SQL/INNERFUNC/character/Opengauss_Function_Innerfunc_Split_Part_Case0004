@@ -1,0 +1,15 @@
+-- @testpoint: 指定个数大于分离个数
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('abc~@~def~@~ghi');
+SQL SUCCESS
+SELECT split_part(string1,'~@~',10) from type_char;
++------------+
+| split_part |
++------------+
+|            |
++------------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

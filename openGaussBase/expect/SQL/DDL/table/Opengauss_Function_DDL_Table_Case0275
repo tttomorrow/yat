@@ -1,0 +1,66 @@
+-- @testpoint: 在创建check约束之后，修改字段的约束，新插入数据违背约束时合理报错
+--建表
+drop table if exists t1 cascade;
+SQL SUCCESS
+create table t1 (c1 int,c2 VARCHAR(4000) NULL,ad VARCHAR(4000) NULL);
+SQL SUCCESS
+--查询字段类型
+SELECT col_description(a.attrelid,a.attnum) as comment,format_type(a.atttypid,a.atttypmod) as type,a.attname as name, a.attnotnull as notnull
+FROM pg_class as c,pg_attribute as a
+where c.relname = 't1' and a.attrelid = c.oid and a.attnum>0;
++---------+-------------------------+------+---------+
+| comment | type                    | name | notnull |
++---------+-------------------------+------+---------+
+|         | integer                 | c1   | false   |
+|         | character varying(4000) | c2   | false   |
+|         | character varying(4000) | ad   | false   |
++---------+-------------------------+------+---------+
+--添加约束后修改字段信息：修改成功
+alter table t1 add constraint cc check(ad in ('confirmed','unconfirmed'));
+SQL SUCCESS
+alter table t1 modify ad null;
+SQL SUCCESS
+alter table t1 modify ad not null;
+SQL SUCCESS
+alter table t1 modify ad int;
+SQL SUCCESS
+--查询字段类型
+SELECT col_description(a.attrelid,a.attnum) as comment,format_type(a.atttypid,a.atttypmod) as type,a.attname as name, a.attnotnull as notnull
+FROM pg_class as c,pg_attribute as a
+where c.relname = 't1' and a.attrelid = c.oid and a.attnum>0;
++---------+-------------------------+------+---------+
+| comment | type                    | name | notnull |
++---------+-------------------------+------+---------+
+|         | integer                 | c1   | false   |
+|         | character varying(4000) | c2   | false   |
+|         | integer                 | ad   | true    |
++---------+-------------------------+------+---------+
+--插入数据，不符合检查约束，报错
+insert into t1(ad) values (3);
+?.*ERROR: new row for relation "t1" violates check constraint "cc"?.*
+  Detail: Failing row contains (null, null, 3).
+insert into t1(ad) values (null);
+?.*ERROR: null value in column "ad" violates not-null constraint?.*
+  Detail: Failing row contains (null, null, null).
+insert into t1(ad) values ('confirmed');
+?.*ERROR: invalid input syntax for integer: "confirmed"?.*
+?.*
+  Where: referenced column: ad
+--drop检查约束
+alter table t1 drop constraint cc;
+SQL SUCCESS
+--插入信息
+insert into t1(ad) values(1);
+SQL SUCCESS
+SELECT col_description(a.attrelid,a.attnum) as comment,format_type(a.atttypid,a.atttypmod) as type,a.attname as name, a.attnotnull as notnull
+FROM pg_class as c,pg_attribute as a
+where c.relname = 't1' and a.attrelid = c.oid and a.attnum>0;
++---------+-------------------------+------+---------+
+| comment | type                    | name | notnull |
++---------+-------------------------+------+---------+
+|         | integer                 | c1   | false   |
+|         | character varying(4000) | c2   | false   |
+|         | integer                 | ad   | true    |
++---------+-------------------------+------+---------+
+drop table if exists t1 cascade;
+SQL SUCCESS

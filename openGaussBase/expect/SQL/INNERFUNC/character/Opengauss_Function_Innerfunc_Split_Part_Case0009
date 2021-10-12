@@ -1,0 +1,21 @@
+-- @testpoint: 分隔符=字符串
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('abc');
+SQL SUCCESS
+SELECT split_part(string1,'abc',1) from type_char;
++------------+
+| split_part |
++------------+
+|            |
++------------+
+SELECT split_part(string1,'abc',2) from type_char;
++------------+
+| split_part |
++------------+
+|            |
++------------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

@@ -1,0 +1,30 @@
+-- @testpoint: 函数regr_slope(Y, X),根据所有输入的点(X, Y)按照最小二乘法拟合成一个线性方程， 然后返回该直线的斜率
+drop table if exists table_test;
+SQL SUCCESS
+create table table_test(id integer,
+name varchar(10),
+age integer,
+height decimal(5,2),
+hobbies text,
+tel bigint
+);
+SQL SUCCESS
+SQL SUCCESS
+select regr_slope(tel, height)from  table_test;
++----------------------+
+| regr_slope           |
++----------------------+
++----------------------+
+select regr_slope(height, id)from  table_test where id <5;
++-------------------+
+| regr_slope        |
++-------------------+
++-------------------+
+select regr_slope(age, id)from  table_test where id <9;
++------------+
+| regr_slope |
++------------+
+| 0.45       |
++------------+
+drop table table_test;
+SQL SUCCESS

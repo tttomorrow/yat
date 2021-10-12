@@ -1,0 +1,48 @@
+-- @testpoint: pg_partition_size(text, text)函数的异常校验，合理报错
+create table test (id int8)
+with(orientation = column)
+partition by range (id)
+(
+        partition "P1" values less than (1000),
+        partition "P2" values less than (2000)
+);
+SQL SUCCESS
+INSERT INTO test VALUES(999);
+SQL SUCCESS
+INSERT INTO test VALUES(888);
+SQL SUCCESS
+SELECT pg_partition_size('testtest','P1');
+?.*ERROR: relation "testtest" does not exist
+  Where: referenced column: pg_partition_size
+SELECT pg_partition_size('test','P3');
+?.*ERROR: partition "P3" does not exist
+  Where: referenced column: pg_partition_size
+SELECT pg_partition_size('test','P1','P2');
+?.*ERROR: function pg_partition_size\(unknown, unknown, unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_partition_size
+SELECT pg_partition_size('test');
+?.*ERROR: function pg_partition_size\(unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_partition_size
+SELECT pg_partition_size();
+?.*ERROR: function pg_partition_size\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_partition_size
+SELECT pg_partition_size('','P3');
++-------------------+
+| pg_partition_size |
++-------------------+
+|                   |
++-------------------+
+SELECT pg_partition_size('test','');
++-------------------+
+| pg_partition_size |
++-------------------+
+|                   |
++-------------------+
+drop table test;
+SQL SUCCESS

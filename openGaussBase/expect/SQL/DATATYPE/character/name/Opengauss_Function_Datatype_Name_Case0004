@@ -1,0 +1,22 @@
+-- @testpoint: 插入正常值，将name数据类型转换至boolean、date，合理报错
+-- @modified at: 2020-11-13
+drop table if exists name_04;
+SQL SUCCESS
+CREATE TABLE name_04 (id name);
+SQL SUCCESS
+insert into name_04 values (11.11);
+SQL SUCCESS
+alter table name_04 alter column id type boolean;
+?.*ERROR: column "id" cannot be cast automatically to type boolean
+  Hint: Specify a USING expression to perform the conversion.
+alter table name_04 alter column id type date;
+?.*ERROR: column "id" cannot be cast automatically to type timestamp without time zone
+  Hint: Specify a USING expression to perform the conversion.
+select * from name_04;
++-------+
+| id    |
++-------+
+| 11.11 |
++-------+
+drop table name_04;
+SQL SUCCESS

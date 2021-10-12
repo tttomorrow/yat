@@ -1,0 +1,24 @@
+--  @testpoint:函数参数名由数字，字母，美元符号（$）组成
+drop function if exists b_test1(func_test1$  integer, func_test2$ integer);
+SQL SUCCESS
+CREATE FUNCTION b_test1(func_test1$ integer, func_test2$ integer) RETURNS integer
+    AS 'select $1 + $2;'
+    LANGUAGE SQL
+    IMMUTABLE
+    RETURNS NULL ON NULL INPUT;
+/
+SQL SUCCESS
+select proargnames from pg_proc where proname='b_test1';
++---------------------------+
+| proargnames               |
++---------------------------+
+| {func_test1$,func_test2$} |
++---------------------------+
+call b_test1(1,999);
++---------+
+| b_test1 |
++---------+
+| 1000    |
++---------+
+drop FUNCTION b_test1;
+SQL SUCCESS

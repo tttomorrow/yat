@@ -1,0 +1,18 @@
+-- @testpoint: 与distinct联用
+drop table if exists test;
+SQL SUCCESS
+create table test(name text);
+SQL SUCCESS
+insert into test values('a'),('j'),('Hi'),('Hello'),('Hello'),('#');
+SQL SUCCESS
+select distinct chr(ascii(name)) from test order by chr(ascii(name));
++-----+
+| chr |
++-----+
+| #   |
+| H   |
+| a   |
+| j   |
++-----+
+drop table if exists test;
+SQL SUCCESS

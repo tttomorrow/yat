@@ -1,0 +1,62 @@
+--  @testpoint: expression：包含is null子句
+--行存表
+DROP TABLE if EXISTS test_index_table_083 CASCADE;
+SQL SUCCESS
+create table test_index_table_083(
+c_float1 float
+) WITH (ORIENTATION = row) ;
+SQL SUCCESS
+begin
+    for i in 0..10000 loop
+        insert into test_index_table_083 values(i);
+    end loop;
+end;
+/
+SQL SUCCESS
+--建btree索引:不包含is null
+drop index if exists index_083_01;
+SQL SUCCESS
+create index index_083_01 on test_index_table_083 using btree(c_float1) where c_float1 >0;
+SQL SUCCESS
+select relname from pg_class where relname like 'index_083_%' order by relname;
++--------------+
+| relname      |
++--------------+
+| index_083_01 |
++--------------+
+--索引有效
+explain select * from test_index_table_083 where c_float1 >500 group by c_float1;
++----------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                             |
++----------------------------------------------------------------------------------------+
+?.*HashAggregate.*
+?.*
+?.*Bitmap.*
+?.*
+?.*Bitmap.*
+?.*
++----------------------------------------------------------------------------------------+
+--建btree索引:包含is null
+drop index if exists index_083_01;
+SQL SUCCESS
+create index index_083_01 on test_index_table_083 using btree(c_float1) where c_float1 is null;
+SQL SUCCESS
+select relname from pg_class where relname like 'index_083_%' order by relname;
++--------------+
+| relname      |
++--------------+
+| index_083_01 |
++--------------+
+--索引无效
+explain select * from test_index_table_083 where c_float1 >500 group by c_float1;
++-------------------------------------------------------------------------------+
+| QUERY PLAN                                                                    |
++-------------------------------------------------------------------------------+
+?.*HashAggregate.*
+?.*
+?.*
+?.*
++-------------------------------------------------------------------------------+
+--清理环境
+DROP TABLE if EXISTS test_index_table_083 CASCADE;
+SQL SUCCESS

@@ -1,0 +1,55 @@
+--  @testpoint:文本搜索配置token_type测试
+--创建文本搜索配置，解析器为默认pg_catalog.default
+DROP TEXT SEARCH CONFIGURATION if exists english2 cascade;
+SQL SUCCESS
+CREATE TEXT SEARCH CONFIGURATION english2 (parser=default);
+SQL SUCCESS
+--创建simple字典
+DROP TEXT SEARCH DICTIONARY IF EXISTS pg_dict cascade;
+SQL SUCCESS
+CREATE TEXT SEARCH DICTIONARY pg_dict (TEMPLATE = Simple);
+SQL SUCCESS
+--增加文本搜索配置字串类型映射，token为hword_asciipart
+ALTER TEXT SEARCH CONFIGURATION english2 ADD MAPPING FOR hword_asciipart WITH pg_dict;
+SQL SUCCESS
+--使用文本检索函数对所创建的词典配置english2进行测试
+SELECT ts_debug('english','postgresql in the context postgresql-beta1');
++---------------------------------------------------------------------------------------------------------+
+| ts_debug                                                                                                |
++---------------------------------------------------------------------------------------------------------+
+| (asciiword,"Word, all ASCII",postgresql,{english_stem},english_stem,{postgresql})                       |
+| (blank,"Space symbols"," ",{},,)                                                                        |
+| (asciiword,"Word, all ASCII",in,{english_stem},english_stem,{})                                         |
+| (blank,"Space symbols"," ",{},,)                                                                        |
+| (asciiword,"Word, all ASCII",the,{english_stem},english_stem,{})                                        |
+| (blank,"Space symbols"," ",{},,)                                                                        |
+| (asciiword,"Word, all ASCII",context,{english_stem},english_stem,{context})                             |
+| (blank,"Space symbols"," ",{},,)                                                                        |
+| (numhword,"Hyphenated word, letters and digits",postgresql-beta1,{simple},simple,{postgresql-beta1})    |
+| (hword_asciipart,"Hyphenated word part, all ASCII",postgresql,{english_stem},english_stem,{postgresql}) |
+| (blank,"Space symbols",-,{},,)                                                                          |
+| (hword_numpart,"Hyphenated word part, letters and digits",beta1,{simple},simple,{beta1})                |
++---------------------------------------------------------------------------------------------------------+
+SELECT ts_debug('postgresql in the context postgresql-beta1');
++---------------------------------------------------------------------------------------------------------+
+| ts_debug                                                                                                |
++---------------------------------------------------------------------------------------------------------+
+| (asciiword,"Word, all ASCII",postgresql,{english_stem},english_stem,{postgresql})                       |
+| (blank,"Space symbols"," ",{},,)                                                                        |
+| (asciiword,"Word, all ASCII",in,{english_stem},english_stem,{})                                         |
+| (blank,"Space symbols"," ",{},,)                                                                        |
+| (asciiword,"Word, all ASCII",the,{english_stem},english_stem,{})                                        |
+| (blank,"Space symbols"," ",{},,)                                                                        |
+| (asciiword,"Word, all ASCII",context,{english_stem},english_stem,{context})                             |
+| (blank,"Space symbols"," ",{},,)                                                                        |
+| (numhword,"Hyphenated word, letters and digits",postgresql-beta1,{simple},simple,{postgresql-beta1})    |
+| (hword_asciipart,"Hyphenated word part, all ASCII",postgresql,{english_stem},english_stem,{postgresql}) |
+| (blank,"Space symbols",-,{},,)                                                                          |
+| (hword_numpart,"Hyphenated word part, letters and digits",beta1,{simple},simple,{beta1})                |
++---------------------------------------------------------------------------------------------------------+
+--删除文本搜索配置
+DROP TEXT SEARCH CONFIGURATION english2 cascade;
+SQL SUCCESS
+--删除词典
+DROP TEXT SEARCH DICTIONARY pg_dict cascade;
+SQL SUCCESS

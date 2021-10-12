@@ -1,0 +1,15 @@
+-- @testpoint: time时间类型与数值相减，更新新的时间
+DROP TABLE IF EXISTS test_time09;
+SQL SUCCESS
+CREATE TABLE test_time09 (name time);
+SQL SUCCESS
+INSERT INTO test_time09 VALUES ('11:22:33.456'- interval '2 hours');
+SQL SUCCESS
+select * from test_time09;
++----------+
+| name     |
++----------+
+| 09:22:33 |
++----------+
+DROP TABLE test_time09;
+SQL SUCCESS

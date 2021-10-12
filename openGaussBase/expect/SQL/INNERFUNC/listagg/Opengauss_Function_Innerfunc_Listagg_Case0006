@@ -1,0 +1,28 @@
+-- @testpoint: listagg函数分隔符缺省时，默认为空。
+drop table if exists emp;
+SQL SUCCESS
+create table emp(deptno smallint,
+eid bigint,
+mgrno integer,
+ename text);
+SQL SUCCESS
+insert into emp values(10,1,7782,'Mary');
+SQL SUCCESS
+insert into emp values(10,2,7888,'Tony');
+SQL SUCCESS
+insert into emp values(20,3,7342,'Hebe');
+SQL SUCCESS
+insert into emp values(20,4,7212,'Tom');
+SQL SUCCESS
+insert into emp values(30,5,7002,'John');
+SQL SUCCESS
+insert into emp values(30,6,7992,'Jack');
+SQL SUCCESS
+SELECT listagg(ename) WITHIN GROUP(ORDER BY ename) AS people FROM emp;
++-------------------------+
+| people                  |
++-------------------------+
+| HebeJackJohnMaryTomTony |
++-------------------------+
+drop table emp cascade;
+SQL SUCCESS

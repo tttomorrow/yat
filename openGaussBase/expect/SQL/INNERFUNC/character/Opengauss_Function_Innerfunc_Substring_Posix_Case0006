@@ -1,0 +1,15 @@
+-- @testpoint: 字符串带括号匹配
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('Thomas');
+SQL SUCCESS
+SELECT substring(string1 from  'o(..)s') from type_char;
++-----------+
+| substring |
++-----------+
+| ma        |
++-----------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

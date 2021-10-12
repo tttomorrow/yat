@@ -1,0 +1,10 @@
+-- @testpoint: 修改用户指定密码存储不加密（合理报错）
+drop user if exists encry_test;
+SQL SUCCESS
+create user encry_test with password 'Hello@123';
+SQL SUCCESS
+alter user encry_test with unencrypted password 'Hello+123';
+?.*ERROR: Permission denied to create role with option UNENCRYPTED.*
+--清理环境
+drop user if exists encry_test;
+SQL SUCCESS

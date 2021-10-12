@@ -1,0 +1,39 @@
+-- @testpoint: 关键字valid,用作字符串
+drop table if exists valid_test cascade;
+SQL SUCCESS
+create table valid_test(id int,valid varchar(20));
+SQL SUCCESS
+create or replace procedure valid_insert
+as
+begin
+ for i in 1..10 loop
+    insert into valid_test values(i,'valid');
+    end loop;
+ end;
+/
+SQL SUCCESS
+call valid_insert();
++--------------+
+| valid_insert |
++--------------+
+|              |
++--------------+
+select * from valid_test;
++----+-------+
+| id | valid |
++----+-------+
+| 1  | valid |
+| 2  | valid |
+| 3  | valid |
+| 4  | valid |
+| 5  | valid |
+| 6  | valid |
+| 7  | valid |
+| 8  | valid |
+| 9  | valid |
+| 10 | valid |
++----+-------+
+drop table if exists valid_test cascade;
+SQL SUCCESS
+drop procedure valid_insert;
+SQL SUCCESS

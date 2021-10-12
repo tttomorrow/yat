@@ -1,0 +1,13 @@
+-- @testpoint: vacuum内存清理，验证功能正常
+drop table if exists vacuum_test_01;
+SQL SUCCESS
+create table vacuum_test_01(id_src int,name_src varchar(10));
+SQL SUCCESS
+drop index if exists vacuum_index_01;
+SQL SUCCESS
+create unique index vacuum_index_01 on vacuum_test_01(id_src);
+SQL SUCCESS
+vacuum (verbose,analyse) vacuum_test_01;
+SQL SUCCESS
+drop table if exists vacuum_test_01;
+SQL SUCCESS

@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字delimiter(非保留)，作为数据库名
+--关键字不带引号-成功
+drop database if exists delimiter;
+SQL SUCCESS
+create database delimiter;
+SQL SUCCESS
+drop database delimiter;
+SQL SUCCESS
+--关键字带双引号-成功
+drop database if exists "delimiter";
+SQL SUCCESS
+create database "delimiter";
+SQL SUCCESS
+drop database "delimiter";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop database if exists 'delimiter';
+?.*ERROR: syntax error at or near "'delimiter'"
+?.*Position.*
+create database 'delimiter';
+?.*ERROR: syntax error at or near "'delimiter'"
+?.*Position.*
+--关键字带反引号-合理报错
+drop database if exists `delimiter`;
+?.*ERROR: syntax error at or near "`"
+?.*Position.*
+create database `delimiter`;
+?.*ERROR: syntax error at or near "`"
+?.*Position.*

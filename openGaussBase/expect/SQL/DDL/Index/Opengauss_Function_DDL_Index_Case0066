@@ -1,0 +1,187 @@
+--  @testpoint: column_name：列存临时表常用数据类型3列：successs
+DROP TABLE if EXISTS test_index_table_066 CASCADE;
+SQL SUCCESS
+create TEMPORARY table test_index_table_066(
+c_int INTEGER,
+c_numeric NUMERIC,
+c_float FLOAT,
+c_money money,
+c_boolean BOOLEAN,
+c_char CHAR,
+c_varchar VARCHAR,
+c_clob CLOB,
+c_text TEXT,
+c_date DATE
+) WITH (ORIENTATION = column);
+SQL SUCCESS
+--建psort索引
+drop index if exists index_066_01;
+SQL SUCCESS
+drop index if exists index_066_02;
+SQL SUCCESS
+drop index if exists index_066_03;
+SQL SUCCESS
+drop index if exists index_066_04;
+SQL SUCCESS
+drop index if exists index_066_05;
+SQL SUCCESS
+drop index if exists index_066_06;
+SQL SUCCESS
+drop index if exists index_066_07;
+SQL SUCCESS
+drop index if exists index_066_08;
+SQL SUCCESS
+drop index if exists index_066_09;
+SQL SUCCESS
+drop index if exists index_066_10;
+SQL SUCCESS
+create index index_066_01 on test_index_table_066(c_int,c_numeric,c_float);
+SQL SUCCESS
+create index index_066_02 on test_index_table_066(c_numeric,c_float,c_money);
+SQL SUCCESS
+create index index_066_03 on test_index_table_066(c_float,c_boolean,c_boolean);
+?.*ERROR: duplicate column name
+create index index_066_04 on test_index_table_066(c_money,c_boolean,c_boolean);
+?.*ERROR: duplicate column name
+create index index_066_05 on test_index_table_066(c_boolean,c_boolean,c_boolean);
+?.*ERROR: duplicate column name
+create index index_066_06 on test_index_table_066(c_char,c_boolean,c_boolean);
+?.*ERROR: duplicate column name
+create index index_066_07 on test_index_table_066(c_varchar,c_boolean,c_char);
+SQL SUCCESS
+create index index_066_08 on test_index_table_066(c_boolean,c_text,c_char);
+SQL SUCCESS
+create index index_066_09 on test_index_table_066(c_text,c_char,c_money);
+SQL SUCCESS
+create index index_066_10 on test_index_table_066(c_date,c_text,c_char);
+SQL SUCCESS
+select relname from pg_class where relname like 'index_066_%' order by relname;
++--------------+
+| relname      |
++--------------+
+| index_066_01 |
+| index_066_02 |
+| index_066_07 |
+| index_066_08 |
+| index_066_09 |
+| index_066_10 |
++--------------+
+--btree
+drop index if exists index_066_01;
+SQL SUCCESS
+drop index if exists index_066_02;
+SQL SUCCESS
+drop index if exists index_066_03;
+SQL SUCCESS
+drop index if exists index_066_04;
+SQL SUCCESS
+drop index if exists index_066_05;
+SQL SUCCESS
+drop index if exists index_066_06;
+SQL SUCCESS
+drop index if exists index_066_07;
+SQL SUCCESS
+drop index if exists index_066_08;
+SQL SUCCESS
+drop index if exists index_066_09;
+SQL SUCCESS
+drop index if exists index_066_10;
+SQL SUCCESS
+create index index_066_01 on test_index_table_066 using btree(c_int,c_numeric,c_float);
+SQL SUCCESS
+create index index_066_02 on test_index_table_066 using btree(c_numeric,c_float,c_money);
+SQL SUCCESS
+create index index_066_03 on test_index_table_066 using btree(c_float,c_boolean,c_boolean);
+?.*ERROR: duplicate column name
+create index index_066_04 on test_index_table_066 using btree(c_money,c_boolean,c_boolean);
+?.*ERROR: duplicate column name
+create index index_066_05 on test_index_table_066 using btree(c_boolean,c_boolean,c_boolean);
+?.*ERROR: duplicate column name
+create index index_066_06 on test_index_table_066 using btree(c_char,c_boolean,c_boolean);
+?.*ERROR: duplicate column name
+create index index_066_07 on test_index_table_066 using btree(c_varchar,c_boolean,c_char);
+SQL SUCCESS
+create index index_066_08 on test_index_table_066 using btree(c_boolean,c_text,c_char);
+SQL SUCCESS
+create index index_066_09 on test_index_table_066 using btree(c_text,c_char,c_money);
+SQL SUCCESS
+create index index_066_10 on test_index_table_066 using btree(c_date,c_text,c_char);
+SQL SUCCESS
+select relname from pg_class where relname like 'index_066_%' order by relname;
++--------------+
+| relname      |
++--------------+
+| index_066_01 |
+| index_066_02 |
+| index_066_07 |
+| index_066_08 |
+| index_066_09 |
+| index_066_10 |
++--------------+
+--gin
+drop index if exists index_066_01;
+SQL SUCCESS
+drop index if exists index_066_02;
+SQL SUCCESS
+drop index if exists index_066_03;
+SQL SUCCESS
+drop index if exists index_066_04;
+SQL SUCCESS
+drop index if exists index_066_05;
+SQL SUCCESS
+drop index if exists index_066_06;
+SQL SUCCESS
+drop index if exists index_066_07;
+SQL SUCCESS
+drop index if exists index_066_08;
+SQL SUCCESS
+drop index if exists index_066_09;
+SQL SUCCESS
+drop index if exists index_066_10;
+SQL SUCCESS
+create index index_066_01 on test_index_table_066 using gin(to_tsvector('english', c_int),to_tsvector('english', c_numeric),to_tsvector('english', c_float));
+SQL SUCCESS
+create index index_066_02 on test_index_table_066 using gin(to_tsvector('english', c_float),to_tsvector('english', c_varchar),to_tsvector('english', c_char));
+SQL SUCCESS
+create index index_066_03 on test_index_table_066 using gin(to_tsvector('english', c_clob),to_tsvector('english', c_numeric),to_tsvector('english', c_date));
+SQL SUCCESS
+create index index_066_06 on test_index_table_066 using gin(to_tsvector('english', c_int),to_tsvector('english', c_clob),to_tsvector('english', c_date));
+SQL SUCCESS
+create index index_066_07 on test_index_table_066 using gin(to_tsvector('english', c_clob),to_tsvector('english', c_numeric),to_tsvector('english', c_date));
+SQL SUCCESS
+create index index_066_08 on test_index_table_066 using gin(to_tsvector('english', c_date),to_tsvector('english', c_numeric),to_tsvector('english', c_float));
+SQL SUCCESS
+select relname from pg_class where relname like 'index_066_%' order by relname;
++--------------+
+| relname      |
++--------------+
+| index_066_01 |
+| index_066_02 |
+| index_066_03 |
+| index_066_06 |
+| index_066_07 |
+| index_066_08 |
++--------------+
+--清理环境
+drop index if exists index_066_01;
+SQL SUCCESS
+drop index if exists index_066_02;
+SQL SUCCESS
+drop index if exists index_066_03;
+SQL SUCCESS
+drop index if exists index_066_04;
+SQL SUCCESS
+drop index if exists index_066_05;
+SQL SUCCESS
+drop index if exists index_066_06;
+SQL SUCCESS
+drop index if exists index_066_07;
+SQL SUCCESS
+drop index if exists index_066_08;
+SQL SUCCESS
+drop index if exists index_066_09;
+SQL SUCCESS
+drop index if exists index_066_10;
+SQL SUCCESS
+DROP TABLE if EXISTS test_index_table_066 CASCADE;
+SQL SUCCESS

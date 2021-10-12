@@ -1,0 +1,211 @@
+-- @testpoint: pg_stat_get_numscans(oid)返回顺序扫描读取的行数目或者索引行的数目。
+-- 清理环境
+alter system set autovacuum to off;
+SQL SUCCESS
+drop table if exists sales;
+SQL SUCCESS
+drop table if exists products;
+SQL SUCCESS
+select pg_stat_reset();
++---------------+
+| pg_stat_reset |
++---------------+
+|               |
++---------------+
+-- 创建表
+CREATE TABLE products (
+    product_no integer PRIMARY KEY,
+    name text
+);
+SQL SUCCESS
+insert into products values (1,'a');
+SQL SUCCESS
+CREATE TABLE sales (
+ product_no numeric(6),
+ cust_id numeric,
+ time_id DATE,
+ channel_id CHAR(1),
+ promo_id numeric(6),
+ quantity_sold numeric(3),
+ amount_sold numeric(10,2)
+);
+SQL SUCCESS
+-- testpoint: 外键创建前初始值0
+select pg_stat_get_numscans(a.oid) from PG_CLASS a where a.relname = 'sales';
++----------------------+
+| pg_stat_get_numscans |
++----------------------+
+| 0                    |
++----------------------+
+-- testpoint:查表 1 0
+SELECT * FROM sales;
++------------+---------+---------+------------+----------+---------------+-------------+
+| product_no | cust_id | time_id | channel_id | promo_id | quantity_sold | amount_sold |
++------------+---------+---------+------------+----------+---------------+-------------+
++------------+---------+---------+------------+----------+---------------+-------------+
+SELECT pg_sleep(1);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+select pg_stat_get_numscans(a.oid) from PG_CLASS a where a.relname = 'sales';
++----------------------+
+| pg_stat_get_numscans |
++----------------------+
+| 1                    |
++----------------------+
+select pg_stat_get_numscans(a.oid) from PG_CLASS a where a.relname = 'test_index1';
++----------------------+
+| pg_stat_get_numscans |
++----------------------+
++----------------------+
+-- testpoint:创建索引 2 0
+create index test_index1 on sales (cust_id);
+SQL SUCCESS
+SELECT pg_sleep(1);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+select pg_stat_get_numscans(a.oid) from PG_CLASS a where a.relname = 'sales';
++----------------------+
+| pg_stat_get_numscans |
++----------------------+
+| 2                    |
++----------------------+
+select pg_stat_get_numscans(a.oid) from PG_CLASS a where a.relname = 'test_index1';
++----------------------+
+| pg_stat_get_numscans |
++----------------------+
+| 0                    |
++----------------------+
+-- testpoint:添加外键 3 0
+alter table sales add constraint product_no foreign key(product_no) REFERENCES products(product_no);
+SQL SUCCESS
+SELECT pg_sleep(1);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+select pg_stat_get_numscans(a.oid) from PG_CLASS a where a.relname = 'sales';
++----------------------+
+| pg_stat_get_numscans |
++----------------------+
+| 3                    |
++----------------------+
+select pg_stat_get_numscans(a.oid) from PG_CLASS a where a.relname = 'test_index1';
++----------------------+
+| pg_stat_get_numscans |
++----------------------+
+| 0                    |
++----------------------+
+-- 插入数据 3 0
+INSERT INTO sales VALUES(1, 12, '2019-01-10 00:00:00', 'a', 1, 1, 1);
+SQL SUCCESS
+INSERT INTO sales VALUES(1, 12, '2019-02-01 00:00:00', 'b', 1, 1, 1);
+SQL SUCCESS
+SELECT pg_sleep(1);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+select pg_stat_get_numscans(a.oid) from PG_CLASS a where a.relname = 'sales';
++----------------------+
+| pg_stat_get_numscans |
++----------------------+
+| 3                    |
++----------------------+
+select pg_stat_get_numscans(a.oid) from PG_CLASS a where a.relname = 'test_index1';
++----------------------+
+| pg_stat_get_numscans |
++----------------------+
+| 0                    |
++----------------------+
+-- testpoint:进索引 3 1
+update sales set channel_id = 'H' where cust_id = 12;
+SQL SUCCESS
+SELECT pg_sleep(1);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+select pg_stat_get_numscans(a.oid) from PG_CLASS a where a.relname = 'sales';
++----------------------+
+| pg_stat_get_numscans |
++----------------------+
+| 3                    |
++----------------------+
+select pg_stat_get_numscans(a.oid) from PG_CLASS a where a.relname = 'test_index1';
++----------------------+
+| pg_stat_get_numscans |
++----------------------+
+| 1                    |
++----------------------+
+-- 添加数据 3 1
+INSERT INTO sales VALUES(1, 12, '2019-02-01 00:00:00', 'c', 1, 1, 1);
+SQL SUCCESS
+SELECT pg_sleep(1);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+select pg_stat_get_numscans(a.oid) from PG_CLASS a where a.relname = 'sales';
++----------------------+
+| pg_stat_get_numscans |
++----------------------+
+| 3                    |
++----------------------+
+select pg_stat_get_numscans(a.oid) from PG_CLASS a where a.relname = 'test_index1';
++----------------------+
+| pg_stat_get_numscans |
++----------------------+
+| 1                    |
++----------------------+
+-- testpoint: 删除数据 4 1
+delete from sales where channel_id = 'b';
+SQL SUCCESS
+SELECT pg_sleep(1);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+select pg_stat_get_numscans(a.oid) from PG_CLASS a where a.relname = 'sales';
++----------------------+
+| pg_stat_get_numscans |
++----------------------+
+| 4                    |
++----------------------+
+select pg_stat_get_numscans(a.oid) from PG_CLASS a where a.relname = 'test_index1';
++----------------------+
+| pg_stat_get_numscans |
++----------------------+
+| 1                    |
++----------------------+
+-- 删除索引 4
+drop index test_index1;
+SQL SUCCESS
+SELECT pg_sleep(1);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+select pg_stat_get_numscans(a.oid) from PG_CLASS a where a.relname = 'sales';
++----------------------+
+| pg_stat_get_numscans |
++----------------------+
+| 4                    |
++----------------------+
+drop table sales cascade;
+SQL SUCCESS
+drop table products cascade;
+SQL SUCCESS
+alter system set autovacuum to on;
+SQL SUCCESS

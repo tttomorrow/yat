@@ -1,0 +1,20 @@
+--  @testpoint:opengauss关键字Hierarchy(非保留)，作为字段数据类型(合理报错)
+--前置条件
+drop table if exists explain_test cascade;
+SQL SUCCESS
+--关键字不带引号-合理报错
+create table explain_test(id int,name Hierarchy);
+?.*ERROR: type "hierarchy" does not exist
+?.*Position.*
+--关键字带双引号-合理报错
+create table explain_test(id int,name "Hierarchy");
+?.*ERROR: type "Hierarchy" does not exist
+?.*Position.*
+--关键字带单引号-合理报错
+create table explain_test(id int,name 'Hierarchy');
+?.*ERROR: syntax error at or near "'Hierarchy'"
+?.*Position.*
+--关键字带反引号-合理报错
+create table explain_test(id int,name `Hierarchy`);
+?.*ERROR: syntax error at or near "`"
+?.*Position.*

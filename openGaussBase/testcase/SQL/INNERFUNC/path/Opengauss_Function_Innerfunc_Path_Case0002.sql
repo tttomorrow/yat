@@ -1,0 +1,2 @@
+-- @testpoint: path函数入参为空值
+SELECT path(polygon '') AS RESULT;

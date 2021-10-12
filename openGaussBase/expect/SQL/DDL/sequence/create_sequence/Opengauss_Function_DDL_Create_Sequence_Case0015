@@ -1,0 +1,23 @@
+--  @testpoint:两种方式调用nextval函数
+--创建序列
+drop SEQUENCE if exists serial_a;
+SQL SUCCESS
+CREATE SEQUENCE serial_a INCREMENT by 2 MAXVALUE 5 cycle;
+SQL SUCCESS
+--调用函数，从序列中选出下一个数字（1）
+SELECT nextval('serial_a');
++---------+
+| nextval |
++---------+
+| 1       |
++---------+
+--调用函数，从序列中选出下一个数字（3）
+select serial_a.nextval;
++---------+
+| nextval |
++---------+
+| 3       |
++---------+
+--删除序列
+drop SEQUENCE serial_a;
+SQL SUCCESS

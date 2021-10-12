@@ -1,0 +1,6 @@
+-- @testpoint: 函数mode() ,返回某列中出现频率最高的值，如果多个值频率相同，则返回最小的那个值,入参为无效值时，合理报错
+
+--from后不跟value别名
+select mode() within group (order by value) from (values(1, 'a'), (2, 'b'), (2, 'c'))  aa;
+--入参value错误
+select mode() within group (order by tag) from (values('a'), ('b'), (2, 'c')) as v(value, tag);

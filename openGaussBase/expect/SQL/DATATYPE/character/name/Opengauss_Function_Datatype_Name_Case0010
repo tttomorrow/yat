@@ -1,0 +1,46 @@
+-- @testpoint: 插入数值，将name类型多次转换至varchar
+-- @modified at: 2020-11-13
+drop table if exists name_10;
+SQL SUCCESS
+CREATE TABLE name_10 (id name);
+SQL SUCCESS
+insert into name_10 values (10);
+SQL SUCCESS
+alter table name_10 alter column id TYPE varchar(64);
+SQL SUCCESS
+alter table name_10 alter column id TYPE name;
+SQL SUCCESS
+alter table name_10 alter column id TYPE varchar(64);
+SQL SUCCESS
+--查询字段信息是否转换成功
+SELECT format_type(a.atttypid,a.atttypmod) as type
+FROM pg_class as c,pg_attribute as a
+where c.relname = 'name_10' and a.attrelid = c.oid and a.attnum>0;
++-----------------------+
+| type                  |
++-----------------------+
+| character varying(64) |
++-----------------------+
+alter table name_10 alter column id TYPE name;
+SQL SUCCESS
+alter table name_10 alter column id TYPE varchar(64);
+SQL SUCCESS
+alter table name_10 alter column id TYPE name;
+SQL SUCCESS
+--查询字段信息是否转换成功
+SELECT format_type(a.atttypid,a.atttypmod) as type
+FROM pg_class as c,pg_attribute as a
+where c.relname = 'name_10' and a.attrelid = c.oid and a.attnum>0;
++------+
+| type |
++------+
+| name |
++------+
+select * from name_10;
++----+
+| id |
++----+
+| 10 |
++----+
+drop table name_10;
+SQL SUCCESS

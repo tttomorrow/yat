@@ -1,0 +1,19 @@
+-- @testpoint: 插入字符串类型,合理报错
+drop table if exists real_05;
+SQL SUCCESS
+create table real_05 (name real);
+SQL SUCCESS
+insert into real_05 values ('123abc');
+?.*ERROR: invalid input syntax for type real: "123abc"
+?.*
+  Where: referenced column: name
+insert into real_05 values ('1235ss4563');
+?.*ERROR: invalid input syntax for type real: "1235ss4563"
+?.*
+  Where: referenced column: name
+insert into real_05 values ('abc456');
+?.*ERROR: invalid input syntax for type real: "abc456"
+?.*
+  Where: referenced column: name
+drop table real_05;
+SQL SUCCESS

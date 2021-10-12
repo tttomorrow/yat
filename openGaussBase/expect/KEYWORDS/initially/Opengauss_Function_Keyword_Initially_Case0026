@@ -1,0 +1,30 @@
+--  @testpoint:opengauss关键字initially(保留)，作为模式名
+--关键字不带引号-合理报错
+drop schema if exists initially;
+?.*ERROR: syntax error at or near "initially".*
+?.*Position.*
+create schema initially;
+?.*ERROR: syntax error at or near "initially".*
+?.*Position.*
+--关键字带双引号-成功
+drop schema if exists "initially";
+SQL SUCCESS
+create schema "initially";
+SQL SUCCESS
+--清理环境
+drop schema "initially";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop schema if exists 'initially';
+?.*ERROR: syntax error at or near "'initially'".*
+?.*Position.*
+create schema 'initially';
+?.*ERROR: syntax error at or near "'initially'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop schema if exists `initially`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create schema `initially`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*

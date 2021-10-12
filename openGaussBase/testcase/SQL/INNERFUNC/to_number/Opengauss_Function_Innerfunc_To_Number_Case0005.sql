@@ -1,0 +1,3 @@
+-- @testpoint: 类型转换函数to_number，参数为日期
+
+select to_number('12,454.8-', to_date('2020-02-01'));

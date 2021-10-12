@@ -1,0 +1,26 @@
+-- @testpoint: 模式匹配POSIX正则表达式,使用^自串开头匹配
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 varchar(10));
+SQL SUCCESS
+insert into type_char values ('abc');
+SQL SUCCESS
+SELECT * from type_char  where string1 ~ '^a';
++---------+
+| string1 |
++---------+
+| abc     |
++---------+
+SELECT * from type_char  where string1 ~ '^b';
++---------+
+| string1 |
++---------+
++---------+
+SELECT * from type_char  where string1 ~ '^(ab)';
++---------+
+| string1 |
++---------+
+| abc     |
++---------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

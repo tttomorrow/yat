@@ -1,0 +1,15 @@
+-- @testpoint: 参数2给空值
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 RAW,string2 RAW);
+SQL SUCCESS
+insert into type_char(string1) values ('abcdeF');
+SQL SUCCESS
+SELECT rawcat(string1,string2) from type_char;
++--------+
+| rawcat |
++--------+
+|        |
++--------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

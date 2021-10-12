@@ -1,0 +1,49 @@
+--  @testpoint:opengauss关键字rollup(非保留)，作为游标名
+--前置条件
+drop table if exists rollup_test cascade;
+SQL SUCCESS
+create table rollup_test(cid int,fid int);
+SQL SUCCESS
+--关键字不带引号-成功
+start transaction;
+SQL SUCCESS
+cursor rollup for select * from rollup_test order by 1;
+SQL SUCCESS
+close rollup;
+SQL SUCCESS
+end;
+SQL SUCCESS
+--关键字带双引号-成功
+start transaction;
+SQL SUCCESS
+cursor "rollup" for select * from rollup_test order by 1;
+SQL SUCCESS
+close "rollup";
+SQL SUCCESS
+end;
+SQL SUCCESS
+--关键字带单引号-合理报错
+start transaction;
+SQL SUCCESS
+cursor 'rollup' for select * from rollup_test order by 1;
+?.*ERROR: syntax error at or near "'rollup'".*
+?.*Position: .*
+close 'rollup';
+?.*ERROR: syntax error at or near "'rollup'".*
+?.*Position: .*
+end;
+SQL SUCCESS
+--关键字带反引号-合理报错
+start transaction;
+SQL SUCCESS
+cursor `rollup` for select * from rollup_test order by 1;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+close `rollup`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+end;
+SQL SUCCESS
+--清理环境
+drop table rollup_test;
+SQL SUCCESS

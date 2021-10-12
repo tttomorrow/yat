@@ -1,0 +1,18 @@
+-- @testpoint: >all的情况，大于stu_age的所有值
+drop table if exists t_student;
+SQL SUCCESS
+create table t_student (stu_name char(20),stu_age int,sex char(10),score int,address char(10),id int,enrollment_time date);
+SQL SUCCESS
+insert into t_student values('zhangsan',18,'boy'),('lisi',25,'boy'),('wangwu',28,'girl'),('zhaosi',35,'boy');
+SQL SUCCESS
+select * from t_student where 36>all(select stu_age from t_student);
++----------------------+---------+------------+-------+---------+----+-----------------+
+| stu_name             | stu_age | sex        | score | address | id | enrollment_time |
++----------------------+---------+------------+-------+---------+----+-----------------+
+| zhangsan             | 18      | boy        |       |         |    |                 |
+| lisi                 | 25      | boy        |       |         |    |                 |
+| wangwu               | 28      | girl       |       |         |    |                 |
+| zhaosi               | 35      | boy        |       |         |    |                 |
++----------------------+---------+------------+-------+---------+----+-----------------+
+drop table if exists t_student;
+SQL SUCCESS

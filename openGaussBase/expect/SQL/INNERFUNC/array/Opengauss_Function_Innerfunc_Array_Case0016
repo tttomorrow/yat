@@ -1,0 +1,23 @@
+-- @testpoint: 函数array_cat，连接两个数组，合理报错
+--连接两个数组维度不一样的多维数组，合理报错
+select array_cat(array[[1,2,3],[2,5]], array[[4,5],[1,2]]) as result;
+?.*ERROR: multidimensional arrays must have array expressions with matching dimensions.*
+  Where: referenced column: result
+--连接数组和元素，合理报错
+select array_cat(array[[1,2,3],[2,5]], 5) as result;
+?.*ERROR: function array_cat\(integer\[\], integer\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position.*
+  Where: referenced column: result
+--连接数组和非int元素，合理报错
+select array_cat(array[[1,2,3],[2,5]], a) as result;
+?.*ERROR: column "a" does not exist.*
+?.*Position.*
+  Where: referenced column: result
+select array_cat(array[[1,2,3],[2,5]], @) as result;
+?.*ERROR: syntax error at or near "\)".*
+?.*Position.*
+select array_cat(array[[1,2,3],[2,5]], _) as result;
+?.*ERROR: column "\_" does not exist.*
+?.*Position.*
+  Where: referenced column: result

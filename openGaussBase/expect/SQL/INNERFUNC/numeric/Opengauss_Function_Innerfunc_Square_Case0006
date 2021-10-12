@@ -1,0 +1,14 @@
+-- @testpoint: 数字操作符|/(平方根),负数进行开方，合理报错
+drop table if exists data_01;
+SQL SUCCESS
+create table data_01 (clo1 int,clo2 int);
+SQL SUCCESS
+insert into data_01 values (-125, -126);
+SQL SUCCESS
+select |/clo1 from data_01;
+?.*ERROR: cannot take square root of a negative number
+SELECT |/ -16 AS RESULT;
+?.*ERROR: cannot take square root of a negative number
+  Where: referenced column: result
+drop table if exists data_01;
+SQL SUCCESS

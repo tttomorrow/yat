@@ -1,0 +1,13 @@
+-- @testpoint: lengthb函数入参为 null 或者 ''
+select LENGTHB(NULL);
++---------+
+| lengthb |
++---------+
+|         |
++---------+
+select LENGTHB('');
++---------+
+| lengthb |
++---------+
+|         |
++---------+

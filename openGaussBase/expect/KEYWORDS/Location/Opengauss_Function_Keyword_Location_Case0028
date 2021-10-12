@@ -1,0 +1,66 @@
+-- @testpoint: opengauss关键字Location(非保留)，作为同义词对象名,部分测试点合理报错
+--前置条件
+drop table if exists explain_test;
+SQL SUCCESS
+create table explain_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists Location;
+SQL SUCCESS
+create synonym Location for explain_test;
+SQL SUCCESS
+insert into Location values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update Location set Location.name='cici' where Location.id=2;
+SQL SUCCESS
+select * from Location;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--关键字带双引号-成功
+drop synonym if exists "Location";
+SQL SUCCESS
+create synonym "Location" for explain_test;
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'Location';
+?.*?.*ERROR: syntax error at or near "'Location'".*.*
+?.*?.*Position: .*.*
+create synonym 'Location' for explain_test;
+?.*?.*ERROR: syntax error at or near "'Location'".*.*
+?.*?.*Position: .*.*
+insert into 'Location' values (1,'ada'),(2, 'bob');
+?.*?.*ERROR: syntax error at or near "'Location'".*.*
+?.*?.*Position: .*.*
+update 'Location' set 'Location'.name='cici' where 'Location'.id=2;
+?.*?.*ERROR: syntax error at or near "'Location'".*.*
+?.*?.*Position: .*.*
+select * from 'Location';
+?.*?.*ERROR: syntax error at or near "'Location'".*.*
+?.*?.*Position: .*.*
+--关键字带反引号-合理报错
+drop synonym if exists `Location`;
+?.*?.*ERROR: syntax error at or near "`".*.*
+?.*?.*Position: .*.*
+create synonym `Location` for explain_test;
+?.*?.*ERROR: syntax error at or near "`".*.*
+?.*?.*Position: .*.*
+insert into `Location` values (1,'ada'),(2, 'bob');
+?.*?.*ERROR: syntax error at or near "`".*.*
+?.*?.*Position: .*.*
+update `Location` set `Location`.name='cici' where `Location`.id=2;
+?.*?.*ERROR: syntax error at or near "`".*.*
+?.*?.*Position: .*.*
+select * from `Location`;
+?.*?.*ERROR: syntax error at or near "`".*.*
+?.*?.*Position: .*.*
+--清理环境
+drop synonym if exists location;
+SQL SUCCESS
+drop synonym if exists "Location";
+SQL SUCCESS
+drop table if exists explain_test;
+SQL SUCCESS

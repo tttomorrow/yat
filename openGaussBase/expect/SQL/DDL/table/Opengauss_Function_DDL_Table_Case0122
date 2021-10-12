@@ -1,0 +1,13 @@
+-- @testpoint: 创建浮点类型-BINARY_DOUBLE 的表
+drop table if exists table_2;
+SQL SUCCESS
+create table table_2(a BINARY_DOUBLE);
+SQL SUCCESS
+SQL SUCCESS
+select * from table_2;
++-----------------------+
+| a                     |
++-----------------------+
++-----------------------+
+drop table if exists table_2;
+SQL SUCCESS

@@ -1,0 +1,48 @@
+-- @testpoint: opengauss关键字diagnostics(非保留)，作为游标名，部分测试点合理报错
+--前置条件
+drop table if exists diagnostics_test cascade;
+SQL SUCCESS
+create table diagnostics_test(cid int,fid int);
+SQL SUCCESS
+--关键字不带引号-成功
+start transaction;
+SQL SUCCESS
+cursor diagnostics for select * from diagnostics_test order by 1;
+SQL SUCCESS
+close diagnostics;
+SQL SUCCESS
+end;
+SQL SUCCESS
+--关键字带双引号-成功
+start transaction;
+SQL SUCCESS
+cursor "diagnostics" for select * from diagnostics_test order by 1;
+SQL SUCCESS
+close "diagnostics";
+SQL SUCCESS
+end;
+SQL SUCCESS
+--关键字带单引号-合理报错
+start transaction;
+SQL SUCCESS
+cursor 'diagnostics' for select * from diagnostics_test order by 1;
+?.*ERROR: syntax error at or near "'diagnostics'"
+?.*
+close 'diagnostics';
+?.*ERROR: syntax error at or near "'diagnostics'"
+?.*
+end;
+SQL SUCCESS
+--关键字带反引号-合理报错
+start transaction;
+SQL SUCCESS
+cursor `diagnostics` for select * from diagnostics_test order by 1;
+?.*ERROR: syntax error at or near "`"
+?.*
+close `diagnostics`;
+?.*ERROR: syntax error at or near "`"
+?.*
+end;
+SQL SUCCESS
+drop table if exists diagnostics_test cascade;
+SQL SUCCESS

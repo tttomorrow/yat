@@ -1,0 +1,21 @@
+-- @testpoint: 时间和日期操作符*，入参给reltime时间间隔负数
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (col1 reltime);
+SQL SUCCESS
+insert into test_date01 values ('-365');
+SQL SUCCESS
+select double precision '1.5' * col1  from test_date01;
++------------------------------------------------------+
+| ?column?                                             |
++------------------------------------------------------+
+| -1 years -6 mons -7 days -12 hours 0 mins -0.00 secs |
++------------------------------------------------------+
+select '10' * col1  from test_date01;
++----------------------------------------------------+
+| ?column?                                           |
++----------------------------------------------------+
+| -10 years 0 mons -50 days 0 hours 0 mins 0.00 secs |
++----------------------------------------------------+
+drop table if exists test_date01;
+SQL SUCCESS

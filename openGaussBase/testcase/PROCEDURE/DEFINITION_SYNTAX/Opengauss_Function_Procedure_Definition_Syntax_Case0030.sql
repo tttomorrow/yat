@@ -1,0 +1,12 @@
+-- @testpoint:  验证匿名块内变量支持带引号及是否区分大小写
+
+declare
+A int;
+b number;
+begin
+A := 1;
+b := 1;
+raise info ':%',A-b;
+end;
+/
+

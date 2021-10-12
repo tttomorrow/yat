@@ -1,0 +1,18 @@
+-- @testpoint: cos函数与其它函数嵌套使用
+select acos(cos(1)) from sys_dummy;
++--------------------+
+| acos               |
++--------------------+
++--------------------+
+select cos(acos(1)) from sys_dummy;
++-----+
+| cos |
++-----+
+| 1.0 |
++-----+
+select cos(acos(cos(acos(cos(acos(cos(acos(cos(acos(1)))))))))) from sys_dummy;
++-----+
+| cos |
++-----+
+| 1.0 |
++-----+

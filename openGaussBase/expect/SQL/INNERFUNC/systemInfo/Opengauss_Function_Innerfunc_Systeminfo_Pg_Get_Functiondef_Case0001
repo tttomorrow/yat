@@ -1,0 +1,36 @@
+-- @testpoint: pg_get_functiondef函数获取函数的定义
+select pg_get_functiondef(oid) from PG_PROC where proname = 'age';
+?.*
+?.*pg_get_functiondef?.*
+?.*
+| (4,"CREATE OR REPLACE FUNCTION pg_catalog.age(xid)
+ RETURNS integer
+ LANGUAGE internal
+ STABLE STRICT NOT FENCED NOT SHIPPABLE
+AS $function$xid_age$function$;
+")                                                                                             |
+| (4,"CREATE OR REPLACE FUNCTION pg_catalog.age(timestamp without time zone)
+ RETURNS interval
+ LANGUAGE sql
+ STABLE STRICT NOT FENCED SHIPPABLE COST 1
+AS $function$select pg_catalog.age(cast(current_date as timestamp without time zone), $1)$function$;
+") |
+| (4,"CREATE OR REPLACE FUNCTION pg_catalog.age(timestamp with time zone)
+ RETURNS interval
+ LANGUAGE sql
+ STABLE STRICT NOT FENCED SHIPPABLE COST 1
+AS $function$select pg_catalog.age(cast(current_date as timestamp with time zone), $1)$function$;
+")       |
+| (4,"CREATE OR REPLACE FUNCTION pg_catalog.age(timestamp without time zone, timestamp without time zone)
+ RETURNS interval
+ LANGUAGE internal
+ IMMUTABLE STRICT NOT FENCED NOT SHIPPABLE
+AS $function$timestamp_age$function$;
+")                              |
+| (4,"CREATE OR REPLACE FUNCTION pg_catalog.age(timestamp with time zone, timestamp with time zone)
+ RETURNS interval
+ LANGUAGE internal
+ IMMUTABLE STRICT NOT FENCED NOT SHIPPABLE
+AS $function$timestamptz_age$function$;
+")                                  |
+?.*

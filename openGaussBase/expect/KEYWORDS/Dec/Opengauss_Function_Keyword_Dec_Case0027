@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字dec(非保留)，作为序列名
+--关键字不带引号-成功
+drop sequence if exists dec;
+SQL SUCCESS
+create sequence dec start 100 cache 50;
+SQL SUCCESS
+drop sequence dec;
+SQL SUCCESS
+--关键字带双引号-成功
+drop sequence if exists "dec";
+SQL SUCCESS
+create sequence "dec" start 100 cache 50;
+SQL SUCCESS
+drop sequence "dec";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'dec';
+?.*ERROR: syntax error at or near "'dec'"
+?.*
+create sequence 'dec' start 100 cache 50;
+?.*ERROR: syntax error at or near "'dec'"
+?.*
+--关键字带反引号-合理报错
+drop sequence if exists `dec`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create sequence `dec` start 100 cache 50;
+?.*ERROR: syntax error at or near "`"
+?.*

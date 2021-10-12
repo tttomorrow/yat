@@ -1,0 +1,3 @@
+-- @testpoint: 文本比较操作符 >，比较tsquery类型的词汇
+
+select 'fat & rat'::tsquery  > 'fat'::tsquery as result;

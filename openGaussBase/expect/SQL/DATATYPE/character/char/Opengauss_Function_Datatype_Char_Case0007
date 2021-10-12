@@ -1,0 +1,18 @@
+-- @testpoint: 插入截取函数及拼接英文字符串结合测试
+-- @modify at: 2020-11-05
+DECLARE
+  V_C char(800);
+BEGIN
+  DROP TABLE IF EXISTS test_char_07;
+  CREATE TABLE test_char_07 (name char(800));
+  FOR I IN 1 .. 800 LOOP
+    V_C := V_C || 'x';
+  END LOOP;
+  insert into test_char_07 values (V_C);
+END;
+/
+SQL SUCCESS
+insert into test_char_07 select substr(name,1,799)||'x' from  test_char_07;
+SQL SUCCESS
+drop table test_char_07;
+SQL SUCCESS

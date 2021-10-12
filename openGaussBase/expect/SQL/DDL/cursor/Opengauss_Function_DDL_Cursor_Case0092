@@ -1,0 +1,43 @@
+--  @testpoint:开启事务提取数据，参数为backward count,从当前关联位置开始，count=0,有数据的话，重新抓取当前行；
+--前置条件
+drop table if exists cur_test_92;
+SQL SUCCESS
+create table cur_test_92(c_id int,c_num int,c_name varchar(10),c_city varchar(10),c_add varchar(20));
+SQL SUCCESS
+insert into cur_test_92 values(1,18,'Allen','Beijing','AAAAABAAAAA'),(2,368,'Bob','Shanghai','AAAAACAAAAA'),
+                           (3,59,'Cathy','Shenzhen','AAAAADAAAAA'),(4,96,'David','Suzhou','AAAAAEAAAAA'),
+                           (5,17,'Edrwd','Fenghuang','AAAAAFAAAAA'),(6,253,'Fendi','Changsha','AAAAAGAAAAA');
+SQL SUCCESS
+--初始位置,count=0
+start transaction;
+SQL SUCCESS
+cursor cursor92_1 for select * from cur_test_92 order by 1;
+SQL SUCCESS
+fetch backward 0 from cursor92_1;
++------+-------+--------+--------+-------+
+| c_id | c_num | c_name | c_city | c_add |
++------+-------+--------+--------+-------+
++------+-------+--------+--------+-------+
+close cursor92_1;
+SQL SUCCESS
+end;
+SQL SUCCESS
+--移动游标到任意位置,count=0
+start transaction;
+SQL SUCCESS
+cursor cursor92_2 for select * from cur_test_92 order by 1;
+SQL SUCCESS
+move 3 from cursor92_2;
+SQL SUCCESS
+fetch backward 0 in cursor92_2;
++------+-------+--------+----------+-------------+
+| c_id | c_num | c_name | c_city   | c_add       |
++------+-------+--------+----------+-------------+
+| 3    | 59    | Cathy  | Shenzhen | AAAAADAAAAA |
++------+-------+--------+----------+-------------+
+close cursor92_2;
+SQL SUCCESS
+end;
+SQL SUCCESS
+drop table cur_test_92;
+SQL SUCCESS

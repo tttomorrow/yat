@@ -1,0 +1,9 @@
+-- @testpoint: mod函数无参数测试，合理报错
+select mod() from sys_dummy;
+?.*ERROR: function mod\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: mod
+select mod(,) from sys_dummy;
+?.*ERROR: syntax error at or near \"\,\"
+?.*

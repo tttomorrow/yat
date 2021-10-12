@@ -1,0 +1,25 @@
+-- @testpoint: 未open cursor ，直接fetch 合理报错
+drop table if exists emp;
+SQL SUCCESS
+create table emp(empno int,ename varchar(10),job varchar(10) ,sal integer);
+SQL SUCCESS
+insert into emp values(1,'zhangsan','doctor1',10000),(2,'zhangsan2','doctor2',10000),(123,'zhangsan3','doctor3',10000);
+SQL SUCCESS
+create or replace procedure p_emp_002(str boolean)
+as
+declare
+    a emp%rowtype;
+    cursor mycursor is  select * from emp where empno=1 order by ename;
+begin
+    fetch  mycursor into a;
+    close mycursor;
+end;
+/
+SQL SUCCESS
+call p_emp_002(true);
+?.*ERROR: cursor variable "mycursor" is null in FETCH statement.*
+  Where: PL/pgSQL function p_emp_002(boolean) line 6 at FETCH
+drop procedure p_emp_002;
+SQL SUCCESS
+drop table emp;
+SQL SUCCESS

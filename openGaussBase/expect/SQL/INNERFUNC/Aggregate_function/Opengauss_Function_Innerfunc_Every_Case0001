@@ -1,0 +1,43 @@
+-- @testpoint: 函数every(expression)，等效于bool_and，如果所有输入值都是真，则为真，否则为假
+select every(100 <2500);
++-------+
+| every |
++-------+
+| true  |
++-------+
+select every(array[1.1,2.1,3.1]::int[] = array[1,2,3]);
++-------+
+| every |
++-------+
+| true  |
++-------+
+select every('a'='a');
++-------+
+| every |
++-------+
+| true  |
++-------+
+select every('a'>'a');
++-------+
+| every |
++-------+
+| false |
++-------+
+select every('a'>'b');
++-------+
+| every |
++-------+
+| false |
++-------+
+select every('a'<'b');
++-------+
+| every |
++-------+
+| true  |
++-------+
+select every('a=b'='b=a');
++-------+
+| every |
++-------+
+| false |
++-------+

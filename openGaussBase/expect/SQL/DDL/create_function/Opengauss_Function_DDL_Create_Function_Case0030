@@ -1,0 +1,23 @@
+drop function if exists a_func1( func_15 integer, func_16 integer);
+SQL SUCCESS
+CREATE FUNCTION a_func1(integer, integer) RETURNS integer
+    AS 'select $1 + $2;'
+    LANGUAGE SQL
+    IMMUTABLE
+    RETURNS NULL ON NULL INPUT;
+/
+SQL SUCCESS
+select proargnames from pg_proc where proname='a_func1';
++-------------+
+| proargnames |
++-------------+
+|             |
++-------------+
+call a_func1 (999,1);
++---------+
+| a_func1 |
++---------+
+| 1000    |
++---------+
+drop FUNCTION a_func1;
+SQL SUCCESS

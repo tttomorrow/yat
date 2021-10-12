@@ -1,0 +1,27 @@
+-- @testpoint: 创建表，插入正常范围值
+drop table if exists test_text_02;
+SQL SUCCESS
+create table test_text_02(id int,c_text text);
+SQL SUCCESS
+insert into test_text_02 values(1,'abcqjigjlfdjpog2ow3-0r43eurt9eiuopfjdgjljgabcqjigjlfdjpog2ow3j');
+SQL SUCCESS
+insert into test_text_02 values(2,'abc');
+SQL SUCCESS
+insert into test_text_02 values(3,'中国');
+SQL SUCCESS
+insert into test_text_02 values(4,'123Gauss');
+SQL SUCCESS
+insert into test_text_02 values(5,'１２３４％＃');
+SQL SUCCESS
+select * from test_text_02;
++----+----------------------------------------------------------------+
+| id | c_text                                                         |
++----+----------------------------------------------------------------+
+| 1  | abcqjigjlfdjpog2ow3-0r43eurt9eiuopfjdgjljgabcqjigjlfdjpog2ow3j |
+| 2  | abc                                                            |
+| 3  | 中国                                                             |
+| 4  | 123Gauss                                                       |
+| 5  | １２３４％＃                                                         |
++----+----------------------------------------------------------------+
+drop table test_text_02;
+SQL SUCCESS

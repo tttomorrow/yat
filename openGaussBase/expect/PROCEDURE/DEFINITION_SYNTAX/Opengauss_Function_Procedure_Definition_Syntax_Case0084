@@ -1,0 +1,22 @@
+-- @testpoint: 匿名块使用操作符 #二进制XOR
+DROP TABLE IF EXISTS test_procedure_insert_084;
+SQL SUCCESS
+create table test_procedure_insert_084(id int,
+name varchar2(20));
+SQL SUCCESS
+declare
+sqlstr varchar(1024);
+begin
+sqlstr := 'insert into test_procedure_insert_084(SELECT 17#5  AS RESULT, 5)';
+execute immediate sqlstr;
+end;
+/
+SQL SUCCESS
+select * from test_procedure_insert_084;
++----+------+
+| id | name |
++----+------+
+| 20 | 5    |
++----+------+
+drop table test_procedure_insert_084;
+SQL SUCCESS

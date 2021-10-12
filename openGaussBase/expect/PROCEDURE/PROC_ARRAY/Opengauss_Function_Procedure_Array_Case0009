@@ -1,0 +1,19 @@
+-- @describe:存储过程中定义数组类型,begin end中间语句为null
+--创建存储过程
+CREATE OR REPLACE procedure pro_record_009() AS
+TYPE months_varray IS VARRAY(12) OF varchar2(200);
+BEGIN
+   null;
+END;
+/
+SQL SUCCESS
+--调用存储过程
+call pro_record_009();
++----------------+
+| pro_record_009 |
++----------------+
+|                |
++----------------+
+--删除存储过程
+drop procedure pro_record_009;
+SQL SUCCESS

@@ -1,0 +1,8 @@
+-- @testpoint: 建表default关键字写错,合理报错
+drop table if exists tbl_01;
+SQL SUCCESS
+create table tbl_01(
+?.*ERROR: syntax error at or near "defualt"
+?.*
+drop table tbl_01;
+?.*ERROR: table "tbl_01" does not exist

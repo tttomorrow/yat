@@ -1,0 +1,15 @@
+-- @testpoint: 插入右边界范围值
+drop table if exists smallint09;
+SQL SUCCESS
+create table smallint09 (name smallint);
+SQL SUCCESS
+insert into smallint09 values (32767);
+SQL SUCCESS
+select * from smallint09;
++-------+
+| name  |
++-------+
+| 32767 |
++-------+
+drop table smallint09;
+SQL SUCCESS

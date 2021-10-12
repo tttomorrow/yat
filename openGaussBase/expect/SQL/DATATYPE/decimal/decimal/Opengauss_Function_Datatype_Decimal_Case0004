@@ -1,0 +1,24 @@
+-- @testpoint: 插入字符串形式数值
+drop table if exists decimal_04;
+SQL SUCCESS
+create table decimal_04 (name decimal);
+SQL SUCCESS
+insert into decimal_04 values ('14165132.99999');
+SQL SUCCESS
+insert into decimal_04 values ('9999999');
+SQL SUCCESS
+insert into decimal_04 values ('-14165132.999999');
+SQL SUCCESS
+insert into decimal_04 values ('-9999999');
+SQL SUCCESS
+select * from decimal_04;
++------------------+
+| name             |
++------------------+
+| 14165132.99999   |
+| 9999999          |
+| -14165132.999999 |
+| -9999999         |
++------------------+
+drop table decimal_04;
+SQL SUCCESS

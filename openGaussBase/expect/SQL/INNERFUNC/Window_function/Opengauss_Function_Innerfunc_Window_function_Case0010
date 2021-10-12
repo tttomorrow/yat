@@ -1,0 +1,29 @@
+-- @testpoint: LEAD(value any [, offset integer [, default any ]]) 描述：各组内对应值生成提前值 入参为无效值时，合理报错
+create table course_table ( id int, grade varchar ( 10 ), course varchar ( 10 ) );
+SQL SUCCESS
+insert into course_table values
+(1,'一年级','心理学'),
+(2,'二年级','社会学'),
+(3,'三年级','社会学'),
+(4,'一年级','刑侦学'),
+(5,'二年级','心理学'),
+(6,'三年级','计算机'),
+(7,'一年级','刑侦学'),
+(8,'二年级','心理学'),
+(9,'三年级','社会学'),
+(10,'一年级','社会学'),
+(11,'二年级','社会学'),
+(12,'二年级','计算机'),
+(13,'一年级','心理学'),
+(14,'三年级','刑侦学'),
+(15,'三年级','计算机');
+SQL SUCCESS
+--入参1为字段名，入参2为数字，入参3为字段名 合理报错
+select id, course, lead(id,2,course) over ( partition by grade order by course desc ) from course_table;
+?.*ERROR: function lead\(integer, integer, character varying\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: lead
+--清理环境
+drop table course_table;
+SQL SUCCESS

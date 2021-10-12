@@ -1,0 +1,70 @@
+--  @testpoint:UNUSABLE：列存表设置索引不可用：不支持
+--建普通表
+DROP TABLE if EXISTS test_index_table_130 CASCADE;
+SQL SUCCESS
+create table test_index_table_130(
+c_int int
+) WITH (ORIENTATION = column) ;
+SQL SUCCESS
+begin
+    for i in 0..10000 loop
+        insert into test_index_table_130 values(i);
+    end loop;
+end;
+/
+SQL SUCCESS
+--建索引
+drop index if exists index_130_01;
+SQL SUCCESS
+create index index_130_01 on test_index_table_130(c_int) ;
+SQL SUCCESS
+select relname from pg_class where relname like 'index_130_%' order by relname;
++--------------+
+| relname      |
++--------------+
+| index_130_01 |
++--------------+
+ALTER INDEX  index_130_02 UNUSABLE;
+?.*ERROR: relation "index_130_02" does not exist
+ALTER INDEX  IF EXISTS  index_130_02 UNUSABLE;
+SQL SUCCESS
+--Un-support feature
+ALTER INDEX  IF EXISTS  index_130_01 UNUSABLE;
+?.*ERROR: Un-support feature
+  Detail: column-store index doesn't support this ALTER yet
+--建临时表
+DROP TABLE if EXISTS test_index_table_130 CASCADE;
+SQL SUCCESS
+create temporary table test_index_table_130(
+c_int int
+) WITH (ORIENTATION = column) ;
+SQL SUCCESS
+begin
+    for i in 0..10000 loop
+        insert into test_index_table_130 values(i);
+    end loop;
+end;
+/
+SQL SUCCESS
+--建索引
+drop index if exists index_130_01;
+SQL SUCCESS
+create index index_130_01 on test_index_table_130(c_int) ;
+SQL SUCCESS
+select relname from pg_class where relname like 'index_130_%' order by relname;
++--------------+
+| relname      |
++--------------+
+| index_130_01 |
++--------------+
+ALTER INDEX  index_130_02 UNUSABLE;
+?.*ERROR: relation "index_130_02" does not exist
+ALTER INDEX  IF EXISTS  index_130_02 UNUSABLE;
+SQL SUCCESS
+--Un-support feature
+ALTER INDEX  IF EXISTS  index_130_01 UNUSABLE;
+?.*ERROR: Un-support feature
+  Detail: column-store index doesn't support this ALTER yet
+--清理环境
+DROP TABLE if EXISTS test_index_table_130 CASCADE;
+SQL SUCCESS

@@ -1,0 +1,37 @@
+--  @testpoint: 创建一个同义词对象，验证大小写。
+--同义词是数据库对象的别名，用于记录与其他数据库对象名间的映射关系，用户可以使用同义词访问关联的数据库对象。
+CREATE OR REPLACE SYNONYM vi for view_3;
+SQL SUCCESS
+CREATE OR REPLACE SYNONYM AD FOR VIEW_3;
+SQL SUCCESS
+CREATE OR REPLACE SYNONYM ad FOR FALSE_3;
+SQL SUCCESS
+CREATE OR REPLACE SYNONYM AD FOR view_3;
+SQL SUCCESS
+CREATE OR REPLACE SYNONYM ad FOR false_3;
+SQL SUCCESS
+select * from ad;
++----+----+
+| a  | f  |
++----+----+
+| 22 | 33 |
+| 0  | 1  |
++----+----+
+select * from AD;
++----+----+
+| a  | f  |
++----+----+
+| 22 | 33 |
+| 0  | 1  |
++----+----+
+select synobjname from pg_synonym where synname in ('ad');
++------------+
+| synobjname |
++------------+
+| false_3    |
++------------+
+select synobjname from pg_synonym where synname in ('AD');
++------------+
+| synobjname |
++------------+
++------------+

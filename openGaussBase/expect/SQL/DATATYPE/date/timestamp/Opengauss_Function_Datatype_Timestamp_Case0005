@@ -1,0 +1,7 @@
+-- @testpoint: 结合case when条件
+SELECT CASE WHEN TIMESTAMP '2018-09-17 11:22:33.456' > TIMESTAMP '2018-09-16 11:22:33.456' THEN 'A' ELSE 'B' END;
++------+
+| case |
++------+
+| A    |
++------+

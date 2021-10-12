@@ -1,0 +1,131 @@
+--  @testpoint: ANY/SOME (array)
+--右侧括号中的是一个数组表达式，它必须产生一个数组值。左侧表达式的结果使用操作符对数组表达式的每一行结果都进行计算和比较，比较结果必须是布尔值。
+--•如果对比结果至少获取一个真值，则ANY的结果为true。
+--•如果对比结果没有真值，则ANY的结果为false。
+--如果结果没有真值，并且数组表达式生成至少一个值为null，则ANY的值为NULL，而不是false。这样的处理方式和SQL返回空值的布尔组合规则是一致的。
+--一真则为真，覆盖常用操作符
+SELECT 9000+500 < ANY (array[10000, 9000]) AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+SELECT 9000+500 <= ANY (array[10000, 9000]) AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+SELECT 9000+500 != ANY (array[10000, 9000]) AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+SELECT 9000+500 >= ANY (array[10000, 9000]) AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+SELECT 'test' != ANY (array['hello', 'world']) AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+SELECT 9000+500 < some (array[10000, 9000]) AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+SELECT 9000+500 <= some (array[10000, 9000]) AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+SELECT 9000+500 != some (array[10000, 9000]) AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+SELECT 9000+500 >= some (array[10000, 9000]) AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+SELECT 'test' != some (array['hello', 'world']) AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+SELECT ADD_MONTHS('2020-10-13',1) > ANY (array['2020-11-01'::timestamp,'2020-11-13 00:00:05'::timestamp,'2020-11-04'::timestamp]) AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+SELECT ADD_MONTHS('2020-10-13',1) > some (array['2020-11-01'::timestamp,'2020-11-13 00:00:05'::timestamp,'2020-11-04'::timestamp]) AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+--全假则为假，覆盖常用操作符
+SELECT 8000+500 = ANY (array[10000, 9000]) AS RESULT;
++--------+
+| result |
++--------+
+| false  |
++--------+
+SELECT 8000+500 > some (array[10000, 9000]) AS RESULT;
++--------+
+| result |
++--------+
+| false  |
++--------+
+--结果没有真值，并且数组表达式生成至少一个值为null，则ANY的值为NULL
+SELECT 8000+500 > ANY (array[10000,9000,null]) AS RESULT;
++--------+
+| result |
++--------+
+|        |
++--------+
+SELECT 8000+500 > some (array[10000,9000,null]) AS RESULT;
++--------+
+| result |
++--------+
+|        |
++--------+
+--null
+SELECT 8000+500 > ANY (array[null,null,null]) AS RESULT;
++--------+
+| result |
++--------+
+|        |
++--------+
+SELECT 8000+500 > some (array[null,null,null]) AS RESULT;
++--------+
+| result |
++--------+
+|        |
++--------+
+SELECT null > ANY (array[null,null,null]) AS RESULT;
++--------+
+| result |
++--------+
+|        |
++--------+
+SELECT null > some (array[null,null,null]) AS RESULT;
++--------+
+| result |
++--------+
+|        |
++--------+
+--环境清理
+--no need to clean

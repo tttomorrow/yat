@@ -1,0 +1,13 @@
+-- @testpoint: 操作符||，bit少参，合理报错
+DROP TABLE IF EXISTS bit_type_t1;
+SQL SUCCESS
+CREATE TABLE bit_type_t1(BT_COL1 BIT(3),BT_COL2 BIT VARYING(5)) ;
+SQL SUCCESS
+insert into bit_type_t1 values (B'101', B'00');
+SQL SUCCESS
+SELECT BT_COL1 || from bit_type_t1 AS RESULT;
+?.*ERROR: operator does not exist.*
+  Hint: No operator matches the given name and argument type(s). You might need to add explicit type casts.
+?.*Position: .*
+DROP TABLE IF EXISTS bit_type_t1;
+SQL SUCCESS

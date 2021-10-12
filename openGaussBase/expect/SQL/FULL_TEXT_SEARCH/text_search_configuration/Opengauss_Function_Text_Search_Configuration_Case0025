@@ -1,0 +1,20 @@
+--  @testpoint:修改文本搜索配置的schema
+--默认public模式下创建文本搜索配置
+DROP TEXT SEARCH CONFIGURATION if exists ngram2;
+SQL SUCCESS
+CREATE TEXT SEARCH CONFIGURATION ngram2 (parser=ngram) WITH (gram_size = 2, grapsymbol_ignore = false);
+SQL SUCCESS
+--查询schema
+drop schema if exists test_schema1;
+SQL SUCCESS
+select schema_name from information_schema.schemata where schema_name = 'test_schema1';
++-------------+
+| schema_name |
++-------------+
++-------------+
+--修改文本搜索配置的schema(schema不存在),合理报错
+ALTER TEXT SEARCH CONFIGURATION ngram2 SET SCHEMA test_schema1;
+?.*ERROR: schema "test_schema1" does not exist
+--删除文本搜索配置
+DROP TEXT SEARCH CONFIGURATION ngram2;
+SQL SUCCESS

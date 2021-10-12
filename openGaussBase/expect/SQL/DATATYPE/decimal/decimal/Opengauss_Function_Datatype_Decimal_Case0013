@@ -1,0 +1,21 @@
+-- @testpoint: 插入0值
+drop table if exists decimal_13;
+SQL SUCCESS
+create table decimal_13 (name decimal);
+SQL SUCCESS
+insert into decimal_13 values (0);
+SQL SUCCESS
+insert into decimal_13 values (0);
+SQL SUCCESS
+insert into decimal_13 values (0);
+SQL SUCCESS
+select * from decimal_13;
++------+
+| name |
++------+
+| 0    |
+| 0    |
+| 0    |
++------+
+drop table decimal_13;
+SQL SUCCESS

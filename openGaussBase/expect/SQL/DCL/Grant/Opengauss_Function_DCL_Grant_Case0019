@@ -1,0 +1,17 @@
+-- @testpoint: 将函数的访问权限赋予给指定的用户或角色
+drop user if exists user_019 cascade;
+SQL SUCCESS
+create user user_019 identified by 'Gauss_234';
+SQL SUCCESS
+drop schema if exists test;
+SQL SUCCESS
+create schema test;
+SQL SUCCESS
+grant execute on all functions in schema test to user_019;
+SQL SUCCESS
+revoke all privileges from user_019;
+SQL SUCCESS
+drop schema test;
+SQL SUCCESS
+drop user user_019;
+SQL SUCCESS

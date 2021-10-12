@@ -1,0 +1,90 @@
+-- @testpoint: 临时表使用数据类型为jsonb的列创建索引，gist索引不支持，合理报错
+--建本地临时表
+drop table if exists tab122 cascade;
+SQL SUCCESS
+create local temporary table tab122(id int,name varchar,message jsonb);
+SQL SUCCESS
+--插入数据
+insert into tab122 values(001,'Jane','{"age":18,"city":"xianyang"}');
+SQL SUCCESS
+insert into tab122 values(012,'Joy','{"age":19,"city":"qingdao"}');
+SQL SUCCESS
+insert into tab122 values(023,'Jack','{"age":20,"city":"xiamen"}');
+SQL SUCCESS
+insert into tab122 values(004,'json','{"age":23,"city":"shenzhen"}');
+SQL SUCCESS
+insert into tab122 values(005,'Jim','{"age":21,"city":"shanghai"}');
+SQL SUCCESS
+--创建索引，gist索引不支持，合理报错
+drop index if exists index12211;
+SQL SUCCESS
+drop index if exists index12212;
+SQL SUCCESS
+drop index if exists index12213;
+SQL SUCCESS
+drop index if exists index12214;
+SQL SUCCESS
+create index index12211 on tab122(message);
+SQL SUCCESS
+create index index12212 on tab122 using gin(message);
+SQL SUCCESS
+create unique index index12213 on tab122 using btree(message asc);
+SQL SUCCESS
+create index index12214 on tab122 using gist(message);
+?.*ERROR: data type jsonb has no default operator class for access method "gist.*
+  Hint: You must specify an operator class for the index or define a default operator class for the data type.
+--建全局临时表
+drop table if exists tab1222 cascade;
+SQL SUCCESS
+create global temporary table tab1222(id int,name varchar,message jsonb);
+SQL SUCCESS
+--插入数据
+insert into tab1222 values(001,'Jane','{"age":18,"city":"xianyang"}');
+SQL SUCCESS
+insert into tab1222 values(012,'Joy','{"age":19,"city":"qingdao"}');
+SQL SUCCESS
+insert into tab1222 values(023,'Jack','{"age":20,"city":"xiamen"}');
+SQL SUCCESS
+insert into tab1222 values(004,'Json','{"age":23,"city":"shenzhen"}');
+SQL SUCCESS
+insert into tab1222 values(005,'Jim','{"age":21,"city":"shanghai"}');
+SQL SUCCESS
+--创建索引，gist索引不支持，合理报错
+drop index if exists index12221;
+SQL SUCCESS
+drop index if exists index12222;
+SQL SUCCESS
+drop index if exists index12223;
+SQL SUCCESS
+drop index if exists index12224;
+SQL SUCCESS
+create index index12221 on tab1222(message);
+SQL SUCCESS
+create index index12222 on tab1222 using gin(message);
+SQL SUCCESS
+create unique index index12223 on tab1222 using btree(message asc);
+SQL SUCCESS
+create index index12224 on tab1222 using gist(message);
+?.*ERROR: data type jsonb has no default operator class for access method "gist.*
+  Hint: You must specify an operator class for the index or define a default operator class for the data type.
+--清理数据
+drop index if exists index12211;
+SQL SUCCESS
+drop index if exists index12212;
+SQL SUCCESS
+drop index if exists index12213;
+SQL SUCCESS
+drop index if exists index12214;
+SQL SUCCESS
+drop index if exists index12221;
+SQL SUCCESS
+drop index if exists index12222;
+SQL SUCCESS
+drop index if exists index12223;
+SQL SUCCESS
+drop index if exists index12224;
+SQL SUCCESS
+drop table if exists tab122 cascade;
+SQL SUCCESS
+drop table if exists tab1222 cascade;
+SQL SUCCESS

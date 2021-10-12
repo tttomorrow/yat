@@ -1,0 +1,65 @@
+-- @testpoint: row_to_json函数入参给record列
+DROP TABLE if EXISTS words CASCADE;
+SQL SUCCESS
+CREATE TABLE words(name1 varchar,name2 int);
+SQL SUCCESS
+begin
+  for i in 1..20 LOOP
+    insert into words VALUES('aa',i);
+  end loop;
+end;
+/
+SQL SUCCESS
+--SELECT * from words;
+select row_to_json(t) from (select name1, name2 from words) t;
++---------------------------+
+| row_to_json               |
++---------------------------+
+| {"name1":"aa","name2":1}  |
+| {"name1":"aa","name2":2}  |
+| {"name1":"aa","name2":3}  |
+| {"name1":"aa","name2":4}  |
+| {"name1":"aa","name2":5}  |
+| {"name1":"aa","name2":6}  |
+| {"name1":"aa","name2":7}  |
+| {"name1":"aa","name2":8}  |
+| {"name1":"aa","name2":9}  |
+| {"name1":"aa","name2":10} |
+| {"name1":"aa","name2":11} |
+| {"name1":"aa","name2":12} |
+| {"name1":"aa","name2":13} |
+| {"name1":"aa","name2":14} |
+| {"name1":"aa","name2":15} |
+| {"name1":"aa","name2":16} |
+| {"name1":"aa","name2":17} |
+| {"name1":"aa","name2":18} |
+| {"name1":"aa","name2":19} |
+| {"name1":"aa","name2":20} |
++---------------------------+
+SELECT row_to_json(words) from words;
++---------------------------+
+| row_to_json               |
++---------------------------+
+| {"name1":"aa","name2":1}  |
+| {"name1":"aa","name2":2}  |
+| {"name1":"aa","name2":3}  |
+| {"name1":"aa","name2":4}  |
+| {"name1":"aa","name2":5}  |
+| {"name1":"aa","name2":6}  |
+| {"name1":"aa","name2":7}  |
+| {"name1":"aa","name2":8}  |
+| {"name1":"aa","name2":9}  |
+| {"name1":"aa","name2":10} |
+| {"name1":"aa","name2":11} |
+| {"name1":"aa","name2":12} |
+| {"name1":"aa","name2":13} |
+| {"name1":"aa","name2":14} |
+| {"name1":"aa","name2":15} |
+| {"name1":"aa","name2":16} |
+| {"name1":"aa","name2":17} |
+| {"name1":"aa","name2":18} |
+| {"name1":"aa","name2":19} |
+| {"name1":"aa","name2":20} |
++---------------------------+
+DROP TABLE if EXISTS words CASCADE;
+SQL SUCCESS

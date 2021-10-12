@@ -1,0 +1,26 @@
+-- @testpoint: 关键字all带双引号作为普通表的列名在delete语句的使用
+drop table if exists  test_all_005 CASCADE;
+SQL SUCCESS
+create table  test_all_005("all" int);
+SQL SUCCESS
+start transaction;
+SQL SUCCESS
+insert into test_all_005 values (20);
+SQL SUCCESS
+select "all" from test_all_005 order by "all";
++-----+
+| all |
++-----+
+| 20  |
++-----+
+delete from test_all_005 where"all" = 20;
+SQL SUCCESS
+select "all" from test_all_005 order by "all";
++-----+
+| all |
++-----+
++-----+
+drop table test_all_005;
+SQL SUCCESS
+commit;
+SQL SUCCESS

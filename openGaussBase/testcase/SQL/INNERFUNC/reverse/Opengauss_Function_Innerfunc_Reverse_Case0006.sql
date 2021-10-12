@@ -1,0 +1,2 @@
+-- @testpoint: reverse函数入参为数值类型
+select reverse(123);

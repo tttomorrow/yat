@@ -1,0 +1,15 @@
+-- @testpoint: 相对时间间隔类型reltime,插入无效值，合理报错
+drop table if exists reltime02;
+SQL SUCCESS
+create table reltime02 (name reltime);
+SQL SUCCESS
+insert into reltime02 values ('faefae');
+?.*ERROR: invalid input syntax for type reltime: "faefae"
+?.*
+  Where: referenced column: name
+insert into reltime02 values ('#￥%……&*');
+?.*ERROR: invalid input syntax for type reltime: "\#\￥\%……\&\*"
+?.*
+  Where: referenced column: name
+drop table reltime02;
+SQL SUCCESS

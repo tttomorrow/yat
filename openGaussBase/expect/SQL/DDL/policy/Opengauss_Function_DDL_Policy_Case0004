@@ -1,0 +1,28 @@
+--  @testpoint:修改行访问控制策略影响的用户
+--创建数据表all_data
+drop table if exists all_data cascade;
+SQL SUCCESS
+CREATE TABLE all_data(id int, role varchar(100), data varchar(100));
+SQL SUCCESS
+--创建行访问控制策略，当前用户只能查看用户自身的数据
+drop ROW LEVEL SECURITY POLICY if exists all_data_rls ON all_data;
+SQL SUCCESS
+CREATE ROW LEVEL SECURITY POLICY all_data_rls ON all_data USING(role = CURRENT_USER);
+SQL SUCCESS
+--创建用户
+drop user if exists test_user1 cascade;
+SQL SUCCESS
+create user test_user1 password 'Xiaxia@123';
+SQL SUCCESS
+--修改行访问控制策略影响的用户
+ALTER ROW LEVEL SECURITY POLICY all_data_rls ON all_data TO test_user1;
+SQL SUCCESS
+--删除行访问控制策略
+drop ROW LEVEL SECURITY POLICY if exists all_data_rls ON all_data;
+SQL SUCCESS
+--删除表
+drop table all_data cascade;
+SQL SUCCESS
+--删除用户
+drop user test_user1 cascade;
+SQL SUCCESS

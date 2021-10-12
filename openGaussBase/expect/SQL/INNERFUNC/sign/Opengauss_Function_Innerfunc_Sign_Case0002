@@ -1,0 +1,12 @@
+-- @testpoint: sign函数非法值校验，合理报错
+select sign(r);
+?.*ERROR: column \"r\" does not exist
+?.*
+  Where: referenced column: sign
+select sign(~);
+?.*ERROR: syntax error at or near \"\)\"
+?.*
+select sign('a');
+?.*ERROR: invalid input syntax for type double precision: \"a\"
+?.*
+  Where: referenced column: sign

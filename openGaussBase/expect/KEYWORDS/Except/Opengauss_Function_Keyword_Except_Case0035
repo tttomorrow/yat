@@ -1,0 +1,36 @@
+-- @testpoint: opengauss关键字except(保留)，自定义数据类型名为except 合理报错
+
+--关键字except作为数据类型不带引号，创建成功
+drop type if exists public.except;
+SQL SUCCESS
+CREATE TYPE public.except AS (f1 int, f2 text);
+SQL SUCCESS
+drop type if exists public.except;
+SQL SUCCESS
+--关键字except作为数据类型加双引号，创建成功
+drop type if exists public."except";
+SQL SUCCESS
+CREATE TYPE public."except" AS (f1 int, f2 text);
+SQL SUCCESS
+select typname from pg_type where typname ='except';
++---------+
+| typname |
++---------+
+| except  |
++---------+
+drop type public."except";
+SQL SUCCESS
+--关键字except作为数据类型加单引号，合理报错
+drop type if exists 'public.except';
+?.*ERROR: syntax error at or near "'public.except'"
+?.*
+CREATE TYPE 'public.except' AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "'public.except'"
+?.*
+--关键字except作为数据类型加反引号，合理报错
+drop type if exists `public.except`;
+?.*ERROR: syntax error at or near "`"
+?.*
+CREATE TYPE `public.except` AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "`"
+?.*

@@ -1,0 +1,58 @@
+--  @testpoint:opengauss关键字numeric(非保留)，自定义数据类型名为numeric
+--关键字numeric作为数据类型不带引号，创建成功
+drop type if exists public.numeric;
+SQL SUCCESS
+CREATE TYPE numeric AS (f1 int, f2 text);
+SQL SUCCESS
+select typname from pg_type where typname ='numeric';
++---------+
+| typname |
++---------+
+| numeric |
+| numeric |
++---------+
+drop type public.numeric;
+SQL SUCCESS
+--关键字numeric作为数据类型加双引号，创建成功
+drop type if exists public."numeric";
+SQL SUCCESS
+CREATE TYPE "numeric" AS (f1 int, f2 text);
+SQL SUCCESS
+select typname from pg_type where typname ='numeric';
++---------+
+| typname |
++---------+
+| numeric |
+| numeric |
++---------+
+drop type public."numeric";
+SQL SUCCESS
+--关键字numeric作为数据类型加单引号，合理报错
+drop type if exists public.'numeric';
+?.*ERROR: syntax error at or near "'numeric'"
+?.*Position.*
+CREATE TYPE 'numeric' AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "'numeric'"
+?.*Position.*
+select * from pg_type where typname ='numeric';
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+------------+-------------+--------------+--------------+-----------------+------------------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
+| typname | typnamespace | typowner | typlen | typbyval | typtype | typcategory | typispreferred | typisdefined | typdelim | typrelid | typelem | typarray | typinput   | typoutput   | typreceive   | typsend      | typmodin        | typmodout        | typanalyze | typalign | typstorage | typnotnull | typbasetype | typtypmod | typndims | typcollation | typdefaultbin | typdefault | typacl |
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+------------+-------------+--------------+--------------+-----------------+------------------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
+| numeric | 11           | 10       | -1     | false    | b       | N           | false          | true         | ,        | 0        | 0       | 1231     | numeric_in | numeric_out | numeric_recv | numeric_send | numerictypmodin | numerictypmodout | -          | i        | m          | false      | 0           | -1        | 0        | 0            |               |            |        |
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+------------+-------------+--------------+--------------+-----------------+------------------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
+drop type public.'numeric';
+?.*ERROR: syntax error at or near "'numeric'"
+?.*Position.*
+--关键字numeric作为数据类型加反引号，合理报错
+drop type if exists public.`numeric`;
+?.*ERROR: syntax error at or near "`"
+?.*Position.*
+CREATE TYPE `numeric` AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "`"
+?.*Position.*
+select * from pg_type where typname =`numeric`;
+?.*ERROR: column "numeric" does not exist
+?.*Position.*
+drop type public.`numeric`;
+?.*ERROR: syntax error at or near "`"
+?.*Position.*

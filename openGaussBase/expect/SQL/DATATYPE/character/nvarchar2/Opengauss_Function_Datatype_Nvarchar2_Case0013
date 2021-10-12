@@ -1,0 +1,11 @@
+-- @testpoint: 插入超出范围值，字节长度设定为合理值，合理报错
+-- @modified at:2020-11-16
+drop table if exists test_nvarchar2_13;
+SQL SUCCESS
+create table test_nvarchar2_13 (name nvarchar2(20));
+SQL SUCCESS
+insert into test_nvarchar2_13 values ('aaaaaaaaaaaaaaaaaaaaa');
+?.*ERROR: value too long for type nvarchar2\(20\)
+  Where: referenced column: name
+drop table if exists test_nvarchar2_13;
+SQL SUCCESS

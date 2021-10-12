@@ -1,0 +1,18 @@
+-- @testpoint: box类型，使用(x1,y1),(x2,y2)方式插入空值，合理报错
+drop table if exists test_box05;
+SQL SUCCESS
+create table test_box05 (name box);
+SQL SUCCESS
+insert into test_box05 values (box '(null,null),(null,null)');
+?.*ERROR: invalid input syntax for type box: "\(null,null\),\(null,null\)"
+?.*
+insert into test_box05 values (box '('',''),('','')');
+?.*ERROR: invalid input syntax for type box: "\(','\),\(','\)"
+?.*
+select * from test_box05;
++------+
+| name |
++------+
++------+
+drop table test_box05;
+SQL SUCCESS

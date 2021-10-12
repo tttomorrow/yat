@@ -1,0 +1,18 @@
+-- @testpoint: 插入空值
+drop table if exists bigint15;
+SQL SUCCESS
+create table bigint15 (id int,name bigint);
+SQL SUCCESS
+insert into bigint15 values (1,null);
+SQL SUCCESS
+insert into bigint15 values (2,'');
+SQL SUCCESS
+select * from bigint15;
++----+------+
+| id | name |
++----+------+
+| 1  |      |
+| 2  |      |
++----+------+
+drop table bigint15;
+SQL SUCCESS

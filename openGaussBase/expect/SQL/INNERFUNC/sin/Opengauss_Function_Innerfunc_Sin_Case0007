@@ -1,0 +1,12 @@
+-- @testpoint: 输入参数为多个,合理报错
+select sin(2  2) as result;
+?.*ERROR: syntax error at or near \"2\"
+?.*
+select sin(2,2) as result;
+?.*ERROR: function sin\(integer, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: result
+select sin(2)(2) as result;
+?.*ERROR: syntax error at or near "\("
+?.*

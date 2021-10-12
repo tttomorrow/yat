@@ -1,0 +1,62 @@
+-- @testpoint: 合理报错唯一索引：行存表B-tree索引支持：普通表，分区表，临时表：success:插入操作
+--建表
+DROP TABLE if EXISTS test_index_table_048_01 CASCADE;
+SQL SUCCESS
+DROP TABLE if EXISTS test_index_table_048_02 CASCADE;
+SQL SUCCESS
+DROP TABLE if EXISTS test_index_table_048_03 CASCADE;
+SQL SUCCESS
+create table test_index_table_048_01(id int);
+SQL SUCCESS
+create table test_index_table_048_02(id int) WITH (ORIENTATION = row)
+PARTITION BY RANGE(id)(
+        PARTITION P1 VALUES LESS THAN(100),
+        PARTITION P2 VALUES LESS THAN(1000),
+        PARTITION P3 VALUES LESS THAN(MAXVALUE))
+;
+SQL SUCCESS
+create  TEMPORARY table test_index_table_048_03(id int);
+SQL SUCCESS
+--建索引
+create unique index index_048_01 on test_index_table_048_01(id);
+SQL SUCCESS
+create unique index index_048_02 on test_index_table_048_02(id) local;
+SQL SUCCESS
+create unique index index_048_03 on test_index_table_048_03(id);
+SQL SUCCESS
+--查询索引
+select relname from pg_class where relname='index_048_01';
++--------------+
+| relname      |
++--------------+
+| index_048_01 |
++--------------+
+select relname from pg_class where relname='index_048_02';
++--------------+
+| relname      |
++--------------+
+| index_048_02 |
++--------------+
+select relname from pg_class where relname='index_048_03';
++--------------+
+| relname      |
++--------------+
+| index_048_03 |
++--------------+
+--插入数据检查唯一索引是否生效
+insert into test_index_table_048_01 values(1),(2),(1);
+?.*ERROR: duplicate key value violates unique constraint "index_048_01"?.*
+  Detail: Key (id)=(1) already exists.
+insert into test_index_table_048_02 values(1),(2),(1);
+?.*ERROR: duplicate key value violates unique constraint "index_048_02"?.*
+  Detail: Key (id)=(1) already exists.
+insert into test_index_table_048_03 values(1),(2),(1);
+?.*ERROR: duplicate key value violates unique constraint "index_048_03"?.*
+  Detail: Key (id)=(1) already exists.
+--清理数据
+DROP TABLE if EXISTS test_index_table_048_01 CASCADE;
+SQL SUCCESS
+DROP TABLE if EXISTS test_index_table_048_02 CASCADE;
+SQL SUCCESS
+DROP TABLE if EXISTS test_index_table_048_03 CASCADE;
+SQL SUCCESS

@@ -1,0 +1,24 @@
+-- @testpoint: 插入浮点数，四舍五入取整
+drop table if exists int12;
+SQL SUCCESS
+create table int12 (name int);
+SQL SUCCESS
+insert into int12 values (122.3340);
+SQL SUCCESS
+insert into int12 values (99999.99999);
+SQL SUCCESS
+insert into int12 values (-122.3340);
+SQL SUCCESS
+insert into int12 values (-99999.99999);
+SQL SUCCESS
+select * from int12;
++---------+
+| name    |
++---------+
+| 122     |
+| 100000  |
+| -122    |
+| -100000 |
++---------+
+drop table int12;
+SQL SUCCESS

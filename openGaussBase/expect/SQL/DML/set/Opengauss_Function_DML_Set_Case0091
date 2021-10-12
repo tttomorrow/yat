@@ -1,0 +1,52 @@
+--  @testpoint:约束建成deferable，事务块外，执行SET CONSTRAINTS不生效（主键约束和唯一约束）
+--建表
+drop table if exists t4;
+SQL SUCCESS
+create table t4 (id int primary key DEFERRABLE,name varchar(40) unique DEFERRABLE);
+SQL SUCCESS
+--查看约束名字
+select conname,condeferrable,condeferred from pg_constraint where conrelid = (select oid from pg_class where relname='t4');
++-------------+---------------+-------------+
+| conname     | condeferrable | condeferred |
++-------------+---------------+-------------+
+?.*t4.*| true          | false       |
+?.*t4.*| true          | false       |
++-------------+---------------+-------------+
+--插入数据
+SQL SUCCESS
+SQL SUCCESS
+--修改数据，成功
+update t4 set id=id+1;
+SQL SUCCESS
+select * from t4;
++----+------------------+
+| id | name             |
++----+------------------+
++----+------------------+
+--设置约束检查条件为IMMEDIATE
+SET CONSTRAINTS all IMMEDIATE;
+SQL SUCCESS
+--修改数据,合理报错（立即检查）
+?.*ERROR: duplicate key value violates unique constraint "t4_pkey"
+  Detail: Key (id)=(3) already exists.
+?.*ERROR: duplicate key value violates unique constraint "t4_name_key"
+truncate table t4;
+SQL SUCCESS
+--插入数据
+SQL SUCCESS
+SQL SUCCESS
+--设置约束检查条件为DEFERRED
+SET CONSTRAINTS all DEFERRED;
+SQL SUCCESS
+--修改数据（合理报错，事务外设置延迟检查约束，不生效）
+update t4 set id=2 where id=1;
+?.*ERROR: duplicate key value violates unique constraint "t4_pkey"
+  Detail: Key (id)=(2) already exists.
+select * from t4;
++----+------------------+
+| id | name             |
++----+------------------+
++----+------------------+
+--删表
+drop table t4;
+SQL SUCCESS

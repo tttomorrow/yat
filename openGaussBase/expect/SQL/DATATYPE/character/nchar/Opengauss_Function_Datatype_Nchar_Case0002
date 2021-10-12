@@ -1,0 +1,15 @@
+-- @testpoint: 插入正常值
+DROP TABLE IF EXISTS type_nchar_02;
+SQL SUCCESS
+CREATE TABLE type_nchar_02 (stringv nchar(20));
+SQL SUCCESS
+insert into type_nchar_02 values ('ou mygod');
+SQL SUCCESS
+select * from type_nchar_02;
++----------------------+
+| stringv              |
++----------------------+
+| ou mygod             |
++----------------------+
+DROP TABLE type_nchar_02;
+SQL SUCCESS

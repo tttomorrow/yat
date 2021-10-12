@@ -1,0 +1,13 @@
+-- @testpoint: 获取约束的定义
+DROP table IF EXISTS warehouse_t2;
+SQL SUCCESS
+CREATE TABLE warehouse_t2(W_WAREHOUSE_SK  INTEGER    UNIQUE DEFERRABLE);
+SQL SUCCESS
+select pg_get_constraintdef(oid) from PG_CONSTRAINT where  conname = 'warehouse_t2_w_warehouse_sk_key' ;
++------------------------------------+
+| pg_get_constraintdef               |
++------------------------------------+
+| UNIQUE (w_warehouse_sk) DEFERRABLE |
++------------------------------------+
+DROP table IF EXISTS warehouse_t2;
+SQL SUCCESS

@@ -1,0 +1,55 @@
+--  @testpoint:opengauss关键字delimiters(非保留)，自定义数据类型名为delimiters
+--关键字delimiters作为数据类型不带引号，创建成功
+drop type if exists delimiters;
+SQL SUCCESS
+CREATE TYPE delimiters AS (f1 int, f2 text);
+SQL SUCCESS
+select typname from pg_type where typname ='delimiters';
++------------+
+| typname    |
++------------+
+| delimiters |
++------------+
+drop type delimiters;
+SQL SUCCESS
+--关键字delimiters作为数据类型名加双引号，创建成功
+drop type if exists "delimiters";
+SQL SUCCESS
+CREATE TYPE "delimiters" AS (f1 int, f2 text);
+SQL SUCCESS
+select typname from pg_type where typname ='delimiters';
++------------+
+| typname    |
++------------+
+| delimiters |
++------------+
+drop type "delimiters";
+SQL SUCCESS
+--关键字delimiters作为数据类型名加单引号，合理报错
+drop type if exists 'delimiters';
+?.*ERROR: syntax error at or near "'delimiters'"
+?.*
+CREATE TYPE 'delimiters' AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "'delimiters'"
+?.*
+select typname from pg_type where typname ='delimiters';
++---------+
+| typname |
++---------+
++---------+
+drop type 'delimiters';
+?.*ERROR: syntax error at or near "'delimiters'"
+?.*
+--关键字delimiters作为数据类型名加反引号，合理报错
+drop type if exists `delimiters`;
+?.*ERROR: syntax error at or near "`"
+?.*
+CREATE TYPE `delimiters` AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "`"
+?.*
+select typname from pg_type where typname =`delimiters`;
+?.*ERROR: column "delimiters" does not exist
+?.*
+drop type `delimiters`;
+?.*ERROR: syntax error at or near "`"
+?.*

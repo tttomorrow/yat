@@ -1,0 +1,19 @@
+-- @testpoint: analyze单列表
+drop table if exists tbl_011;
+SQL SUCCESS
+drop table if exists tbl_012;
+SQL SUCCESS
+create table tbl_011 (col_tinyint  tinyint );
+SQL SUCCESS
+create table tbl_012 ( col_tinyint   tinyint);
+SQL SUCCESS
+insert into tbl_011 values(183);
+SQL SUCCESS
+insert into tbl_012 (select col_tinyint from tbl_011);
+SQL SUCCESS
+analyze  tbl_012 ;
+SQL SUCCESS
+drop table if exists tbl_011;
+SQL SUCCESS
+drop table if exists tbl_012;
+SQL SUCCESS

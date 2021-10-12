@@ -1,0 +1,40 @@
+-- @testpoint: 关键字unencrypted，用作字段名
+drop table if exists unencrypted_test cascade;
+SQL SUCCESS
+create table if not exists unencrypted_test(id int,unencrypted varchar(20));
+SQL SUCCESS
+create or replace procedure unencrypted_insert
+as
+begin
+ for i in 1..10 loop
+    insert into unencrypted_test values(i,'unencry+'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call unencrypted_insert();
++--------------------+
+| unencrypted_insert |
++--------------------+
+|                    |
++--------------------+
+select * from unencrypted_test;
++----+-------------+
+| id | unencrypted |
++----+-------------+
+| 1  | unencry+1   |
+| 2  | unencry+2   |
+| 3  | unencry+3   |
+| 4  | unencry+4   |
+| 5  | unencry+5   |
+| 6  | unencry+6   |
+| 7  | unencry+7   |
+| 8  | unencry+8   |
+| 9  | unencry+9   |
+| 10 | unencry+10  |
++----+-------------+
+--清理环境
+drop table if exists unencrypted_test cascade;
+SQL SUCCESS
+drop procedure unencrypted_insert;
+SQL SUCCESS

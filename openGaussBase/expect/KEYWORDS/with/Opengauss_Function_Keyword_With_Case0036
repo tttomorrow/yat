@@ -1,0 +1,25 @@
+-- @testpoint: 关键字with嵌套with
+drop table if exists with_test_01;
+SQL SUCCESS
+drop table if exists with_test_02;
+SQL SUCCESS
+create table with_test_01(a int,b char(2));
+SQL SUCCESS
+create table with_test_02(a int,b char(2));
+SQL SUCCESS
+insert into with_test_02 values(2,6);
+SQL SUCCESS
+insert into with_test_01 with a as (select a from with_test_02),b as (select b from with_test_02) select a.a,b.b from a,b order by 1,2;
+SQL SUCCESS
+insert into with_test_01 with b as (select b from with_test_02) select b.b,b.b from b;
+SQL SUCCESS
+with cc as(with yy as(select * from with_test_02)select * from yy)select * from cc order by 1,2;
++---+----+
+| a | b  |
++---+----+
+| 2 | 6  |
++---+----+
+drop table if exists with_test_01;
+SQL SUCCESS
+drop table if exists with_test_02;
+SQL SUCCESS

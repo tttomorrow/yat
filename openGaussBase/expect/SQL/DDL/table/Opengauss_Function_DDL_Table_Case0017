@@ -1,0 +1,37 @@
+-- @testpoint: 删除表数据后alter table修改列类型
+drop table if exists table_alter_017;
+SQL SUCCESS
+create table table_alter_017(
+c_id int,
+c_real real,
+c_char char(50) default null,
+c_clob clob,
+
+c_blob blob,
+c_date date
+);
+SQL SUCCESS
+SQL SUCCESS
+delete from table_alter_017;
+SQL SUCCESS
+--rename
+alter table table_alter_017  rename COLUMN c_real to c_2;
+SQL SUCCESS
+--real改为varchar
+alter table table_alter_017 MODIFY (c_2 varchar(20));
+SQL SUCCESS
+SELECT col_description(a.attrelid,a.attnum) as comment,format_type(a.atttypid,a.atttypmod) as type,a.attname as name, a.attnotnull as notnull
+FROM pg_class as c,pg_attribute as a
+where c.relname = 'table_alter_017' and a.attrelid = c.oid and a.attnum>0;
++---------+--------------------------------+--------+---------+
+| comment | type                           | name   | notnull |
++---------+--------------------------------+--------+---------+
+|         | integer                        | c_id   | false   |
+|         | character varying(20)          | c_2    | false   |
+|         | character(50)                  | c_char | false   |
+|         | clob                           | c_clob | false   |
+|         | blob                           | c_blob | false   |
+|         | timestamp(0) without time zone | c_date | false   |
++---------+--------------------------------+--------+---------+
+drop table if exists table_alter_017;
+SQL SUCCESS

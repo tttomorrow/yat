@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字validate(非保留)，作为角色名
+--关键字不带引号-成功
+drop role if exists validate;
+SQL SUCCESS
+create role validate with password 'gauss@123' valid until '2020-12-31';
+SQL SUCCESS
+drop role validate;
+SQL SUCCESS
+--关键字带双引号-成功
+drop role if exists "validate";
+SQL SUCCESS
+create role "validate" with password 'gauss@123' valid until '2020-12-31';
+SQL SUCCESS
+drop role "validate";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop role if exists 'validate';
+?.*ERROR: syntax error at or near "'validate'".*
+?.*Position: .*
+create role 'validate' with password 'gauss@123' valid until '2020-12-31';
+?.*ERROR: syntax error at or near "'validate'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop role if exists `validate`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create role `validate` with password 'gauss@123' valid until '2020-12-31';
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

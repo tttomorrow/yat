@@ -1,0 +1,25 @@
+-- @testpoint: 表达式做为参数的存储过程测试--函数表达式-数值计算函数-数值计算函数-ABS(exp)
+
+--创建存储过程
+CREATE OR REPLACE PROCEDURE PROC_EXPR_PARAM_007(P2 NUMBER)  AS
+BEGIN
+raise info 'P2=:%',P2;
+EXCEPTION
+WHEN NO_DATA_FOUND THEN raise info 'NO_DATA_FOUND';
+END;
+/
+--调用存储过程
+DECLARE
+V1 REAL :=ABS(-1234.5678);
+BEGIN
+ PROC_EXPR_PARAM_007(V1);
+END;
+/
+--调用存储过程
+DECLARE
+BEGIN
+ PROC_EXPR_PARAM_007(V2);
+END;
+/
+--清理环境
+drop PROCEDURE PROC_EXPR_PARAM_007;

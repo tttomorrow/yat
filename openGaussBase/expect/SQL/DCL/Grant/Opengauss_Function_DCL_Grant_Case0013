@@ -1,0 +1,11 @@
+-- @testpoint: 将过程语言的访问权限赋予给指定的用户或角色
+drop user if exists user_013 cascade;
+SQL SUCCESS
+create user user_013 identified by 'Gauss_234';
+SQL SUCCESS
+grant usage on language sql to user_013;
+SQL SUCCESS
+revoke all privileges on language sql from user_013;
+SQL SUCCESS
+drop user if exists user_013;
+SQL SUCCESS

@@ -1,0 +1,78 @@
+-- @testpoint: 存储过程loop语句
+drop table if exists t_user;
+SQL SUCCESS
+create table t_user(
+  user_id int,
+  name varchar2(200),
+  sal number
+);
+SQL SUCCESS
+insert into t_user values(1,'xq',1200);
+SQL SUCCESS
+insert into t_user values(2,'ll',900.0);
+SQL SUCCESS
+insert into t_user values(3,'wwj',1000);
+SQL SUCCESS
+insert into t_user values(1,'xq',899.999);
+SQL SUCCESS
+insert into t_user values(4,'ly',899.9990);
+SQL SUCCESS
+select * from t_user order by user_id;
++---------+------+----------+
+| user_id | name | sal      |
++---------+------+----------+
+| 1       | xq   | 1200     |
+| 1       | xq   | 899.999  |
+| 2       | ll   | 900.0    |
+| 3       | wwj  | 1000     |
+| 4       | ly   | 899.9990 |
++---------+------+----------+
+create or replace procedure pro1(v_id int) is
+begin
+  for i in (select user_id, sum(sal) sal
+		from t_user t where t.user_id <= v_id group by user_id having sum(sal) > 1order by user_id) 
+  loop
+    insert into t_user values (i.user_id, '总工资', i.sal);
+    update t_user t set t.sal = round(t.sal * 0.99,2) where name = '总工资' and user_id=i.user_id;
+    delete from t_user where name <> '总工资' and user_id <= v_id;
+  end loop;
+end;
+/
+SQL SUCCESS
+call pro1(3);
++------+
+| pro1 |
++------+
+|      |
++------+
+select * from t_user order by user_id;
++---------+------+----------+
+| user_id | name | sal      |
++---------+------+----------+
+| 1       | 总工资  | 2079.00  |
+| 2       | 总工资  | 891.00   |
+| 3       | 总工资  | 990.00   |
+| 4       | ly   | 899.9990 |
++---------+------+----------+
+call pro1(4);
++------+
+| pro1 |
++------+
+|      |
++------+
+select * from t_user order by user_id;
++---------+------+---------+
+| user_id | name | sal     |
++---------+------+---------+
+| 1       | 总工资  | 2058.21 |
+| 1       | 总工资  | 2058.21 |
+| 2       | 总工资  | 882.09  |
+| 2       | 总工资  | 882.09  |
+| 3       | 总工资  | 980.10  |
+| 3       | 总工资  | 980.10  |
+| 4       | 总工资  | 891.00  |
++---------+------+---------+
+drop table t_user;
+SQL SUCCESS
+drop procedure pro1;
+SQL SUCCESS

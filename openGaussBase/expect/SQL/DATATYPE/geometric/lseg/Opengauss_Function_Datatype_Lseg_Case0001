@@ -1,0 +1,21 @@
+-- @testpoint: lseg类型，使用[(x1,y1),(x2,y2)]方式插入正数坐标值
+drop table if exists test_lseg01;
+SQL SUCCESS
+create table test_lseg01 (name lseg);
+SQL SUCCESS
+insert into test_lseg01 values (lseg '[(1,1),(2,2)]');
+SQL SUCCESS
+insert into test_lseg01 values (lseg '[(1.2,1.3),(2.3,2.4)]');
+SQL SUCCESS
+insert into test_lseg01 values (lseg '[(10,10.23),(22,2.023)]');
+SQL SUCCESS
+select * from test_lseg01;
++-----------------------------+
+| name                        |
++-----------------------------+
+| [(1.0,1.0),(2.0,2.0)]       |
+| [(1.2,1.3),(2.3,2.4)]       |
+| [(10.0,10.23),(22.0,2.023)] |
++-----------------------------+
+drop table test_lseg01;
+SQL SUCCESS

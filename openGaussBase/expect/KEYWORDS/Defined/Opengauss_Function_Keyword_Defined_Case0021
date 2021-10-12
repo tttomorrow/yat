@@ -1,0 +1,71 @@
+-- @testpoint: opengauss关键字defined(非保留)，作为函数名 带单引号、反引号时 合理报错
+--关键字不带引号-成功
+drop function if exists defined(i integer);
+SQL SUCCESS
+create function defined(i integer)
+returns integer
+as $$
+begin
+    return i+1;
+end;
+$$ language plpgsql;
+/
+SQL SUCCESS
+select defined(3);
++---------+
+| defined |
++---------+
+| 4       |
++---------+
+--清理环境
+drop function defined(i integer);
+SQL SUCCESS
+--关键字带双引号-成功
+drop function if exists "defined"(i integer);
+SQL SUCCESS
+create function "defined"(i integer)
+returns integer
+as $$
+begin
+    return i+1;
+end;
+$$ language plpgsql;
+/
+SQL SUCCESS
+select "defined"(3);
++---------+
+| defined |
++---------+
+| 4       |
++---------+
+--清理环境
+drop function "defined"(i integer);
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop function if exists 'defined';
+?.*ERROR: syntax error at or near "'defined'".*
+?.*Position.*
+create function 'defined'(i integer)
+returns integer
+as $$
+begin
+    return i+1;
+end;
+$$ language plpgsql;
+/
+?.*ERROR: syntax error at or near "'defined'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop function if exists `defined`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create function `defined`(i integer)
+returns integer
+as $$
+begin
+    return i+1;
+end;
+$$ language plpgsql;
+/
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*

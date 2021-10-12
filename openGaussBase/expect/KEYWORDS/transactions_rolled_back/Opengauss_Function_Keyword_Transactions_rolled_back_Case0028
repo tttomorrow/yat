@@ -1,0 +1,66 @@
+-- @testpoint: opengauss关键字transactions_rolled_back(非保留)，作为同义词对象名,部分测试点合理报错
+--前置条件
+drop table if exists explain_test;
+SQL SUCCESS
+create table explain_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists transactions_rolled_back;
+SQL SUCCESS
+create synonym transactions_rolled_back for explain_test;
+SQL SUCCESS
+insert into transactions_rolled_back values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update transactions_rolled_back set transactions_rolled_back.name='cici' where transactions_rolled_back.id=2;
+SQL SUCCESS
+select * from transactions_rolled_back;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+drop synonym if exists transactions_rolled_back;
+SQL SUCCESS
+--关键字带双引号-成功
+drop synonym if exists "transactions_rolled_back";
+SQL SUCCESS
+create synonym "transactions_rolled_back" for explain_test;
+SQL SUCCESS
+drop synonym if exists "transactions_rolled_back";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'transactions_rolled_back';
+?.*ERROR: syntax error at or near "'transactions_rolled_back'".*
+?.*Position: .*
+create synonym 'transactions_rolled_back' for explain_test;
+?.*ERROR: syntax error at or near "'transactions_rolled_back'".*
+?.*Position: .*
+insert into 'transactions_rolled_back' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'transactions_rolled_back'".*
+?.*Position: .*
+update 'transactions_rolled_back' set 'transactions_rolled_back'.name='cici' where 'transactions_rolled_back'.id=2;
+?.*ERROR: syntax error at or near "'transactions_rolled_back'".*
+?.*Position: .*
+select * from 'transactions_rolled_back';
+?.*ERROR: syntax error at or near "'transactions_rolled_back'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop synonym if exists `transactions_rolled_back`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create synonym `transactions_rolled_back` for explain_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+insert into `transactions_rolled_back` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+update `transactions_rolled_back` set `transactions_rolled_back`.name='cici' where `transactions_rolled_back`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+select * from `transactions_rolled_back`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+--清理环境
+drop table if exists explain_test;
+SQL SUCCESS

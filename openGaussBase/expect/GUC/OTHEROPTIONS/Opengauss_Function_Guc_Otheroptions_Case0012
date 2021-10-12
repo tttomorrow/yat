@@ -1,0 +1,15 @@
+-- @testpoint: 查看integer_datetimes,报告是否支持64位整数形式的日期和时间格式
+--通过show方式查看
+show integer_datetimes;
++-------------------+
+| integer_datetimes |
++-------------------+
+| on                |
++-------------------+
+--通过系统视图pg_settings查看
+select setting from pg_settings where name='integer_datetimes';
++---------+
+| setting |
++---------+
+| on      |
++---------+

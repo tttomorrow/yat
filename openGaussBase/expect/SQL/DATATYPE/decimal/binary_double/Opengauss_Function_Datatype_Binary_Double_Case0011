@@ -1,0 +1,22 @@
+-- @testpoint: 插入bool类型，合理报错
+drop table if exists binary_double11;
+SQL SUCCESS
+create table binary_double11 (name binary_double);
+SQL SUCCESS
+insert into binary_double11 values (true);
+?.*ERROR: column "name" is of type double precision but expression is of type boolean
+  Hint: You will need to rewrite or cast the expression.
+?.*
+  Where: referenced column: name
+insert into binary_double11 values (false);
+?.*ERROR: column "name" is of type double precision but expression is of type boolean
+  Hint: You will need to rewrite or cast the expression.
+?.*
+  Where: referenced column: name
+select * from binary_double11;
++------+
+| name |
++------+
++------+
+drop table binary_double11;
+SQL SUCCESS

@@ -1,0 +1,21 @@
+-- @testpoint: 指定网络地址为0
+drop table if exists test_cidr_04;
+SQL SUCCESS
+create table test_cidr_04(id int,type cidr);
+SQL SUCCESS
+insert into test_cidr_04 values(1,'0');
+SQL SUCCESS
+insert into test_cidr_04 values(2,'0');
+SQL SUCCESS
+insert into test_cidr_04 values(3,'0');
+SQL SUCCESS
+select * from test_cidr_04;
++----+-----------+
+| id | type      |
++----+-----------+
+| 1  | 0.0.0.0/8 |
+| 2  | 0.0.0.0/8 |
+| 3  | 0.0.0.0/8 |
++----+-----------+
+drop table test_cidr_04;
+SQL SUCCESS

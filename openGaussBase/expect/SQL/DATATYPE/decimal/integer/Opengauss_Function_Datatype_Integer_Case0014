@@ -1,0 +1,29 @@
+-- @testpoint: 使用别名int4
+drop table if exists integer14;
+SQL SUCCESS
+create table integer14 (name int4);
+SQL SUCCESS
+insert into integer14 values (122);
+SQL SUCCESS
+insert into integer14 values (123.456);
+SQL SUCCESS
+SQL SUCCESS
+insert into integer14 values (-122);
+SQL SUCCESS
+insert into integer14 values (-99999.99999);
+SQL SUCCESS
+insert into integer14 values (-0.12355678);
+SQL SUCCESS
+select * from integer14;
++---------+
+| name    |
++---------+
+| 122     |
+| 123     |
+| 0       |
+| -122    |
+| -100000 |
+| 0       |
++---------+
+drop table integer14;
+SQL SUCCESS

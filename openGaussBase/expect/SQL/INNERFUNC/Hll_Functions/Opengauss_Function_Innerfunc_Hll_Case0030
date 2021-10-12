@@ -1,0 +1,10 @@
+-- @testpoint: hll_hashval_eq(hll_hashval, hll_hashval), 当入参为非hll_hashval类型时，合理报错
+select hll_hashval_eq(hll_hash_integer(1),basicemailmasking('abcd@gmail.com'));
+?.*ERROR: function hll_hashval_eq\(hll_hashval, text\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: hll_hashval_eq
+?.*ERROR: function hll_hashval_eq\(hll_hashval, bigint\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: hll_hashval_eq

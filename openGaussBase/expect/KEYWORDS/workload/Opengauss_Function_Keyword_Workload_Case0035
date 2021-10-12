@@ -1,0 +1,39 @@
+-- @testpoint: 关键字workload，用作表名创建普通表
+drop table if exists workload cascade;
+SQL SUCCESS
+create table workload(id int,name varchar(20));
+SQL SUCCESS
+create or replace procedure workload_insert
+as
+begin
+ for i in 1..10 loop
+    insert into workload values(i,'work+'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call workload_insert();
++-----------------+
+| workload_insert |
++-----------------+
+|                 |
++-----------------+
+select * from workload;
++----+---------+
+| id | name    |
++----+---------+
+| 1  | work+1  |
+| 2  | work+2  |
+| 3  | work+3  |
+| 4  | work+4  |
+| 5  | work+5  |
+| 6  | work+6  |
+| 7  | work+7  |
+| 8  | work+8  |
+| 9  | work+9  |
+| 10 | work+10 |
++----+---------+
+drop table if exists workload cascade;
+SQL SUCCESS
+drop procedure workload_insert;
+SQL SUCCESS

@@ -1,0 +1,29 @@
+-- @testpoint: 查询某一列的注释
+DROP table IF EXISTS table_test001;
+SQL SUCCESS
+create table table_test001(c int,d int);
+SQL SUCCESS
+COMMENT ON COLUMN table_test001.c IS 'Primary key of customer demographics table.';
+SQL SUCCESS
+select col_description(oid, 1) from pg_class where relname = 'table_test001';
++---------------------------------------------+
+| col_description                             |
++---------------------------------------------+
+| Primary key of customer demographics table. |
++---------------------------------------------+
+DROP table IF EXISTS table_test001;
+SQL SUCCESS
+DROP table IF EXISTS table_test002;
+SQL SUCCESS
+create table table_test002(c int,d int);
+SQL SUCCESS
+COMMENT ON COLUMN table_test002.d IS 'this is a comment.';
+SQL SUCCESS
+select col_description(oid, 2) from pg_class where relname = 'table_test002';
++--------------------+
+| col_description    |
++--------------------+
+| this is a comment. |
++--------------------+
+DROP table IF EXISTS table_test002;
+SQL SUCCESS

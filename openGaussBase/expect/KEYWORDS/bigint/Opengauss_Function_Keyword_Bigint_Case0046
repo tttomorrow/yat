@@ -1,0 +1,14 @@
+--  @testpoint:插入右边界范围外整数，应该报错：超出范围
+drop table if exists bigint09;
+SQL SUCCESS
+create table bigint09 (name bigint);
+SQL SUCCESS
+?.*ERROR: bigint out of range
+  Where: referenced column: name
+select * from bigint09;
++------+
+| name |
++------+
++------+
+drop table if exists bigint09;
+SQL SUCCESS

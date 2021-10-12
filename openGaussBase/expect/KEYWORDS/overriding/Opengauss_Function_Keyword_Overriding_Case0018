@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字overriding(非保留)，作为数据库名
+--关键字不带引号-成功
+drop database if exists overriding;
+SQL SUCCESS
+create database overriding;
+SQL SUCCESS
+drop database overriding;
+SQL SUCCESS
+--关键字带双引号-成功
+drop database if exists "overriding";
+SQL SUCCESS
+create database "overriding";
+SQL SUCCESS
+drop database "overriding";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop database if exists 'overriding';
+?.*ERROR: syntax error at or near "'overriding'".*
+?.*Position: .*
+create database 'overriding';
+?.*ERROR: syntax error at or near "'overriding'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop database if exists `overriding`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create database `overriding`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

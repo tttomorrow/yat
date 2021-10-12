@@ -1,0 +1,9 @@
+-- @testpoint: 坐标中有字母，计算矩形水平尺寸,合理报错
+select width(box '((1,a),(2,3))') as result;
+?.*ERROR: invalid input syntax for type box: "\(\(1,a\),\(2,3\)\)".*
+?.*Position.*
+  Where: referenced column: result
+select width(box '((a,2),(2,3))') as result;
+?.*ERROR: invalid input syntax for type box: "\(\(a,2\),\(2,3\)\)".*
+?.*Position.*
+  Where: referenced column: result

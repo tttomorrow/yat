@@ -1,0 +1,20 @@
+--  @testpoint:修改函数的执行规则为IMMUTABLE
+drop FUNCTION if EXISTS u_testfun44(c_int int);
+SQL SUCCESS
+CREATE FUNCTION u_testfun44 ( INOUT c_int int) RETURNS int  AS $$
+        BEGIN
+                RETURN (c_int);
+        END;
+$$ LANGUAGE plpgsql;
+/
+SQL SUCCESS
+ALTER FUNCTION  u_testfun44(int) IMMUTABLE;
+SQL SUCCESS
+call u_testfun44(87);
++-------+
+| c_int |
++-------+
+| 87    |
++-------+
+drop FUNCTION u_testfun44;
+SQL SUCCESS

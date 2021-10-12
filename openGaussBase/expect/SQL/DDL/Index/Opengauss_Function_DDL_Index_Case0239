@@ -1,0 +1,152 @@
+-- @testpoint: 行存表列约束default,unique,foreign key的同时创建唯一索引,合理报错
+--1.创建行存一般表
+create table foreign_key_table(i int unique);
+SQL SUCCESS
+create table main_table(i int,c varchar default 'rr',x int references foreign_key_table(i),unique(i));
+SQL SUCCESS
+--2.在各列上创建唯一索引
+create unique index i_idx on main_table(i);
+SQL SUCCESS
+create unique index c_idx on main_table(c);
+SQL SUCCESS
+create unique index x_idx on main_table(x);
+SQL SUCCESS
+--3.插入数据
+insert into main_table values(1,'dd'),(1,'ee');
+?.*ERROR: duplicate key value violates unique constraint "main_table_i_key"
+  Detail: Key (i)=(1) already exists.
+insert into main_table values(2),(3);
+?.*ERROR: duplicate key value violates unique constraint "c_idx"
+  Detail: Key (c)=(rr) already exists.
+insert into main_table values(4,'dd2',1),(5,'e2e',1);
+?.*ERROR: duplicate key value violates unique constraint "x_idx"
+  Detail: Key (x)=(1) already exists.
+--4.查看索引
+SET ENABLE_SEQSCAN=off;
+SQL SUCCESS
+explain select i from main_table;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*Bitmap Heap Scan on main_table.*
+?.*Bitmap Index Scan on i_idx.*
+?.*
+explain select c from main_table;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*Bitmap Heap Scan on main_table.*
+?.*Bitmap Index Scan on c_idx.*
+?.*
+explain select x from main_table;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*Bitmap Heap Scan on main_table.*
+?.*Bitmap Index Scan on x_idx.*
+?.*
+--5.创建本地临时表
+create local temp table foreign_key_table_local(i int unique);
+SQL SUCCESS
+create local temp table main_table_local(i int,c varchar default 'rr',x int references foreign_key_table_local(i),unique(i));
+SQL SUCCESS
+--6.在各列上创建唯一索引
+create unique index i_idx_local on main_table_local(i);
+SQL SUCCESS
+create unique index c_idx_local on main_table_local(c);
+SQL SUCCESS
+create unique index x_idx_local on main_table_local(x);
+SQL SUCCESS
+--7.插入数据
+insert into main_table_local values(1,'dd'),(1,'ee');
+?.*ERROR: duplicate key value violates unique constraint "main_table_local_i_key"
+  Detail: Key (i)=(1) already exists.
+insert into main_table_local values(2),(3);
+?.*ERROR: duplicate key value violates unique constraint "c_idx_local"
+  Detail: Key (c)=(rr) already exists.
+insert into main_table_local values(4,'dd2',1),(5,'e2e',1);
+?.*ERROR: duplicate key value violates unique constraint "x_idx_local"
+  Detail: Key (x)=(1) already exists.
+--8.查看索引
+SET ENABLE_SEQSCAN=off;
+SQL SUCCESS
+explain select i from main_table_local;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*Bitmap Heap Scan on main_table_local.*
+?.*Bitmap Index Scan on i_idx_local.*
+?.*
+explain select c from main_table_local;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*Bitmap Heap Scan on main_table_local.*
+?.*Bitmap Index Scan on c_idx_local.*
+?.*
+explain select x from main_table_local;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*Bitmap Heap Scan on main_table_local.*
+?.*Bitmap Index Scan on x_idx_local.*
+?.*
+--9.创建全局临时表
+create global temp table foreign_key_table_global(i int unique);
+SQL SUCCESS
+create global temp table main_table_global(i int,c varchar default 'rr',x int references foreign_key_table_global(i),unique(i));
+SQL SUCCESS
+--10.在各列上创建唯一索引
+create unique index i_idx_global on main_table_global(i);
+SQL SUCCESS
+create unique index c_idx_global on main_table_global(c);
+SQL SUCCESS
+create unique index x_idx_global on main_table_global(x);
+SQL SUCCESS
+--11.插入数据
+insert into main_table_global values(1,'dd'),(1,'ee');
+?.*ERROR: duplicate key value violates unique constraint "main_table_global_i_key"
+  Detail: Key (i)=(1) already exists.
+insert into main_table_global values(2),(3);
+?.*ERROR: duplicate key value violates unique constraint "c_idx_global"
+  Detail: Key (c)=(rr) already exists.
+insert into main_table_global values(4,'dd2',1),(5,'e2e',1);
+?.*ERROR: duplicate key value violates unique constraint "x_idx_global"
+  Detail: Key (x)=(1) already exists.
+--12.查看索引
+SET ENABLE_SEQSCAN=off;
+SQL SUCCESS
+explain select i from main_table_global;
+?.*
+?.*QUERY PLAN .*
+?.*
+?.*Bitmap Heap Scan on main_table_global.*
+?.*Bitmap Index Scan on i_idx_global.*
+?.*
+explain select c from main_table_global;
+?.*
+?.*QUERY PLAN .*
+?.*
+?.*Bitmap Heap Scan on main_table_global.*
+?.*Bitmap Index Scan on c_idx_global.*
+?.*
+explain select x from main_table_global;
+?.*
+?.*QUERY PLAN .*
+?.*
+?.*Bitmap Heap Scan on main_table_global.*
+?.*Bitmap Index Scan on x_idx_global.*
+?.*
+--tearDown
+drop table if exists foreign_key_table cascade;
+SQL SUCCESS
+drop table if exists main_table cascade;
+SQL SUCCESS
+drop table if exists foreign_key_table_local cascade;
+SQL SUCCESS
+drop table if exists main_table_local cascade;
+SQL SUCCESS
+drop table if exists foreign_key_table_global cascade;
+SQL SUCCESS
+drop table if exists main_table_global cascade;
+SQL SUCCESS

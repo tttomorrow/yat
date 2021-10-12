@@ -1,0 +1,27 @@
+-- @testpoint: 插入其他类型
+drop table if exists special_char_06;
+SQL SUCCESS
+CREATE  TABLE special_char_06 (id "char");
+SQL SUCCESS
+insert into special_char_06 values ('test');
+SQL SUCCESS
+insert into special_char_06 values (100.999);
+SQL SUCCESS
+insert into special_char_06 values (date'2020-02-02');
+SQL SUCCESS
+insert into special_char_06 values (TRUE);
+SQL SUCCESS
+insert into special_char_06 values (HEXTORAW('DEADBEEF'));
+SQL SUCCESS
+select * from special_char_06;
++----+
+| id |
++----+
+| t  |
+| 1  |
+| 2  |
+| t  |
+| D  |
++----+
+drop table if exists special_char_06;
+SQL SUCCESS

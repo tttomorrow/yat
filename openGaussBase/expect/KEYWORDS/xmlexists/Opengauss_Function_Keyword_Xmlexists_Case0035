@@ -1,0 +1,39 @@
+-- @testpoint: 关键字xmlexists，用作表名创建普通表
+drop table if exists xmlexists cascade;
+SQL SUCCESS
+create table xmlexists(id int,name varchar(20));
+SQL SUCCESS
+create or replace procedure xmlexists_insert
+as
+begin
+ for i in 1..10 loop
+    insert into xmlexists values(i,'xml+'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call xmlexists_insert();
++------------------+
+| xmlexists_insert |
++------------------+
+|                  |
++------------------+
+select * from xmlexists;
++----+--------+
+| id | name   |
++----+--------+
+| 1  | xml+1  |
+| 2  | xml+2  |
+| 3  | xml+3  |
+| 4  | xml+4  |
+| 5  | xml+5  |
+| 6  | xml+6  |
+| 7  | xml+7  |
+| 8  | xml+8  |
+| 9  | xml+9  |
+| 10 | xml+10 |
++----+--------+
+drop table if exists xmlexists cascade;
+SQL SUCCESS
+drop procedure xmlexists_insert;
+SQL SUCCESS

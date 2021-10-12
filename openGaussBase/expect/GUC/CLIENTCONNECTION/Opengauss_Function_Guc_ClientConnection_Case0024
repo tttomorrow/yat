@@ -1,0 +1,24 @@
+-- @testpoint: 设置current_schema为不存在的模式，建表，合理报错
+set current_schema to kkkurtyu;
+SQL SUCCESS
+--查询
+show current_schema;
++----------------+
+| current_schema |
++----------------+
+| kkkurtyu       |
++----------------+
+--建表，报错
+drop table if exists test_search_path024;
+SQL SUCCESS
+create table test_search_path024(id int);
+?.*ERROR: schema "kkkurtyu" does not exist
+--恢复默认
+set current_schema to public;
+SQL SUCCESS
+show current_schema;
++----------------+
+| current_schema |
++----------------+
+| public         |
++----------------+

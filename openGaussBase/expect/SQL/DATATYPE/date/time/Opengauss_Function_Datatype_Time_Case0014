@@ -1,0 +1,13 @@
+-- @testpoint: 插入特殊字符，合理报错
+DROP TABLE IF EXISTS test_time14;
+SQL SUCCESS
+CREATE TABLE test_time14 (name time);
+SQL SUCCESS
+INSERT INTO test_time14 VALUES (time 'r');
+?.*ERROR: invalid input syntax for type time: "r"
+?.*
+INSERT INTO test_time14 VALUES (time '~');
+?.*ERROR: invalid input syntax for type time: "~"
+?.*
+DROP TABLE test_time14;
+SQL SUCCESS

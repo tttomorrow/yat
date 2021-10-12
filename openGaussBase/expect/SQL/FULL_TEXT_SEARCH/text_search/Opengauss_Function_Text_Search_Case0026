@@ -1,0 +1,37 @@
+--  @testpoint:函数ts_lexize测试，多个token(资料表示ts_lexize函数支持单一token，不支持文本，待确认)
+--查看文本搜索字典记录
+select dictname,dictinitoption from PG_TS_DICT;
++-----------------+---------------------------------------------------+
+| dictname        | dictinitoption                                    |
++-----------------+---------------------------------------------------+
+| simple          |                                                   |
+| danish_stem     | language = 'danish', stopwords = 'danish'         |
+| dutch_stem      | language = 'dutch', stopwords = 'dutch'           |
+| english_stem    | language = 'english', stopwords = 'english'       |
+| finnish_stem    | language = 'finnish', stopwords = 'finnish'       |
+| french_stem     | language = 'french', stopwords = 'french'         |
+| german_stem     | language = 'german', stopwords = 'german'         |
+| hungarian_stem  | language = 'hungarian', stopwords = 'hungarian'   |
+| italian_stem    | language = 'italian', stopwords = 'italian'       |
+| norwegian_stem  | language = 'norwegian', stopwords = 'norwegian'   |
+| portuguese_stem | language = 'portuguese', stopwords = 'portuguese' |
+| romanian_stem   | language = 'romanian'                             |
+| russian_stem    | language = 'russian', stopwords = 'russian'       |
+| spanish_stem    | language = 'spanish', stopwords = 'spanish'       |
+| swedish_stem    | language = 'swedish', stopwords = 'swedish'       |
+| turkish_stem    | language = 'turkish', stopwords = 'turkish'       |
++-----------------+---------------------------------------------------+
+--函数ts_lexize用于进行词典测试，指定字典名为simple
+SELECT ts_lexize('simple', 'many stars in the sky');
++-------------------------+
+| ts_lexize               |
++-------------------------+
+| {many stars in the sky} |
++-------------------------+
+--指定字典名为english_stem，token为停用词
+SELECT ts_lexize('english_stem', 'a the fats');
++-------------+
+| ts_lexize   |
++-------------+
+| {a the fat} |
++-------------+

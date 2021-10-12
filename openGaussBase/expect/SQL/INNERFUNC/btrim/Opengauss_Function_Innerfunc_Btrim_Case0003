@@ -1,0 +1,24 @@
+-- @testpoint: 参数为空，null，空格，合理报错
+SELECT btrim(null);
++-------+
+| btrim |
++-------+
+|       |
++-------+
+select btrim('');
++-------+
+| btrim |
++-------+
+|       |
++-------+
+select btrim(' ');
++-------+
+| btrim |
++-------+
+|       |
++-------+
+select btrim();
+?.*ERROR: function btrim\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: btrim

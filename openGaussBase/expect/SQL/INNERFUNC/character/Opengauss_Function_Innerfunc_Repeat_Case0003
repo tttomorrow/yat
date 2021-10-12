@@ -1,0 +1,12 @@
+-- @testpoint: 空字符重复
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+SELECT repeat(string1,2) from type_char;
++--------+
+| repeat |
++--------+
++--------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

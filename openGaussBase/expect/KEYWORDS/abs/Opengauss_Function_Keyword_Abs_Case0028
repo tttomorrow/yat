@@ -1,0 +1,56 @@
+-- @testpoint: opengauss关键字abs(非保留)，作为同义词对象名，部分测试点合理报错
+--前置条件
+drop table if exists abs_test;
+SQL SUCCESS
+create table abs_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists abs;
+SQL SUCCESS
+create synonym abs for abs_test;
+SQL SUCCESS
+insert into abs values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update abs set abs.name='cici' where abs.id=2;
+SQL SUCCESS
+select * from abs;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--清理环境
+drop synonym if exists abs;
+SQL SUCCESS
+--关键字带双引号-成功
+drop synonym if exists "abs";
+SQL SUCCESS
+create synonym "abs" for abs_test;
+SQL SUCCESS
+insert into "abs" values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update "abs" set "abs".name='cici' where "abs".id=2;
+SQL SUCCESS
+select * from "abs";
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 1  | ada  |
+| 2  | cici |
+| 2  | cici |
++----+------+
+--清理环境
+drop synonym if exists "abs";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'abs';
+?.*ERROR: syntax error at or near "'abs'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop synonym if exists `abs`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+drop table if exists abs_test;
+SQL SUCCESS

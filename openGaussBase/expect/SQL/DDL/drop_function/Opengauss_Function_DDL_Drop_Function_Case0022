@@ -1,0 +1,56 @@
+--  @testpoint:删除重载函数不带函数参数，合理报错
+drop FUNCTION if EXISTS  package_func_overload1(col int, col2  int);
+SQL SUCCESS
+create function  package_func_overload1(col int, col2  int)
+RETURNS int
+    AS 'select $1 + $2;'
+    LANGUAGE SQL
+    RETURNS NULL ON NULL INPUT
+    package;
+/
+SQL SUCCESS
+select proname,propackage from pg_proc where proname='package_func_overload1';
++------------------------+------------+
+| proname                | propackage |
++------------------------+------------+
+| package_func_overload1 | true       |
++------------------------+------------+
+--创建同名函数
+drop FUNCTION if EXISTS  package_func_overload1(col int, col2 smallint);
+SQL SUCCESS
+create function  package_func_overload1(col int, col2 smallint)
+RETURNS int
+    AS 'select $1 + $2;'
+    LANGUAGE SQL
+    RETURNS NULL ON NULL INPUT
+    package;
+/
+SQL SUCCESS
+select proname,propackage from pg_proc where proname='package_func_overload1';
++------------------------+------------+
+| proname                | propackage |
++------------------------+------------+
+| package_func_overload1 | true       |
+| package_func_overload1 | true       |
++------------------------+------------+
+--调用函数
+call package_func_overload1(1, 1);
++------------------------+
+| package_func_overload1 |
++------------------------+
+| 2                      |
++------------------------+
+call package_func_overload1(1, 1000);
++------------------------+
+| package_func_overload1 |
++------------------------+
+| 1001                   |
++------------------------+
+--删除重载函数不带参数,合理报错
+drop function package_func_overload1;
+?.*ERROR: function package_func_overload1 asks parameters
+--删除函数带参数
+drop FUNCTION package_func_overload1(col int, col2  int);
+SQL SUCCESS
+drop FUNCTION package_func_overload1(col int, col2 smallint);
+SQL SUCCESS

@@ -1,0 +1,47 @@
+--  @testpoint:开启事务移动游标位置，参数为last，默认从当前关联位置开始，将游标移动到查询的最后一行；
+--前置条件
+drop table if exists cur_test_160;
+SQL SUCCESS
+create table cur_test_160(c_id int,c_num int,c_name varchar(10),c_city varchar(10),c_add varchar(20));
+SQL SUCCESS
+insert into cur_test_160 values(1,18,'Allen','Beijing','AAAAABAAAAA'),(2,368,'Bob','Shanghai','AAAAACAAAAA'),
+                           (3,59,'Cathy','Shenzhen','AAAAADAAAAA'),(4,96,'David','Suzhou','AAAAAEAAAAA'),
+                           (5,17,'Edrwd','Fenghuang','AAAAAFAAAAA'),(6,253,'Fendi','Changsha','AAAAAGAAAAA');
+SQL SUCCESS
+--初始位置，移动游标到查询的最后一行，提取下一行数据
+start transaction;
+SQL SUCCESS
+cursor cursor160_1 for select * from cur_test_160 order by 1;
+SQL SUCCESS
+move last from cursor160_1;
+SQL SUCCESS
+fetch from cursor160_1;
++------+-------+--------+--------+-------+
+| c_id | c_num | c_name | c_city | c_add |
++------+-------+--------+--------+-------+
++------+-------+--------+--------+-------+
+close cursor160_1;
+SQL SUCCESS
+end;
+SQL SUCCESS
+--移动游标到任意位置，再移动游标到查询的最后一行，提取上一行数据
+start transaction;
+SQL SUCCESS
+cursor cursor160_2 for select * from cur_test_160 order by 1;
+SQL SUCCESS
+move 3 from cursor160_2;
+SQL SUCCESS
+move last in cursor160_2;
+SQL SUCCESS
+fetch prior from cursor160_2;
++------+-------+--------+-----------+-------------+
+| c_id | c_num | c_name | c_city    | c_add       |
++------+-------+--------+-----------+-------------+
+| 5    | 17    | Edrwd  | Fenghuang | AAAAAFAAAAA |
++------+-------+--------+-----------+-------------+
+close cursor160_2;
+SQL SUCCESS
+end;
+SQL SUCCESS
+drop table cur_test_160;
+SQL SUCCESS

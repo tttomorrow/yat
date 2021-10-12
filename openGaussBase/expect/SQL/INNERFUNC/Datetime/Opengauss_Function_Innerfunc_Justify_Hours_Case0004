@@ -1,0 +1,21 @@
+--  @testpoint: justify_days 小数
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (clo1 interval );
+SQL SUCCESS
+insert into test_date01 values ('1 year 3.5 months 3.5 days 5.5 hours 3 m 4 s');
+SQL SUCCESS
+select justify_days(clo1) from test_date01;
++---------------------------------------------------+
+| justify_days                                      |
++---------------------------------------------------+
+| 1 years 3 mons 18 days 17 hours 33 mins 4.00 secs |
++---------------------------------------------------+
+SELECT justify_days(interval  '1 year 3.5 months 3.5 days 5.5 hours 3 m 4 s');
++---------------------------------------------------+
+| justify_days                                      |
++---------------------------------------------------+
+| 1 years 3 mons 18 days 17 hours 33 mins 4.00 secs |
++---------------------------------------------------+
+drop table if exists test_date01;
+SQL SUCCESS

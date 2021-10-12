@@ -1,0 +1,2 @@
+-- @testpoint: point函数返回圆心
+SELECT point(circle '((0,0),2.0)') AS RESULT;

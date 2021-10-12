@@ -1,0 +1,18 @@
+-- @testpoint: json类型的临时创建主键:不支持，合理报错
+--在本地临时表上建主键：不支持
+drop table if exists tab111 cascade;
+SQL SUCCESS
+create local temporary table tab111(id int,name varchar,message json primary key);
+?.*ERROR: data type json has no default operator class for access method "btree.*
+  Hint: You must specify an operator class for the index or define a default operator class for the data type.
+--在全局临时表上建主键：不支持
+drop table if exists tab1112 cascade;
+SQL SUCCESS
+create global temporary table tab1112(id int,name varchar,message json primary key);
+?.*ERROR: data type json has no default operator class for access method "btree.*
+  Hint: You must specify an operator class for the index or define a default operator class for the data type.
+--清理数据
+drop table if exists tab111 cascade;
+SQL SUCCESS
+drop table if exists tab1112 cascade;
+SQL SUCCESS

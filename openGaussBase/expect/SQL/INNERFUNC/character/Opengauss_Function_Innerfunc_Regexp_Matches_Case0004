@@ -1,0 +1,15 @@
+-- @testpoint: 参数g不使用
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('foobarbequebazilbarfbonk');
+SQL SUCCESS
+SELECT regexp_matches(string1,'(b[^b]+)(b[^b]+)') from type_char;
++----------------+
+| regexp_matches |
++----------------+
+| {bar,beque}    |
++----------------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

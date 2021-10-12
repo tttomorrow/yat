@@ -1,0 +1,74 @@
+-- @testpoint: 列存分区表创建唯一索引，修改分区属性
+
+--测试点一:创建本地唯一索引后重命名原有表分区,插入数据
+--step1:测试点一,创建列存范围分区表   expect:成功
+drop table if exists t_columns_unique_index_0063_01;
+create table t_columns_unique_index_0063_01(id1 int,id2 int,id3 int) with(orientation=column)
+partition by range(id1)
+(partition p01 values less than(1000),
+ partition p02 values less than(2000),
+ partition p03 values less than(3000),
+ partition p04 values less than(5000),
+ partition p05 values less than(6000));
+
+--step2:测试点一,创建本地唯一索引   expect:成功
+create unique index i_columns_unique_index_0063_01 on t_columns_unique_index_0063_01 using btree(id1,id2,id3) local;
+
+--step3:测试点一,重命名原有分区   expect:成功
+alter table t_columns_unique_index_0063_01 rename partition for(5000) to p03_1;
+
+--step4:测试点一,查看分区信息   expect:成功
+select relname from pg_partition
+where parentid = (select parentid from pg_partition where relname = 't_columns_unique_index_0063_01')
+and parttype = 'p' order by boundaries desc;
+
+--step5:测试点一,向新增分区插入数据   expect:成功
+insert into t_columns_unique_index_0063_01 values(generate_series(1,5999),generate_series(1,5999),generate_series(1,5999));
+
+--step6:测试点一,清理环境   expect:成功
+drop table t_columns_unique_index_0063_01 cascade;
+
+
+--测试点二:创建本地唯一索引后修改原有分区表空间,插入数据
+--step1:测试点二,创建表空间  expect:成功
+drop tablespace if exists ts_column_unqiue_index_0063_01;
+drop tablespace if exists ts_column_unqiue_index_0063_02;
+create tablespace ts_column_unqiue_index_0063_01 relative location 'tablespace/tablespace_1';
+create tablespace ts_column_unqiue_index_0063_02 relative location 'tablespace/tablespace_2';
+
+--step2:测试点二,创建列存范围分区表  expect:成功
+drop table if exists t_columns_unique_index_0063_02;
+create table t_columns_unique_index_0063_02(id1 int,id2 int,id3 int) with(orientation=column)
+partition by range(id1)
+(partition p01 values less than(1000) tablespace ts_column_unqiue_index_0063_01,
+ partition p02 values less than(2000) tablespace ts_column_unqiue_index_0063_01,
+ partition p03 values less than(3000) tablespace ts_column_unqiue_index_0063_01,
+ partition p04 values less than(5000) tablespace ts_column_unqiue_index_0063_01,
+ partition p05 values less than(6000) tablespace ts_column_unqiue_index_0063_01);
+
+--step3:测试点二,创建本地唯一索引   expect:成功
+create unique index i_columns_unique_index_0063_02 on t_columns_unique_index_0063_02 using btree(id1,id2,id3) local;
+
+--step4:测试点二,修改原有分区p04的所属表空间   expect:成功
+alter table t_columns_unique_index_0063_02 move partition p04 tablespace ts_column_unqiue_index_0063_02;
+
+--step5:测试点二,查看分区所属表空间信息   expect:成功
+select relname, spcname from pg_tablespace t join pg_partition p
+on t.oid = p.reltablespace where t.oid in
+(select distinct reltablespace from PG_PARTITION where parentid =
+(select oid from pg_class where relname='t_columns_unique_index_0063_02')) order by relname desc;
+
+--step6:测试点二,插入数据   expect:成功
+insert into t_columns_unique_index_0063_02 values(generate_series(1,5999),generate_series(1,5999),generate_series(1,5999));
+
+--step7:测试点二,清理环境   expect:成功
+drop table t_columns_unique_index_0063_02 cascade;
+drop tablespace ts_column_unqiue_index_0063_01;
+drop tablespace ts_column_unqiue_index_0063_02;
+
+
+
+
+
+
+

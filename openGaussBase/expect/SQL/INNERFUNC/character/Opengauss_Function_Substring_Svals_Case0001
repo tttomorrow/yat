@@ -1,0 +1,22 @@
+-- @testpoint: 函数svals(hstore)，获取hstore中的值
+select svals('"aa"=>"bb"');
++-------+
+| svals |
++-------+
+| bb    |
++-------+
+select svals('a=>1,b=>2');
++-------+
+| svals |
++-------+
+| 1     |
+| 2     |
++-------+
+select svals('a=>1,b=>2,c=>3');
++-------+
+| svals |
++-------+
+| 1     |
+| 2     |
+| 3     |
++-------+

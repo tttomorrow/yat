@@ -1,0 +1,32 @@
+-- @testpoint: 删除模式,合理报错
+drop schema if exists test_case007;
+SQL SUCCESS
+drop schema test_case007;
+?.*ERROR: schema "test_case007" does not exist
+create schema test_case007;
+SQL SUCCESS
+create table test_case007.i_tbl(i int);
+SQL SUCCESS
+drop schema test_case007;
+?.*ERROR: cannot drop schema test_case007 because other objects depend on it
+  Detail: table test_case007.i_tbl depends on schema test_case007
+  Hint: Use DROP ... CASCADE to drop the dependent objects too.
+drop schema test_case007 restrict;
+?.*ERROR: cannot drop schema test_case007 because other objects depend on it
+  Detail: table test_case007.i_tbl depends on schema test_case007
+  Hint: Use DROP ... CASCADE to drop the dependent objects too.
+drop schema test_case007 cascade;
+SQL SUCCESS
+create schema test_case007;
+SQL SUCCESS
+drop schema test_case007;
+SQL SUCCESS
+create schema test_case007;
+SQL SUCCESS
+drop schema test_case007 restrict;
+SQL SUCCESS
+create schema test_case007;
+SQL SUCCESS
+drop schema test_case007 cascade;
+SQL SUCCESS
+--tearDown

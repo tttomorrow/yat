@@ -1,0 +1,27 @@
+-- @testpoint: default '正常值' 对检查约束的影响，违反检查约束合理报错
+drop table if exists alter_table_tb012;
+SQL SUCCESS
+CREATE TABLE alter_table_tb012 ( a VARCHAR(255) null, b CLOB NULL, c varchar(10) default 'abc');
+SQL SUCCESS
+insert into alter_table_tb012 values('','3','4');
+SQL SUCCESS
+insert into alter_table_tb012 values('3','3',null);
+SQL SUCCESS
+ALTER TABLE alter_table_tb012 ADD  CONSTRAINT con_tb_001 check(c != '');
+SQL SUCCESS
+insert into alter_table_tb012 values('3','3','');
+SQL SUCCESS
+drop table if exists alter_table_tb012;
+SQL SUCCESS
+CREATE TABLE alter_table_tb012 ( a VARCHAR(255) null, b CLOB NULL, c varchar(10) default 'abc');
+SQL SUCCESS
+insert into alter_table_tb012 values('','3','4');
+SQL SUCCESS
+insert into alter_table_tb012 values('3','3','');
+SQL SUCCESS
+ALTER TABLE alter_table_tb012 ADD  CONSTRAINT con_tb_001 check(c ='');
+SQL SUCCESS
+insert into alter_table_tb012 values('3','3',null);
+SQL SUCCESS
+drop table if exists alter_table_tb012;
+SQL SUCCESS

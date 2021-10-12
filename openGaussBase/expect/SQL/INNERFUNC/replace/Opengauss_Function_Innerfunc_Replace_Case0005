@@ -1,0 +1,16 @@
+-- @testpoint: replace函数异常校验，合理报错
+select replace('woand') as result from sys_dummy;
+?.*ERROR: function replace\(unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: result
+select replace('woand','wo','you',null) as result from sys_dummy;
+?.*ERROR: function replace\(unknown, unknown, unknown, unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: result
+select replace() as result from sys_dummy;
+?.*ERROR: function replace\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: result

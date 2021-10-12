@@ -1,0 +1,20 @@
+--  @testpoint:插入字符串类型
+drop table if exists bigint10;
+SQL SUCCESS
+create table bigint10 (name bigint);
+SQL SUCCESS
+insert into bigint10 values ('12345678');
+SQL SUCCESS
+select * from bigint10;
++----------+
+| name     |
++----------+
+| 12345678 |
++----------+
+-----插入非整数字符，应该报错
+insert into bigint10 values ('111a222');
+?.*ERROR: invalid input syntax for type bigint: "111a222"
+?.*Position: .*
+  Where: referenced column: name
+drop table if exists bigint10;
+SQL SUCCESS

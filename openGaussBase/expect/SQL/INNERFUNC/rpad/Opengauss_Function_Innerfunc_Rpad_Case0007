@@ -1,0 +1,19 @@
+-- @testpoint: rpad函数异常测试，合理报错
+select rpad('dss','gogogo','111') from sys_dummy;
+?.*ERROR: invalid input syntax for integer: "gogogo"
+?.*
+  Where: referenced column: rpad
+select rpad(ARRAY[1,2,3],'30','111') from sys_dummy;
+?.*ERROR: function rpad\(integer\[\], unknown, unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: rpad
+select rpad('dss',13,raw) from sys_dummy;
+?.*ERROR: column "raw" does not exist
+?.*
+  Where: referenced column: rpad
+select rpad(13) from sys_dummy;
+?.*ERROR: function rpad\(integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: rpad

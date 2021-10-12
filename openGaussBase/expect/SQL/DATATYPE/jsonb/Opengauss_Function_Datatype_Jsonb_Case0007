@@ -1,0 +1,89 @@
+-- @testpoint: json格式校验：Num-json（不符合格式合理报错）
+--符合格式
+--1.正负数
+select '100'::json;
++------+
+| json |
++------+
+| 100  |
++------+
+select '-99'::json;
++------+
+| json |
++------+
+| -99  |
++------+
+--2.小数
+select '0.99'::json;
++------+
+| json |
++------+
+| 0.99 |
++------+
+select '99.99'::json;
++-------+
+| json  |
++-------+
+| 99.99 |
++-------+
+select '-0.98'::json;
++-------+
+| json  |
++-------+
+| -0.98 |
++-------+
+--3.0
+select '0'::json;
++------+
+| json |
++------+
+| 0    |
++------+
+--4.科学计数法
+select '-1.5e-5'::json;
++---------+
+| json    |
++---------+
+| -1.5e-5 |
++---------+
+--不符合格式
+--1.不支持多余的前导零
+select '007'::json;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "007" is invalid.
+?.*
+  Where: JSON data, line 1: 007
+referenced column: json
+select '00.7'::json;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "00" is invalid.
+?.*
+  Where: JSON data, line 1: 00...
+referenced column: json
+--2.正数最前面不支持加 +
+select '+100'::json;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "+" is invalid.
+?.*
+  Where: JSON data, line 1: +...
+referenced column: json
+select '+00.7'::json;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "+" is invalid.
+?.*
+  Where: JSON data, line 1: +...
+referenced column: json
+--3.不支持NaN
+select 'NaN'::json;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "NaN" is invalid.
+?.*
+  Where: JSON data, line 1: NaN
+referenced column: json
+--4.不支持infinity
+select 'infinity'::json;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "infinity" is invalid.
+?.*
+  Where: JSON data, line 1: infinity
+referenced column: json

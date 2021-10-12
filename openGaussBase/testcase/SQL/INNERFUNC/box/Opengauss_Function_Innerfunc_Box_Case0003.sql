@@ -1,0 +1,2 @@
+-- @testpoint:将多边形转换成矩形
+SELECT box(polygon '((0,0),(1,1),(2,0))') AS RESULT;

@@ -1,0 +1,57 @@
+-- @testpoint: jsonb格式校验：Str-jsonb（不符合格式合理报错）
+--符合规范(使用反斜杠转义后，数据库显示包含反斜杠)
+select '"abcdefg"'::jsonb;
++-----------+
+| jsonb     |
++-----------+
+| "abcdefg" |
++-----------+
+select '"1"'::jsonb;
++-------+
+| jsonb |
++-------+
+| "1"   |
++-------+
+select '"$$"'::jsonb;
++-------+
+| jsonb |
++-------+
+| "$$"  |
++-------+
+select '"\"$$\""'::jsonb;
++----------+
+| jsonb    |
++----------+
+| "\"$$\"" |
++----------+
+select '"[\"www@13^\", 1, {\"name\": \"john\"}, \"2\"]"'::jsonb;
++-------------------------------------------------+
+| jsonb                                           |
++-------------------------------------------------+
+| "[\"www@13^\", 1, {\"name\": \"john\"}, \"2\"]" |
++-------------------------------------------------+
+--不符合规范
+select 'abcdefg'::jsonb;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "abcdefg" is invalid.
+?.*
+  Where: JSON data, line 1: abcdefg
+referenced column: jsonb
+select '''abcdefg'''::jsonb;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "'" is invalid.
+?.*
+  Where: JSON data, line 1: '...
+referenced column: jsonb
+select '\"$$\"'::jsonb;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "\" is invalid.
+?.*
+  Where: JSON data, line 1: \...
+referenced column: jsonb
+select '"["www@13^", 1, {"name": "john"}, "2"]"'::jsonb;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "www" is invalid.
+?.*
+  Where: JSON data, line 1: "["www...
+referenced column: jsonb

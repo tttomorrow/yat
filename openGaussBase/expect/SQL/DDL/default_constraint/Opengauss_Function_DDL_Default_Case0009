@@ -1,0 +1,8 @@
+-- @testpoint: 建表未指定列名,合理报错
+drop table if exists qaz;
+SQL SUCCESS
+create table qaz(varchar not null defualt 'aaaaaaaaaaaaa');
+?.*ERROR: syntax error at or near "not null"
+?.*
+drop table qaz;
+?.*ERROR: table "qaz" does not exist

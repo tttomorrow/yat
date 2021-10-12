@@ -1,0 +1,18 @@
+-- @testpoint: 聚集函数var_pop，入参为整数
+drop table if exists t_nvl_rca_tab;
+SQL SUCCESS
+create table t_nvl_rca_tab(col_1 int);
+SQL SUCCESS
+insert into t_nvl_rca_tab values (253);
+SQL SUCCESS
+insert into t_nvl_rca_tab values (254);
+SQL SUCCESS
+insert into t_nvl_rca_tab values (255);
+SQL SUCCESS
+select var_pop(col_1) from t_nvl_rca_tab;
++------------------------+
+| var_pop                |
++------------------------+
++------------------------+
+drop table if exists t_nvl_rca_tab;
+SQL SUCCESS

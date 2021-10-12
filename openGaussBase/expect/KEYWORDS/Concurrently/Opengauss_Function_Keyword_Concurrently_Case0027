@@ -1,0 +1,32 @@
+--  @testpoint:opengauss关键字concurrently(非保留)，作为序列名
+--关键字不带引号-成功
+drop sequence if exists concurrently;
+?.*ERROR: syntax error at or near "concurrently"
+?.*
+create sequence concurrently start 100 cache 50;
+?.*ERROR: syntax error at or near "concurrently"
+?.*
+drop sequence concurrently;
+?.*ERROR: syntax error at or near "concurrently"
+?.*
+--关键字带双引号-成功
+drop sequence if exists "concurrently";
+SQL SUCCESS
+create sequence "concurrently" start 100 cache 50;
+SQL SUCCESS
+drop sequence "concurrently";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'concurrently';
+?.*ERROR: syntax error at or near "'concurrently'"
+?.*
+create sequence 'concurrently' start 100 cache 50;
+?.*ERROR: syntax error at or near "'concurrently'"
+?.*
+--关键字带反引号-合理报错
+drop sequence if exists `concurrently`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create sequence `concurrently` start 100 cache 50;
+?.*ERROR: syntax error at or near "`"
+?.*

@@ -1,0 +1,15 @@
+-- @testpoint: 参数为浮点型
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 text);
+SQL SUCCESS
+insert into type_char values (quote_nullable(5.5));
+SQL SUCCESS
+SELECT * from type_char;
++---------+
+| string1 |
++---------+
+| '5.5'   |
++---------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

@@ -1,0 +1,9 @@
+--@testpoint:删除角色
+DROP ROLE if exists manager;
+SQL SUCCESS
+DROP ROLE if exists miriam;
+SQL SUCCESS
+DROP ROLE if exists sjk;
+SQL SUCCESS
+DROP ROLE if exists jim;
+SQL SUCCESS

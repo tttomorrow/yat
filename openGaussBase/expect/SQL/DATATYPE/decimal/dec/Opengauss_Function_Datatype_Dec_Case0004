@@ -1,0 +1,23 @@
+-- @testpoint: dec数据类型转换至boolean、date，合理报错
+drop table if exists dec_04;
+SQL SUCCESS
+CREATE  TABLE dec_04 (id DEC(4,2));
+SQL SUCCESS
+insert into dec_04 values (11.11);
+SQL SUCCESS
+select * from dec_04;
++-------+
+| id    |
++-------+
+| 11.11 |
++-------+
+--修改dec数据类型为boolean
+alter table dec_04 alter column id type boolean;
+?.*ERROR: column "id" cannot be cast automatically to type boolean
+  Hint: Specify a USING expression to perform the conversion.
+--修改dec数据类型为date
+alter table dec_04 alter column id type date;
+?.*ERROR: column "id" cannot be cast automatically to type timestamp without time zone
+  Hint: Specify a USING expression to perform the conversion.
+drop table dec_04;
+SQL SUCCESS

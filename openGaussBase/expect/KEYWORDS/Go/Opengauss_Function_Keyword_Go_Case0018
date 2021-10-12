@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字Go(非保留)，作为数据库名
+--关键字不带引号-成功
+drop database if exists Go;
+SQL SUCCESS
+create database Go;
+SQL SUCCESS
+drop database Go;
+SQL SUCCESS
+--关键字带双引号-成功
+drop database if exists "Go";
+SQL SUCCESS
+create database "Go";
+SQL SUCCESS
+drop database "Go";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop database if exists 'Go';
+?.*ERROR: syntax error at or near "'Go'".*
+?.*Position.*
+create database 'Go';
+?.*ERROR: syntax error at or near "'Go'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop database if exists `Go`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create database `Go`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*

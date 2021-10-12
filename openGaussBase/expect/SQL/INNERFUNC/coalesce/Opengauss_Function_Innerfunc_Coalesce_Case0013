@@ -1,0 +1,28 @@
+-- @testpoint:创建视图
+drop table if exists t_coalesce;
+SQL SUCCESS
+create table t_coalesce(id int,numb int);
+SQL SUCCESS
+insert into t_coalesce values(1,111);
+SQL SUCCESS
+insert into t_coalesce values(2,null);
+SQL SUCCESS
+insert into t_coalesce values(3,222);
+SQL SUCCESS
+insert into t_coalesce values(4,null);
+SQL SUCCESS
+create or replace view v_t_coalesce as select numb from t_coalesce;
+SQL SUCCESS
+select coalesce(numb,0) from v_t_coalesce order by numb;
++----------+
+| coalesce |
++----------+
+| 111      |
+| 222      |
+| 0        |
+| 0        |
++----------+
+drop view v_t_coalesce;
+SQL SUCCESS
+drop table if exists t_coalesce;
+SQL SUCCESS

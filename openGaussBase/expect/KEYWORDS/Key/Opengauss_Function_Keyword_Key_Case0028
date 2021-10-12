@@ -1,0 +1,66 @@
+-- @testpoint: opengauss关键字Key(非保留)，作为同义词对象名,部分测试点合理报错
+--前置条件
+drop table if exists explain_test;
+SQL SUCCESS
+create table explain_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists Key;
+SQL SUCCESS
+create synonym Key for explain_test;
+SQL SUCCESS
+insert into Key values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update Key set Key.name='cici' where Key.id=2;
+SQL SUCCESS
+select * from Key;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--关键字带双引号-成功
+drop synonym if exists "Key";
+SQL SUCCESS
+create synonym "Key" for explain_test;
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'Key';
+?.*ERROR: syntax error at or near "'Key'".*
+?.*Position: .*
+create synonym 'Key' for explain_test;
+?.*ERROR: syntax error at or near "'Key'".*
+?.*Position: .*
+insert into 'Key' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'Key'".*
+?.*Position: .*
+update 'Key' set 'Key'.name='cici' where 'Key'.id=2;
+?.*ERROR: syntax error at or near "'Key'".*
+?.*Position: .*
+select * from 'Key';
+?.*ERROR: syntax error at or near "'Key'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop synonym if exists `Key`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create synonym `Key` for explain_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+insert into `Key` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+update `Key` set `Key`.name='cici' where `Key`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+select * from `Key`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+--清理环境
+drop synonym if exists key;
+SQL SUCCESS
+drop synonym if exists "Key";
+SQL SUCCESS
+drop table if exists explain_test;
+SQL SUCCESS

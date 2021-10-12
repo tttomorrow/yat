@@ -1,0 +1,7 @@
+# Example
+#   USER_DEFINE_VALUE: 'value1'
+#   USER_DEFAULT_VALUE2: 'value2'
+
+ZSQL_PATH: zsql
+GSQL_PATH: gsql
+

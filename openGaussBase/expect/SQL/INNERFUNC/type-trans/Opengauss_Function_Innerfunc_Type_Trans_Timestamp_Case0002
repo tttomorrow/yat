@@ -1,0 +1,20 @@
+-- @testpoint: to_timestamp(double precision)把unix纪元转换成时间戳，入参为无效值时合理报错
+select to_timestamp('0x5f');
+?.*ERROR: invalid value "5f" for "Mon".*
+  Detail: The given value did not match any of the allowed values for this field.
+  Where: referenced column: to_timestamp
+?.*ERROR: value for "DD" in source string is out of range.*
+  Where: referenced column: to_timestamp
+?.*ERROR: timestamp out of range.*
+  Where: SQL function "to_timestamp" statement 1
+referenced column: to_timestamp
+select to_timestamp(-#&%#^5);
+?.*ERROR: operator does not exist: \-\#\&\%\#\^ intege.*r
+  Hint: No operator matches the given name and argument type(s). You might need to add explicit type casts.
+?.*
+  Where: referenced column: to_timestamp
+select to_timestamp();
+?.*ERROR: function to\_timestamp\(\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: to_timestamp

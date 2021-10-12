@@ -1,0 +1,21 @@
+-- @testpoint: 插入0值
+drop table if exists smallint14;
+SQL SUCCESS
+create table smallint14 (name smallint);
+SQL SUCCESS
+insert into smallint14 values (0);
+SQL SUCCESS
+insert into smallint14 values (0);
+SQL SUCCESS
+insert into smallint14 values (0);
+SQL SUCCESS
+select * from smallint14;
++------+
+| name |
++------+
+| 0    |
+| 0    |
+| 0    |
++------+
+drop table smallint14;
+SQL SUCCESS

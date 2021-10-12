@@ -1,0 +1,53 @@
+-- @testpoint: 创建唯一索引后更新数据,合理报错
+--1.创建表
+create table test_238(i int, c char(5));
+SQL SUCCESS
+--2.创建唯一索引
+create unique index unique_idx on test_238(i,c);
+SQL SUCCESS
+--3.插入数据，无重复值
+INSERT INTO test_238 values (generate_series(1,200), 're');
+SQL SUCCESS
+--4.更新数据，具有重复值
+update test_238 set i = 2001 where i>10;
+?.*ERROR: duplicate key value violates unique constraint "unique_idx"
+  Detail: Key (i, c)=(2001, re   ) already exists.
+--5.更新数据，无重复值
+update test_238 set i = 2001 where i=10;
+SQL SUCCESS
+--6.查询
+explain select * from test_238 where i>197;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*Bitmap Heap Scan on test_238.*
+?.*Recheck Cond: \(i > 197\)?.*
+?.*Bitmap Index Scan on unique_idx.*
+?.*Index Cond: \(i > 197\).*
+?.*
+--7.删除索引
+drop index unique_idx;
+SQL SUCCESS
+--8.更新数据
+update test_238 set i = 2001 where i=11;
+SQL SUCCESS
+--9.创建唯一索引
+create unique index unique_idx on test_238(i,c);
+?.*ERROR: could not create unique index "unique_idx"
+  Detail: Key (i, c)=(2001, re   ) is duplicated.
+--10.修改重复值
+delete from test_238 where i = 2001;
+SQL SUCCESS
+--11.创建唯一索引
+create unique index unique_idx on test_238(i,c);
+SQL SUCCESS
+--12.更新数据
+update test_238 set i = 2 where i=1;
+?.*ERROR: duplicate key value violates unique constraint "unique_idx"
+  Detail: Key (i, c)=(2, re   ) already exists.
+--13.插入数据
+INSERT INTO test_238 values (1234, 're');
+SQL SUCCESS
+--tearDown
+drop table test_238 cascade;
+SQL SUCCESS

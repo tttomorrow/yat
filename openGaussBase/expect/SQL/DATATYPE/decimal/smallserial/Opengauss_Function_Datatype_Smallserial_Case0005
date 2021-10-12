@@ -1,0 +1,15 @@
+-- @testpoint: 插入左边界范围值
+drop table if exists smallserial_05;
+SQL SUCCESS
+create table smallserial_05 (name smallserial);
+SQL SUCCESS
+insert into smallserial_05 values (1);
+SQL SUCCESS
+select * from smallserial_05;
++------+
+| name |
++------+
+| 1    |
++------+
+drop table smallserial_05;
+SQL SUCCESS

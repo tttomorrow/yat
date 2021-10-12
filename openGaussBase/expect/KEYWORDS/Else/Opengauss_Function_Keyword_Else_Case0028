@@ -1,0 +1,65 @@
+-- @testpoint: opengauss关键字else(保留)，作为同义词对象名，部分测试点合理报错
+--前置条件
+drop table if exists else_test;
+SQL SUCCESS
+create table else_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-失败
+drop synonym if exists else;
+?.*ERROR: syntax error at or near "else"
+?.*Position: .*
+create synonym else for else_test;
+?.*ERROR: syntax error at or near "else"
+?.*Position: .*
+--关键字带双引号-成功
+drop synonym if exists "else";
+SQL SUCCESS
+create synonym "else" for else_test;
+SQL SUCCESS
+insert into "else" values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update "else" set "else".name='cici' where "else".id=2;
+SQL SUCCESS
+select * from "else";
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+drop synonym "else";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'else';
+?.*ERROR: syntax error at or near "'else'"
+?.*Position: .*
+create synonym 'else' for else_test;
+?.*ERROR: syntax error at or near "'else'"
+?.*Position: .*
+insert into 'else' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'else'"
+?.*Position: .*
+update 'else' set 'else'.name='cici' where 'else'.id=2;
+?.*ERROR: syntax error at or near "'else'"
+?.*Position: .*
+select * from 'else';
+?.*ERROR: syntax error at or near "'else'"
+?.*Position: .*
+--关键字带反引号-合理报错
+drop synonym if exists `else`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+create synonym `else` for else_test;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+insert into `else` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+update `else` set `else`.name='cici' where `else`.id=2;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+select * from `else`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+drop table if exists else_test;
+SQL SUCCESS

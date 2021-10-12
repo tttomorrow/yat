@@ -1,0 +1,110 @@
+-- @testpoint: timestamp类型转换
+--查询源数据类型和目标数据类型间的转化方式：
+--'e'：表示只能进行显式转化（使用CAST或::语法）。
+--'i'：表示只能进行隐式转化。
+--'a'：表示类型间同时支持隐式和显式转化。
+--转化方法：
+--'f'：使用castfunc字段中指定的函数进行转化。
+--'b'：类型间是二进制强制转化，不使用castfunc。
+select typname,proname,castcontext,castmethod from pg_cast c
+join pg_type t on t.oid=c.casttarget
+left join pg_proc p on p.oid=c.castfunc
+where c.oid in (select oid from pg_cast
+where castsource= (select oid from pg_type where typname='timestamp'));
++---------------+----------------------------+-------------+------------+
+| typname       | proname                    | castcontext | castmethod |
++---------------+----------------------------+-------------+------------+
+| abstime       | abstime                    | a           | f          |
+| date          | date                       | a           | f          |
+| time          | time                       | a           | f          |
+| timestamptz   | timestamptz                | i           | f          |
+| timestamp     | timestamp                  | i           | f          |
+| text          | timestamp_text             | i           | f          |
+| clob          | timestamp_text             | i           | f          |
+| varchar       | timestamp_varchar          | i           | f          |
+| smalldatetime | timestamp_to_smalldatetime | i           | f          |
+| nvarchar2     | to_nvarchar2               | i           | f          |
++---------------+----------------------------+-------------+------------+
+--建表
+drop table if exists test_cast_0012 cascade;
+SQL SUCCESS
+create table test_cast_0012(
+c_abstime abstime,
+c_date date,
+c_time time,
+c_timestamptz timestamptz,
+c_timestamp timestamp,
+c_text text,
+c_clob clob,
+c_varchar varchar,
+c_smalldatetime smalldatetime,
+c_nvarchar2 nvarchar2
+);
+SQL SUCCESS
+--查询转换计划
+--test point：隐式转换:success
+explain performance insert into test_cast_0012 values(
+'2020-09-29'::timestamp,
+'2020-09-29'::timestamp,
+'2020-09-29'::timestamp,
+'2020-09-29'::timestamp,
+'2020-09-29'::timestamp,
+'2020-09-29'::timestamp,
+'2020-09-29'::timestamp,
+'2020-09-29'::timestamp,
+'2020-09-29'::timestamp,
+'2020-09-29'::timestamp
+);
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*
+?.*
+?.*Output: '2020-09-29 00:00:00'::timestamp without time zone, '2020-09-29 00:00:00'::timestamp\(0\) without time zone, '00:00:00'::time without time zone, '2020-09-29 00:00:00'::timestamp without time zone, '2020-09-29 00:00:00'::timestamp without time zone, '2020-09-29 00:00:00'::text, '2020-09-29 00:00:00'::clob, '2020-09-29 00:00:00'::character varying, '2020-09-29 00:00:00'::smalldatetime, '2020-09-29 00:00:00'::nvarchar2.*
+?.*
+?.*
+?.*
+--test point：显式转换:success
+explain performance insert into test_cast_0012(c_abstime) values('2020-09-29'::timestamp::abstime);
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*
+?.*
+?.*Output: \('2020-09-29 00:00:00'::timestamp without time zone\)::abstime, NULL::timestamp without time zone, NULL::time without time zone, NULL::timestamp with time zone, NULL::timestamp without time zone, NULL::text, NULL::clob, NULL::character varying, NULL::smalldatetime, NULL::nvarchar2.*
+?.*
+?.*
+?.*
+explain performance insert into test_cast_0012(c_date) values(cast('2020-09-29'::timestamp as date));
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*
+?.*
+?.*
+?.*Output: NULL::abstime, '2020-09-29 00:00:00'::timestamp\(0\) without time zone, NULL::time without time zone, NULL::timestamp with time zone, NULL::timestamp without time zone, NULL::text, NULL::clob, NULL::character varying, NULL::smalldatetime, NULL::nvarchar2.*
+?.*
+?.*
+?.*
+explain performance insert into test_cast_0012(c_time) values('2020-09-29'::timestamp::time);
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*
+?.*
+?.*
+?.*Output: NULL::abstime, NULL::timestamp without time zone, '00:00:00'::time without time zone, NULL::timestamp with time zone, NULL::timestamp without time zone, NULL::text, NULL::clob, NULL::character varying, NULL::smalldatetime, NULL::nvarchar2.*
+?.*
+?.*
+?.*
+--清理数据
+drop table if exists test_cast_0012 cascade;
+SQL SUCCESS

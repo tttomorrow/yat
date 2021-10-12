@@ -1,0 +1,15 @@
+-- @testpoint: 被搜索字符为空
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('');
+SQL SUCCESS
+SELECT strpos(string1,'rc') from type_char;
++--------+
+| strpos |
++--------+
+|        |
++--------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

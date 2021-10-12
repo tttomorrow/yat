@@ -1,0 +1,66 @@
+-- @testpoint: opengauss关键字some(保留)，作为同义词对象名，部分测试点合理报错
+--前置条件
+drop table if exists some_test;
+SQL SUCCESS
+create table some_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-失败
+drop synonym if exists some;
+?.*ERROR: syntax error at or near "some".*
+?.*Position.*
+create synonym some for some_test;
+?.*ERROR: syntax error at or near "some".*
+?.*Position.*
+--关键字带双引号-成功
+drop synonym if exists "some";
+SQL SUCCESS
+create synonym "some" for some_test;
+SQL SUCCESS
+insert into "some" values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update "some" set "some".name='cici' where "some".id=2;
+SQL SUCCESS
+select * from "some";
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--清理环境
+drop synonym "some";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'some';
+?.*ERROR: syntax error at or near "'some'".*
+?.*Position.*
+create synonym 'some' for some_test;
+?.*ERROR: syntax error at or near "'some'".*
+?.*Position.*
+insert into 'some' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'some'".*
+?.*Position.*
+update 'some' set 'some'.name='cici' where 'some'.id=2;
+?.*ERROR: syntax error at or near "'some'".*
+?.*Position.*
+select * from 'some';
+?.*ERROR: syntax error at or near "'some'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop synonym if exists `some`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create synonym `some` for some_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+insert into `some` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+update `some` set `some`.name='cici' where `some`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+select * from `some`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+drop table if exists some_test;
+SQL SUCCESS

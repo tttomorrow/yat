@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字K非保留)，作为序列名
+--关键字不带引号-成功
+drop sequence if exists K;
+SQL SUCCESS
+create sequence K start 100 cache 50;
+SQL SUCCESS
+drop sequence K;
+SQL SUCCESS
+--关键字带双引号-成功
+drop sequence if exists "K";
+SQL SUCCESS
+create sequence "K" start 100 cache 50;
+SQL SUCCESS
+drop sequence "K";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'K';
+?.*ERROR: syntax error at or near "'K'".*
+?.*Position: .*
+create sequence 'K' start 100 cache 50;
+?.*ERROR: syntax error at or near "'K'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop sequence if exists `K`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create sequence `K` start 100 cache 50;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

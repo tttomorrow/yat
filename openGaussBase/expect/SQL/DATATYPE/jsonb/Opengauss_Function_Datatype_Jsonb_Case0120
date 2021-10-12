@@ -1,0 +1,63 @@
+-- @testpoint: 行存表使用数据类型为jsonb的列创建主外键，合理报错
+--创建行存表创建主键
+drop table if exists tab1201;
+SQL SUCCESS
+create table tab1201(id int,name varchar,message jsonb primary key);
+SQL SUCCESS
+drop table if exists tab1202;
+SQL SUCCESS
+create table tab1202(id int,name varchar,message jsonb, primary key(message));
+SQL SUCCESS
+--创建行存表创建外键:jsonb类型的列不为主键
+drop table if exists tab1203;
+SQL SUCCESS
+drop table if exists tab1204;
+SQL SUCCESS
+create table tab1203(a int primary key, b jsonb,c integer);
+SQL SUCCESS
+create table tab1204(a int, b jsonb,c integer,  foreign key(a) references  tab1203(a));
+SQL SUCCESS
+--创建行存表创建外键:jsonb类型的列为主键
+drop table if exists tab1205;
+SQL SUCCESS
+drop table if exists tab1206;
+SQL SUCCESS
+create table tab1205(a jsonb primary key, b int,c integer);
+SQL SUCCESS
+create table tab1206(a jsonb  primary key,b int,c integer,foreign key(a) references  tab1206(a));
+SQL SUCCESS
+--jsonb类型的列创建唯一约束，并创建外键
+drop table if exists tab1207;
+SQL SUCCESS
+drop table if exists tab1208;
+SQL SUCCESS
+drop table if exists tab1209;
+SQL SUCCESS
+create table tab1207(a int,b jsonb unique,c integer,foreign key(b) references  tab1206(a));
+SQL SUCCESS
+create table tab1208(a jsonb,b jsonb unique,c integer,foreign key(b) references  tab1207(b));
+SQL SUCCESS
+--jsonb类型的列无唯一约束或主键：合理报错
+drop table if exists tab1209;
+SQL SUCCESS
+create table tab1209(a int primary key, b jsonb,c integer,foreign key(a) references  tab1204(a));
+?.*ERROR: there is no unique constraint matching given keys for referenced table "tab1204.*
+--清理数据
+drop table if exists tab1201 cascade;
+SQL SUCCESS
+drop table if exists tab1202 cascade;
+SQL SUCCESS
+drop table if exists tab1203 cascade;
+SQL SUCCESS
+drop table if exists tab1204 cascade;
+SQL SUCCESS
+drop table if exists tab1205 cascade;
+SQL SUCCESS
+drop table if exists tab1206 cascade;
+SQL SUCCESS
+drop table if exists tab1207 cascade;
+SQL SUCCESS
+drop table if exists tab1208 cascade;
+SQL SUCCESS
+drop table if exists tab1209 cascade;
+SQL SUCCESS

@@ -1,0 +1,28 @@
+--  @testpoint:事务外，使用set..local SCHEMA 'schema'命令，设置schema为已存在的模式不会生效
+--创建schema
+drop schema if exists myschema;
+SQL SUCCESS
+create schema myschema;
+SQL SUCCESS
+--set local SCHEMA为myschema
+set local SCHEMA 'myschema';
+SQL SUCCESS
+--查询当前schema，还是public
+select current_schema;
++----------------+
+| current_schema |
++----------------+
+| public         |
++----------------+
+--set local schema为myschema，schema小写
+set local schema 'myschema';
+SQL SUCCESS
+--查询当前schema，还是public
+select current_schema;
++----------------+
+| current_schema |
++----------------+
+| public         |
++----------------+
+drop schema myschema;
+SQL SUCCESS

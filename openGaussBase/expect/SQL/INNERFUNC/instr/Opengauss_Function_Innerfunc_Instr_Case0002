@@ -1,0 +1,46 @@
+-- @testpoint: instr函数测试，参数为0或者负数、小数以及函数嵌套自己本身
+SELECT instr('woaiwojia','wo',1,0) AS RESULT from sys_dummy;
++--------+
+| result |
++--------+
+| 0      |
++--------+
+SELECT instr('woaiwojia','WO',1,-1) AS RESULT from sys_dummy;
++--------+
+| result |
++--------+
+| 0      |
++--------+
+SELECT instr('woaiwojia','wo',0,2) AS RESULT from sys_dummy;
++--------+
+| result |
++--------+
+| 0      |
++--------+
+--int1参数为小数，四舍五入
+SELECT instr('woaiwojia','wo',0.568,2) AS RESULT from sys_dummy;
++--------+
+| result |
++--------+
+| 5      |
++--------+
+--int2参数为小数，四舍五入
+SELECT instr('woaiwojia','wo',1,2.06754) AS RESULT from sys_dummy;
++--------+
+| result |
++--------+
+| 5      |
++--------+
+SELECT instr('woaiwojiawo','wo',1,2.96754) AS RESULT from sys_dummy;
++--------+
+| result |
++--------+
+| 10     |
++--------+
+--instr函数嵌套
+SELECT instr('woaiwojia','wo',instr('zhong','z',-1,1),instr('china','h',1,1)) AS RESULT from sys_dummy;
++--------+
+| result |
++--------+
+| 5      |
++--------+

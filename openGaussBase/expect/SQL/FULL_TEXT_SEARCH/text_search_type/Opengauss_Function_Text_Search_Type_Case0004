@@ -1,0 +1,16 @@
+--  @testpoint:文本搜索类型（tsquery无效性测试）
+--检索的词汇使用and连接（合理报错）
+SELECT 'fat and rat'::tsquery;
+?.*ERROR: syntax error in tsquery: "fat and rat"
+?.*
+  Where: referenced column: tsquery
+--检索的词汇使用and和not连接（合理报错）
+SELECT 'fat and rat and not cat'::tsquery;
+?.*ERROR: syntax error in tsquery: "fat and rat and not cat"
+?.*
+  Where: referenced column: tsquery
+--检索的词汇使用and和not以及or连接（合理报错）
+SELECT 'fat and rat and not cat or dog'::tsquery;
+?.*ERROR: syntax error in tsquery: "fat and rat and not cat or dog"
+?.*
+  Where: referenced column: tsquery

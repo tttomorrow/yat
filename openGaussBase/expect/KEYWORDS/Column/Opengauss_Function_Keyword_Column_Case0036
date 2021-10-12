@@ -1,0 +1,18 @@
+--  @testpoint:给表添加一个字段,使用add...column
+drop table if exists yy;
+SQL SUCCESS
+create table yy(id int);
+SQL SUCCESS
+alter table yy add column age int;
+SQL SUCCESS
+drop table yy;
+SQL SUCCESS
+------给表添加一个字段,使用add，不加column选项
+drop table if exists yy;
+SQL SUCCESS
+create table yy(id int);
+SQL SUCCESS
+alter table yy add  age int;
+SQL SUCCESS
+drop table yy;
+SQL SUCCESS

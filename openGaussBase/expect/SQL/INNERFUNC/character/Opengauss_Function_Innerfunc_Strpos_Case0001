@@ -1,0 +1,15 @@
+-- @testpoint: 有多个搜索字符时返回第一个位置
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('sourcerc');
+SQL SUCCESS
+SELECT strpos(string1,'rc') from type_char;
++--------+
+| strpos |
++--------+
+| 4      |
++--------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

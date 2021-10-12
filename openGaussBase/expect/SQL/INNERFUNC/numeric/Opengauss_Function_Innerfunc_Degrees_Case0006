@@ -1,0 +1,12 @@
+-- @testpoint: degrees函数与其它函数嵌套使用
+select degrees(degrees(pi()));
++--------------------+
+| degrees            |
++--------------------+
++--------------------+
+select to_clob((degrees(pi())));
++---------+
+| to_clob |
++---------+
+| 180     |
++---------+

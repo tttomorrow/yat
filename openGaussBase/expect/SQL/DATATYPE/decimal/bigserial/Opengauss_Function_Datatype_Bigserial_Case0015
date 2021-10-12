@@ -1,0 +1,27 @@
+-- @testpoint: 插入default自定义值
+drop table if exists bigserial_15;
+SQL SUCCESS
+create table bigserial_15 (name bigserial);
+SQL SUCCESS
+insert into bigserial_15 values (default);
+SQL SUCCESS
+insert into bigserial_15 values (default);
+SQL SUCCESS
+insert into bigserial_15 values (default);
+SQL SUCCESS
+insert into bigserial_15 values (default);
+SQL SUCCESS
+insert into bigserial_15 values (default);
+SQL SUCCESS
+select * from bigserial_15;
++------+
+| name |
++------+
+| 1    |
+| 2    |
+| 3    |
+| 4    |
+| 5    |
++------+
+drop table bigserial_15;
+SQL SUCCESS

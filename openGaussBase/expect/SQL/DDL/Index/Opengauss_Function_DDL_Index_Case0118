@@ -1,0 +1,38 @@
+-- @testpoint: RENAME TO：修改索引名称为索引同义词名称
+--创建表
+DROP TABLE if EXISTS test_index_table_118 CASCADE;
+SQL SUCCESS
+create table test_index_table_118(
+c_int int
+) WITH (ORIENTATION = row) ;
+SQL SUCCESS
+--建索引
+drop index if exists index_118_01;
+SQL SUCCESS
+create index index_118_01 on test_index_table_118(c_int);
+SQL SUCCESS
+select relname from pg_class where relname like 'index_118%' order by relname;
++--------------+
+| relname      |
++--------------+
+| index_118_01 |
++--------------+
+--建同义词
+drop synonym if exists syn_index_118_01;
+SQL SUCCESS
+create synonym  syn_index_118_01 for index_118_01;
+SQL SUCCESS
+--通过同义词rename
+ALTER index index_118_01 RENAME TO syn_index_118_01;
+SQL SUCCESS
+select relname from pg_class where relname like '%index_118%' order by relname;
++------------------+
+| relname          |
++------------------+
+| syn_index_118_01 |
++------------------+
+--清理环境
+drop synonym if exists syn_index_118_01;
+SQL SUCCESS
+DROP TABLE if EXISTS test_index_table_118 CASCADE;
+SQL SUCCESS

@@ -1,0 +1,2 @@
+-- @testpoint: hextoraw函数测试，参数使用多层函数嵌套
+select hextoraw(to_char(hextoraw(123231)));

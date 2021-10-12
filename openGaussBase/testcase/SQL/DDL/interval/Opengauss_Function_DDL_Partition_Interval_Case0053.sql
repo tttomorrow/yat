@@ -1,0 +1,35 @@
+-- @testpoint: interval分区,创建分区表索引：GLOBAL索引,最多支持31列，超过时合理报错
+drop index if exists global_idx_3;
+drop index if exists global_idx_4;
+drop table if exists table1;
+
+create table table1(
+col_1 float,col_2 float,col_3 float,col_4 date,col_5 float,col_6 float,
+col_7 float,col_8 float,col_9 float,col_10 float,col_11 float,col_12 float,
+col_13 float,col_14 float,col_15 float,col_16 float,col_17 float,
+col_18 float,col_19 float,col_20 float,col_21 float,col_22 float,
+col_23 float,col_24 float,col_25 float,col_26 float,col_27 float,
+col_28 float,col_29 float,col_30 float,col_31 float,col_32 float
+)
+partition by range (col_4)
+interval ('1 month')
+(
+	partition table1_p1 values less than ('2020-03-01'),
+	partition table1_p2 values less than ('2020-04-01'),
+	partition table1_p3 values less than ('2020-05-01')
+);
+
+create index global_idx_3 on table1(col_1,col_2,col_3,col_4,col_5,
+col_6,col_7,col_8,col_9,col_10,col_11,col_12,col_13,col_14,col_15,
+col_16,col_17,col_18,col_19,col_20,col_21,col_22,col_23,col_24,
+col_25,col_26,col_27,col_28,col_29,col_30,col_31) global;
+
+--创建global分区索引,列数为32列，合理报错
+create index global_idx_4 on table1(col_1,col_2,col_3,col_4,col_5,
+col_6,col_7,col_8,col_9,col_10,col_11,col_12,col_13,col_14,col_15,
+col_16,col_17,col_18,col_19,col_20,col_21,col_22,col_23,col_24,
+col_25,col_26,col_27,col_28,col_29,col_30,col_31,col_32) global;
+
+drop index if exists global_idx_3;
+drop index if exists global_idx_4;
+drop table if exists table1;

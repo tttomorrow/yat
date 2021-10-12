@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字Inherit(非保留)，作为模式名
+--关键字不带引号-成功
+drop schema if exists Inherit;
+SQL SUCCESS
+create schema Inherit;
+SQL SUCCESS
+drop schema Inherit;
+SQL SUCCESS
+--关键字带双引号-成功
+drop schema if exists "Inherit";
+SQL SUCCESS
+create schema "Inherit";
+SQL SUCCESS
+drop schema "Inherit";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop schema if exists 'Inherit';
+?.*ERROR: syntax error at or near "'Inherit'".*
+?.*Position: .*
+create schema 'Inherit';
+?.*ERROR: syntax error at or near "'Inherit'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop schema if exists `Inherit`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create schema `Inherit`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

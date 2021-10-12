@@ -1,0 +1,100 @@
+-- @testpoint: jsonb操作符：#>获取在指定路径的JSON对象，路径不存在则返回空，输入不合理时，合理报错
+--合理输入1.左侧输入值为object-jsonb类型，右侧为text[]类型
+select '{"a": {"b":{"c":{"a":"b"}}}}'::jsonb #> (select '{a,b}'::text[]);
++-------------------+
+| ?column?          |
++-------------------+
+| {"c": {"a": "b"}} |
++-------------------+
+select '{"a": "b","a":{"a":{"b":88}}}'::jsonb #> '{a}';
++------------------+
+| ?column?         |
++------------------+
+| {"a": {"b": 88}} |
++------------------+
+select '{"a": {"b":{"a":{"b":{"a":{"b":88}}}}}}'::jsonb #> '{b,a}';
++----------+
+| ?column? |
++----------+
+|          |
++----------+
+select '{"a":"b","a":{"a":{"b":88}},"a":{"a":{"b":99}}}'::jsonb #> '{a}';
++------------------+
+| ?column?         |
++------------------+
+| {"a": {"b": 99}} |
++------------------+
+select '{"a":"b","a":{"a":{"b":88}},"a":{"a":{"b":99}}}'::jsonb #>'{a:b}';
++----------+
+| ?column? |
++----------+
+|          |
++----------+
+--合理输入2.左侧输入值为array-jsonb类型，右侧为text[]类型
+select '[1, 2, "foo", null]'::jsonb #>'{2}';
++----------+
+| ?column? |
++----------+
+| "foo"    |
++----------+
+select '[null, 2, "foo", {"b":88}]'::jsonb #>'{3}';
++-----------+
+| ?column?  |
++-----------+
+| {"b": 88} |
++-----------+
+select '[null, 2, "foo", {"b":88}]'::jsonb #>'{2.6}';
++----------+
+| ?column? |
++----------+
+|          |
++----------+
+select '["a","foo","b","bar","c","baz"]'::jsonb #> '{a}';
++----------+
+| ?column? |
++----------+
+|          |
++----------+
+--不合理输入1.左侧输入值为非container-jsonb类型，右侧为text[]类型
+select '"a","foo","b","bar","c","baz"'::jsonb #> '{b,a}';
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Expected end of input, but found ",".
+?.*
+  Where: JSON data, line 1: "a",...
+select '138,852,1323'::jsonb #>(select '{a,b}'::text[]);
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Expected end of input, but found ",".
+?.*
+  Where: JSON data, line 1: 138,...
+select '138'::jsonb #> '{138}';
+?.*ERROR: cannot call extract path from a scala.*
+select '"ALL"'::jsonb #> '{A}';
+?.*ERROR: cannot call extract path from a scala.*
+select 'null'::jsonb #>'{n}';
+?.*ERROR: cannot call extract path from a scala.*
+select 'true'::jsonb #>'{t,f}';
+?.*ERROR: cannot call extract path from a scala.*
+--不合理输入2.左侧输入值为非container-jsonb类型，右侧为非text[]类型
+select '"a","foo","b","bar","c","baz"'::json #> 'a';
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Expected end of input, but found ",".
+?.*
+  Where: JSON data, line 1: "a",...
+select '138,852,1323'::jsonb #>2;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Expected end of input, but found ",".
+?.*
+  Where: JSON data, line 1: 138,...
+select '138'::jsonb #> '8';
+?.*ERROR: array value must start with "\{" or dimension informatio.*
+?.*
+select '"ALL"'::jsonb #>(select '"all"'::json);
+?.*ERROR: operator does not exist: jsonb #> json.*
+  Hint: No operator matches the given name and argument type(s). You might need to add explicit type casts.
+?.*
+select 'null'::jsonb #>'""';
+?.*ERROR: array value must start with "\{" or dimension informatio.*
+?.*
+select 'true'::jsonb #>'0';
+?.*ERROR: array value must start with "\{" or dimension informatio.*
+?.*

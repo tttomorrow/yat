@@ -1,0 +1,13 @@
+-- @testpoint: char_length函数入参给不加单引号的字符串
+select char_length($$jjslf$$);
++-------------+
+| char_length |
++-------------+
+| 5           |
++-------------+
+select char_length($$jj' 'slf$$);
++-------------+
+| char_length |
++-------------+
+| 8           |
++-------------+

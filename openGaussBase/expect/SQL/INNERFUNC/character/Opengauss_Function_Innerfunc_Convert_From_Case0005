@@ -1,0 +1,16 @@
+-- @testpoint: 缺参数，合理报错
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values (convert_from('是sA@#123'));
+?.*ERROR: function convert_from\(unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+SELECT * from type_char;
++---------+
+| string1 |
++---------+
++---------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

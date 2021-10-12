@@ -1,0 +1,65 @@
+-- @testpoint: opengauss关键字view(非保留)，作为同义词对象名，部分测试点合理报错
+--前置条件
+drop table if exists explain_test;
+SQL SUCCESS
+create table explain_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists view;
+SQL SUCCESS
+create synonym view for explain_test;
+SQL SUCCESS
+insert into view values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update view set view.name='cici' where view.id=2;
+SQL SUCCESS
+select * from view;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+drop synonym if exists view;
+SQL SUCCESS
+--关键字带双引号-成功
+drop synonym if exists "view";
+SQL SUCCESS
+create synonym "view" for explain_test;
+SQL SUCCESS
+drop synonym if exists "view";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'view';
+?.*ERROR: syntax error at or near "'view'".*
+?.*Position: .*
+create synonym 'view' for explain_test;
+?.*ERROR: syntax error at or near "'view'".*
+?.*Position: .*
+insert into 'view' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'view'".*
+?.*Position: .*
+update 'view' set 'view'.name='cici' where 'view'.id=2;
+?.*ERROR: syntax error at or near "'view'".*
+?.*Position: .*
+select * from 'view';
+?.*ERROR: syntax error at or near "'view'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop synonym if exists `view`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create synonym `view` for explain_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+insert into `view` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+update `view` set `view`.name='cici' where `view`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+select * from `view`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+drop table if exists explain_test;
+SQL SUCCESS

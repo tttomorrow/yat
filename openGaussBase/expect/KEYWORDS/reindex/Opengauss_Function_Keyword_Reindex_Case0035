@@ -1,0 +1,27 @@
+--  @testpoint:opengauss关键字reindex(非保留),为表中的数据重建索引
+drop schema if exists tpcds;
+SQL SUCCESS
+create schema tpcds;
+SQL SUCCESS
+CREATE TABLE tpcds.customer_t1
+(
+    c_customer_sk             integer               not null,
+    c_customer_id             char(16)              not null
+)
+WITH (orientation = row);
+SQL SUCCESS
+CREATE INDEX tpcds_customer_index1 ON tpcds.customer_t1 (c_customer_sk);
+SQL SUCCESS
+INSERT INTO  tpcds.customer_t1 values(1,'zhangsan');
+SQL SUCCESS
+--重建一个单独索引。
+REINDEX INDEX tpcds.tpcds_customer_index1;
+SQL SUCCESS
+--重建表tpcds.customer_t1上的所有索引。
+REINDEX TABLE tpcds.customer_t1;
+SQL SUCCESS
+--删除tpcds.customer_t1表。
+DROP TABLE tpcds.customer_t1;
+SQL SUCCESS
+DROP schema tpcds;
+SQL SUCCESS

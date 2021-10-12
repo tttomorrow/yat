@@ -1,0 +1,25 @@
+-- @testpoint: 验证匿名块内变量是否区分大小写
+
+drop table if exists emp;
+create table emp
+       (empno number(4) not null,
+        ename varchar2(10),
+        job varchar2(9),
+        mgr number(4),
+        hiredate date,
+        sal number(7, 2),
+        comm number(7, 2),
+        deptno number(2));
+insert into emp values
+        (7369, 'smith',  'clerk',     7902,
+        to_date('17-dec-1980', 'dd-mon-yyyy'),  800, null, 20);
+
+declare 
+	v_job varchar(9);
+begin 
+	select job into v_job from emp where ename='smith';
+	raise info ':%',v_job;
+end;
+/
+
+drop table emp;

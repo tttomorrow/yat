@@ -1,0 +1,12 @@
+--  @testpoint:验证cast函数是否能够将日期类型转为字符型
+drop table if exists TEST1;
+SQL SUCCESS
+create table TEST1( riqi date);
+SQL SUCCESS
+insert into TEST1 values(to_date('2018-08-15 17:27:39','yyyy-mm-dd hh24:mi:ss'));
+SQL SUCCESS
+select cast(riqi as signed char) from TEST1;
+?.*ERROR: syntax error at or near "char"
+?.*Position: .*
+drop table  TEST1;
+SQL SUCCESS

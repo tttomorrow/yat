@@ -1,0 +1,11 @@
+-- @testpoint: 插入非法空值，合理报错
+drop table if exists test_uuid_05;
+SQL SUCCESS
+create table test_uuid_05 (c1 int,c2 uuid);
+SQL SUCCESS
+insert into test_uuid_05 values (1,' ');
+?.*ERROR: invalid input syntax for uuid: " "
+?.*
+  Where: referenced column: c2
+drop table test_uuid_05;
+SQL SUCCESS

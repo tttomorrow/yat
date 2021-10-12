@@ -1,0 +1,30 @@
+-- @testpoint: opengauss关键字verbose(保留)，作为角色名 合理报错
+--关键字不带引号-合理报错
+drop role if exists verbose;
+?.*ERROR: syntax error at or near "verbose"
+?.*Position: .*
+create role verbose with password 'gauss@123' valid until '2020-12-31';
+?.*ERROR: syntax error at or near "verbose"
+?.*Position: .*
+--关键字带双引号-成功
+drop role if exists "verbose";
+SQL SUCCESS
+create role "verbose" with password 'gauss@123' valid until '2020-12-31';
+SQL SUCCESS
+--清理环境
+drop role "verbose";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop role if exists 'verbose';
+?.*ERROR: syntax error at or near "'verbose'"
+?.*Position: .*
+create role 'verbose' with password 'gauss@123' valid until '2020-12-31';
+?.*ERROR: syntax error at or near "'verbose'"
+?.*Position: .*
+--关键字带反引号-合理报错
+drop role if exists `verbose`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+create role `verbose` with password 'gauss@123' valid until '2020-12-31';
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*

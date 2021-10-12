@@ -1,0 +1,60 @@
+-- @testpoint: 创建普通list分区表，结合视图
+--创建list分区表
+drop table if exists partition_list_tab;
+SQL SUCCESS
+create table partition_list_tab(p_id int,p_name varchar,p_age int)
+partition by list(p_id)
+(partition p0 values(0),
+ partition p1 values(10),
+ partition p2 values(20),
+ partition p3 values(30),
+ partition p4 values(40));
+SQL SUCCESS
+--创建视图
+drop view if exists partition_view;
+SQL SUCCESS
+create view partition_view as select * from partition_list_tab where p_id != 20;
+SQL SUCCESS
+--向分区表中插入数据
+create or replace procedure insert_partition_list()
+as
+insert_str varchar;
+begin
+    for i in 0..5 loop
+        insert_str = 'insert into partition_list_tab values(10),(20),(30);';
+        execute immediate insert_str;
+    end loop;
+end;
+/
+SQL SUCCESS
+call insert_partition_list();
++-----------------------+
+| insert_partition_list |
++-----------------------+
+|                       |
++-----------------------+
+--查看视图中的数据
+select * from partition_view order by p_id asc;
++------+--------+-------+
+| p_id | p_name | p_age |
++------+--------+-------+
+| 10   |        |       |
+| 10   |        |       |
+| 10   |        |       |
+| 10   |        |       |
+| 10   |        |       |
+| 10   |        |       |
+| 30   |        |       |
+| 30   |        |       |
+| 30   |        |       |
+| 30   |        |       |
+| 30   |        |       |
+| 30   |        |       |
++------+--------+-------+
+--清理环境
+drop view partition_view;
+SQL SUCCESS
+drop table partition_list_tab cascade;
+SQL SUCCESS
+drop procedure if exists insert_partition_list;
+SQL SUCCESS

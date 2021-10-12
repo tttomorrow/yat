@@ -1,0 +1,65 @@
+-- @testpoint: opengauss关键字diagnostics(非保留)，作为同义词对象名，部分测试点合理报错
+--前置条件
+drop table if exists diagnostics_test;
+SQL SUCCESS
+create table diagnostics_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists diagnostics;
+SQL SUCCESS
+create synonym diagnostics for diagnostics_test;
+SQL SUCCESS
+insert into diagnostics values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update diagnostics set diagnostics.name='cici' where diagnostics.id=2;
+SQL SUCCESS
+select * from diagnostics;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+drop synonym if exists diagnostics;
+SQL SUCCESS
+--关键字带双引号-成功
+drop synonym if exists "diagnostics";
+SQL SUCCESS
+create synonym "diagnostics" for diagnostics_test;
+SQL SUCCESS
+drop synonym if exists "diagnostics";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'diagnostics';
+?.*ERROR: syntax error at or near "'diagnostics'"
+?.*
+create synonym 'diagnostics' for diagnostics_test;
+?.*ERROR: syntax error at or near "'diagnostics'"
+?.*
+insert into 'diagnostics' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'diagnostics'"
+?.*
+update 'diagnostics' set 'diagnostics'.name='cici' where 'diagnostics'.id=2;
+?.*ERROR: syntax error at or near "'diagnostics'"
+?.*
+select * from 'diagnostics';
+?.*ERROR: syntax error at or near "'diagnostics'"
+?.*
+--关键字带反引号-合理报错
+drop synonym if exists `diagnostics`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create synonym `diagnostics` for diagnostics_test;
+?.*ERROR: syntax error at or near "`"
+?.*
+insert into `diagnostics` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`"
+?.*
+update `diagnostics` set `diagnostics`.name='cici' where `diagnostics`.id=2;
+?.*ERROR: syntax error at or near "`"
+?.*
+select * from `diagnostics`;
+?.*ERROR: syntax error at or near "`"
+?.*
+drop table if exists diagnostics_test;
+SQL SUCCESS

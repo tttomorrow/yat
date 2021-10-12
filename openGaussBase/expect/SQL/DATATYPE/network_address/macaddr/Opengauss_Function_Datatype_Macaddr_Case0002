@@ -1,0 +1,27 @@
+-- @testpoint: 插入无效MAC类型值，合理报错
+drop table if exists test_macaddr_02;
+SQL SUCCESS
+create table test_macaddr_02(type macaddr);
+SQL SUCCESS
+insert into test_macaddr_02 values('08:00:2b:01:02:0W');
+?.*ERROR: invalid input syntax for type macaddr: "08:00:2b:01:02:0W"
+?.*
+  Where: referenced column: type
+insert into test_macaddr_02 values('08-00-2b-01-02-0@');
+?.*ERROR: invalid input syntax for type macaddr: "08-00-2b-01-02-0@"
+?.*
+  Where: referenced column: type
+insert into test_macaddr_02 values('08002b:01020#');
+?.*ERROR: invalid input syntax for type macaddr: "08002b:01020#"
+?.*
+  Where: referenced column: type
+insert into test_macaddr_02 values('08002b-010W03');
+?.*ERROR: invalid input syntax for type macaddr: "08002b-010W03"
+?.*
+  Where: referenced column: type
+insert into test_macaddr_02 values('0800.2bW1.0203');
+?.*ERROR: invalid input syntax for type macaddr: "0800.2bW1.0203"
+?.*
+  Where: referenced column: type
+drop table test_macaddr_02;
+SQL SUCCESS

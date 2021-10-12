@@ -1,0 +1,17 @@
+-- @testpoint: pg_stat_get_db_stat_reset_time(oid)函数的异常校验，合理报错
+-- 调用函数pg_stat_reset重置，给空值、特殊字符（oid不存在）
+select pg_stat_reset();
++---------------+
+| pg_stat_reset |
++---------------+
+|               |
++---------------+
+select pg_stat_get_db_stat_reset_time('*&^%');
+?.*ERROR: invalid input syntax for type oid: \"\*\&\^\%\"
+?.*
+  Where: referenced column: pg_stat_get_db_stat_reset_time
+select pg_stat_get_db_stat_reset_time();
+?.*ERROR: function pg_stat_get_db_stat_reset_time\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_stat_get_db_stat_reset_time

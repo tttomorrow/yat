@@ -1,0 +1,19 @@
+-- @testpoint: octet_length函数输入值为null,空格，空字符
+SELECT octet_length(null);
++--------------+
+| octet_length |
++--------------+
+|              |
++--------------+
+SELECT octet_length(' ');
++--------------+
+| octet_length |
++--------------+
+| 1            |
++--------------+
+SELECT octet_length('');
++--------------+
+| octet_length |
++--------------+
+|              |
++--------------+

@@ -1,0 +1,7 @@
+-- @testpoint: extract(field from interval)从给定的时间戳里获取月份的值。如果大于12，则取与12的模
+select extract(month from interval '2 years 3 months') from sys_dummy;
++-----------+
+| date_part |
++-----------+
+| 3.0       |
++-----------+

@@ -1,0 +1,57 @@
+-- @testpoint: 行存表使用数据类型为json的列创建索引:不支持gist索引，合理报错
+--行存表：创建索引
+drop table if exists tab107;
+SQL SUCCESS
+create table tab107(id int,name varchar,message json);
+SQL SUCCESS
+insert into tab107 values(001,'Jane','{"age":18,"city":"xianyang"}');
+SQL SUCCESS
+insert into tab107 values(012,'Joy','{"age":19,"city":"qingdao"}');
+SQL SUCCESS
+insert into tab107 values(023,'Jack','{"age":20,"city":"xiamen"}');
+SQL SUCCESS
+insert into tab107 values(004,'Json','{"age":23,"city":"shenzhen"}');
+SQL SUCCESS
+insert into tab107 values(005,'Jim','{"age":21,"city":"shanghai"}');
+SQL SUCCESS
+select * from  tab107;
++----+------+------------------------------+
+| id | name | message                      |
++----+------+------------------------------+
+| 1  | Jane | {"age":18,"city":"xianyang"} |
+| 12 | Joy  | {"age":19,"city":"qingdao"}  |
+| 23 | Jack | {"age":20,"city":"xiamen"}   |
+| 4  | Json | {"age":23,"city":"shenzhen"} |
+| 5  | Jim  | {"age":21,"city":"shanghai"} |
++----+------+------------------------------+
+drop index if exists index1071;
+SQL SUCCESS
+drop index if exists index1072;
+SQL SUCCESS
+drop index if exists index1073;
+SQL SUCCESS
+drop index if exists index1074;
+SQL SUCCESS
+create index index1071 on tab107(message);
+?.*ERROR: data type json has no default operator class for access method "btree.*
+  Hint: You must specify an operator class for the index or define a default operator class for the data type.
+create index index1072 on tab107 using gist(message);
+?.*ERROR: data type json has no default operator class for access method "gist.*
+  Hint: You must specify an operator class for the index or define a default operator class for the data type.
+create index index1073 on tab107 using gin(message);
+?.*ERROR: data type json has no default operator class for access method "gin.*
+  Hint: You must specify an operator class for the index or define a default operator class for the data type.
+create unique index index1074 on tab107 using btree(message asc);
+?.*ERROR: data type json has no default operator class for access method "btree.*
+  Hint: You must specify an operator class for the index or define a default operator class for the data type.
+--清理数据
+drop index if exists index1071;
+SQL SUCCESS
+drop index if exists index1072;
+SQL SUCCESS
+drop index if exists index1073;
+SQL SUCCESS
+drop index if exists index1074;
+SQL SUCCESS
+drop table if exists tab107 cascade;
+SQL SUCCESS

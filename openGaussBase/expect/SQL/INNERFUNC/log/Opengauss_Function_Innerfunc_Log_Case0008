@@ -1,0 +1,14 @@
+-- @testpoint: log函数入参给numeric类型
+drop table if exists LOG_004;
+SQL SUCCESS
+create table LOG_004(COL_LOG numeric);
+SQL SUCCESS
+insert into LOG_004 values(100.0);
+SQL SUCCESS
+select log(COL_LOG) as RESULT from LOG_004;
++--------------------+
+| result             |
++--------------------+
++--------------------+
+drop table if exists LOG_004;
+SQL SUCCESS

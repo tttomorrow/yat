@@ -1,0 +1,42 @@
+-- @testpoint: 打印rowtype类型的变量
+drop table if exists emp;
+SQL SUCCESS
+create table emp(empno int,ename varchar(10),job varchar(10) ,sal integer);
+SQL SUCCESS
+insert into emp values(1,'zhangsan','doctor1',10000),(2,'zhangsan2','doctor2',10000),(123,'zhangsan3','doctor3',10000);
+SQL SUCCESS
+insert into emp values(1,'zhansi','doctor1',10000),(2,'lisiabc','doctor2',10000),(123,'zhangwu123','doctor3',10000);
+SQL SUCCESS
+insert into emp values(10,'abc','worker',9000);
+SQL SUCCESS
+insert into emp values(716,'ZHANGSAN','leader',20000);
+SQL SUCCESS
+create or replace procedure syscur_013()
+is
+declare
+    c_empno varchar2(20);
+    c_empno1 emp%rowtype;
+    cursor mycursor is  select * from emp where job='worker';
+begin
+    c_empno :='ch';
+    open mycursor;
+    fetch mycursor into c_empno1;
+    if  mycursor%found  then
+        raise info 'c_empno is emp:%',c_empno;
+        raise info 'c_empno1 is emp:%',c_empno1;
+        raise info ':%',mycursor%rowcount;
+    end if;
+    close mycursor;
+end;
+/
+SQL SUCCESS
+call syscur_013();
++------------+
+| syscur_013 |
++------------+
+|            |
++------------+
+drop table emp;
+SQL SUCCESS
+drop procedure syscur_013;
+SQL SUCCESS

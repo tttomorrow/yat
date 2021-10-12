@@ -1,0 +1,48 @@
+-- @testpoint: to_timestamp(text, text)字符串类型的值转换为指定格式的时间戳，入参为无效值时合理报错
+-- 年份特殊值
+select to_timestamp('12-sep-0000', 'dd mon yyyy');
+?.*ERROR: invalid data for "year =  0" ,value must be between 1 and 9999, and not be 0.*
+  Where: referenced column: to_timestamp
+select to_timestamp('12-sep-0', 'dd mon yyyy');
+?.*ERROR: invalid data for "year =  0" ,value must be between 1 and 9999, and not be 0.*
+  Where: referenced column: to_timestamp
+select to_timestamp('12-sep--2014', 'dd mon yyyy');
+?.*ERROR: invalid data for "year =  -2014" ,value must be between 1 and 9999, and not be 0.*
+  Where: referenced column: to_timestamp
+-- 不匹配  14小时对应hh12
+select to_timestamp('12-sep-10 14:10:10.123000','dd-mon-yyy hh12:mi:ss.ff');
+?.*ERROR: invalid data for "hour =  14" ,value must be between 1 and 12.*
+  Where: referenced column: to_timestamp
+select to_timestamp('12-sep-14','ddd-mon-yyy');
+?.*ERROR: month conflicts with days of year.*
+  Where: referenced column: to_timestamp
+select to_timestamp('05 dec 2000', 'dd month yyyy');
+?.*ERROR: invalid value "Dec 2000" for "month".*
+  Detail: The given value did not match any of the allowed values for this field.
+  Where: referenced column: to_timestamp
+select to_timestamp('5009 dec -2000', 'dd mon yyyy');
+?.*ERROR: invalid data for "day of month =  5009" ,value must be between 1 and 31.*
+  Where: referenced column: to_timestamp
+--修改默认时间戳格式
+set nls_timestamp_format to 'dd-month-yy hh:mi:ss.ff am';
+SQL SUCCESS
+select to_timestamp('12-sep-2014');
+?.*ERROR: invalid value "Sep-2014" for "month".*
+  Detail: The given value did not match any of the allowed values for this field.
+  Where: referenced column: to_timestamp
+select to_timestamp('12-september-14');
++-------------------------------+
+| to_timestamp                  |
++-------------------------------+
++-------------------------------+
+set nls_timestamp_format to 'dd-mon-yyyy hh:mi:ss.ff am';
+SQL SUCCESS
+select to_timestamp('12-september-14');
+?.*ERROR: invalid value "embe" for "yyyy".*
+  Detail: Value must be an integer.
+  Where: referenced column: to_timestamp
+select to_timestamp('12-sep-2014');
++-------------------------------+
+| to_timestamp                  |
++-------------------------------+
++-------------------------------+

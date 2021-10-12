@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字match(非保留)，作为用户组名
+--关键字不带引号-成功
+drop group if exists match;
+SQL SUCCESS
+create group match with password 'gauss@123';
+SQL SUCCESS
+drop group match;
+SQL SUCCESS
+--关键字带双引号-成功
+drop group if exists "match";
+SQL SUCCESS
+create group "match" with password 'gauss@123';
+SQL SUCCESS
+drop group "match";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop group if exists 'match';
+?.*ERROR: syntax error at or near "'match'".*
+?.*Position: .*
+create group 'match' with password 'gauss@123';
+?.*ERROR: syntax error at or near "'match'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop group if exists `match`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create group `match` with password 'gauss@123';
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

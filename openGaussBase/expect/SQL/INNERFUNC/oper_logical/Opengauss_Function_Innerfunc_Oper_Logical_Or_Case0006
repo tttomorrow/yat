@@ -1,0 +1,21 @@
+-- @testpoint: opengauss逻辑操作符OR,运算的交换性
+drop table if exists ts_zhparser;
+SQL SUCCESS
+CREATE TABLE ts_zhparser(id int, index int);
+SQL SUCCESS
+INSERT INTO ts_zhparser VALUES(2, 100);
+SQL SUCCESS
+select * from ts_zhparser where id >1 OR index>120;
++----+-------+
+| id | index |
++----+-------+
+| 2  | 100   |
++----+-------+
+select * from ts_zhparser where index>120 OR id >1;
++----+-------+
+| id | index |
++----+-------+
+| 2  | 100   |
++----+-------+
+drop table if exists ts_zhparser;
+SQL SUCCESS

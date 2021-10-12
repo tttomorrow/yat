@@ -1,0 +1,10 @@
+-- @testpoint: 转换字符为二进制再转换为文本数据，参数不添加引号，合理报错
+SELECT encode(test,'base64');
+?.*ERROR: column "test" does not exist.*
+?.*Position:.*
+  Where: referenced column: encode
+SELECT encode(11010011, 'base64');
+?.*ERROR: function encode\(integer, unknown\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position:.*
+  Where: referenced column: encode

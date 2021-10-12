@@ -1,0 +1,62 @@
+-- @testpoint: jsonb额外支持操作函数：jsonb_hash(遍历json结构和数据，计算出来一个hash值),不合理入参，合理报错
+--合理入参
+select jsonb_hash('"abcdefg"');
++-------------+
+| jsonb_hash  |
++-------------+
++-------------+
+select jsonb_hash('true');
++-------------+
+| jsonb_hash  |
++-------------+
++-------------+
+select jsonb_hash('null');
++-------------+
+| jsonb_hash  |
++-------------+
++-------------+
+select jsonb_hash('100.6');
++-------------+
+| jsonb_hash  |
++-------------+
++-------------+
+select jsonb_hash('-100.99');
++-------------+
+| jsonb_hash  |
++-------------+
++-------------+
+select jsonb_hash('{"false":0}');
++------------+
+| jsonb_hash |
++------------+
++------------+
+select jsonb_hash('[{"false":0},100,null,true,"qwert"]');
++------------+
+| jsonb_hash |
++------------+
+| -30755660  |
++------------+
+--不合理入参
+select jsonb_hash('abcdefg');
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "abcdefg" is invalid.
+?.*
+  Where: JSON data, line 1: abcdefg
+referenced column: jsonb_hash
+select jsonb_hash('123','-852.36','235.6');
+?.*ERROR: function jsonb_hash\(unknown, unknown, unknown\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: jsonb_hash
+select jsonb_hash('abcdefg,qwee,qaz');
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "abcdefg" is invalid.
+?.*
+  Where: JSON data, line 1: abcdefg...
+referenced column: jsonb_hash
+select jsonb_hash('[{"false":0},100,null,true,qwert]');
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "qwert" is invalid.
+?.*
+  Where: JSON data, line 1: [{"false":0},100,null,true,qwert...
+referenced column: jsonb_hash

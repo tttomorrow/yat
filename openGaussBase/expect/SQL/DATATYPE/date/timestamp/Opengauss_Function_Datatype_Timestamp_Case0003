@@ -1,0 +1,11 @@
+-- @testpoint: timestamp日期类型相加，合理报错
+DROP TABLE IF EXISTS test_timestamp03;
+SQL SUCCESS
+CREATE TABLE test_timestamp03 (name timestamp);
+SQL SUCCESS
+insert into  test_timestamp03 values (timestamp '2018-09-17' +  timestamp '2018-09-16');
+?.*ERROR: operator does not exist: timestamp without time zone \+ timestamp without time zone
+  Hint: No operator matches the given name and argument type(s). You might need to add explicit type casts.
+?.*
+DROP TABLE IF EXISTS test_timestamp03;
+SQL SUCCESS

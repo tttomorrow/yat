@@ -1,0 +1,12 @@
+-- @testpoint: set方法设置参数enable_online_ddl_waitlock，合理报错
+--查看默认
+show enable_online_ddl_waitlock;
++----------------------------+
+| enable_online_ddl_waitlock |
++----------------------------+
+| off                        |
++----------------------------+
+--设置，报错
+set enable_online_ddl_waitlock to 'on';
+?.*ERROR: parameter "enable_online_ddl_waitlock" cannot be changed now
+--no need to clean

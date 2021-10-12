@@ -1,0 +1,15 @@
+-- @testpoint: opengauss比较操作符<,比较类型:TINYINT
+drop table if exists ts_zhparser;
+SQL SUCCESS
+CREATE TABLE ts_zhparser(id TINYINT, index TINYINT);
+SQL SUCCESS
+INSERT INTO ts_zhparser VALUES(2, 100); 
+SQL SUCCESS
+select * from ts_zhparser where id < index;
++----+-------+
+| id | index |
++----+-------+
+| 2  | 100   |
++----+-------+
+drop table if exists ts_zhparser;
+SQL SUCCESS

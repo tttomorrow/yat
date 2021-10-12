@@ -1,0 +1,21 @@
+-- @testpoint: 数字操作符@(绝对值)，入参为整数类型
+drop table if exists data_01;
+SQL SUCCESS
+create table data_01 (clo1 int,clo2 SMALLINT);
+SQL SUCCESS
+insert into data_01 values (255, -25);
+SQL SUCCESS
+select @ clo1, @ clo2 from data_01;
++----------+----------+
+| ?column? | ?column? |
++----------+----------+
+| 255      | 25       |
++----------+----------+
+SELECT  @124, @ -45 AS RESULT;
++----------+--------+
+| ?column? | result |
++----------+--------+
+| 124      | 45     |
++----------+--------+
+drop table if exists data_01;
+SQL SUCCESS

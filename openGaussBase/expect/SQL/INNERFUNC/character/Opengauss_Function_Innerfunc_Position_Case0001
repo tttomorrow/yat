@@ -1,0 +1,15 @@
+-- @testpoint: 有多个搜索字符时返回第一个位置
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (stringv char(20));
+SQL SUCCESS
+insert into type_char values ('stringing');
+SQL SUCCESS
+SELECT position('ing' in stringv) from type_char;
++----------+
+| position |
++----------+
+| 4        |
++----------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

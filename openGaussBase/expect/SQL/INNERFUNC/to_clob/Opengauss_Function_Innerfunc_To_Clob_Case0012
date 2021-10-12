@@ -1,0 +1,11 @@
+-- @testpoint: to_clob函数入参给rowid，rownum，在入参是rowid时合理报错
+select count(to_clob(rowid));
+?.*ERROR: column "rowid" does not exist.*
+?.*Position.*
+  Where: referenced column: count
+select count(to_clob(rownum));
++-------+
+| count |
++-------+
+| 1     |
++-------+

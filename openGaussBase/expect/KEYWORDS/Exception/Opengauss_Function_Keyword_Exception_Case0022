@@ -1,0 +1,29 @@
+-- @testpoint: opengauss关键字exception(非保留)，作为用户组名 合理报错
+--关键字不带引号-成功
+drop group if exists exception;
+SQL SUCCESS
+create group exception with password 'gauss@123';
+SQL SUCCESS
+drop group exception;
+SQL SUCCESS
+--关键字带双引号-成功
+drop group if exists "exception";
+SQL SUCCESS
+create group "exception" with password 'gauss@123';
+SQL SUCCESS
+drop group "exception";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop group if exists 'exception';
+?.*ERROR: syntax error at or near "'exception'"
+?.*Position: .*
+create group 'exception' with password 'gauss@123';
+?.*ERROR: syntax error at or near "'exception'"
+?.*Position: .*
+--关键字带反引号-合理报错
+drop group if exists `exception`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+create group `exception` with password 'gauss@123';
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*

@@ -1,0 +1,24 @@
+
+
+-- @testpoint:  count的使用
+
+drop table if exists test_left;
+SQL SUCCESS
+create table test_left(a int,b char(20));
+SQL SUCCESS
+insert into test_left values(1,'xiexiaoyu');
+SQL SUCCESS
+insert into test_left values(2,'llllll');
+SQL SUCCESS
+insert into test_left values(3,'vvvvvv');
+SQL SUCCESS
+insert into test_left values(4,'llllll');
+SQL SUCCESS
+select count(1) from test_left where LEFT(B,4) = 'llll';
++-------+
+| count |
++-------+
+| 2     |
++-------+
+drop table if exists test_left;
+SQL SUCCESS

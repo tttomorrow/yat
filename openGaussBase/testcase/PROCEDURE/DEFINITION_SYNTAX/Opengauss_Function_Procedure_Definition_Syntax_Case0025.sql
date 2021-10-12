@@ -1,0 +1,34 @@
+-- @testpoint: 存储过程声明语法带 DECLARE声明 显式游标
+
+--前置条件
+drop table if exists table_pro_025;
+create table table_pro_025(
+id int,
+name varchar2(20)
+);
+
+--创建存储过程
+CREATE OR REPLACE PROCEDURE Proc_Syntax_025()
+AS
+a table_pro_025%rowtype;
+cursor mycursor is select * from table_pro_025 where id=1 order by name;
+begin
+ FOR I IN 1 .. 10 LOOP
+    insert into table_pro_025 values (I,'李明'||i);
+ END LOOP;
+open mycursor;
+fetch  mycursor into a;
+close mycursor;
+select * into a from table_pro_025 where id=2;
+raise info 'a=:%',a.name;
+end;
+/
+
+--调用存储过程
+call Proc_Syntax_025();
+
+--清理环境
+DROP PROCEDURE Proc_Syntax_025;
+DROP table table_pro_025;
+
+

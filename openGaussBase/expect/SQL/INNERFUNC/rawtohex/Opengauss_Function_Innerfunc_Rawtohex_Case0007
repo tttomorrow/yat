@@ -1,0 +1,18 @@
+-- @testpoint: rawtohex函数作为自定义函数的返回值
+DROP FUNCTION IF EXISTS F_TEST_RAWTOHEX;
+SQL SUCCESS
+CREATE OR REPLACE FUNCTION F_TEST_RAWTOHEX(A char) RETURN FLOAT
+IS
+BEGIN
+	RETURN rawtohex(A);
+END;
+/
+SQL SUCCESS
+SELECT F_TEST_RAWTOHEX('aa');
++-----------------+
+| f_test_rawtohex |
++-----------------+
+| 6161.0          |
++-----------------+
+DROP FUNCTION F_TEST_RAWTOHEX;
+SQL SUCCESS

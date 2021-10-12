@@ -1,0 +1,29 @@
+-- @testpoint: alter table在对包含重复值的列进行unique约束时合理报错
+
+drop table if exists alter_table_tb002;
+SQL SUCCESS
+create table alter_table_tb002
+(
+c1 int,
+c2 bigint,
+c3 varchar(20)
+);
+SQL SUCCESS
+insert into alter_table_tb002 values('11',null,'sss');
+SQL SUCCESS
+insert into alter_table_tb002 values('21','','sss');
+SQL SUCCESS
+insert into alter_table_tb002 values('31',66,'');
+SQL SUCCESS
+insert into alter_table_tb002 values('41',66,null);
+SQL SUCCESS
+ALTER TABLE alter_table_tb002 ADD CONSTRAINT UN_ID UNIQUE(c3);
+?.*ERROR: could not create unique index "un_id"
+  Detail: Key (c3)=(sss) is duplicated.
+--ERROR
+ALTER TABLE alter_table_tb002 ADD CONSTRAINT UN_ID UNIQUE(c1);
+SQL SUCCESS
+alter table alter_table_tb002 modify c1 not null;
+SQL SUCCESS
+drop table if exists alter_table_tb002;
+SQL SUCCESS

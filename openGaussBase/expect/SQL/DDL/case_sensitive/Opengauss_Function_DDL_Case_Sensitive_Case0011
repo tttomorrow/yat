@@ -1,0 +1,87 @@
+--  @testpoint: --子查询验证表名大小写
+drop table if exists WMS cascade;
+SQL SUCCESS
+drop table if exists wms cascade;
+SQL SUCCESS
+create table wms(A int,b char(10));
+SQL SUCCESS
+insert into wms values(5,'re');
+SQL SUCCESS
+insert into wms values(3,'aa');
+SQL SUCCESS
+insert into wms values(5,'xx');
+SQL SUCCESS
+select * from false_1 a where a.a in (select a from WMS);
++---+---+
+| a | b |
++---+---+
+| 3 |   |
+| 5 |   |
+| 3 |   |
+| 5 |   |
+| 3 |   |
+| 5 |   |
+| 3 |   |
+| 5 |   |
+| 3 |   |
+| 5 |   |
+| 3 |   |
+| 5 |   |
+| 3 |   |
+| 5 |   |
+| 3 |   |
+| 5 |   |
+| 3 |   |
+| 5 |   |
+| 3 |   |
+| 5 |   |
+| 3 |   |
+| 5 |   |
+| 3 |   |
+| 5 |   |
+| 3 |   |
+| 5 |   |
+| 3 |   |
+| 5 |   |
+| 3 |   |
+| 5 |   |
+| 3 |   |
+| 5 |   |
++---+---+
+select * from false_1 a where a.a in (select a from wms);
++---+---+
+| a | b |
++---+---+
+| 3 |   |
+| 5 |   |
+| 3 |   |
+| 5 |   |
+| 3 |   |
+| 5 |   |
+| 3 |   |
+| 5 |   |
+| 3 |   |
+| 5 |   |
+| 3 |   |
+| 5 |   |
+| 3 |   |
+| 5 |   |
+| 3 |   |
+| 5 |   |
+| 3 |   |
+| 5 |   |
+| 3 |   |
+| 5 |   |
+| 3 |   |
+| 5 |   |
+| 3 |   |
+| 5 |   |
+| 3 |   |
+| 5 |   |
+| 3 |   |
+| 5 |   |
+| 3 |   |
+| 5 |   |
+| 3 |   |
+| 5 |   |
++---+---+

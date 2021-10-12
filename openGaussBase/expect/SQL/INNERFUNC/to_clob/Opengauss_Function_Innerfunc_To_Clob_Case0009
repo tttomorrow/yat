@@ -1,0 +1,21 @@
+-- @testpoint: 创建视图时使用to_clob类型转换函数
+drop table if exists test2;
+SQL SUCCESS
+create table test2 (f1 clob);
+SQL SUCCESS
+drop view if exists to_clob_view;
+SQL SUCCESS
+insert into test2 values (3);
+SQL SUCCESS
+create view to_clob_view as select * from test2 where f1>to_clob(2);
+SQL SUCCESS
+select * from to_clob_view;
++----+
+| f1 |
++----+
+| 3  |
++----+
+drop view if exists to_clob_view;
+SQL SUCCESS
+drop table if exists test2;
+SQL SUCCESS

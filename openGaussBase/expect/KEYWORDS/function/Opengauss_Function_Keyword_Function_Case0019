@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字function(非保留)，作为外部数据源名
+--关键字不带引号-成功
+drop data source if exists function;
+SQL SUCCESS
+create data source function;
+SQL SUCCESS
+drop data source function;
+SQL SUCCESS
+--关键字带双引号-成功
+drop data source if exists "function";
+SQL SUCCESS
+create data source "function";
+SQL SUCCESS
+drop data source "function";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop data source if exists 'function';
+?.*ERROR: syntax error at or near "'function'".*
+?.*Position.*
+create data source 'function';
+?.*ERROR: syntax error at or near "'function'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop data source if exists `function`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create data source `function`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*

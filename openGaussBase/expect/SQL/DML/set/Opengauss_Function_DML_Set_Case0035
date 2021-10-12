@@ -1,0 +1,47 @@
+--  @testpoint:事务中使用set local命令设置xml解析方式
+--开启事务
+start transaction;
+SQL SUCCESS
+--set local命令设置xml解析方式
+set local xml option document;
+SQL SUCCESS
+--查看解析方式更改为document
+show xmloption;
++-----------+
+| xmloption |
++-----------+
+| document  |
++-----------+
+--提交事务
+commit;
+SQL SUCCESS
+--查看xml解析方式，恢复为默认content
+show xmloption;
++-----------+
+| xmloption |
++-----------+
+| content   |
++-----------+
+--再次开启事务
+start transaction;
+SQL SUCCESS
+--set local命令设置xml解析方式
+set local xml option document;
+SQL SUCCESS
+--查看解析方式更改为document
+show xmloption;
++-----------+
+| xmloption |
++-----------+
+| document  |
++-----------+
+--回滚
+rollback;
+SQL SUCCESS
+--查看xml解析方式，恢复为默认content
+show xmloption;
++-----------+
+| xmloption |
++-----------+
+| content   |
++-----------+

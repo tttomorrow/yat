@@ -1,0 +1,47 @@
+-- @testpoint: 设置current_schema为新模式，再新模式下建表查询
+--查看默认值
+show current_schema;
++----------------+
+| current_schema |
++----------------+
+| "$user",public |
++----------------+
+--创建模式
+drop schema if exists t_myschema023 cascade;
+SQL SUCCESS
+create schema t_myschema023;
+SQL SUCCESS
+--设置新模式
+set current_schema to t_myschema023;
+SQL SUCCESS
+show current_schema;
++----------------+
+| current_schema |
++----------------+
+| t_myschema023  |
++----------------+
+--建表
+drop table if exists test_search_path023;
+SQL SUCCESS
+create table test_search_path023(id int);
+SQL SUCCESS
+--查询表的模式
+select schemaname,tablename from pg_tables where tablename = 'test_search_path023';
++---------------+---------------------+
+| schemaname    | tablename           |
++---------------+---------------------+
+| t_myschema023 | test_search_path023 |
++---------------+---------------------+
+--删表
+drop table if exists test_search_path023;
+SQL SUCCESS
+reset current_schema;
+SQL SUCCESS
+show current_schema;
++----------------+
+| current_schema |
++----------------+
+| "$user",public |
++----------------+
+drop schema if exists t_myschema023 cascade;
+SQL SUCCESS

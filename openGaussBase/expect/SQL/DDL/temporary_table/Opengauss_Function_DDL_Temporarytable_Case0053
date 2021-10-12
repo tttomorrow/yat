@@ -1,0 +1,33 @@
+-- @testpoint: 创建检查约束的临时表，违反约束，合理报错
+-- @modify at: 2020-11-24
+--建表
+drop table if exists temp_table_053;
+SQL SUCCESS
+create temporary table temp_table_053 ( id_p int check (id_p>0), lastname varchar(255) not null);
+SQL SUCCESS
+--插入数据，成功
+insert into temp_table_053 values(10,'qw');
+SQL SUCCESS
+insert into temp_table_053 values(09,'ijw');
+SQL SUCCESS
+insert into temp_table_053 values(123,'xcbnw');
+SQL SUCCESS
+--插入数据,报错
+insert into temp_table_053 (id_p,lastname) values(0,'b');
+?.*ERROR: new row for relation "temp_table_053" violates check constraint "temp_table_053_id_p_check"
+  Detail: Failing row contains (0, b).
+insert into temp_table_053 values(-9,'xw');
+?.*ERROR: new row for relation "temp_table_053" violates check constraint "temp_table_053_id_p_check"
+  Detail: Failing row contains (-9, xw).
+--查询
+select * from temp_table_053;
++------+----------+
+| id_p | lastname |
++------+----------+
+| 10   | qw       |
+| 9    | ijw      |
+| 123  | xcbnw    |
++------+----------+
+--删表
+drop table  temp_table_053;
+SQL SUCCESS

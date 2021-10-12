@@ -1,0 +1,11 @@
+-- @testpoint: 插入非法空值，合理报错
+drop table if exists bigint13;
+SQL SUCCESS
+create table bigint13 (id int,name bigint);
+SQL SUCCESS
+insert into bigint13 values (1,' ');
+?.*ERROR: invalid input syntax for type bigint: " "
+?.*
+  Where: referenced column: name
+drop table bigint13;
+SQL SUCCESS

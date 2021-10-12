@@ -1,0 +1,70 @@
+-- @testpoint: 唯一索引：合理报错 列存表psort+gin+btree不支持：普通表，分区表，临时表
+--建表
+DROP TABLE if EXISTS test_index_table_050_01 CASCADE;
+SQL SUCCESS
+DROP TABLE if EXISTS test_index_table_050_02 CASCADE;
+SQL SUCCESS
+DROP TABLE if EXISTS test_index_table_050_03 CASCADE;
+SQL SUCCESS
+create table test_index_table_050_01(id int) WITH (ORIENTATION = column);
+SQL SUCCESS
+create table test_index_table_050_02(id int) WITH (ORIENTATION = column)
+PARTITION BY RANGE(id)(
+        PARTITION P1 VALUES LESS THAN(100),
+        PARTITION P2 VALUES LESS THAN(1000),
+        PARTITION P3 VALUES LESS THAN(MAXVALUE));
+SQL SUCCESS
+create  TEMPORARY table test_index_table_050_03(id int) WITH (ORIENTATION = column);
+SQL SUCCESS
+--建索引--临时表
+DROP INDEX IF EXISTS index_050_01;
+SQL SUCCESS
+DROP INDEX IF EXISTS index_050_02;
+SQL SUCCESS
+DROP INDEX IF EXISTS index_050_03;
+SQL SUCCESS
+create unique index index_050_01 on test_index_table_050_03(id);
+?.*ERROR: access method "psort" does not support unique indexes
+create unique index index_050_02 on test_index_table_050_03 USING gin(to_tsvector('english', id));
+?.*ERROR: access method "cgin" does not support unique indexes
+create unique index index_050_03 on test_index_table_050_03 USING btree(id) ;
+SQL SUCCESS
+--建索引--普通表
+DROP INDEX IF EXISTS index_050_01;
+SQL SUCCESS
+DROP INDEX IF EXISTS index_050_02;
+SQL SUCCESS
+DROP INDEX IF EXISTS index_050_03;
+SQL SUCCESS
+create unique index index_050_01 on test_index_table_050_01(id);
+?.*ERROR: access method "psort" does not support unique indexes
+create unique index index_050_02 on test_index_table_050_01 USING gin(to_tsvector('english', id));
+?.*ERROR: access method "cgin" does not support unique indexes
+create unique index index_050_03 on test_index_table_050_01 USING btree(id);
+SQL SUCCESS
+--建索引--分区表
+DROP INDEX IF EXISTS index_050_01;
+SQL SUCCESS
+DROP INDEX IF EXISTS index_050_02;
+SQL SUCCESS
+DROP INDEX IF EXISTS index_050_03;
+SQL SUCCESS
+create unique index index_050_01 on test_index_table_050_02(id) local;
+?.*ERROR: access method "psort" does not support unique indexes
+create unique index index_050_02 on test_index_table_050_02 USING gin(to_tsvector('english', id)) local;
+?.*ERROR: unique index columns must contain the partition key and collation must be default collation
+create unique index index_050_03 on test_index_table_050_02 USING btree(id) local;
+SQL SUCCESS
+--清理数据
+DROP INDEX IF EXISTS index_050_01;
+SQL SUCCESS
+DROP INDEX IF EXISTS index_050_02;
+SQL SUCCESS
+DROP INDEX IF EXISTS index_050_03;
+SQL SUCCESS
+DROP TABLE if EXISTS test_index_table_050_01 CASCADE;
+SQL SUCCESS
+DROP TABLE if EXISTS test_index_table_050_02 CASCADE;
+SQL SUCCESS
+DROP TABLE if EXISTS test_index_table_050_03 CASCADE;
+SQL SUCCESS

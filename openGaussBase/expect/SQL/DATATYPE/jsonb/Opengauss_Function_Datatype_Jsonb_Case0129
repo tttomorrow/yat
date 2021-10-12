@@ -1,0 +1,46 @@
+-- @testpoint: 结合存储过程使用jsonb数据类型
+drop procedure if exists proc129;
+SQL SUCCESS
+drop table if exists tab129;
+SQL SUCCESS
+create table tab129(id jsonb);
+SQL SUCCESS
+select * from tab129;
++----+
+| id |
++----+
++----+
+create or replace procedure proc129()
+as
+begin
+    for id in 1..10 loop
+        insert into tab129 values('"aaa"');
+    end loop;
+end;
+/
+SQL SUCCESS
+call proc129();
++---------+
+| proc129 |
++---------+
+|         |
++---------+
+select * from tab129;
++-------+
+| id    |
++-------+
+| "aaa" |
+| "aaa" |
+| "aaa" |
+| "aaa" |
+| "aaa" |
+| "aaa" |
+| "aaa" |
+| "aaa" |
+| "aaa" |
+| "aaa" |
++-------+
+drop procedure if exists proc129;
+SQL SUCCESS
+drop table if exists tab129;
+SQL SUCCESS

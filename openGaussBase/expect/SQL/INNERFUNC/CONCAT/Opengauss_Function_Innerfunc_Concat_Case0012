@@ -1,0 +1,15 @@
+
+
+-- @testpoint:order by条件
+
+drop table if exists t2;
+SQL SUCCESS
+create table t2 (a int,b char(10));
+SQL SUCCESS
+select a,b,trim('2' from '2342') from t2 order by concat(a,b),a;
++---+---+-------+
+| a | b | btrim |
++---+---+-------+
++---+---+-------+
+drop table t2;
+SQL SUCCESS

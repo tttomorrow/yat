@@ -1,0 +1,67 @@
+-- @testpoint: opengauss关键字maxvalue(保留)，作为同义词对象名,部分测试点合理报错
+--前置条件
+drop table if exists maxvalue_test;
+SQL SUCCESS
+create table maxvalue_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-失败
+drop synonym if exists maxvalue;
+?.*ERROR: syntax error at or near "maxvalue".*
+?.*Position.*
+create synonym maxvalue for maxvalue_test;
+?.*ERROR: syntax error at or near "maxvalue".*
+?.*Position.*
+--关键字带双引号-成功
+drop synonym if exists "maxvalue";
+SQL SUCCESS
+create synonym "maxvalue" for maxvalue_test;
+SQL SUCCESS
+insert into "maxvalue" values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update "maxvalue" set "maxvalue".name='cici' where "maxvalue".id=2;
+SQL SUCCESS
+select * from "maxvalue";
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--清理环境
+drop synonym "maxvalue";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'maxvalue';
+?.*ERROR: syntax error at or near "'maxvalue'".*
+?.*Position.*
+create synonym 'maxvalue' for maxvalue_test;
+?.*ERROR: syntax error at or near "'maxvalue'".*
+?.*Position.*
+insert into 'maxvalue' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'maxvalue'".*
+?.*Position.*
+update 'maxvalue' set 'maxvalue'.name='cici' where 'maxvalue'.id=2;
+?.*ERROR: syntax error at or near "'maxvalue'".*
+?.*Position.*
+select * from 'maxvalue';
+?.*ERROR: syntax error at or near "'maxvalue'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop synonym if exists `maxvalue`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create synonym `maxvalue` for maxvalue_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+insert into `maxvalue` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+update `maxvalue` set `maxvalue`.name='cici' where `maxvalue`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+select * from `maxvalue`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+--清理环境
+drop table if exists maxvalue_test cascade;
+SQL SUCCESS

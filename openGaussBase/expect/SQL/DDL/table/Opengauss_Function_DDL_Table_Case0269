@@ -1,0 +1,67 @@
+-- @testpoint: 插入索引后，修改列
+drop table if exists test_modify cascade;
+SQL SUCCESS
+create table test_modify(
+c_id int,
+c_integer integer,
+c_real real,
+c_float float,
+c_cdouble binary_double,
+c_decimal decimal(38),
+c_number number(38),
+c_number1 number,
+c_number2 number(20,10),
+c_numeric numeric(38),
+c_char char(50) default null,
+c_varchar varchar(20),
+c_varchar2 varchar2(4000),
+c_clob clob,
+c_raw raw(20),
+c_blob blob,
+c_date date,
+c_timestamp timestamp
+);
+SQL SUCCESS
+create index test_modify_idx1 on test_modify(c_id);
+SQL SUCCESS
+create index test_modify_idx2 on test_modify(c_integer);
+SQL SUCCESS
+create index test_modify_idx3 on test_modify(c_varchar);
+SQL SUCCESS
+create index test_modify_idx4 on test_modify(c_char);
+SQL SUCCESS
+create index test_modify_idx5 on test_modify(c_timestamp);
+SQL SUCCESS
+create index test_modify_idx6 on test_modify(c_id,c_integer,c_number);
+SQL SUCCESS
+create index test_modify_idx7 on test_modify(c_id,c_varchar,c_char,c_timestamp);
+SQL SUCCESS
+alter table test_modify MODIFY (c_varchar char(80),c_timestamp DATE);
+SQL SUCCESS
+SELECT col_description(a.attrelid,a.attnum) as comment,format_type(a.atttypid,a.atttypmod) as type,a.attname as name, a.attnotnull as notnull
+FROM pg_class as c,pg_attribute as a
+where c.relname = 'test_modify' and a.attrelid = c.oid and a.attnum>0;
++---------+--------------------------------+-------------+---------+
+| comment | type                           | name        | notnull |
++---------+--------------------------------+-------------+---------+
+|         | integer                        | c_id        | false   |
+|         | integer                        | c_integer   | false   |
+|         | real                           | c_real      | false   |
+|         | double precision               | c_float     | false   |
+|         | double precision               | c_cdouble   | false   |
+|         | numeric(38,0)                  | c_decimal   | false   |
+|         | numeric(38,0)                  | c_number    | false   |
+|         | numeric                        | c_number1   | false   |
+|         | numeric(20,10)                 | c_number2   | false   |
+|         | numeric(38,0)                  | c_numeric   | false   |
+|         | character(50)                  | c_char      | false   |
+|         | character(80)                  | c_varchar   | false   |
+|         | character varying(4000)        | c_varchar2  | false   |
+|         | clob                           | c_clob      | false   |
+|         | raw                            | c_raw       | false   |
+|         | blob                           | c_blob      | false   |
+|         | timestamp(0) without time zone | c_date      | false   |
+|         | timestamp(0) without time zone | c_timestamp | false   |
++---------+--------------------------------+-------------+---------+
+drop table if exists test_modify cascade;
+SQL SUCCESS

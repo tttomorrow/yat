@@ -1,0 +1,3 @@
+-- @testpoint: extract(field from timestamp)从给定的时间戳里获取秒域的值
+--（field的取值范围：second秒域，包括小数部分（0-59））
+select extract(second from time '17:12:28.5') from sys_dummy;

@@ -1,0 +1,10 @@
+-- @testpoint: array_agg超过范围测试，合理报错
+SELECT char_length(to_char(array_agg(lpad('9',131072,'9')::numeric)::text));
++-------------+
+| char_length |
++-------------+
+| 131074      |
++-------------+
+select array_agg(lpad('9',131072,'9')::numeric+1);
+?.*ERROR: value overflows numeric format
+  Where: referenced column: array_agg

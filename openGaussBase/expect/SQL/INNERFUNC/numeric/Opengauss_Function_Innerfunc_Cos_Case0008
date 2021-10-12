@@ -1,0 +1,24 @@
+-- @testpoint: cos函数与when联合使用
+drop table if exists tb1;
+SQL SUCCESS
+create table tb1(flag varchar, col_cos double precision);
+SQL SUCCESS
+insert into tb1 values('no1', 2*pi());
+SQL SUCCESS
+insert into tb1 values('no2', -2*pi());
+SQL SUCCESS
+insert into tb1 values('no3', 4*pi());
+SQL SUCCESS
+insert into tb1 values('no4', 337);
+SQL SUCCESS
+insert into tb1 values('no5', -99.99);
+SQL SUCCESS
+insert into tb1 values('no6', -598*pi());
+SQL SUCCESS
+select * from tb1 where cos(col_cos) = 1;
++------+---------------------+
+| flag | col_cos             |
++------+---------------------+
++------+---------------------+
+drop table tb1;
+SQL SUCCESS

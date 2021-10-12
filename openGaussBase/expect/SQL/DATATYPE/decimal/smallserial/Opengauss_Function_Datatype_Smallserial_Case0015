@@ -1,0 +1,21 @@
+-- @testpoint: 插入default自定义值
+drop table if exists smallserial_15;
+SQL SUCCESS
+create table smallserial_15 (name smallserial);
+SQL SUCCESS
+insert into smallserial_15 values (default);
+SQL SUCCESS
+insert into smallserial_15 values (default);
+SQL SUCCESS
+insert into smallserial_15 values (default);
+SQL SUCCESS
+select * from smallserial_15;
++------+
+| name |
++------+
+| 1    |
+| 2    |
+| 3    |
++------+
+drop table smallserial_15;
+SQL SUCCESS

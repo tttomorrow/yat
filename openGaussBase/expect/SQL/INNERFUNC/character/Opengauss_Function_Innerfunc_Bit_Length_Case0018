@@ -1,0 +1,15 @@
+-- @testpoint: 不设定n大小值，默认为1，插入正常字符
+drop table if exists test_char_11;
+SQL SUCCESS
+create table test_char_11 (name char);
+SQL SUCCESS
+insert into test_char_11 values ('a');
+SQL SUCCESS
+select bit_length(name) from test_char_11;
++------------+
+| bit_length |
++------------+
+| 8          |
++------------+
+DROP TABLE IF EXISTS test_char_11;
+SQL SUCCESS

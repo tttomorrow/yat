@@ -1,0 +1,27 @@
+--  @testpoint:openGauss保留关键字split作为作为表空间名
+--不带引号，成功
+drop tablespace if exists split;
+SQL SUCCESS
+CREATE TABLESPACE split RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+SQL SUCCESS
+--openGauss保留关键字split作为作为表空间名，加双引号，创建成功
+drop tablespace if exists "split";
+SQL SUCCESS
+CREATE TABLESPACE "split" RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+SQL SUCCESS
+drop tablespace "split";
+SQL SUCCESS
+--openGauss保留关键字split作为作为表空间名，加单引号，合理报错
+drop tablespace if exists 'split';
+?.*ERROR: syntax error at or near "'split'"
+?.*Position: .*
+CREATE TABLESPACE 'split' RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+?.*ERROR: syntax error at or near "'split'"
+?.*Position: .*
+--openGauss保留关键字split作为作为表空间名，加反引号，合理报错
+drop tablespace if exists `split`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+CREATE TABLESPACE `split` RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*

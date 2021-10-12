@@ -1,0 +1,108 @@
+-- @testpoint: clob：列存分区表clob修改为其他类型：可拓展为各数据类型
+drop table if exists test_clob_26 CASCADE;
+SQL SUCCESS
+create table test_clob_26(id int,
+name1 CLOB,
+name2 CLOB,
+name3 CLOB,
+name4 CLOB,
+name5 CLOB,
+name6 CLOB,
+name7 CLOB,
+name8 CLOB,
+name9 CLOB,
+name10 CLOB,
+name11 CLOB,
+name12 CLOB,
+name13 CLOB,
+name14 CLOB,
+name15 CLOB,
+name16 CLOB,
+name19 CLOB,
+name20 CLOB,
+name22 CLOB
+
+) with (orientation=column)
+PARTITION BY RANGE(id)(
+        PARTITION P1 VALUES LESS THAN(100),
+        PARTITION P2 VALUES LESS THAN(1000),
+        PARTITION P3 VALUES LESS THAN(MAXVALUE));
+SQL SUCCESS
+--插入数据
+--查询字段信息
+SELECT a.attname,format_type(a.atttypid,a.atttypmod) as type
+FROM pg_class as c,pg_attribute as a
+where c.relname = 'test_clob_26' and a.attrelid = c.oid and a.attnum>0 order by a.attname asc;
++---------+---------+
+| attname | type    |
++---------+---------+
+| id      | integer |
+| name1   | clob    |
+| name10  | clob    |
+| name11  | clob    |
+| name12  | clob    |
+| name13  | clob    |
+| name14  | clob    |
+| name15  | clob    |
+| name16  | clob    |
+| name19  | clob    |
+| name2   | clob    |
+| name20  | clob    |
+| name22  | clob    |
+| name3   | clob    |
+| name4   | clob    |
+| name5   | clob    |
+| name6   | clob    |
+| name7   | clob    |
+| name8   | clob    |
+| name9   | clob    |
++---------+---------+
+--clob修改为其他类型
+alter table test_clob_26 modify (
+name1 INTEGER,
+name2 BIGINT,
+name3 NUMERIC,
+name4 NUMBER,
+name5 CHAR,
+name8 REAL,
+name9 DOUBLE PRECISION,
+name10 FLOAT,
+name11 BINARY_DOUBLE,
+name12 DEC,
+name13 NCHAR,
+name14 VARCHAR,
+name15 CLOB,
+name16 TEXT,
+name20 DATE);
+SQL SUCCESS
+--查询字段信息
+SELECT a.attname,col_description(a.attrelid,a.attnum) as comment,format_type(a.atttypid,a.atttypmod) as type,a.attname as name, a.attnotnull as notnull
+FROM pg_class as c,pg_attribute as a
+where c.relname = 'test_clob_26' and a.attrelid = c.oid and a.attnum>0 order by a.attname asc;
++---------+---------+--------------------------------+--------+---------+
+| attname | comment | type                           | name   | notnull |
++---------+---------+--------------------------------+--------+---------+
+| id      |         | integer                        | id     | false   |
+| name1   |         | integer                        | name1  | false   |
+| name10  |         | double precision               | name10 | false   |
+| name11  |         | double precision               | name11 | false   |
+| name12  |         | numeric                        | name12 | false   |
+| name13  |         | character(1)                   | name13 | false   |
+| name14  |         | character varying              | name14 | false   |
+| name15  |         | clob                           | name15 | false   |
+| name16  |         | text                           | name16 | false   |
+| name19  |         | clob                           | name19 | false   |
+| name2   |         | bigint                         | name2  | false   |
+| name20  |         | timestamp(0) without time zone | name20 | false   |
+| name22  |         | clob                           | name22 | false   |
+| name3   |         | numeric                        | name3  | false   |
+| name4   |         | numeric                        | name4  | false   |
+| name5   |         | character(1)                   | name5  | false   |
+| name6   |         | clob                           | name6  | false   |
+| name7   |         | clob                           | name7  | false   |
+| name8   |         | real                           | name8  | false   |
+| name9   |         | double precision               | name9  | false   |
++---------+---------+--------------------------------+--------+---------+
+--清理数据
+drop table if exists test_clob_26 CASCADE;
+SQL SUCCESS

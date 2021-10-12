@@ -1,0 +1,21 @@
+-- @testpoint: 关键字variadic（保留），用作表名创建普通表（合理报错）
+drop table if exists variadic cascade;
+?.*ERROR: syntax error at or near "variadic"
+  Position: 22
+create table variadic(id int,name varchar(20));
+?.*ERROR: syntax error at or near "variadic"
+  Position: 14
+create or replace procedure variadic_insert
+as
+begin
+ for i in 1..10 loop
+    insert into variadic values(i,'vari+'||i);
+    end loop;
+ end;
+/
+?.*ERROR: syntax error at or near "variadic"
+call variadic_insert();
+?.*ERROR: function "variadic_insert" doesn't exist.*
+select * from variadic;
+?.*ERROR: syntax error at or near "variadic".*
+?.*Position.*

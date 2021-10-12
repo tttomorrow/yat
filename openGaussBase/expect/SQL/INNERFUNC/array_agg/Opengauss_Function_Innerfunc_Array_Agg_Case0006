@@ -1,0 +1,46 @@
+-- @testpoint: array_agg函数插入表中
+drop table if exists t_varray_array_agg;
+SQL SUCCESS
+create table t_varray_array_agg
+(
+f1 integer,
+f2 integer,
+f3 varchar(30)
+);
+SQL SUCCESS
+insert into t_varray_array_agg values (1,100,'fdfd1'), (1,100,'fdfd'), (2,200,'fdfd'), (2, 220,'fdfd'), (3,300,'fdfd'), (4, 300,'fdfd'), (4, 500,'fdfd'), (5,600,'fdfd');
+SQL SUCCESS
+commit;
+SQL SUCCESS
+SELECT array_agg(f1),array_agg(f2),array_agg(f3) FROM t_varray_array_agg GROUP BY f1 order by f1;
++-----------+-----------+--------------+
+| array_agg | array_agg | array_agg    |
++-----------+-----------+--------------+
+| {1,1}     | {100,100} | {fdfd1,fdfd} |
+| {2,2}     | {200,220} | {fdfd,fdfd}  |
+| {3}       | {300}     | {fdfd}       |
+| {4,4}     | {300,500} | {fdfd,fdfd}  |
+| {5}       | {600}     | {fdfd}       |
++-----------+-----------+--------------+
+drop table if exists t_varray_array_agg5;
+SQL SUCCESS
+create table t_varray_array_agg5(a int[],b bigint[],c varchar(50)[]);
+SQL SUCCESS
+insert into t_varray_array_agg5 SELECT array_agg(f1),array_agg(f2),array_agg(f3) FROM t_varray_array_agg GROUP BY f1 order by f1;
+SQL SUCCESS
+commit;
+SQL SUCCESS
+select * from t_varray_array_agg5;
++-------+-----------+--------------+
+| a     | b         | c            |
++-------+-----------+--------------+
+| {1,1} | {100,100} | {fdfd1,fdfd} |
+| {2,2} | {200,220} | {fdfd,fdfd}  |
+| {3}   | {300}     | {fdfd}       |
+| {4,4} | {300,500} | {fdfd,fdfd}  |
+| {5}   | {600}     | {fdfd}       |
++-------+-----------+--------------+
+drop table if exists t_varray_array_agg5;
+SQL SUCCESS
+drop table if exists t_varray_array_agg;
+SQL SUCCESS

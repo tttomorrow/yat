@@ -1,0 +1,61 @@
+-- @testpoint: opengauss关键字preserve(非保留)，作为同义词对象名,合理报错
+--前置条件
+drop table if exists preserve_test;
+SQL SUCCESS
+create table preserve_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists preserve;
+SQL SUCCESS
+create synonym preserve for preserve_test;
+SQL SUCCESS
+insert into preserve values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update preserve set preserve.name='cici' where preserve.id=2;
+SQL SUCCESS
+select * from preserve;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--关键字带双引号-成功
+drop synonym if exists "preserve";
+SQL SUCCESS
+create synonym "preserve" for preserve_test;
+SQL SUCCESS
+insert into "preserve" values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update "preserve" set "preserve".name='cici' where "preserve".id=2;
+SQL SUCCESS
+select * from "preserve";
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 1  | ada  |
+| 2  | cici |
+| 2  | cici |
++----+------+
+--关键字带单引号-合理报错
+drop synonym if exists 'preserve';
+?.*ERROR: syntax error at or near "'preserve'"
+?.*Position.*
+create synonym 'preserve' for preserve_test;
+?.*ERROR: syntax error at or near "'preserve'"
+?.*Position.*
+--关键字带反引号-合理报错
+drop synonym if exists `preserve`;
+?.*ERROR: syntax error at or near "`"
+?.*Position.*
+create synonym `preserve` for preserve_test;
+?.*ERROR: syntax error at or near "`"
+?.*Position.*
+--清理环境
+drop synonym if exists preserve;
+SQL SUCCESS
+drop synonym if exists "preserve";
+SQL SUCCESS
+drop table if exists preserve_test;
+SQL SUCCESS

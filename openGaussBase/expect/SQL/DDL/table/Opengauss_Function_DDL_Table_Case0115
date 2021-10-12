@@ -1,0 +1,18 @@
+-- @testpoint: 创建列类型是NUMBER[(p[,s])的表
+drop table if exists NUMBER_t1;
+SQL SUCCESS
+CREATE TABLE NUMBER_t1
+(
+    DT DECIMAL(12,3)
+);
+SQL SUCCESS
+INSERT INTO NUMBER_t1 VALUES(14523456.1233);
+SQL SUCCESS
+select * from  NUMBER_t1;
++--------------+
+| dt           |
++--------------+
+| 14523456.123 |
++--------------+
+drop table if exists NUMBER_t1;
+SQL SUCCESS

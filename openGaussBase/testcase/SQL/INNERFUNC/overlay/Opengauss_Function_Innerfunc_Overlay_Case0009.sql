@@ -1,0 +1,2 @@
+-- @testpoint: overlay函数与concat函数结合使用
+SELECT overlay(concat('hello','sharenfan') placing 'world' from 2 for 3 );

@@ -1,0 +1,183 @@
+--  @testpoint: --WITH语句验证字段名大小写
+with
+t1 as (select b from false_1)
+select * from t1;
++------------+
+| b          |
++------------+
+|            |
+|            |
+| xx         |
+| wms        |
+| xx         |
+|            |
+|            |
+| xx         |
+| wms        |
+| xx         |
+|            |
+|            |
+| xx         |
+| wms        |
+| xx         |
+|            |
+|            |
+| xx         |
+| wms        |
+| xx         |
+|            |
+|            |
+|            |
+| xx         |
+| wms        |
+| xx         |
+|            |
+|            |
+| xx         |
+| wms        |
+| xx         |
+|            |
+|            |
+| xx         |
+| wms        |
+| xx         |
+|            |
+|            |
+| xx         |
+| wms        |
+| xx         |
+|            |
+|            |
+|            |
+| xx         |
+| wms        |
+| xx         |
+|            |
+|            |
+| xx         |
+| wms        |
+| xx         |
+|            |
+|            |
+| xx         |
+| wms        |
+| xx         |
+|            |
+|            |
+| xx         |
+| wms        |
+| xx         |
+|            |
+|            |
+|            |
+| xx         |
+| wms        |
+| xx         |
+|            |
+|            |
+| xx         |
+| wms        |
+| xx         |
+|            |
+|            |
+| xx         |
+| wms        |
+| xx         |
+|            |
+|            |
+| xx         |
+| wms        |
+| xx         |
+|            |
++------------+
+with
+t1 as (select B from false_1)
+select * from t1;
++------------+
+| b          |
++------------+
+|            |
+|            |
+| xx         |
+| wms        |
+| xx         |
+|            |
+|            |
+| xx         |
+| wms        |
+| xx         |
+|            |
+|            |
+| xx         |
+| wms        |
+| xx         |
+|            |
+|            |
+| xx         |
+| wms        |
+| xx         |
+|            |
+|            |
+|            |
+| xx         |
+| wms        |
+| xx         |
+|            |
+|            |
+| xx         |
+| wms        |
+| xx         |
+|            |
+|            |
+| xx         |
+| wms        |
+| xx         |
+|            |
+|            |
+| xx         |
+| wms        |
+| xx         |
+|            |
+|            |
+|            |
+| xx         |
+| wms        |
+| xx         |
+|            |
+|            |
+| xx         |
+| wms        |
+| xx         |
+|            |
+|            |
+| xx         |
+| wms        |
+| xx         |
+|            |
+|            |
+| xx         |
+| wms        |
+| xx         |
+|            |
+|            |
+|            |
+| xx         |
+| wms        |
+| xx         |
+|            |
+|            |
+| xx         |
+| wms        |
+| xx         |
+|            |
+|            |
+| xx         |
+| wms        |
+| xx         |
+|            |
+|            |
+| xx         |
+| wms        |
+| xx         |
+|            |
++------------+

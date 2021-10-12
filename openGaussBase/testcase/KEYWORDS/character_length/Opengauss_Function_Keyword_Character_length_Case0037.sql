@@ -1,0 +1,2 @@
+-- @testpoint: 使用character_length，查询非字符的参数，应该报错
+ SELECT character_length(123);

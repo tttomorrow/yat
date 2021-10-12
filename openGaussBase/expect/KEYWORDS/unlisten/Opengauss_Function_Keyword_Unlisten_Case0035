@@ -1,0 +1,40 @@
+-- @testpoint: 关键字unlisten，用作表名创建普通表
+drop table if exists unlisten cascade;
+SQL SUCCESS
+create table if not exists unlisten(id int,name varchar(20));
+SQL SUCCESS
+create or replace procedure unlisten_insert
+as
+begin
+ for i in 1..10 loop
+    insert into unlisten values(i,'unlis+'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call unlisten_insert();
++-----------------+
+| unlisten_insert |
++-----------------+
+|                 |
++-----------------+
+select * from unlisten;
++----+----------+
+| id | name     |
++----+----------+
+| 1  | unlis+1  |
+| 2  | unlis+2  |
+| 3  | unlis+3  |
+| 4  | unlis+4  |
+| 5  | unlis+5  |
+| 6  | unlis+6  |
+| 7  | unlis+7  |
+| 8  | unlis+8  |
+| 9  | unlis+9  |
+| 10 | unlis+10 |
++----+----------+
+--清理环境
+drop table if exists unlisten cascade;
+SQL SUCCESS
+drop procedure unlisten_insert;
+SQL SUCCESS

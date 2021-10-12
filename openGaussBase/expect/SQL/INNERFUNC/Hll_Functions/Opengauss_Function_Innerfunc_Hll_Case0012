@@ -1,0 +1,20 @@
+-- @testpoint: hll_hash_integer(integer, int32),当入参类型为其他类型时，合理报错
+?.*ERROR: function hll_hash_integer\(bigint, integer\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: hll_hash_integer
+?.*ERROR: function hll_hash_integer\(bigint, integer\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: hll_hash_integer
+?.*ERROR: invalid input syntax for integer: "a".*
+?.*
+  Where: referenced column: hll_hash_integer
+?.*ERROR: function hll_hash_integer\(integer, bigint\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: hll_hash_integer
+select hll_hash_integer(111, 'a');
+?.*ERROR: invalid input syntax for integer: "a".*
+?.*
+  Where: referenced column: hll_hash_integer

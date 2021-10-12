@@ -1,0 +1,29 @@
+-- @testpoint: 年月日与整数相除
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (col1 interval);
+SQL SUCCESS
+insert into test_date01 values ('1 day');
+SQL SUCCESS
+insert into test_date01 values ('1 month');
+SQL SUCCESS
+insert into test_date01 values ('1 year');
+SQL SUCCESS
+select col1/2  from test_date01;
++-------------------------------------------------+
+| ?column?                                        |
++-------------------------------------------------+
+| 0 years 0 mons 0 days 12 hours 0 mins 0.00 secs |
+| 0 years 0 mons 15 days 0 hours 0 mins 0.00 secs |
+| 0 years 6 mons 0 days 0 hours 0 mins 0.00 secs  |
++-------------------------------------------------+
+select col1/3  from test_date01;
++-------------------------------------------------+
+| ?column?                                        |
++-------------------------------------------------+
+| 0 years 0 mons 0 days 8 hours 0 mins 0.00 secs  |
+| 0 years 0 mons 10 days 0 hours 0 mins 0.00 secs |
+| 0 years 4 mons 0 days 0 hours 0 mins 0.00 secs  |
++-------------------------------------------------+
+drop table if exists test_date01;
+SQL SUCCESS

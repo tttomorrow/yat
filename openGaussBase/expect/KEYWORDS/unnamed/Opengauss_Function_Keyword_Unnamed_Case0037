@@ -1,0 +1,40 @@
+-- @testpoint: 关键字unnamed，用作字符串
+drop table if exists unnamed_test cascade;
+SQL SUCCESS
+create table if not exists unnamed_test(id int,unnamed varchar(20));
+SQL SUCCESS
+create or replace procedure unnamed_insert
+as
+begin
+ for i in 1..10 loop
+    insert into unnamed_test values(i,'unnamed');
+    end loop;
+ end;
+/
+SQL SUCCESS
+call unnamed_insert();
++----------------+
+| unnamed_insert |
++----------------+
+|                |
++----------------+
+select * from unnamed_test;
++----+---------+
+| id | unnamed |
++----+---------+
+| 1  | unnamed |
+| 2  | unnamed |
+| 3  | unnamed |
+| 4  | unnamed |
+| 5  | unnamed |
+| 6  | unnamed |
+| 7  | unnamed |
+| 8  | unnamed |
+| 9  | unnamed |
+| 10 | unnamed |
++----+---------+
+--清理环境
+drop table if exists unnamed_test cascade;
+SQL SUCCESS
+drop procedure unnamed_insert;
+SQL SUCCESS

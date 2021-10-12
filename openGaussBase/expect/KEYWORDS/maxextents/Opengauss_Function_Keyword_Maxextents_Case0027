@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字maxextents非保留)，作为序列名
+--关键字不带引号-成功
+drop sequence if exists maxextents;
+SQL SUCCESS
+create sequence maxextents start 100 cache 50;
+SQL SUCCESS
+drop sequence maxextents;
+SQL SUCCESS
+--关键字带双引号-成功
+drop sequence if exists "maxextents";
+SQL SUCCESS
+create sequence "maxextents" start 100 cache 50;
+SQL SUCCESS
+drop sequence "maxextents";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'maxextents';
+?.*ERROR: syntax error at or near "'maxextents'".*
+?.*Position: .*
+create sequence 'maxextents' start 100 cache 50;
+?.*ERROR: syntax error at or near "'maxextents'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop sequence if exists `maxextents`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create sequence `maxextents` start 100 cache 50;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

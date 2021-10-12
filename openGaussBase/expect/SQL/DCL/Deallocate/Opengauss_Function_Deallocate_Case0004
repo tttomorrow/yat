@@ -1,0 +1,25 @@
+--- Case Type： Deallocate
+--- Case Name： 未删除已创建的预备语句，再次创建，合理报错
+--前置条件，创建表
+drop table if exists deallocate_test1;
+SQL SUCCESS
+drop table if exists deallocate_test2;
+SQL SUCCESS
+create table deallocate_test1(id int,name varchar(10));
+SQL SUCCESS
+create table deallocate_test2(id int,name varchar(10));
+SQL SUCCESS
+--创建insert预备语句
+prepare insert_sql(int,varchar(10)) as insert into deallocate_test1 values($1,$2);
+SQL SUCCESS
+--同一会话，未删除已创建的预备语句，再次创建，合理报错
+prepare insert_sql(int,varchar(10)) as insert into deallocate_test2 values($1,$2);
+?.*ERROR: prepared statement "insert_sql" already exists.*
+--删除预备语句
+deallocate insert_sql;
+SQL SUCCESS
+--清理环境
+drop table deallocate_test1;
+SQL SUCCESS
+drop table deallocate_test2;
+SQL SUCCESS

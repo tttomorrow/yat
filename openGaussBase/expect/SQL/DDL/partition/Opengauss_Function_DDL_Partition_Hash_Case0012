@@ -1,0 +1,16 @@
+-- @testpoint: hash分区表，不支持的功能切割分区，合理报错
+--创建hash分区表
+drop table if exists partition_hash_tab;
+SQL SUCCESS
+create table partition_hash_tab(p_id int,p_name varchar,p_age int)
+partition by hash(p_id)
+(partition p1,
+ partition p2,
+ partition p3);
+SQL SUCCESS
+--切割分区,合理报错
+alter table partition_hash_tab split partition p2 INTO(partition q1 start(15) end(25) every(5));
+?.*ERROR: can not split LIST/HASH partition table
+--清理环境
+drop table partition_hash_tab;
+SQL SUCCESS

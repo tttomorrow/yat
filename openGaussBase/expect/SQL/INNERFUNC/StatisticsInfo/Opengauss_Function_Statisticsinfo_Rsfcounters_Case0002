@@ -1,0 +1,27 @@
+-- @testpoint: pg_stat_reset_single_function_counters(oid)函数的异常校验，合理报错
+select pg_stat_reset_single_function_counters('') from PG_PROC a where a.proname = 'func_add_sql';
++----------------------------------------+
+| pg_stat_reset_single_function_counters |
++----------------------------------------+
++----------------------------------------+
+select pg_stat_reset_single_function_counters() from PG_PROC a where a.proname = 'func_add_sql';
+?.*ERROR: function pg_stat_reset_single_function_counters\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_stat_reset_single_function_counters
+select pg_stat_reset_single_function_counters(a.oid,a.oid,a.oid) from PG_PROC a where a.proname = 'func_add_sql';
+?.*ERROR: function pg_stat_reset_single_function_counters\(oid, oid, oid\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_stat_reset_single_function_counters
+?.*ERROR: OID out of range
+  Where: referenced column: pg_stat_reset_single_function_counters
+select pg_stat_reset_single_function_counters('*&^%%*^$') from PG_PROC a where a.proname = 'func_add_sql';
+?.*ERROR: invalid input syntax for type oid: \"\*\&\^\%\%\*\^\$\"
+?.*
+  Where: referenced column: pg_stat_reset_single_function_counters
+select pg_stat_reset_single_function_counters(a.oid) from PG_PROC a where a.proname = 'func_add_sql';
++----------------------------------------+
+| pg_stat_reset_single_function_counters |
++----------------------------------------+
++----------------------------------------+

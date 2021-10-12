@@ -1,0 +1,3 @@
+-- @testpoint: instr函数参数中包含数字,合理报错
+?.*ERROR: syntax error at or near "，3，2，2"
+?.*

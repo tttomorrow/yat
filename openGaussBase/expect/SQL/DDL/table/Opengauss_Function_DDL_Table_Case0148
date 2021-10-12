@@ -1,0 +1,26 @@
+-- @testpoint: 创建列类型是位串类型的表
+drop table if exists bit_type_t1;
+SQL SUCCESS
+CREATE TABLE bit_type_t1(BT_COL1 INTEGER,BT_COL2 BIT(3),BT_COL3 BIT VARYING(5));
+SQL SUCCESS
+insert into bit_type_t1 values(122,'100'::bit(3),'10001');
+SQL SUCCESS
+--select * from bit_type_t1;
+drop table if exists bit_type_t1;
+SQL SUCCESS
+drop table if exists bit_type_t2;
+SQL SUCCESS
+CREATE TABLE bit_type_t2(BT_COL1 INTEGER,BT_COL2 BIT,BT_COL3 BIT VARYING) ;
+SQL SUCCESS
+insert into bit_type_t2 values(122,'1','10001');
+SQL SUCCESS
+select * from bit_type_t2;
++---------+---------+---------+
+| bt_col1 | bt_col2 | bt_col3 |
++---------+---------+---------+
+| 122     | true    | 10001   |
++---------+---------+---------+
+drop table if exists bit_type_t1;
+SQL SUCCESS
+drop table if exists bit_type_t2;
+SQL SUCCESS

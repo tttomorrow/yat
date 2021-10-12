@@ -1,0 +1,2 @@
+-- @testpoint: opengauss逻辑操作符OR,三个以上表达式
+select 2<1 or 1>1 or char_length('hi')<0 or 3*9=27;

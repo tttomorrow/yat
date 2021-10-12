@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字pctfree(非保留)，作为数据库名
+--关键字不带引号-成功
+drop database if exists pctfree;
+SQL SUCCESS
+create database pctfree;
+SQL SUCCESS
+drop database pctfree;
+SQL SUCCESS
+--关键字带双引号-成功
+drop database if exists "pctfree";
+SQL SUCCESS
+create database "pctfree";
+SQL SUCCESS
+drop database "pctfree";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop database if exists 'pctfree';
+?.*ERROR: syntax error at or near "'pctfree'".*
+?.*Position: .*
+create database 'pctfree';
+?.*ERROR: syntax error at or near "'pctfree'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop database if exists `pctfree`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create database `pctfree`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

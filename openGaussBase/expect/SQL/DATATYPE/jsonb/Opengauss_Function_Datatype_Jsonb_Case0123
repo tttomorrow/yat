@@ -1,0 +1,63 @@
+-- @testpoint: 临时表（local）使用数据类型为jsonb的列创建主外键，合理报错
+--创建临时表创建主键
+drop table if exists tab1231;
+SQL SUCCESS
+create local temporary table tab1231(id int,name varchar,message jsonb primary key);
+SQL SUCCESS
+drop table if exists tab1232;
+SQL SUCCESS
+create local temporary table tab1232(id int,name varchar,message jsonb, primary key(message));
+SQL SUCCESS
+--创建临时表创建外键:jsonb类型的列不为主键
+drop table if exists tab1233;
+SQL SUCCESS
+drop table if exists tab1234;
+SQL SUCCESS
+create local temporary table tab1233(a int primary key, b jsonb,c integer);
+SQL SUCCESS
+create local temporary table tab1234(a int, b jsonb,c integer,  foreign key(a) references  tab1233(a));
+SQL SUCCESS
+--创建临时表创建外键:jsonb类型的列为主键
+drop table if exists tab1235;
+SQL SUCCESS
+drop table if exists tab1236;
+SQL SUCCESS
+create local temporary table tab1235(a jsonb primary key, b int,c integer);
+SQL SUCCESS
+create local temporary table tab1236(a jsonb  primary key,b int,c integer,foreign key(a) references  tab1236(a));
+SQL SUCCESS
+--jsonb类型的列创建唯一约束，并创建外键
+drop table if exists tab1237;
+SQL SUCCESS
+drop table if exists tab1238;
+SQL SUCCESS
+drop table if exists tab1239;
+SQL SUCCESS
+create local temporary table tab1237(a int,b jsonb unique,c integer,foreign key(b) references  tab1236(a));
+SQL SUCCESS
+create local temporary table tab1238(a jsonb,b jsonb unique,c integer,foreign key(b) references  tab1237(b));
+SQL SUCCESS
+--jsonb类型的列无唯一约束或主键：合理报错
+drop table if exists tab1239;
+SQL SUCCESS
+create local temporary table tab1239(a int primary key, b jsonb,c integer,foreign key(a) references  tab1234(a));
+?.*ERROR: there is no unique constraint matching given keys for referenced table "tab1234.*
+--清理数据
+drop table if exists tab1231 cascade;
+SQL SUCCESS
+drop table if exists tab1232 cascade;
+SQL SUCCESS
+drop table if exists tab1233 cascade;
+SQL SUCCESS
+drop table if exists tab1234 cascade;
+SQL SUCCESS
+drop table if exists tab1235 cascade;
+SQL SUCCESS
+drop table if exists tab1236 cascade;
+SQL SUCCESS
+drop table if exists tab1237 cascade;
+SQL SUCCESS
+drop table if exists tab1238 cascade;
+SQL SUCCESS
+drop table if exists tab1239 cascade;
+SQL SUCCESS

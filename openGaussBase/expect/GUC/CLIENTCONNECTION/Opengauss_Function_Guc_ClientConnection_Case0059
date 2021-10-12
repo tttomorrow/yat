@@ -1,0 +1,34 @@
+-- @testpoint: set方法设置参数值为有效值
+--查看默认
+show default_transaction_isolation;
++-------------------------------+
+| default_transaction_isolation |
++-------------------------------+
+| read committed                |
++-------------------------------+
+--设置
+set default_transaction_isolation to 'repeatable read';
+SQL SUCCESS
+show default_transaction_isolation;
++-------------------------------+
+| default_transaction_isolation |
++-------------------------------+
+| repeatable read               |
++-------------------------------+
+set default_transaction_isolation to 'serializable';
+SQL SUCCESS
+show default_transaction_isolation;
++-------------------------------+
+| default_transaction_isolation |
++-------------------------------+
+| repeatable read               |
++-------------------------------+
+--恢复默认
+set default_transaction_isolation to 'read committed';
+SQL SUCCESS
+show default_transaction_isolation;
++-------------------------------+
+| default_transaction_isolation |
++-------------------------------+
+| read committed                |
++-------------------------------+

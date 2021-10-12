@@ -1,0 +1,11 @@
+--  @testpoint:opengauss�ؼ���owner(�Ǳ���)��ϵͳ��PG_DIRECTORY ����ͼPG_PREPARED_XACTS���ֶ���
+select * from PG_DIRECTORY;
++---------+-------+---------+--------+
+| dirname | owner | dirpath | diracl |
++---------+-------+---------+--------+
++---------+-------+---------+--------+
+select * from PG_PREPARED_XACTS;
++-------------+-----+----------+-------+----------+
+| transaction | gid | prepared | owner | database |
++-------------+-----+----------+-------+----------+
++-------------+-----+----------+-------+----------+

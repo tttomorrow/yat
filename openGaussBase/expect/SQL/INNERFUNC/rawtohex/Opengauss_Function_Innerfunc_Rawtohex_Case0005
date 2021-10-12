@@ -1,0 +1,25 @@
+-- @testpoint: rawtohex函数与order by联合使用
+drop table if exists tb;
+SQL SUCCESS
+create table tb(id int,hex int);
+SQL SUCCESS
+insert into tb values(1,3),(4,5),(8,9);
+SQL SUCCESS
+select rawtohex(concat(id,hex)) from tb order by 1;
++----------+
+| rawtohex |
++----------+
+| 3133     |
+| 3435     |
+| 3839     |
++----------+
+select rawtohex(concat_ws('',id,hex)) from tb order by 1;
++----------+
+| rawtohex |
++----------+
+|          |
+|          |
+|          |
++----------+
+drop table if exists tb;
+SQL SUCCESS

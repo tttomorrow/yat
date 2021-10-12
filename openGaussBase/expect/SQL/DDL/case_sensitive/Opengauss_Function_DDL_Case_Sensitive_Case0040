@@ -1,0 +1,27 @@
+--  @testpoint: --创建UNIQUE约束区别大小写
+drop table if exists false_2 cascade;
+SQL SUCCESS
+create table false_2(a int,b int);
+SQL SUCCESS
+insert into false_2 values(1,2),(2,3),(3,4),(4,5);
+SQL SUCCESS
+alter table false_2 drop constraint yy;
+?.*ERROR: constraint "yy" of relation "false_2" does not exist
+alter table false_2 add constraint yy unique(a);
+SQL SUCCESS
+alter table false_2 add constraint YY unique(A);
+?.*ERROR: relation "yy" already exists
+alter table false_2 add constraint zz unique(B);
+SQL SUCCESS
+alter table false_2 add constraint zz unique(b);
+?.*ERROR: relation "zz" already exists
+alter table false_2 drop constraint yy;
+SQL SUCCESS
+alter table false_2 drop constraint YY;
+?.*ERROR: constraint "yy" of relation "false_2" does not exist
+alter table false_2 drop constraint ZZ;
+SQL SUCCESS
+alter table false_2 drop constraint zZ;
+?.*ERROR: constraint "zz" of relation "false_2" does not exist
+alter table false_2 drop constraint zz;
+?.*ERROR: constraint "zz" of relation "false_2" does not exist

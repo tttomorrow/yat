@@ -1,0 +1,27 @@
+-- @testpoint: 插入0值
+drop table if exists bigint14;
+SQL SUCCESS
+create table bigint14 (c1 bigint,c2 bigint,c3 bigint,c4 bigint,c5 bigint);
+SQL SUCCESS
+insert into bigint14 values (0);
+SQL SUCCESS
+insert into bigint14 values (0,0);
+SQL SUCCESS
+insert into bigint14 values (0,0,0);
+SQL SUCCESS
+insert into bigint14 values (0,0,0,0);
+SQL SUCCESS
+insert into bigint14 values (0,0,0,0,0);
+SQL SUCCESS
+select * from bigint14;
++----+----+----+----+----+
+| c1 | c2 | c3 | c4 | c5 |
++----+----+----+----+----+
+| 0  |    |    |    |    |
+| 0  | 0  |    |    |    |
+| 0  | 0  | 0  |    |    |
+| 0  | 0  | 0  | 0  |    |
+| 0  | 0  | 0  | 0  | 0  |
++----+----+----+----+----+
+drop table bigint14;
+SQL SUCCESS

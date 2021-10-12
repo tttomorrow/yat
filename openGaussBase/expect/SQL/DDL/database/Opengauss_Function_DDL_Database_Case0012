@@ -1,0 +1,12 @@
+-- @testpoint: 创建重名数据库，合理报错
+drop database if exists test;
+SQL SUCCESS
+create database test with LC_COLLATE='zh_CN.gbk' LC_CTYPE = 'zh_CN.gbk' CONNECTION LIMIT=2;
+SQL SUCCESS
+create database test with LC_COLLATE='zh_CN.gbk' LC_CTYPE = 'zh_CN.gbk' CONNECTION LIMIT=2;
+?.*ERROR: database "test" already exists
+create database test with LC_COLLATE='C' LC_CTYPE = 'C' CONNECTION LIMIT=-1;
+?.*ERROR: database "test" already exists
+--tearDown
+drop database if exists test;
+SQL SUCCESS

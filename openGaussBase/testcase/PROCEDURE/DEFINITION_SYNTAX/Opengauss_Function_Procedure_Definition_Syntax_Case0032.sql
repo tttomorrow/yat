@@ -1,0 +1,11 @@
+-- @testpoint:  验证匿名块内变量支持带引号
+
+declare
+"a" varchar2(30):='wang';
+"b" varchar2(30):='kang';
+begin
+ "a":="b";
+raise info ':%',"a";
+end;
+/
+

@@ -1,0 +1,19 @@
+-- @testpoint: 指定错误网络地址输入值，合理报错
+drop table if exists test_inet_02;
+SQL SUCCESS
+create table test_inet_02(type inet);
+SQL SUCCESS
+insert into test_inet_02 values('528.23.10.100/24');
+?.*ERROR: invalid input syntax for type inet: "528.23.10.100/24"
+?.*
+  Where: referenced column: type
+insert into test_inet_02 values('192.623.10.100/24');
+?.*ERROR: invalid input syntax for type inet: "192.623.10.100/24"
+?.*
+  Where: referenced column: type
+insert into test_inet_02 values('192.168.300.100/24');
+?.*ERROR: invalid input syntax for type inet: "192.168.300.100/24"
+?.*
+  Where: referenced column: type
+drop table test_inet_02;
+SQL SUCCESS

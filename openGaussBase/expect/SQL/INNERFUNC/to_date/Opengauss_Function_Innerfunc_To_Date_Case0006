@@ -1,0 +1,8 @@
+-- @testpoint: to_date函数，将文本类型的值转换为指定格式的时间戳，中文参数测试，合理报错
+select to_date('2018-01-15','年月日');
+?.*ERROR: invalid data for match  in date string.*
+  Where: referenced column: to_date
+select to_date('时间','yyyy');
+?.*ERROR: invalid value "æ¶é" for "yyyy" \(pgjdbc: autodetected server-encoding to be ISO-8859-1, if the message is not readable, please check database logs and/or host, port, dbname, user, password, pg_hba.conf\).*
+  Detail: Value must be an integer.
+  Where: referenced column: to_date

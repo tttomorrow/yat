@@ -1,0 +1,55 @@
+--  @testpoint:opengauss关键字dictionary(非保留)，自定义数据类型名为dictionary
+--关键字dictionary作为数据类型不带引号，创建成功
+drop type if exists dictionary;
+SQL SUCCESS
+CREATE TYPE dictionary AS (f1 int, f2 text);
+SQL SUCCESS
+select typname from pg_type where typname ='dictionary';
++------------+
+| typname    |
++------------+
+| dictionary |
++------------+
+drop type dictionary;
+SQL SUCCESS
+--关键字dictionary作为数据类型名加双引号，创建成功
+drop type if exists "dictionary";
+SQL SUCCESS
+CREATE TYPE "dictionary" AS (f1 int, f2 text);
+SQL SUCCESS
+select typname from pg_type where typname ='dictionary';
++------------+
+| typname    |
++------------+
+| dictionary |
++------------+
+drop type "dictionary";
+SQL SUCCESS
+--关键字dictionary作为数据类型名加单引号，合理报错
+drop type if exists 'dictionary';
+?.*ERROR: syntax error at or near "'dictionary'"
+?.*
+CREATE TYPE 'dictionary' AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "'dictionary'"
+?.*
+select * from pg_type where typname ='dictionary';
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+----------+-----------+------------+---------+----------+-----------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
+| typname | typnamespace | typowner | typlen | typbyval | typtype | typcategory | typispreferred | typisdefined | typdelim | typrelid | typelem | typarray | typinput | typoutput | typreceive | typsend | typmodin | typmodout | typanalyze | typalign | typstorage | typnotnull | typbasetype | typtypmod | typndims | typcollation | typdefaultbin | typdefault | typacl |
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+----------+-----------+------------+---------+----------+-----------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+----------+-----------+------------+---------+----------+-----------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
+drop type 'dictionary';
+?.*ERROR: syntax error at or near "'dictionary'"
+?.*
+--关键字dictionary作为数据类型名加反引号，合理报错
+drop type if exists `dictionary`;
+?.*ERROR: syntax error at or near "`"
+?.*
+CREATE TYPE `dictionary` AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "`"
+?.*
+select * from pg_type where typname =`dictionary`;
+?.*ERROR: column "dictionary" does not exist
+?.*
+drop type `dictionary`;
+?.*ERROR: syntax error at or near "`"
+?.*

@@ -1,0 +1,2 @@
+--  @testpoint:验证cast函数是否能将整型数据转换为time型
+select cast(2008 as time) from;

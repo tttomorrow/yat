@@ -1,0 +1,54 @@
+-- @testpoint: last_day函数参数为表的数值类型列，合理报错
+drop table if exists last_day_t001;
+SQL SUCCESS
+create table last_day_t001(
+COL_1 bigint,
+COL_4 decimal,
+COL_8 double precision,
+COL_13 real ,
+COL_14 numeric
+);
+SQL SUCCESS
+truncate table last_day_t001;
+SQL SUCCESS
+begin
+	for i in 1..100 loop
+      insert into last_day_t001 values(
+	    fun_seq.nextval,
+	    3.1415926+fun_seq.nextval,
+	    3.1415926+fun_seq.nextval,
+	    i/4
+	    );
+   end loop;
+end;
+/
+?.*ERROR: missing FROM-clause entry for table "fun\_seq"
+  Where: PL/pgSQL function inline_code_block line 3 at SQL statement
+--SELECT * from last_day_t001 LIMIT 1,10;
+select distinct last_day(COL_1) from last_day_t001;
+?.*ERROR: function last_day\(bigint\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: last_day
+select distinct last_day(COL_4) from last_day_t001;
+?.*ERROR: function last_day\(numeric\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: last_day
+select distinct last_day(COL_8) from last_day_t001;
+?.*ERROR: function last_day\(double precision\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: last_day
+select distinct last_day(COL_13) from last_day_t001;
+?.*ERROR: function last_day\(real\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: last_day
+select distinct last_day(COL_14) from last_day_t001;
+?.*ERROR: function last_day\(numeric\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: last_day
+drop table last_day_t001 CASCADE;
+SQL SUCCESS

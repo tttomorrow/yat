@@ -1,0 +1,15 @@
+-- @testpoint: 为空
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('');
+SQL SUCCESS
+SELECT lower(string1) from type_char;
++-------+
+| lower |
++-------+
+|       |
++-------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

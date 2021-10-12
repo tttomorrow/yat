@@ -1,0 +1,3 @@
+-- @testpoint: 缺省逃逸字符\
+
+SELECT 'AABBCC' LIKE 'AA_BB%' AS RESULT;

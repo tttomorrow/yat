@@ -1,0 +1,66 @@
+-- @testpoint: opengauss关键字mumps(非保留)，作为同义词对象名,部分测试点合理报错
+--前置条件
+drop table if exists explain_test;
+SQL SUCCESS
+create table explain_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists mumps;
+SQL SUCCESS
+create synonym mumps for explain_test;
+SQL SUCCESS
+insert into mumps values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update mumps set mumps.name='cici' where mumps.id=2;
+SQL SUCCESS
+select * from mumps;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--关键字带双引号-成功
+drop synonym if exists "mumps";
+SQL SUCCESS
+create synonym "mumps" for explain_test;
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'mumps';
+?.*ERROR: syntax error at or near "'mumps'".*
+?.*Position: .*
+create synonym 'mumps' for explain_test;
+?.*ERROR: syntax error at or near "'mumps'".*
+?.*Position: .*
+insert into 'mumps' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'mumps'".*
+?.*Position: .*
+update 'mumps' set 'mumps'.name='cici' where 'mumps'.id=2;
+?.*ERROR: syntax error at or near "'mumps'".*
+?.*Position: .*
+select * from 'mumps';
+?.*ERROR: syntax error at or near "'mumps'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop synonym if exists `mumps`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create synonym `mumps` for explain_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+insert into `mumps` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+update `mumps` set `mumps`.name='cici' where `mumps`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+select * from `mumps`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+--清理环境
+drop synonym if exists "mumps";
+SQL SUCCESS
+drop synonym if exists mumps;
+SQL SUCCESS
+drop table if exists explain_test;
+SQL SUCCESS

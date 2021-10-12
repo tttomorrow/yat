@@ -1,0 +1,28 @@
+--  @testpoint:使用concurrently删除gin gist索引
+-- create table
+DROP TABLE IF EXISTS ddl_index_case0230;
+SQL SUCCESS
+CREATE TABLE ddl_index_case0230(id INT, first_name text, last_name text);
+SQL SUCCESS
+--create  gin index
+create  index CONCURRENTLY ddl_index_case0230_idx on ddl_index_case0230 USING gin(to_tsvector('english', first_name));
+SQL SUCCESS
+--drop index
+drop index concurrently ddl_index_case0230_idx;
+SQL SUCCESS
+-- create table
+DROP TABLE IF EXISTS ddl_index_case0230_gist;
+SQL SUCCESS
+CREATE TABLE ddl_index_case0230_gist(id INT, c_point point);
+SQL SUCCESS
+--create  gist index
+create  index CONCURRENTLY ddl_index_case0230_idx_gist on ddl_index_case0230_gist  USING gist(c_point);
+SQL SUCCESS
+--drop index
+drop index concurrently ddl_index_case0230_idx_gist;
+SQL SUCCESS
+--tearDown drop table
+DROP TABLE IF EXISTS ddl_index_case0230;
+SQL SUCCESS
+DROP TABLE IF EXISTS ddl_index_case0230_gist;
+SQL SUCCESS

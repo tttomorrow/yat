@@ -1,0 +1,11 @@
+-- @testpoint: 添加字段，先指定数据类型为blob，并且定义约束为unique,再次更新列属性为clob，约束为unique，合理报错
+drop table if exists t1;
+SQL SUCCESS
+create table t1(a int);
+SQL SUCCESS
+alter table t1 add c blob unique;
+SQL SUCCESS
+alter table t1 add c clob unique;
+?.*ERROR: column "c" of relation "t1" already exists.*
+drop table if exists t1;
+SQL SUCCESS

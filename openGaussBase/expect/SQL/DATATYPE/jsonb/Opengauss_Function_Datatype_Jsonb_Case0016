@@ -1,0 +1,58 @@
+-- @testpoint: json格式校验：Object-json（不符合格式合理报错）
+--符合规范
+select '{}'::json;
++------+
+| json |
++------+
+| {}   |
++------+
+select '{"a": 1, "b": {"a": 2, "b": null}}'::json;
++------------------------------------+
+| json                               |
++------------------------------------+
+| {"a": 1, "b": {"a": 2, "b": null}} |
++------------------------------------+
+select '{"foo": [true, "bar"], "tags": {"a": 1, "b": null}}'::json;
++-----------------------------------------------------+
+| json                                                |
++-----------------------------------------------------+
+| {"foo": [true, "bar"], "tags": {"a": 1, "b": null}} |
++-----------------------------------------------------+
+select '{"a":null, "bb": 1, "bb": "A",   "cde": [1,2,   "re"], "abc": 1}'::json;
++------------------------------------------------------------------+
+| json                                                             |
++------------------------------------------------------------------+
+| {"a":null, "bb": 1, "bb": "A",   "cde": [1,2,   "re"], "abc": 1} |
++------------------------------------------------------------------+
+select '{"a":null, "[1,2,\"re\"]": 1, "bb": "A", "cde": [1,2,   "re"], "abc": 1}'::json;
++--------------------------------------------------------------------------+
+| json                                                                     |
++--------------------------------------------------------------------------+
+| {"a":null, "[1,2,\"re\"]": 1, "bb": "A", "cde": [1,2,   "re"], "abc": 1} |
++--------------------------------------------------------------------------+
+--不符合规范
+select '{"qq","true","null","false"}'::json;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Expected ":", but found ",".
+?.*
+  Where: JSON data, line 1: {"qq",...
+referenced column: json
+select '{"a":null, "[1,2,"re"]": 1, "bb": "A", "cde": [1,2,   "re"], "abc": 1}'::json;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "re" is invalid.
+?.*
+  Where: JSON data, line 1: {"a":null, "[1,2,"re...
+referenced column: json
+select '{"a":null, "[1,2,"re"]": 1},{"bb": "A", "cde": [1,2,"re"], "abc": 1}'::json;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "re" is invalid.
+?.*
+  Where: JSON data, line 1: {"a":null, "[1,2,"re...
+referenced column: json
+select '"a": 1, "b": {"a": 2, b": null}}'::json;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Expected end of input, but found ":".
+?.*
+  Where: JSON data, line 1: "a":...
+referenced column: json
+?.*

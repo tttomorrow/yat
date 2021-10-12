@@ -1,0 +1,43 @@
+-- @testpoint: 使用set session...命令设置当前模式
+--创建schema
+drop schema if exists myschema;
+SQL SUCCESS
+create schema myschema;
+SQL SUCCESS
+--设置current_schema
+set session current_schema =myschema;
+SQL SUCCESS
+--查看设置是否生效
+select current_schema;
++----------------+
+| current_schema |
++----------------+
+| myschema       |
++----------------+
+--查看该参数的具体运行信息
+select * from pg_settings where name = 'current_schema';
++----------------+----------+------+-------------------------------------------------+-----------------------------------------------------------------------+------------+---------+---------+---------+---------+---------+----------+----------------+----------------+------------+------------+
+| name           | setting  | unit | category                                        | short_desc                                                            | extra_desc | context | vartype | source  | min_val | max_val | enumvals | boot_val       | reset_val      | sourcefile | sourceline |
++----------------+----------+------+-------------------------------------------------+-----------------------------------------------------------------------+------------+---------+---------+---------+---------+---------+----------+----------------+----------------+------------+------------+
+| current_schema | myschema |      | Client Connection Defaults / Statement Behavior | Sets the schema search order for names that are not schema-qualified. |            | user    | string  | session |         |         |          | "$user",public | "$user",public |            |            |
++----------------+----------+------+-------------------------------------------------+-----------------------------------------------------------------------+------------+---------+---------+---------+---------+---------+----------+----------------+----------------+------------+------------+
+--恢复current_schema为默认值
+set session current_schema =default;
+SQL SUCCESS
+--查看系统表数据是否变化
+select * from pg_settings where name = 'current_schema';
++----------------+----------------+------+-------------------------------------------------+-----------------------------------------------------------------------+------------+---------+---------+---------+---------+---------+----------+----------------+----------------+------------+------------+
+| name           | setting        | unit | category                                        | short_desc                                                            | extra_desc | context | vartype | source  | min_val | max_val | enumvals | boot_val       | reset_val      | sourcefile | sourceline |
++----------------+----------------+------+-------------------------------------------------+-----------------------------------------------------------------------+------------+---------+---------+---------+---------+---------+----------+----------------+----------------+------------+------------+
+| current_schema | "$user",public |      | Client Connection Defaults / Statement Behavior | Sets the schema search order for names that are not schema-qualified. |            | user    | string  | default |         |         |          | "$user",public | "$user",public |            |            |
++----------------+----------------+------+-------------------------------------------------+-----------------------------------------------------------------------+------------+---------+---------+---------+---------+---------+----------+----------------+----------------+------------+------------+
+--查看当前schema，已恢复为默认public
+select current_schema;
++----------------+
+| current_schema |
++----------------+
+| public         |
++----------------+
+--清理环境
+drop schema if exists myschema;
+SQL SUCCESS

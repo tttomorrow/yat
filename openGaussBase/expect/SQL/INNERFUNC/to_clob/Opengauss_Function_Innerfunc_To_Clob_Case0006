@@ -1,0 +1,15 @@
+-- @testpoint: to_clob和‘||’结合
+drop table if exists test2;
+SQL SUCCESS
+create table test2 (f2 clob);
+SQL SUCCESS
+insert into test2 values(to_clob('1111111??????????')||to_clob('444aaaaaaaa44444')||to_clob('qqq55555'));
+SQL SUCCESS
+select * from test2;
++-------------------------------------------+
+| f2                                        |
++-------------------------------------------+
+| 1111111??????????444aaaaaaaa44444qqq55555 |
++-------------------------------------------+
+drop table if exists test2;
+SQL SUCCESS

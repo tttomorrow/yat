@@ -1,0 +1,15 @@
+-- @testpoint: 模式匹配POSIX正则表达式,使用{m}重复前面的项刚好m次去匹配
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 varchar(100));
+SQL SUCCESS
+insert into type_char values ('aaabc');
+SQL SUCCESS
+SELECT * from type_char  where string1 ~ 'a{3}(b|c)';
++---------+
+| string1 |
++---------+
+| aaabc   |
++---------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

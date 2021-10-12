@@ -1,0 +1,24 @@
+--  @testpoint:省略函数的参数名
+drop function if exists fun_test2(int1, int1);
+SQL SUCCESS
+CREATE FUNCTION fun_test2(int1, int1) RETURNS double precision
+    AS 'select $1 + $2;'
+    LANGUAGE SQL
+    IMMUTABLE
+    RETURNS NULL ON NULL INPUT;
+/
+SQL SUCCESS
+select proargnames from pg_proc where proname='fun_test2';
++-------------+
+| proargnames |
++-------------+
+|             |
++-------------+
+call fun_test2(10,10);
++-----------+
+| fun_test2 |
++-----------+
+| 20.0      |
++-----------+
+drop FUNCTION fun_test2;
+SQL SUCCESS

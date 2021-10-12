@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字Load非保留)，作为序列名
+--关键字不带引号-成功
+drop sequence if exists Load;
+SQL SUCCESS
+create sequence Load start 100 cache 50;
+SQL SUCCESS
+drop sequence Load;
+SQL SUCCESS
+--关键字带双引号-成功
+drop sequence if exists "Load";
+SQL SUCCESS
+create sequence "Load" start 100 cache 50;
+SQL SUCCESS
+drop sequence "Load";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'Load';
+?.*?.*ERROR: syntax error at or near "'Load'".*.*
+?.*?.*Position: .*.*
+create sequence 'Load' start 100 cache 50;
+?.*?.*ERROR: syntax error at or near "'Load'".*.*
+?.*?.*Position: .*.*
+--关键字带反引号-合理报错
+drop sequence if exists `Load`;
+?.*?.*ERROR: syntax error at or near "`".*.*
+?.*?.*Position: .*.*
+create sequence `Load` start 100 cache 50;
+?.*?.*ERROR: syntax error at or near "`".*.*
+?.*?.*Position: .*.*

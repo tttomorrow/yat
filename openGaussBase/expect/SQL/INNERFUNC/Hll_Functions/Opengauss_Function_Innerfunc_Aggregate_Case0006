@@ -1,0 +1,15 @@
+-- @testpoint:  hll_add_agg(hll_hashval,int32 log2m,int32 regwidth),当入参为其他类型时,合理报错
+create table t_id(id int);
+SQL SUCCESS
+insert into t_id values(generate_series(1,10));
+SQL SUCCESS
+select  hll_add_agg(hll_hash_text(id), 9, 6) from t_id ;
+?.*ERROR: log2m = 9 is out of range, it should be in range 10 to 16.*
+drop table t_id;
+SQL SUCCESS
+select hll_add_agg('aaa', 16, 5);
+?.*ERROR: invalid input syntax for type bigint: "aaa".*
+?.*
+  Where: referenced column: hll_add_agg
+select hll_add_agg (hll_hash_smallint(32767, 0), 17, 0);
+?.*ERROR: log2m = 17 is out of range, it should be in range 10 to 16.*

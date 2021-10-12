@@ -1,0 +1,9 @@
+-- @testpoint: 插入超出左边界范围值，合理报错
+drop table if exists float06;
+SQL SUCCESS
+create table float06 (name float);
+SQL SUCCESS
+insert into float06 values (1E-325);
+  Where: referenced column: name
+drop table float06;
+SQL SUCCESS

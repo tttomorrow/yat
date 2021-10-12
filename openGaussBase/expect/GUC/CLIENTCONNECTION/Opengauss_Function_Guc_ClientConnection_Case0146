@@ -1,0 +1,20 @@
+-- @testpoint: 使用set方法设置参数extra_float_digits为无效值，合理报错
+--查看默认值
+show extra_float_digits;
++--------------------+
+| extra_float_digits |
++--------------------+
+| 3                  |
++--------------------+
+--设置为浮点数，报错
+set extra_float_digits to 5.56;
+?.*ERROR: invalid value for parameter "extra_float_digits": "5.56"
+--设置为超范围值，报错
+set extra_float_digits to -16;
+?.*ERROR: -16 is outside the valid range for parameter "extra_float_digits" \(-15 .. 3\)
+set extra_float_digits to -4;
+SQL SUCCESS
+--设置为test，报错
+set extra_float_digits to 'test';
+?.*ERROR: invalid value for parameter "extra_float_digits": "test"
+--no need to clean

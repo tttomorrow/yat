@@ -1,0 +1,15 @@
+-- @testpoint: 起始位加提取字符长度大于字符串长度
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('abcd');
+SQL SUCCESS
+SELECT substrb(string1,2,5) from type_char;
++---------+
+| substrb |
++---------+
+| bcd     |
++---------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

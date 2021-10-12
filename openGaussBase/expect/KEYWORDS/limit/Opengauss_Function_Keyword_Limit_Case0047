@@ -1,0 +1,15 @@
+--  @testpoint:使用关键字limit为列名的临时表创建视图
+drop table if exists test_temporary_limit_007;
+SQL SUCCESS
+create temporary table test_temporary_limit_007("limit" int);
+SQL SUCCESS
+insert into test_temporary_limit_007 values(1);
+SQL SUCCESS
+create or replace view v_limit_002 as select "limit" from test_temporary_limit_007;
+SQL SUCCESS
+select "limit" from test_temporary_limit_007 order by "limit";
++-------+
+| limit |
++-------+
+| 1     |
++-------+

@@ -1,0 +1,27 @@
+-- @testpoint: 表与自定义函数
+drop table if exists t1;
+SQL SUCCESS
+CREATE TABLE t1(a int);
+SQL SUCCESS
+INSERT INTO t1 VALUES(1),(10);
+SQL SUCCESS
+CREATE OR REPLACE FUNCTION fun_for_return_query() RETURNS SETOF t1 AS $$
+DECLARE
+   r t1%ROWTYPE;
+BEGIN
+   RETURN QUERY select * from t1;
+END;
+$$ language plpgsql;
+/
+SQL SUCCESS
+call fun_for_return_query();
++----+
+| a  |
++----+
+| 1  |
+| 10 |
++----+
+DROP FUNCTION if exists fun_for_return_query();
+SQL SUCCESS
+drop table if exists t1 CASCADE;
+SQL SUCCESS

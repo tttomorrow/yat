@@ -1,0 +1,65 @@
+-- @testpoint: opengauss关键字column(保留)，作为同义词对象名，部分测试点合理报错
+--前置条件
+drop table if exists column_test;
+SQL SUCCESS
+create table column_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-失败
+drop synonym if exists column;
+?.*ERROR: syntax error at or near "column"
+?.*
+create synonym column for column_test;
+?.*ERROR: syntax error at or near "column"
+?.*
+--关键字带双引号-成功
+drop synonym if exists "column";
+SQL SUCCESS
+create synonym "column" for column_test;
+SQL SUCCESS
+insert into "column" values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update "column" set "column".name='cici' where "column".id=2;
+SQL SUCCESS
+select * from "column";
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+drop synonym "column";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'column';
+?.*ERROR: syntax error at or near "'column'"
+?.*
+create synonym 'column' for column_test;
+?.*ERROR: syntax error at or near "'column'"
+?.*
+insert into 'column' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'column'"
+?.*
+update 'column' set 'column'.name='cici' where 'column'.id=2;
+?.*ERROR: syntax error at or near "'column'"
+?.*
+select * from 'column';
+?.*ERROR: syntax error at or near "'column'"
+?.*
+--关键字带反引号-合理报错
+drop synonym if exists `column`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create synonym `column` for column_test;
+?.*ERROR: syntax error at or near "`"
+?.*
+insert into `column` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`"
+?.*
+update `column` set `column`.name='cici' where `column`.id=2;
+?.*ERROR: syntax error at or near "`"
+?.*
+select * from `column`;
+?.*ERROR: syntax error at or near "`"
+?.*
+drop table if exists column_test;
+SQL SUCCESS

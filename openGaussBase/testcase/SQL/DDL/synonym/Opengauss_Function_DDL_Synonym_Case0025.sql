@@ -1,0 +1,26 @@
+-- @testpoint: 自定义函数同义词在匿名块中调用
+-- @modify at: 2020-11-25
+--创建函数
+drop function if exists SYN_FUN_001(ARRAY_C integer[]) cascade;
+create or replace function SYN_FUN_001(ARRAY_C integer[]) return integer[]
+as
+ARRAY_A integer[];
+begin
+	ARRAY_A:=ARRAY_C;
+	return ARRAY_A;
+end;
+/
+--创建同义词
+drop synonym if exists SYN_FUN_SYN_001;
+create or replace synonym SYN_FUN_SYN_001 for SYN_FUN_001;
+--定义匿名块
+declare
+	ARRAY_A integer[]:=array[1,2,3,4,5,6,7,8,9,10];
+begin
+	ARRAY_A := SYN_FUN_SYN_001(ARRAY_A);
+	raise info '%',ARRAY_A;
+end;
+/
+--清理环境
+drop function if exists SYN_FUN_001(ARRAY_C integer[]) cascade;
+drop synonym if exists SYN_FUN_SYN_001;

@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字configuration(非保留)，作为模式名
+--关键字不带引号-成功
+drop schema if exists configuration;
+SQL SUCCESS
+create schema configuration;
+SQL SUCCESS
+drop schema configuration;
+SQL SUCCESS
+--关键字带双引号-成功
+drop schema if exists "configuration";
+SQL SUCCESS
+create schema "configuration";
+SQL SUCCESS
+drop schema "configuration";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop schema if exists 'configuration';
+?.*ERROR: syntax error at or near "'configuration'"
+?.*
+create schema 'configuration';
+?.*ERROR: syntax error at or near "'configuration'"
+?.*
+--关键字带反引号-合理报错
+drop schema if exists `configuration`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create schema `configuration`;
+?.*ERROR: syntax error at or near "`"
+?.*

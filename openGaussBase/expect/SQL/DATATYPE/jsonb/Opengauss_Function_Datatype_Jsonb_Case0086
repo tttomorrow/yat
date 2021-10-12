@@ -1,0 +1,68 @@
+-- @testpoint: json额外支持操作函数：json_agg（将值聚集为json类型的数组，当入参不合理时，合理报错）
+--合理入参
+drop table if exists classes;
+SQL SUCCESS
+create table classes(class int,name varchar,score float);
+SQL SUCCESS
+insert into classes values(1,'xiaoming',87.5),(3,'xiaowang',66),(3,'xiaozhang',90);
+SQL SUCCESS
+select name,json_agg(score) score from classes group by name order by name;
++-----------+--------+
+| name      | score  |
++-----------+--------+
+| xiaoming  | [87.5] |
+| xiaowang  | [66]   |
+| xiaozhang | [90]   |
++-----------+--------+
+select json_agg(score) from (select score from classes);
++----------------+
+| json_agg       |
++----------------+
+| [87.5, 66, 90] |
++----------------+
+select json_agg(name) score from classes;
++---------------------------------------+
+| score                                 |
++---------------------------------------+
+| ["xiaoming", "xiaowang", "xiaozhang"] |
++---------------------------------------+
+select json_agg(name) name from classes;
++---------------------------------------+
+| name                                  |
++---------------------------------------+
+| ["xiaoming", "xiaowang", "xiaozhang"] |
++---------------------------------------+
+select json_agg(score) from classes;
++----------------+
+| json_agg       |
++----------------+
+| [87.5, 66, 90] |
++----------------+
+select json_agg(k) from (values(1,1),(1,2),(2,2)) as xx(k, v) group by k;
++----------+
+| json_agg |
++----------+
+| [1, 1]   |
+| [2]      |
++----------+
+--不合理入参：报错
+select name, json_agg(score) score from classes;
+?.*ERROR: column "classes.name" must appear in the GROUP BY clause or be used in an aggregate function.*
+?.*
+select name,json_agg(score) from classes;
+?.*ERROR: column "classes.name" must appear in the GROUP BY clause or be used in an aggregate function.*
+?.*
+select json_agg(score) from class;
+?.*ERROR: relation "class" does not exist.*
+?.*
+select json_agg(id) from classes;
+?.*ERROR: column "id" does not exist.*
+?.*
+  Where: referenced column: json_agg
+select json_agg(x) from (values(1,1),(1,2),(2,2)) as xx(k, v) group by k;
+?.*ERROR: column "x" does not exist.*
+?.*
+  Where: referenced column: json_agg
+--清理数据
+drop table classes;
+SQL SUCCESS

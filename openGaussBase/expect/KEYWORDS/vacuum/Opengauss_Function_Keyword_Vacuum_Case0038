@@ -1,0 +1,39 @@
+-- @testpoint: 关键字vacuum,用作表名创建普通表
+drop table if exists vacuum cascade;
+SQL SUCCESS
+create table vacuum(id int,name varchar(20));
+SQL SUCCESS
+create or replace procedure vacuum_insert
+as
+begin
+ for i in 1..10 loop
+    insert into vacuum values(i,'vac+'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call vacuum_insert();
++---------------+
+| vacuum_insert |
++---------------+
+|               |
++---------------+
+select * from vacuum;
++----+--------+
+| id | name   |
++----+--------+
+| 1  | vac+1  |
+| 2  | vac+2  |
+| 3  | vac+3  |
+| 4  | vac+4  |
+| 5  | vac+5  |
+| 6  | vac+6  |
+| 7  | vac+7  |
+| 8  | vac+8  |
+| 9  | vac+9  |
+| 10 | vac+10 |
++----+--------+
+drop table if exists vacuum cascade;
+SQL SUCCESS
+drop procedure vacuum_insert;
+SQL SUCCESS

@@ -1,0 +1,13 @@
+-- @testpoint: 无效值测试
+drop table if exists test_boolean_001;
+SQL SUCCESS
+create table test_boolean_001 (a boolean);
+SQL SUCCESS
+insert into test_boolean_001 values(true);
+SQL SUCCESS
+insert into test_boolean_001 values(false);
+SQL SUCCESS
+commit;
+SQL SUCCESS
+drop table if exists test_boolean_001;
+SQL SUCCESS

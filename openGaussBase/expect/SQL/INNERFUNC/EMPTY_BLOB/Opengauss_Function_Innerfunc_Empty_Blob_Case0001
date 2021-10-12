@@ -1,0 +1,15 @@
+-- @testpoint: 初始化BLOB值
+drop table if exists blob_tb;
+SQL SUCCESS
+CREATE TABLE blob_tb(b blob,id int);
+SQL SUCCESS
+INSERT INTO blob_tb VALUES (empty_blob(),1);
+SQL SUCCESS
+select * from blob_tb;
++---+----+
+| b | id |
++---+----+
+|   | 1  |
++---+----+
+DROP TABLE blob_tb;
+SQL SUCCESS

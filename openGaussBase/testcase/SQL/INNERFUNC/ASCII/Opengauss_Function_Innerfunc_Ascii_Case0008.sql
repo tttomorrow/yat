@@ -1,0 +1,2 @@
+-- @testpoint: 引号数值+字母+特殊符号，只转换首字数值
+select ASCII('12A#');

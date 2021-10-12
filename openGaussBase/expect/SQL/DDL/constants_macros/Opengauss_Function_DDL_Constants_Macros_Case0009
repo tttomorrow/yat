@@ -1,0 +1,58 @@
+--  @testpoint:Null有效性测试
+--建表
+drop table if exists test_1;
+SQL SUCCESS
+create table test_1(id int);
+SQL SUCCESS
+--插入数据null
+insert into test_1 values(null);
+SQL SUCCESS
+select * from test_1;
++----+
+| id |
++----+
+|    |
++----+
+--查询null的字节数
+select char_length(null);
++-------------+
+| char_length |
++-------------+
+|             |
++-------------+
+--给id字段创建唯一约束
+alter table test_1 add constraint "id_unique" unique(id);
+SQL SUCCESS
+--插入null值，成功
+insert into test_1 values(null);
+SQL SUCCESS
+--查询表的记录数（2）
+select count(*) from test_1;
++-------+
+| count |
++-------+
+| 2     |
++-------+
+--查询表的记录数（非空数,0）
+select count(id) from test_1;
++-------+
+| count |
++-------+
+| 0     |
++-------+
+--修改id字段为主键约束,合理报错（id列有null值）
+alter table test_1 add constraint "id_primary" primary key(id);
+?.*ERROR: column "id" contains null values
+--清空表的数据
+truncate table test_1;
+SQL SUCCESS
+--修改id字段为主键约束
+alter table test_1 add constraint "id_primary" primary key(id);
+SQL SUCCESS
+--插入数据null，合理报错
+insert into test_1 values(null);
+?.*ERROR: null value in column "id" violates not-null constraint
+  Detail: Failing row contains (null).
+--删表
+drop table test_1;
+SQL SUCCESS

@@ -1,0 +1,15 @@
+-- @testpoint: 创建列类型是文本搜索类型的表
+drop table if exists table_2;
+SQL SUCCESS
+create table table_2(a tsvector,b tsquery);
+SQL SUCCESS
+insert into table_2 values('qwerrttyyutuyi','23redrvxcvvfhtyuhn6ty');
+SQL SUCCESS
+select * from table_2;
++------------------+-------------------------+
+| a                | b                       |
++------------------+-------------------------+
+| 'qwerrttyyutuyi' | '23redrvxcvvfhtyuhn6ty' |
++------------------+-------------------------+
+drop table if exists table_2;
+SQL SUCCESS

@@ -1,0 +1,179 @@
+-- @testpoint: alter table在插入数据前后进行添加删除列
+drop table if exists table_alter_011;
+SQL SUCCESS
+create table table_alter_011(
+c_id int, c_integer integer,
+c_real real,c_float float, c_double binary_double,
+c_decimal decimal(38), c_number number(38),c_number1 number,c_number2 number(20,10),c_numeric numeric(38),
+c_char char(50) default null, c_varchar varchar(20), c_varchar2 varchar2(4000),
+c_clob clob,
+c_raw raw(20),c_blob blob,
+c_date date,c_timestamp timestamp
+);
+SQL SUCCESS
+--增加列
+alter table table_alter_011 add(c_1 int);
+SQL SUCCESS
+SQL SUCCESS
+alter table table_alter_011 add(c_3 VARCHAR(200));
+SQL SUCCESS
+alter table table_alter_011 add(c_4 CLOB);
+SQL SUCCESS
+SELECT col_description(a.attrelid,a.attnum) as comment,format_type(a.atttypid,a.atttypmod) as type,a.attname as name, a.attnotnull as notnull
+FROM pg_class as c,pg_attribute as a
+where c.relname = 'table_alter_011' and a.attrelid = c.oid and a.attnum>0;
++---------+--------------------------------+-------------+---------+
+| comment | type                           | name        | notnull |
++---------+--------------------------------+-------------+---------+
+|         | integer                        | c_id        | false   |
+|         | integer                        | c_integer   | false   |
+|         | real                           | c_real      | false   |
+|         | double precision               | c_float     | false   |
+|         | double precision               | c_double    | false   |
+|         | numeric(38,0)                  | c_decimal   | false   |
+|         | numeric(38,0)                  | c_number    | false   |
+|         | numeric                        | c_number1   | false   |
+|         | numeric(20,10)                 | c_number2   | false   |
+|         | numeric(38,0)                  | c_numeric   | false   |
+|         | character(50)                  | c_char      | false   |
+|         | character varying(20)          | c_varchar   | false   |
+|         | character varying(4000)        | c_varchar2  | false   |
+|         | clob                           | c_clob      | false   |
+|         | raw                            | c_raw       | false   |
+|         | blob                           | c_blob      | false   |
+|         | timestamp(0) without time zone | c_date      | false   |
+|         | timestamp without time zone    | c_timestamp | false   |
+|         | integer                        | c_1         | false   |
+|         | blob                           | c_2         | false   |
+|         | character varying(200)         | c_3         | false   |
+|         | clob                           | c_4         | false   |
++---------+--------------------------------+-------------+---------+
+--删除新增加的列
+alter table table_alter_011 drop c_1;
+SQL SUCCESS
+alter table table_alter_011 drop c_2;
+SQL SUCCESS
+alter table table_alter_011 drop c_3;
+SQL SUCCESS
+SELECT col_description(a.attrelid,a.attnum) as comment,format_type(a.atttypid,a.atttypmod) as type,a.attname as name, a.attnotnull as notnull
+FROM pg_class as c,pg_attribute as a
+where c.relname = 'table_alter_011' and a.attrelid = c.oid and a.attnum>0;
++---------+--------------------------------+-------------------------------+---------+
+| comment | type                           | name                          | notnull |
++---------+--------------------------------+-------------------------------+---------+
+|         | integer                        | c_id                          | false   |
+|         | integer                        | c_integer                     | false   |
+|         | real                           | c_real                        | false   |
+|         | double precision               | c_float                       | false   |
+|         | double precision               | c_double                      | false   |
+|         | numeric(38,0)                  | c_decimal                     | false   |
+|         | numeric(38,0)                  | c_number                      | false   |
+|         | numeric                        | c_number1                     | false   |
+|         | numeric(20,10)                 | c_number2                     | false   |
+|         | numeric(38,0)                  | c_numeric                     | false   |
+|         | character(50)                  | c_char                        | false   |
+|         | character varying(20)          | c_varchar                     | false   |
+|         | character varying(4000)        | c_varchar2                    | false   |
+|         | clob                           | c_clob                        | false   |
+|         | raw                            | c_raw                         | false   |
+|         | blob                           | c_blob                        | false   |
+|         | timestamp(0) without time zone | c_date                        | false   |
+|         | timestamp without time zone    | c_timestamp                   | false   |
+|         | -                              | ........pg.dropped.19........ | false   |
+|         | -                              | ........pg.dropped.20........ | false   |
+|         | -                              | ........pg.dropped.21........ | false   |
+|         | clob                           | c_4                           | false   |
++---------+--------------------------------+-------------------------------+---------+
+--插入数据
+insert into table_alter_011 values(1,0,3.14,1.0002,3.55555,5,7887.656,0,0.111111,3.1415926,'dghg','jjj','pokj99',
+);
+SQL SUCCESS
+insert into table_alter_011 select * from table_alter_011;
+SQL SUCCESS
+insert into table_alter_011 select * from table_alter_011;
+SQL SUCCESS
+insert into table_alter_011 select * from table_alter_011;
+SQL SUCCESS
+analyze  table_alter_011;
+SQL SUCCESS
+--增加列
+alter table table_alter_011 add(c_1 int);
+SQL SUCCESS
+SQL SUCCESS
+alter table table_alter_011 add(c_5 date);
+SQL SUCCESS
+SELECT col_description(a.attrelid,a.attnum) as comment,format_type(a.atttypid,a.atttypmod) as type,a.attname as name, a.attnotnull as notnull
+FROM pg_class as c,pg_attribute as a
+where c.relname = 'table_alter_011' and a.attrelid = c.oid and a.attnum>0;
++---------+--------------------------------+-------------------------------+---------+
+| comment | type                           | name                          | notnull |
++---------+--------------------------------+-------------------------------+---------+
+|         | integer                        | c_id                          | false   |
+|         | integer                        | c_integer                     | false   |
+|         | real                           | c_real                        | false   |
+|         | double precision               | c_float                       | false   |
+|         | double precision               | c_double                      | false   |
+|         | numeric(38,0)                  | c_decimal                     | false   |
+|         | numeric(38,0)                  | c_number                      | false   |
+|         | numeric                        | c_number1                     | false   |
+|         | numeric(20,10)                 | c_number2                     | false   |
+|         | numeric(38,0)                  | c_numeric                     | false   |
+|         | character(50)                  | c_char                        | false   |
+|         | character varying(20)          | c_varchar                     | false   |
+|         | character varying(4000)        | c_varchar2                    | false   |
+|         | clob                           | c_clob                        | false   |
+|         | raw                            | c_raw                         | false   |
+|         | blob                           | c_blob                        | false   |
+|         | timestamp(0) without time zone | c_date                        | false   |
+|         | timestamp without time zone    | c_timestamp                   | false   |
+|         | -                              | ........pg.dropped.19........ | false   |
+|         | -                              | ........pg.dropped.20........ | false   |
+|         | -                              | ........pg.dropped.21........ | false   |
+|         | clob                           | c_4                           | false   |
+|         | integer                        | c_1                           | false   |
+|         | blob                           | c_2                           | false   |
+|         | timestamp(0) without time zone | c_5                           | false   |
++---------+--------------------------------+-------------------------------+---------+
+--删除新增加的列
+alter table table_alter_011 drop c_1;
+SQL SUCCESS
+alter table table_alter_011 drop c_2;
+SQL SUCCESS
+alter table table_alter_011 drop c_4;
+SQL SUCCESS
+alter table table_alter_011 drop c_5;
+SQL SUCCESS
+SELECT col_description(a.attrelid,a.attnum) as comment,format_type(a.atttypid,a.atttypmod) as type,a.attname as name, a.attnotnull as notnull
+FROM pg_class as c,pg_attribute as a
+where c.relname = 'table_alter_011' and a.attrelid = c.oid and a.attnum>0;
++---------+--------------------------------+-------------------------------+---------+
+| comment | type                           | name                          | notnull |
++---------+--------------------------------+-------------------------------+---------+
+|         | integer                        | c_id                          | false   |
+|         | integer                        | c_integer                     | false   |
+|         | real                           | c_real                        | false   |
+|         | double precision               | c_float                       | false   |
+|         | double precision               | c_double                      | false   |
+|         | numeric(38,0)                  | c_decimal                     | false   |
+|         | numeric(38,0)                  | c_number                      | false   |
+|         | numeric                        | c_number1                     | false   |
+|         | numeric(20,10)                 | c_number2                     | false   |
+|         | numeric(38,0)                  | c_numeric                     | false   |
+|         | character(50)                  | c_char                        | false   |
+|         | character varying(20)          | c_varchar                     | false   |
+|         | character varying(4000)        | c_varchar2                    | false   |
+|         | clob                           | c_clob                        | false   |
+|         | raw                            | c_raw                         | false   |
+|         | blob                           | c_blob                        | false   |
+|         | timestamp(0) without time zone | c_date                        | false   |
+|         | timestamp without time zone    | c_timestamp                   | false   |
+|         | -                              | ........pg.dropped.19........ | false   |
+|         | -                              | ........pg.dropped.20........ | false   |
+|         | -                              | ........pg.dropped.21........ | false   |
+|         | -                              | ........pg.dropped.22........ | false   |
+|         | -                              | ........pg.dropped.23........ | false   |
+|         | -                              | ........pg.dropped.24........ | false   |
+|         | -                              | ........pg.dropped.25........ | false   |
++---------+--------------------------------+-------------------------------+---------+
+drop table if exists table_alter_011;
+SQL SUCCESS

@@ -1,0 +1,22 @@
+-- @testpoint: date_part入参为采用数字表示的时间段
+ 
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (clo1 reltime);
+SQL SUCCESS
+insert into test_date01 values ('60');
+SQL SUCCESS
+select date_part('month', clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| 2.0       |
++-----------+
+SELECT date_part('month', reltime '121');
++-----------+
+| date_part |
++-----------+
+| 4.0       |
++-----------+
+drop table if exists test_date01;
+SQL SUCCESS

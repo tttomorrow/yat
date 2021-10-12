@@ -1,0 +1,31 @@
+--  @testpoint:事务中，使用delete子句
+--建表
+drop table if exists t_delete03;
+SQL SUCCESS
+create table t_delete03(id int,name varchar(10));
+SQL SUCCESS
+--插入数据
+insert into t_delete03 values (1,'小明');
+SQL SUCCESS
+insert into t_delete03 values (2,'小李');
+SQL SUCCESS
+--开启事务
+start transaction;
+SQL SUCCESS
+--删除表数据
+delete from t_delete03;
+SQL SUCCESS
+--回滚
+rollback;
+SQL SUCCESS
+--查询表信息，表数据恢复
+select * from t_delete03;
++----+------+
+| id | name |
++----+------+
+| 1  | 小明   |
+| 2  | 小李   |
++----+------+
+--删除表
+drop table t_delete03;
+SQL SUCCESS

@@ -1,0 +1,32 @@
+-- @testpoint: opengauss关键字operator(非保留)，自定义操作符，操作符类，操作符族 合理报错
+--下面的命令为数据类型box定义了一种新的操作符--面积相等：
+CREATE OPERATOR === (
+    LEFTARG = box,
+    RIGHTARG = box,
+    PROCEDURE = area_equal_procedure,
+    COMMUTATOR = ===,
+    NEGATOR = !==,
+    RESTRICT = area_restriction_procedure,
+    JOIN = area_join_procedure,
+    HASHES, MERGES
+);
+?.*ERROR: function area_equal_procedure\(box, box\) does not exist.*
+--下面的例子命令为数据类型_int4(int4数组) 定义了一个 GiST 索引操作符类
+CREATE OPERATOR CLASS gist__int_ops
+    DEFAULT FOR TYPE _int4 USING gist AS
+        OPERATOR        3       &&,
+        OPERATOR        6       = (anyarray, anyarray),
+        OPERATOR        7       @>,
+        OPERATOR        8       <@,
+        OPERATOR        20      @@ (_int4, query_int),
+        FUNCTION        1       g_int_consistent (internal, _int4, int, oid, internal),
+        FUNCTION        2       g_int_union (internal, internal),
+        FUNCTION        3       g_int_compress (internal),
+        FUNCTION        4       g_int_decompress (internal),
+        FUNCTION        5       g_int_penalty (internal, internal, internal),
+        FUNCTION        6       g_int_picksplit (internal, internal),
+        FUNCTION        7       g_int_same (_int4, _int4, internal);
+?.*ERROR: operator does not exist.*
+-- 定义操作符族
+CREATE OPERATOR FAMILY name_001 USING index_method;
+?.*ERROR: user defined operator is not yet supported.*

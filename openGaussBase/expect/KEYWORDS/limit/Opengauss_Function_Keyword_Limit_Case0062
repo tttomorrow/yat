@@ -1,0 +1,46 @@
+-- @testpoint: merge into补充
+drop table if exists test_limit_009;
+SQL SUCCESS
+create table test_limit_009 ("LIMIT" int,id int);
+SQL SUCCESS
+insert into test_limit_009 values (-999,1);
+SQL SUCCESS
+insert into test_limit_009 values (-10000,2);
+SQL SUCCESS
+insert into test_limit_009 values (-10000,3);
+SQL SUCCESS
+insert into test_limit_009 values (100,3);
+SQL SUCCESS
+insert into test_limit_009 values (100,2);
+SQL SUCCESS
+drop table if exists test_limit_011;
+SQL SUCCESS
+create table test_limit_011 ("LIMIT" int,id int);
+SQL SUCCESS
+insert into test_limit_011 values (-999,9);
+SQL SUCCESS
+insert into test_limit_011 values (1,10);
+SQL SUCCESS
+insert into test_limit_011 values (2,11);
+SQL SUCCESS
+MERGE INTO test_limit_011 t1 USING test_limit_009 t2 ON (t1."LIMIT" = t2."LIMIT")
+      WHEN MATCHED THEN UPDATE SET t1.id = t2.id
+	  WHEN NOT MATCHED THEN INSERT ("LIMIT",id) VALUES (t2."LIMIT",t2.id);
+SQL SUCCESS
+select id,"LIMIT" from test_limit_011 order by id,"LIMIT";
++----+--------+
+| id | LIMIT  |
++----+--------+
+| 1  | -999   |
+| 2  | -10000 |
+| 2  | 100    |
+| 3  | -10000 |
+| 3  | 100    |
+| 10 | 1      |
+| 11 | 2      |
++----+--------+
+--清理环境
+drop table if exists test_limit_009;
+SQL SUCCESS
+drop table if exists test_limit_011;
+SQL SUCCESS

@@ -1,0 +1,16 @@
+
+
+--  @testpoint:输入为null,''
+
+select asin(null);
++------+
+| asin |
++------+
+|      |
++------+
+select asin('');
++------+
+| asin |
++------+
+|      |
++------+

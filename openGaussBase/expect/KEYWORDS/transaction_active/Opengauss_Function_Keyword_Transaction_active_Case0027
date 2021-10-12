@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字transaction_active非保留)，作为序列名
+--关键字不带引号-成功
+drop sequence if exists transaction_active;
+SQL SUCCESS
+create sequence transaction_active start 100 cache 50;
+SQL SUCCESS
+drop sequence transaction_active;
+SQL SUCCESS
+--关键字带双引号-成功
+drop sequence if exists "transaction_active";
+SQL SUCCESS
+create sequence "transaction_active" start 100 cache 50;
+SQL SUCCESS
+drop sequence "transaction_active";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'transaction_active';
+?.*ERROR: syntax error at or near "'transaction_active'".*
+?.*Position: .*
+create sequence 'transaction_active' start 100 cache 50;
+?.*ERROR: syntax error at or near "'transaction_active'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop sequence if exists `transaction_active`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create sequence `transaction_active` start 100 cache 50;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

@@ -1,0 +1,32 @@
+--  @testpoint:opengauss关键字column(保留)，作为序列名
+--关键字不带引号-失败
+drop sequence if exists column;
+?.*ERROR: syntax error at or near "column"
+?.*
+create sequence column start 100 cache 50;
+?.*ERROR: syntax error at or near "column"
+?.*
+drop sequence column;
+?.*ERROR: syntax error at or near "column"
+?.*
+--关键字带双引号-成功
+drop sequence if exists "column";
+SQL SUCCESS
+create sequence "column" start 100 cache 50;
+SQL SUCCESS
+drop sequence "column";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'column';
+?.*ERROR: syntax error at or near "'column'"
+?.*
+create sequence 'column' start 100 cache 50;
+?.*ERROR: syntax error at or near "'column'"
+?.*
+--关键字带反引号-合理报错
+drop sequence if exists `column`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create sequence `column` start 100 cache 50;
+?.*ERROR: syntax error at or near "`"
+?.*

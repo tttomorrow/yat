@@ -1,0 +1,89 @@
+-- @testpoint: 列存本地临时表，增加表字段(单字段)主键约束，部分测试点合理报错
+--测试点1：创建列存本地临时表，表中存在数据，数据为唯一且非空
+drop table if exists columns_local_tab13;
+SQL SUCCESS
+create local temp table columns_local_tab13(id int) with(orientation=column);
+SQL SUCCESS
+insert into columns_local_tab13 values(generate_series(1,1000));
+SQL SUCCESS
+--修改字段主键约束
+alter table columns_local_tab13 add primary key(id);
+SQL SUCCESS
+--删除表
+drop table columns_local_tab13 cascade;
+SQL SUCCESS
+--测试点2：创建列存本地临时表，表中存在数据，数据为唯一且有空值
+drop table if exists columns_local_tab13;
+SQL SUCCESS
+create local temp table columns_local_tab13(id int) with(orientation=column);
+SQL SUCCESS
+insert into columns_local_tab13 values(generate_series(1,1000));
+SQL SUCCESS
+insert into columns_local_tab13 values(null),(null),(null);
+SQL SUCCESS
+--修改字段主键约束,合理报错
+alter table columns_local_tab13 add primary key(id);
+?.*ERROR: column "id" contains null values
+--删除表
+drop table columns_local_tab13 cascade;
+SQL SUCCESS
+--测试点3：创建列存本地临时表，表中存在数据，数据不唯一且非空
+drop table if exists columns_local_tab13;
+SQL SUCCESS
+create local temp table columns_local_tab13(id int) with(orientation=column);
+SQL SUCCESS
+insert into columns_local_tab13 values(generate_series(1,100));
+SQL SUCCESS
+insert into columns_local_tab13 values(generate_series(1,100));
+SQL SUCCESS
+insert into columns_local_tab13 values(generate_series(1,100));
+SQL SUCCESS
+--修改字段主键约束，合理报错
+alter table columns_local_tab13 add primary key(id);
+?.*ERROR: could not create unique index "columns_local_tab13_pkey"
+  Detail: Key (id)=(51) is duplicated.
+--删除表
+drop table columns_local_tab13 cascade;
+SQL SUCCESS
+--测试点4：创建列存本地临时表，表中存在数据，数据不唯一且有空值
+drop table if exists columns_local_tab13;
+SQL SUCCESS
+create local temp table columns_local_tab13(id int) with(orientation=column);
+SQL SUCCESS
+insert into columns_local_tab13 values(generate_series(1,100));
+SQL SUCCESS
+insert into columns_local_tab13 values(null),(null),(null);
+SQL SUCCESS
+insert into columns_local_tab13 values(generate_series(1,100));
+SQL SUCCESS
+--修改字段主键约束，合理报错
+alter table columns_local_tab13 add primary key(id);
+?.*ERROR: column "id" contains null values
+--删除表
+drop table columns_local_tab13 cascade;
+SQL SUCCESS
+--测试点5：创建列存本地临时表，表中不存在数据，添加主键约束，插入数据
+drop table if exists columns_local_tab13;
+SQL SUCCESS
+create local temp table columns_local_tab13(id int) with(orientation=column);
+SQL SUCCESS
+--修改字段主键约束
+alter table columns_local_tab13 add primary key(id);
+SQL SUCCESS
+--插入数据
+insert into columns_local_tab13 values(generate_series(1,1000));
+SQL SUCCESS
+--再次插入已存在数据，合理报错
+insert into columns_local_tab13 values(generate_series(1,1000));
+?.*ERROR: duplicate key value violates unique constraint "columns_local_tab13_pkey"
+  Detail: Key (id)=(1) already exists.
+--查看数据
+select count(*) from columns_local_tab13 where id=1;
++-------+
+| count |
++-------+
+| 1     |
++-------+
+--删除表
+drop table columns_local_tab13 cascade;
+SQL SUCCESS

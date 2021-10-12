@@ -1,0 +1,18 @@
+-- @testpoint: exp函数入参范围校验，合理报错
+select exp(709);
++-----------------------+
+| exp                   |
++-----------------------+
++-----------------------+
+select exp(710);
+?.*ERROR: value out of range: overflow
+  Where: referenced column: exp
+select exp(-745);
++----------+
+| exp      |
++----------+
+| 4.9E-324 |
++----------+
+select exp(-746);
+?.*ERROR: value out of range: underflow
+  Where: referenced column: exp

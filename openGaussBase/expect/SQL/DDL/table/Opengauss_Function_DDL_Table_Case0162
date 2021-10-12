@@ -1,0 +1,38 @@
+-- @testpoint: 创建列存表，列存表GIN索引设置唯一索引时合理报错
+drop table if exists table_t1;
+SQL SUCCESS
+CREATE TABLE table_t1
+(SM_SK           INTEGER               NOT NULL,
+ SM_id        CHAR(16)              NOT NULL,
+ SM_TYPE         CHAR(30)
+ )with (ORIENTATION=COLUMN);
+SQL SUCCESS
+DROP INDEX if exists table_t1_index1;
+SQL SUCCESS
+CREATE UNIQUE INDEX table_t1_index1 ON table_t1 using gin(SM_SK);
+?.*ERROR: access method "cgin" does not support unique indexes.*
+insert into table_t1 values (1,'a','1a'),(2,'b','2b'),(3,'c','3c');
+SQL SUCCESS
+DROP INDEX if exists table_t1_index1;
+SQL SUCCESS
+drop table if exists table_t1;
+SQL SUCCESS
+-- @testpoint: 创建列存表以及列存表GIN索引不支持唯一部分索引
+drop table if exists table_t2;
+SQL SUCCESS
+CREATE TABLE table_t2
+(SM_SK           INTEGER               NOT NULL,
+ SM_id        CHAR(16)              NOT NULL,
+ SM_TYPE         CHAR(30)
+ )with (ORIENTATION=COLUMN);
+SQL SUCCESS
+DROP INDEX if exists table_t2_index2;
+SQL SUCCESS
+CREATE  INDEX table_t2_index2 ON table_t2 using gin(SM_SK) where SM_SK > 5;
+?.*ERROR: access method "cgin" does not support WHERE clause.*
+insert into table_t2 values (1,'a','1a'),(2,'b','2b'),(3,'c','3c');
+SQL SUCCESS
+DROP INDEX if exists table_t2_index2;
+SQL SUCCESS
+drop table if exists table_t2;
+SQL SUCCESS

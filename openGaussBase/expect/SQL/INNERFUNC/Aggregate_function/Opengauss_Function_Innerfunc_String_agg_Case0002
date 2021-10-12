@@ -1,0 +1,28 @@
+-- @testpoint: 函数string_agg(expression, delimiter)，将输入值连接成为一个字符串，用分隔符分开,入参为无效值时，合理报错
+drop table if exists table_test;
+SQL SUCCESS
+create table table_test(id integer,
+name varchar(10),
+age integer,
+height decimal(5,2),
+hobbies text,
+tel bigint );
+SQL SUCCESS
+SQL SUCCESS
+--分隔符为不带引号的中文
+select string_agg(name, 你好) from table_test;
+?.*ERROR: column "你好" does not exist.*
+?.*Position.*
+  Where: referenced column: string_agg
+--分隔符为不带引号的特殊符号
+select string_agg(name, #) from table_test;
+?.*ERROR: syntax error at or near "\)".*
+?.*Position.*
+--输入值为两个参数时
+select string_agg(name, id, '、') from table_test;
+?.*ERROR: function string_agg\(character varying, integer, unknown\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position.*
+  Where: referenced column: string_agg
+drop table table_test;
+SQL SUCCESS

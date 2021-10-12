@@ -1,0 +1,23 @@
+--  @testpoint:opengauss关键字method(非保留)，作为用户名
+--关键字explain作为用户名不带引号，创建成功
+drop user if exists method;
+SQL SUCCESS
+CREATE USER method PASSWORD 'Bigdata@123';
+SQL SUCCESS
+drop user method;
+SQL SUCCESS
+--关键字explain作为用户名加双引号，创建成功
+drop user if exists "method";
+SQL SUCCESS
+CREATE USER "method" PASSWORD 'Bigdata@123';
+SQL SUCCESS
+drop user "method";
+SQL SUCCESS
+--关键字explain作为用户名加单引号，合理报错
+CREATE USER 'method' PASSWORD 'Bigdata@123';
+?.*ERROR: syntax error at or near "'method'".*
+?.*Position: .*
+--关键字explain作为用户名加反引号，合理报错
+CREATE USER `method` PASSWORD 'Bigdata@123';
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

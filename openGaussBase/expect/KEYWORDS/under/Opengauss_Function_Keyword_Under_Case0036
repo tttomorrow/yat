@@ -1,0 +1,40 @@
+-- @testpoint: 关键字under,用作字段名
+drop table if exists under_test cascade;
+SQL SUCCESS
+create table if not exists under_test(id int,under varchar(20));
+SQL SUCCESS
+create or replace procedure under_insert
+as
+begin
+ for i in 1..10 loop
+    insert into under_test values(i,'und+'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call under_insert();
++--------------+
+| under_insert |
++--------------+
+|              |
++--------------+
+select * from under_test;
++----+--------+
+| id | under  |
++----+--------+
+| 1  | und+1  |
+| 2  | und+2  |
+| 3  | und+3  |
+| 4  | und+4  |
+| 5  | und+5  |
+| 6  | und+6  |
+| 7  | und+7  |
+| 8  | und+8  |
+| 9  | und+9  |
+| 10 | und+10 |
++----+--------+
+--清理环境
+drop table if exists under_test cascade;
+SQL SUCCESS
+drop procedure under_insert;
+SQL SUCCESS

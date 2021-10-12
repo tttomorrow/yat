@@ -1,0 +1,13 @@
+-- @testpoint: 输入为特殊字符，合理报错
+DROP TABLE IF EXISTS test_timestamp14;
+SQL SUCCESS
+CREATE TABLE test_timestamp14 (name timestamp);
+SQL SUCCESS
+INSERT INTO test_timestamp14 VALUES (timestamp 'r');
+?.*ERROR: invalid input syntax for type timestamp: "r"
+?.*
+INSERT INTO test_timestamp14 VALUES (timestamp '~');
+?.*ERROR: invalid input syntax for type timestamp: "~"
+?.*
+DROP TABLE IF EXISTS test_timestamp14;
+SQL SUCCESS

@@ -1,0 +1,8 @@
+-- @testpoint: 数组操作符<，判断一个数组是否小于另一个数组
+
+--当前面数组小于后面数组时返回true
+select array[1,2,3] < array[1,2,4] as result;
+
+--当前面数组不小于后面数组时返回false
+select array[1,2,5] < array[1,2,4] as result;
+

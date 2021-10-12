@@ -1,0 +1,49 @@
+-- @testpoint: 基础测试点(空值,参数个数)
+select nullif('','');
++--------+
+| nullif |
++--------+
+|        |
++--------+
+select nullif(' ',' ');
++--------+
+| nullif |
++--------+
+|        |
++--------+
+select nullif('  ',' ');
++--------+
+| nullif |
++--------+
+|        |
++--------+
+SELECT NULLIF(1,1);
++--------+
+| nullif |
++--------+
+|        |
++--------+
+SELECT NULLIF(2,3);
++--------+
+| nullif |
++--------+
+| 2      |
++--------+
+SELECT NULLIF(NULL,1);
++--------+
+| nullif |
++--------+
+|        |
++--------+
+select nullif(1,null);
++--------+
+| nullif |
++--------+
+| 1      |
++--------+
+select NULLIF(,);
+?.*ERROR: syntax error at or near \"\,\"
+?.*
+select NULLIF();
+?.*ERROR: syntax error at or near \"\)\"
+?.*

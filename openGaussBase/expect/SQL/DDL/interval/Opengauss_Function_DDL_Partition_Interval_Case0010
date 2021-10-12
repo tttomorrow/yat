@@ -1,0 +1,23 @@
+-- @testpoint: interval分区,interval_expr个数校验，合理报错
+drop table if exists partition_table_001;
+SQL SUCCESS
+create table partition_table_001 (col1 date not null) 
+partition by range (col1) interval ('1 year','1 day')
+(
+	partition partition_table_001_p1 values less than ('2020-02-01 1:00:00'),
+	partition partition_table_001_p2 values less than ('2020-03-01 2:00:00')
+);
+?.*ERROR: syntax error at or near "\,"
+?.*
+drop table if exists partition_table_001;
+SQL SUCCESS
+create table partition_table_001 (col1 date not null)
+partition by range (col1) interval ()
+(
+	partition partition_table_001_p1 values less than ('2020-02-01 1:00:00'),
+	partition partition_table_001_p2 values less than ('2020-03-01 2:00:00')
+);
+?.*ERROR: syntax error at or near "\)"
+?.*
+drop table if exists partition_table_001;
+SQL SUCCESS

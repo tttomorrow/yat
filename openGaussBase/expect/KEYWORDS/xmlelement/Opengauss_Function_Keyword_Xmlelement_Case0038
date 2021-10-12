@@ -1,0 +1,23 @@
+-- @testpoint: 关键字xmlelement，用作字段类型(合理报错)
+drop table if exists xmlelement_test cascade;
+SQL SUCCESS
+create table xmlelement_test(id int,name xmlelement(20));
+?.*ERROR.*
+?.*Position: .*
+create or replace procedure xmlelement_insert
+as
+begin
+ for i in 1..10 loop
+    insert into xmlelement_test values(i,'xmlelement'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call xmlelement_insert();
+?.*ERROR.*
+  Where: PL/pgSQL function xmlelement_insert() line 4 at SQL statement
+select * from xmlelement_test;
+?.*ERROR.*
+?.*Position: .*
+drop procedure xmlelement_insert;
+SQL SUCCESS

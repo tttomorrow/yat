@@ -1,0 +1,71 @@
+--  @testpoint: RENAME TO：修改索引名称为已存在索引名称
+--创建表
+DROP TABLE if EXISTS test_index_table_116 CASCADE;
+SQL SUCCESS
+create table test_index_table_116(
+c_int int
+) WITH (ORIENTATION = row) ;
+SQL SUCCESS
+--建索引
+drop index if exists index_116_01;
+SQL SUCCESS
+drop index if exists index_116_02;
+SQL SUCCESS
+create index index_116_01 on test_index_table_116(c_int);
+SQL SUCCESS
+create index index_116_02 on test_index_table_116(c_int);
+SQL SUCCESS
+select relname from pg_class where relname like 'index_116%' order by relname;
++--------------+
+| relname      |
++--------------+
+| index_116_01 |
+| index_116_02 |
++--------------+
+--rename
+--不存在
+ALTER index index_116 RENAME TO index_116_01;
+?.*ERROR: relation "index_116" does not exist
+ALTER index IF EXISTS index_116 RENAME TO index_116_01;
+SQL SUCCESS
+--同名
+ALTER index IF EXISTS index_116_02 RENAME TO index_116_02;
+?.*ERROR: relation "index_116_02" already exists
+select relname from pg_class where relname like 'index_116%' order by relname;
++--------------+
+| relname      |
++--------------+
+| index_116_01 |
+| index_116_02 |
++--------------+
+--已存在
+ALTER index IF EXISTS index_116_02 RENAME TO index_116_01;
+?.*ERROR: relation "index_116_01" already exists
+select relname from pg_class where relname like 'index_116%' order by relname;
++--------------+
+| relname      |
++--------------+
+| index_116_01 |
+| index_116_02 |
++--------------+
+ALTER index IF EXISTS index_116_01 RENAME TO index_116;
+SQL SUCCESS
+select relname from pg_class where relname like 'index_116%' order by relname;
++--------------+
+| relname      |
++--------------+
+| index_116    |
+| index_116_02 |
++--------------+
+ALTER index IF EXISTS index_116_02 RENAME TO index_116_01;
+SQL SUCCESS
+select relname from pg_class where relname like 'index_116%' order by relname;
++--------------+
+| relname      |
++--------------+
+| index_116    |
+| index_116_01 |
++--------------+
+--清理环境
+DROP TABLE if EXISTS test_index_table_116 CASCADE;
+SQL SUCCESS

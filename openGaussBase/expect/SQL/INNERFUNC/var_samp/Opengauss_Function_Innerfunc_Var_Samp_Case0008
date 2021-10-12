@@ -1,0 +1,18 @@
+-- @testpoint: 聚集函数var_samp，与group by、having联合使用
+drop table if exists t_nvl_rca_tab;
+SQL SUCCESS
+create table t_nvl_rca_tab(col_1 int,col_2 int);
+SQL SUCCESS
+insert into t_nvl_rca_tab values (253,333);
+SQL SUCCESS
+insert into t_nvl_rca_tab values (254,111);
+SQL SUCCESS
+insert into t_nvl_rca_tab values (255,987);
+SQL SUCCESS
+select distinct var_samp(col_2),grouping(col_1) from t_nvl_rca_tab group by cube(col_1,col_2) having var_samp(abs(-col_1*-col_2))>100 and var_samp(col_2)>1 order by 1,2;
++---------------------+----------+
+| var_samp            | grouping |
++---------------------+----------+
++---------------------+----------+
+drop table if exists t_nvl_rca_tab;
+SQL SUCCESS

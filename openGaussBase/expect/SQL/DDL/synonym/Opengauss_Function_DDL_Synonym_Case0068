@@ -1,0 +1,47 @@
+-- @testpoint: 创建函数的同义词，修改同义词属主（属主为存在+不存在+存在无create权限）,不存在+存在无create权限,合理报错
+--建自定义函数
+drop function if exists SYN_FUN_068_001(c int);
+SQL SUCCESS
+create or replace function SYN_FUN_068_001(c int)return number
+as
+b int := c;
+begin
+	for i in 1..c loop
+		b:= b - 1;
+	end loop;
+	return b;
+end;
+/
+SQL SUCCESS
+--建自定义函数同义词
+drop synonym if exists SYN_FUN_SYN_068_001 cascade ;
+SQL SUCCESS
+create or replace synonym SYN_FUN_SYN_068_001 for SYN_FUN_068_001;
+SQL SUCCESS
+--创建用户
+drop user if exists syn005;
+SQL SUCCESS
+create user syn005 password 'Test@123';
+SQL SUCCESS
+--修改为存在的属主：新属主无create权限：报错
+alter synonym SYN_PROC_SYN_068_001 owner to syn005;
+?.*ERROR: synonym "syn_proc_syn_068_001" does not exist
+--修改为不存在的属主：报错
+drop user if exists test_syn05;
+SQL SUCCESS
+alter synonym SYN_PROC_SYN_068_001 owner to test_syn05;
+?.*ERROR: role "test_syn05" does not exist
+--修改为存在的属主：新属主有create权限
+GRANT ALL PRIVILEGES TO syn005;
+SQL SUCCESS
+alter synonym syn_fun_syn_068_001 owner to syn005;
+SQL SUCCESS
+--清理数据
+drop user if exists syn005 cascade;
+SQL SUCCESS
+drop synonym if exists syn_fun_syn_068_001 cascade;
+SQL SUCCESS
+drop procedure if exists SYN_PEOC_068_001;
+SQL SUCCESS
+drop function if exists SYN_FUN_068_001(c int);
+SQL SUCCESS

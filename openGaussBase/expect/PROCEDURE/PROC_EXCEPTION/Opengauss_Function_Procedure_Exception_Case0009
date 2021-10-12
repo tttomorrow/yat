@@ -1,0 +1,23 @@
+-- @testpoint: 验证存储过程是否支持抛出用户自定义异常 合理报错
+create or replace   employee_hiredate(hiredate varchar2)
+is
+ low_hiredate exception;
+?.*ERROR: syntax error at or near "employee_hiredate".*
+?.*Position.*
+begin
+  if hiredate>to_date('1981-04-02','yyyy-mm-dd') then
+    raise low_hiredate;
+    end if;
+exception
+  when low_hiredate then
+    raise info 'low_hiredate%',hiredate;
+ end;
+ /
+?.*ERROR: unrecognized exception condition "low_hiredate".*
+  Where: compilation of PL/pgSQL function "inline_code_block" near line 3
+--调用存储过程
+call employee_hiredate(to_date('2018-09-12','yyyy-mm-dd'));
+?.*ERROR: function "employee_hiredate" doesn't exist.*
+--清理环境
+drop procedure employee_hiredate;
+?.*ERROR: function employee_hiredate does not exist.*

@@ -1,0 +1,26 @@
+
+
+-- @testpoint:  update的使用
+
+drop table if exists test_left;
+SQL SUCCESS
+create table test_left(a int,b varchar2(20));
+SQL SUCCESS
+insert into test_left values(1,'xiexiaoyu');
+SQL SUCCESS
+insert into test_left values(2,'llllll');
+SQL SUCCESS
+insert into test_left values(3,'vvvvvv');
+SQL SUCCESS
+update test_left set B='888' where LEFT(B,4) = 'xiex';
+SQL SUCCESS
+select A,B from test_left order by A;
++---+--------+
+| a | b      |
++---+--------+
+| 1 | 888    |
+| 2 | llllll |
+| 3 | vvvvvv |
++---+--------+
+drop table if exists test_left;
+SQL SUCCESS

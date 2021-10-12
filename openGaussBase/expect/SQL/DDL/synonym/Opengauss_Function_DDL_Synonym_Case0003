@@ -1,0 +1,46 @@
+-- @testpoint: 为不同长度的表名创建同义词
+--建表
+drop table if EXISTS syn_tab_003 cascade;
+SQL SUCCESS
+create table syn_tab_003(a int,b varchar);
+SQL SUCCESS
+--建同义词
+drop synonym if exists syn_a;
+SQL SUCCESS
+create synonym syn_a for syn_tab_003;
+SQL SUCCESS
+--建表，表名63位
+SQL SUCCESS
+SQL SUCCESS
+--建同义词
+drop synonym if exists syn_a63;
+SQL SUCCESS
+SQL SUCCESS
+select synobjname from pg_synonym WHERE synname='syn_a63';
++-----------------------------------------------------------------+
+| synobjname                                                      |
++-----------------------------------------------------------------+
++-----------------------------------------------------------------+
+--建表，表名64位
+SQL SUCCESS
+SQL SUCCESS
+--建同义词
+drop synonym if exists syn_a64;
+SQL SUCCESS
+SQL SUCCESS
+select synobjname from pg_synonym WHERE synname='syn_a64';
++-----------------------------------------------------------------+
+| synobjname                                                      |
++-----------------------------------------------------------------+
++-----------------------------------------------------------------+
+--清理环境
+drop table if EXISTS syn_tab_003 cascade;
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+drop synonym if exists syn_a;
+SQL SUCCESS
+drop synonym if exists syn_a63;
+SQL SUCCESS
+drop synonym if exists syn_a64;
+SQL SUCCESS

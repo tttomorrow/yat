@@ -1,0 +1,19 @@
+-- @testpoint: 不指定精度，插入有效负整数
+drop table if exists decimal_02;
+SQL SUCCESS
+create table decimal_02 (name decimal);
+SQL SUCCESS
+insert into decimal_02 values (-12);
+SQL SUCCESS
+insert into decimal_02 values (-1200345);
+SQL SUCCESS
+SQL SUCCESS
+select * from decimal_02;
++-------------+
+| name        |
++-------------+
+| -12         |
+| -1200345    |
++-------------+
+drop table decimal_02;
+SQL SUCCESS

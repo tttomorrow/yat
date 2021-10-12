@@ -1,0 +1,68 @@
+-- @testpoint: 行存表使用数据类型为jsonb的列创建索引:gist索引不支持，合理报错
+--行存表
+drop table if exists tab112;
+SQL SUCCESS
+create table tab112(id int,name varchar,message jsonb);
+SQL SUCCESS
+insert into tab112 values(001,'Jane','{"age":18,"city":"xianyang"}');
+SQL SUCCESS
+insert into tab112 values(012,'Joy','{"age":19,"city":"qingdao"}');
+SQL SUCCESS
+insert into tab112 values(023,'Jack','{"age":20,"city":"xiamen"}');
+SQL SUCCESS
+insert into tab112 values(004,'Json','{"age":23,"city":"shenzhen"}');
+SQL SUCCESS
+insert into tab112 values(005,'Jim','{"age":21,"city":"shanghai"}');
+SQL SUCCESS
+select * from  tab112;
++----+------+---------------------------------+
+| id | name | message                         |
++----+------+---------------------------------+
+| 1  | Jane | {"age": 18, "city": "xianyang"} |
+| 12 | Joy  | {"age": 19, "city": "qingdao"}  |
+| 23 | Jack | {"age": 20, "city": "xiamen"}   |
+| 4  | Json | {"age": 23, "city": "shenzhen"} |
+| 5  | Jim  | {"age": 21, "city": "shanghai"} |
++----+------+---------------------------------+
+--创建索引：btree,gin
+drop index if exists index1121;
+SQL SUCCESS
+drop index if exists index1122;
+SQL SUCCESS
+drop index if exists index1123;
+SQL SUCCESS
+drop index if exists index1124;
+SQL SUCCESS
+drop index if exists index1125;
+SQL SUCCESS
+drop index if exists index1126;
+SQL SUCCESS
+create index index1121 on tab112(message);
+SQL SUCCESS
+create index index1123 on tab112 using gin(message);
+SQL SUCCESS
+create unique index index1124 on tab112 using btree(message asc);
+SQL SUCCESS
+create index index1125 on tab112 using gin ((message ->'{"age": 18, "city": "xianyang"}'));
+SQL SUCCESS
+create index index1126 on tab112 using  btree ((message ->'{"age": 18, "city": "xianyang"}'));
+SQL SUCCESS
+--gist索引不支持，合理报错
+create index index1122 on tab112 using gist(message);
+?.*ERROR: data type jsonb has no default operator class for access method "gist.*
+  Hint: You must specify an operator class for the index or define a default operator class for the data type.
+--清理数据
+drop index if exists index1121;
+SQL SUCCESS
+drop index if exists index1122;
+SQL SUCCESS
+drop index if exists index1123;
+SQL SUCCESS
+drop index if exists index1124;
+SQL SUCCESS
+drop index if exists index1125;
+SQL SUCCESS
+drop index if exists index1126;
+SQL SUCCESS
+drop table if exists tab112;
+SQL SUCCESS

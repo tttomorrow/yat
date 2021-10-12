@@ -1,0 +1,54 @@
+-- @testpoint: 行存表使用数据类型为jsonb的列创建索引:不支持gist索引，合理报错
+--行存表：创建索引
+drop table if exists tab116;
+SQL SUCCESS
+create table tab116(id int,name varchar,message jsonb);
+SQL SUCCESS
+insert into tab116 values(001,'Jane','{"age":18,"city":"xianyang"}');
+SQL SUCCESS
+insert into tab116 values(012,'Joy','{"age":19,"city":"qingdao"}');
+SQL SUCCESS
+insert into tab116 values(023,'Jack','{"age":20,"city":"xiamen"}');
+SQL SUCCESS
+insert into tab116 values(004,'Json','{"age":23,"city":"shenzhen"}');
+SQL SUCCESS
+insert into tab116 values(005,'Jim','{"age":21,"city":"shanghai"}');
+SQL SUCCESS
+select * from  tab116;
++----+------+---------------------------------+
+| id | name | message                         |
++----+------+---------------------------------+
+| 1  | Jane | {"age": 18, "city": "xianyang"} |
+| 12 | Joy  | {"age": 19, "city": "qingdao"}  |
+| 23 | Jack | {"age": 20, "city": "xiamen"}   |
+| 4  | Json | {"age": 23, "city": "shenzhen"} |
+| 5  | Jim  | {"age": 21, "city": "shanghai"} |
++----+------+---------------------------------+
+drop index if exists index1161;
+SQL SUCCESS
+drop index if exists index1162;
+SQL SUCCESS
+drop index if exists index1163;
+SQL SUCCESS
+drop index if exists index1164;
+SQL SUCCESS
+create index index1161 on tab116(message);
+SQL SUCCESS
+create index index1162 on tab116 using gist(message);
+?.*ERROR: data type jsonb has no default operator class for access method "gist.*
+  Hint: You must specify an operator class for the index or define a default operator class for the data type.
+create index index1163 on tab116 using gin(message);
+SQL SUCCESS
+create unique index index1164 on tab116 using btree(message asc);
+SQL SUCCESS
+--清理数据
+drop index if exists index1161;
+SQL SUCCESS
+drop index if exists index1162;
+SQL SUCCESS
+drop index if exists index1163;
+SQL SUCCESS
+drop index if exists index1164;
+SQL SUCCESS
+drop table if exists tab116;
+SQL SUCCESS

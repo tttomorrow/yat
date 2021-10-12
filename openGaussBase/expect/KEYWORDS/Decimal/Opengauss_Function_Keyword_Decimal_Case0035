@@ -1,0 +1,17 @@
+--  @testpoint:定义数据类型是decimal，插入decimal数据查询
+drop table if exists decimal_type_t1;
+SQL SUCCESS
+CREATE TABLE decimal_type_t1
+(DT_COL1 DECIMAL(10,4)
+);
+SQL SUCCESS
+INSERT INTO decimal_type_t1 VALUES(123456.122331);
+SQL SUCCESS
+SELECT * FROM decimal_type_t1;
++-------------+
+| dt_col1     |
++-------------+
+| 123456.1223 |
++-------------+
+DROP TABLE decimal_type_t1;
+SQL SUCCESS

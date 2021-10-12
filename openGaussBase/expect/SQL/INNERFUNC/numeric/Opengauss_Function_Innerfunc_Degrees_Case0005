@@ -1,0 +1,13 @@
+-- @testpoint: degrees函数入参为指定类型的边界值
+drop table if exists tb1;
+SQL SUCCESS
+create table tb1 (clo1 bigint,clo2 bigint);
+SQL SUCCESS
+SQL SUCCESS
+select degrees(clo1),degrees(clo2) from tb1;
++-----------------------+------------------------+
+| degrees               | degrees                |
++-----------------------+------------------------+
++-----------------------+------------------------+
+drop table if exists tb1;
+SQL SUCCESS

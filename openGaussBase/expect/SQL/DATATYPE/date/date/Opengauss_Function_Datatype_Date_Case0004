@@ -1,0 +1,17 @@
+-- @testpoint: 结合where条件
+DROP TABLE IF EXISTS test_date04;
+SQL SUCCESS
+CREATE TABLE test_date04 (A INT,B DATE);
+SQL SUCCESS
+INSERT INTO test_date04 VALUES (1,DATE '2018-09-16');
+SQL SUCCESS
+INSERT INTO test_date04 VALUES (2,DATE '2018-09-17');
+SQL SUCCESS
+SELECT A,B FROM test_date04 where B = DATE '2018-09-17' order by A;
++---+-------------------------------+
+| a | b                             |
++---+-------------------------------+
+?.*| 2 | 2018-09-17 00:00:00.*
++---+-------------------------------+
+drop table test_date04;
+SQL SUCCESS

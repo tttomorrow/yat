@@ -1,0 +1,25 @@
+--  @testpoint:opengauss关键字add(非保留)，作为模式名
+--关键字不带引号-成功
+drop schema if exists add;
+SQL SUCCESS
+create schema add;
+SQL SUCCESS
+--清理环境
+drop schema add;
+SQL SUCCESS
+--关键字带双引号-成功
+drop schema if exists "add";
+SQL SUCCESS
+create schema "add";
+SQL SUCCESS
+--清理环境
+drop schema "add";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop schema if exists 'add';
+?.*ERROR: syntax error at or near "'add'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop schema if exists `add`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

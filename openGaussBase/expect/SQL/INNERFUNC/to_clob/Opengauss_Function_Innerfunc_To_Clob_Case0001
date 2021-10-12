@@ -1,0 +1,15 @@
+-- @testpoint:  varchar2类型转换clob类型
+drop table if exists test2;
+SQL SUCCESS
+create table test2 (d varchar2);
+SQL SUCCESS
+insert into test2 values('nihao');
+SQL SUCCESS
+select to_clob(d) from test2;
++---------+
+| to_clob |
++---------+
+| nihao   |
++---------+
+drop table if exists test2;
+SQL SUCCESS

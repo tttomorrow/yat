@@ -1,0 +1,50 @@
+-- @testpoint: 输入类型不匹配但是可以隐式转换为匹配
+-- @repeat(string text, number int )
+-- @testpoint：输入类型不匹配但是可以隐式转换为匹配：success
+explain performance select repeat(123, 2);
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*Output: '123123'::text.*
+?.*
+?.*
+?.*
+explain performance select repeat(0.01, 4);
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*Output: '.01.01.01.01'::text.*
+?.*
+?.*
+?.*
+explain performance select repeat(HEXTORAW('DEADBEEF'), 3);
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*Output: 'DEADBEEFDEADBEEFDEADBEEF'::text.*
+?.*
+?.*
+?.*
+explain performance select repeat(date '2020-12-3', 2);
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*Output: '2020-12-03 00:00:002020-12-03 00:00:00'::text.*
+?.*
+?.*
+?.*
+explain performance select repeat(timestamp without time zone '2020-12-3', 2);
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*Output: '2020-12-03 00:00:002020-12-03 00:00:00'::text.*
+?.*
+?.*
+?.*
+--清理环境
+--no need to clean

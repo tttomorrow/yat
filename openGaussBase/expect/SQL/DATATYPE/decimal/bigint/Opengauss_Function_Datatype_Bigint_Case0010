@@ -1,0 +1,19 @@
+-- @testpoint: 插入字符串类型，合理报错
+drop table if exists bigint10;
+SQL SUCCESS
+create table bigint10 (name bigint);
+SQL SUCCESS
+insert into bigint10 values ('123abc');
+?.*ERROR: invalid input syntax for type bigint: "123abc"
+?.*
+  Where: referenced column: name
+insert into bigint10 values ('abcde');
+?.*ERROR: invalid input syntax for type bigint: "abcde"
+?.*
+  Where: referenced column: name
+insert into bigint10 values ('abc456');
+?.*ERROR: invalid input syntax for type bigint: "abc456"
+?.*
+  Where: referenced column: name
+drop table bigint10;
+SQL SUCCESS

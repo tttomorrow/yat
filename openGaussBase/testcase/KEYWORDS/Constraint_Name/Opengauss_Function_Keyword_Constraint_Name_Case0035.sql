@@ -1,0 +1,14 @@
+-- @testpoint: 创建指定列的约束条件
+drop table if exists warehouse_t1;
+CREATE TABLE warehouse_t1
+(
+    W_WAREHOUSE_SK            INTEGER               NOT NULL,
+    W_WAREHOUSE_ID            CHAR(16)              NULL,
+    W_WAREHOUSE_NAME          VARCHAR(20)                   ,
+    W_WAREHOUSE_SQ_FT         INTEGER              CHECK(W_WAREHOUSE_SQ_FT>0),
+    W_STREET_NUMBER           CHAR(10)             DEFAULT 'usually',
+    W_STREET_NAME             VARCHAR(60)          UNIQUE,
+    W_STREET_TYPE             CHAR(15)             PRIMARY KEY
+);
+
+drop table  warehouse_t1;

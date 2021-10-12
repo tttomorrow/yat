@@ -1,0 +1,173 @@
+-- @testpoint: 测试在物化视图中执行DDL（select），合理报错
+--物化视图执行DDL（select）
+drop table if exists student cascade;
+SQL SUCCESS
+drop table if exists class cascade;
+SQL SUCCESS
+create table class
+(
+    class_id int primary key,
+    class_name varchar(10) not null
+);
+SQL SUCCESS
+create table student
+(
+    id int primary key,
+    name varchar(10) not null,
+    class_id int
+);
+SQL SUCCESS
+insert into class values (101, '1-1');
+SQL SUCCESS
+insert into class values (102, '1-2');
+SQL SUCCESS
+insert into class values (104, '1-4');
+SQL SUCCESS
+insert into student values (1, 'aaa', 101);
+SQL SUCCESS
+insert into student values (2, 'bbb', 101);
+SQL SUCCESS
+insert into student values (3, 'ccc', 102);
+SQL SUCCESS
+insert into student values (4, 'ddd', 102);
+SQL SUCCESS
+insert into student values (5, 'eee', 102);
+SQL SUCCESS
+insert into student values (6, 'fff', 103);
+SQL SUCCESS
+--子查询 && 子链接 && 组合查询 && order by
+create materialized view student_mv as select * from student where class_id in (select class_id from class);
+SQL SUCCESS
+select * from student_mv;
++----+------+----------+
+| id | name | class_id |
++----+------+----------+
+| 1  | aaa  | 101      |
+| 2  | bbb  | 101      |
+| 3  | ccc  | 102      |
+| 4  | ddd  | 102      |
+| 5  | eee  | 102      |
++----+------+----------+
+select * from student_mv where class_id = 101;
++----+------+----------+
+| id | name | class_id |
++----+------+----------+
+| 1  | aaa  | 101      |
+| 2  | bbb  | 101      |
++----+------+----------+
+select * from class where class_id in (select class_id from student_mv);
++----------+------------+
+| class_id | class_name |
++----------+------------+
+| 101      | 1-1        |
+| 102      | 1-2        |
++----------+------------+
+--组合查询1
+create materialized view student_mvv as select id, name from student_mv union select class_id, class_name from class;
+SQL SUCCESS
+--union
+select * from student_mvv where id < 103 order by id desc;
++-----+------+
+| id  | name |
++-----+------+
+| 102 | 1-2  |
+| 101 | 1-1  |
+| 5   | eee  |
+| 4   | ddd  |
+| 3   | ccc  |
+| 2   | bbb  |
+| 1   | aaa  |
++-----+------+
+--别名检查
+select id nid, name noname from student_mvv;
++-----+--------+
+| nid | noname |
++-----+--------+
+| 2   | bbb    |
+| 101 | 1-1    |
+| 1   | aaa    |
+| 3   | ccc    |
+| 5   | eee    |
+| 104 | 1-4    |
+| 102 | 1-2    |
+| 4   | ddd    |
++-----+--------+
+--增加/删除被参照表列
+alter table class drop column class_id;
+?.*ERROR: cannot drop table class column class_id because other objects depend on it
+  Detail: materialized view student_mv depends on table class column class_id
+materialized view student_mvv depends on table class column class_id
+  Hint: Use DROP ... CASCADE to drop the dependent objects too.
+--error
+refresh materialized view student_mvv;
+SQL SUCCESS
+alter table class add column id_new int;
+SQL SUCCESS
+refresh materialized view student_mvv;
+SQL SUCCESS
+--未报错，与pg保持一致
+select * from student_mvv;
++-----+------+
+| id  | name |
++-----+------+
+| 2   | bbb  |
+| 101 | 1-1  |
+| 1   | aaa  |
+| 3   | ccc  |
+| 5   | eee  |
+| 104 | 1-4  |
+| 102 | 1-2  |
+| 4   | ddd  |
++-----+------+
+--修改被参照表列名
+alter table class rename column class_id to class_id_new;
+SQL SUCCESS
+refresh materialized view student_mvv;
+SQL SUCCESS
+--ok
+select * from student_mvv;
++-----+------+
+| id  | name |
++-----+------+
+| 2   | bbb  |
+| 101 | 1-1  |
+| 1   | aaa  |
+| 3   | ccc  |
+| 5   | eee  |
+| 104 | 1-4  |
+| 102 | 1-2  |
+| 4   | ddd  |
++-----+------+
+--组合查询2
+create view student_mv_v as select * from student_mv;
+SQL SUCCESS
+create materialized view student_mv_mvv as select * from student_mv_v minus select * from student_mv;
+SQL SUCCESS
+--minus
+insert into student values (7, 'ggg', 104);
+SQL SUCCESS
+refresh materialized view student_mv;
+SQL SUCCESS
+refresh materialized view student_mv_mvv;
+SQL SUCCESS
+select * from student_mv_mvv;
++----+------+----------+
+| id | name | class_id |
++----+------+----------+
++----+------+----------+
+--查看执行计划
+EXPLAIN (analyze on, costs off) 
+select * from student_mv where class_id = 101;
++------------------------------------------------------------------+
+| QUERY PLAN                                                       |
++------------------------------------------------------------------+
+?.*Seq Scan on student_mv?.*
+|   Filter: (class_id = 101)                                       |
+|   Rows Removed by Filter: 4                                      |
+?.*Total runtime:?.*
++------------------------------------------------------------------+
+--清理环境
+drop table if exists student cascade;
+SQL SUCCESS
+drop table if exists class cascade;
+SQL SUCCESS

@@ -1,0 +1,5 @@
+--  @testpoint:转换非字符串为小写，应该报错
+SELECT lower(TOM);
+?.*ERROR: column "tom" does not exist
+?.*Position: .*
+  Where: referenced column: lower

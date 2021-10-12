@@ -1,0 +1,12 @@
+-- @testpoint: set方法设置参数local_preload_libraries，合理报错
+--查看默认
+show local_preload_libraries;
++-------------------------+
+| local_preload_libraries |
++-------------------------+
+|                         |
++-------------------------+
+--set方法设置，报错
+SET local_preload_libraries to '/home';
+?.*ERROR: parameter "local_preload_libraries" cannot be set after connection start
+--no need to clean

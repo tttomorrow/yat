@@ -1,0 +1,23 @@
+-- @testpoint: 修改字段值后，使用abort回滚
+drop table if exists t_student;
+SQL SUCCESS
+create table t_student (stu_name char(20),stu_age int,sex char(10));
+SQL SUCCESS
+insert into t_student values('zhangsan',18,'boy'),('lisi',25,'boy'),('wangwu',28,'girl');
+SQL SUCCESS
+start transaction;
+SQL SUCCESS
+update t_student set stu_age=30 where stu_name='zhangsan';
+SQL SUCCESS
+select * from t_student;
++----------------------+---------+------------+
+| stu_name             | stu_age | sex        |
++----------------------+---------+------------+
+| lisi                 | 25      | boy        |
+| wangwu               | 28      | girl       |
+| zhangsan             | 30      | boy        |
++----------------------+---------+------------+
+abort;
+SQL SUCCESS
+drop table if exists t_student;
+SQL SUCCESS

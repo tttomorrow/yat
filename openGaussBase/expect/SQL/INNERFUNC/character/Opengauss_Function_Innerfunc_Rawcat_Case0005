@@ -1,0 +1,13 @@
+-- @testpoint: 没有参数，合理报错
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 RAW,string2 RAW);
+SQL SUCCESS
+SQL SUCCESS
+SELECT rawcat() from type_char;
+?.*ERROR: function rawcat\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: rawcat
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

@@ -1,0 +1,18 @@
+-- @testpoint: 插入负数值
+drop table if exists test_money03;
+SQL SUCCESS
+create table test_money03 (name money);
+SQL SUCCESS
+insert into test_money03 values (-123.123);
+SQL SUCCESS
+insert into test_money03 values (-123);
+SQL SUCCESS
+select * from test_money03;
++---------+
+| name    |
++---------+
+| -123.12 |
+| -123.0  |
++---------+
+drop table test_money03;
+SQL SUCCESS

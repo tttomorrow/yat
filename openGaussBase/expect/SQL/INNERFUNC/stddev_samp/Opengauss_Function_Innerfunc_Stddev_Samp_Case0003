@@ -1,0 +1,19 @@
+-- @testpoint: 入参为bool类型的列，分组求标准差
+drop table if exists test1;
+SQL SUCCESS
+create table test1(col_1 BOOLEAN, col_2 BOOLEAN);
+SQL SUCCESS
+insert into test1 values(true,false);
+SQL SUCCESS
+insert into test1 values('t','f');
+SQL SUCCESS
+insert into test1 values(1,0);
+SQL SUCCESS
+select STDDEV_SAMP(COL_1),STDDEV_SAMP(COL_2) from test1;
++-------------+-------------+
+| stddev_samp | stddev_samp |
++-------------+-------------+
+| 0           | 0           |
++-------------+-------------+
+drop table if exists test1;
+SQL SUCCESS

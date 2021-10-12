@@ -1,0 +1,3 @@
+-- @testpoint: extract(field from timestamp)从给定的时间戳里获取时区偏移量的值
+--（field的取值范围：timezone--与utc的时区偏移量，单位为秒。正数对应utc东边的时区，负数对应utc西边的时区）
+select extract(week from timestamp '2001-02-16 20:38:40') from sys_dummy;

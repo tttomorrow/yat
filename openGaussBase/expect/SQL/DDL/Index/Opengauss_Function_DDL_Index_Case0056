@@ -1,0 +1,192 @@
+-- @testpoint: column_name：行存普通表各数据类型1列：合理报错
+DROP TABLE if EXISTS test_index_table_056 CASCADE;
+SQL SUCCESS
+create table test_index_table_056(name1 TINYINT,name2 BIGINT,
+name3 NUMERIC,name4 SMALLSERIAL,name5 SERIAL,name6 BIGSERIAL,name7 FLOAT,
+name8 BINARY_DOUBLE,name9 DEC,name10 BOOLEAN,name12 CHAR,name13 CLOB,
+name14 TEXT,name15 BLOB,name16 RAW,name17 BYTEA,name18 DATE,name19 INTERVAL,
+name20 reltime,name21 cidr,name22 bit,name23 tsvector,name24 tsquery
+);
+SQL SUCCESS
+--建索引 btree
+drop index if exists index_056_01,index_056_02,index_056_03,index_056_04,index_056_05;
+SQL SUCCESS
+drop index if exists index_056_06,index_056_07,index_056_08,index_056_09,index_056_10;
+SQL SUCCESS
+drop index if exists index_056_12,index_056_13,index_056_14,index_056_15;
+SQL SUCCESS
+drop index if exists index_056_16,index_056_17,index_056_18,index_056_19,index_056_20;
+SQL SUCCESS
+drop index if exists index_056_21,index_056_22,index_056_23,index_056_24;
+SQL SUCCESS
+create index index_056_01 on test_index_table_056(name1);
+SQL SUCCESS
+create index index_056_02 on test_index_table_056(name2);
+SQL SUCCESS
+create index index_056_03 on test_index_table_056(name3);
+SQL SUCCESS
+create index index_056_04 on test_index_table_056(name4);
+SQL SUCCESS
+create index index_056_05 on test_index_table_056(name5);
+SQL SUCCESS
+create index index_056_06 on test_index_table_056(name6);
+SQL SUCCESS
+create index index_056_07 on test_index_table_056(name7);
+SQL SUCCESS
+create index index_056_08 on test_index_table_056(name8);
+SQL SUCCESS
+create index index_056_09 on test_index_table_056(name9);
+SQL SUCCESS
+create index index_056_10 on test_index_table_056(name10);
+SQL SUCCESS
+create index index_056_12 on test_index_table_056(name12);
+SQL SUCCESS
+create index index_056_13 on test_index_table_056(name13);
+SQL SUCCESS
+create index index_056_14 on test_index_table_056(name14);
+SQL SUCCESS
+create index index_056_15 on test_index_table_056(name15);
+SQL SUCCESS
+create index index_056_16 on test_index_table_056(name16);
+SQL SUCCESS
+create index index_056_17 on test_index_table_056(name17);
+SQL SUCCESS
+create index index_056_18 on test_index_table_056(name18);
+SQL SUCCESS
+create index index_056_19 on test_index_table_056(name19);
+SQL SUCCESS
+create index index_056_20 on test_index_table_056(name20);
+SQL SUCCESS
+create index index_056_21 on test_index_table_056(name21);
+SQL SUCCESS
+create index index_056_22 on test_index_table_056(name22);
+SQL SUCCESS
+create index index_056_23 on test_index_table_056(name23);
+SQL SUCCESS
+create index index_056_24 on test_index_table_056(name24);
+SQL SUCCESS
+--查询索引
+select relname from pg_class where relname like 'index_056%' order by relname asc;
++--------------+
+| relname      |
++--------------+
+| index_056_01 |
+| index_056_02 |
+| index_056_03 |
+| index_056_04 |
+| index_056_05 |
+| index_056_06 |
+| index_056_07 |
+| index_056_08 |
+| index_056_09 |
+| index_056_10 |
+| index_056_12 |
+| index_056_13 |
+| index_056_14 |
+| index_056_15 |
+| index_056_16 |
+| index_056_17 |
+| index_056_18 |
+| index_056_19 |
+| index_056_20 |
+| index_056_21 |
+| index_056_22 |
+| index_056_23 |
+| index_056_24 |
++--------------+
+--创建gin索引
+drop index if exists index_056_01,index_056_02,index_056_03,index_056_04,index_056_05;
+SQL SUCCESS
+drop index if exists index_056_06,index_056_07,index_056_08,index_056_09,index_056_10;
+SQL SUCCESS
+drop index if exists index_056_11,index_056_12,index_056_13,index_056_14,index_056_15;
+SQL SUCCESS
+drop index if exists index_056_16,index_056_17,index_056_18,index_056_19,index_056_20;
+SQL SUCCESS
+drop index if exists index_056_21,index_056_22,index_056_23,index_056_24;
+SQL SUCCESS
+create index index_056_01 on test_index_table_056 using gin(to_tsvector('english', name1));
+SQL SUCCESS
+create index index_056_02 on test_index_table_056 using gin(to_tsvector('english', name2));
+SQL SUCCESS
+create index index_056_03 on test_index_table_056 using gin(to_tsvector('english', name3));
+SQL SUCCESS
+create index index_056_04 on test_index_table_056 using gin(to_tsvector('english', name4));
+SQL SUCCESS
+create index index_056_05 on test_index_table_056 using gin(to_tsvector('english', name5));
+SQL SUCCESS
+create index index_056_06 on test_index_table_056 using gin(to_tsvector('english', name6));
+SQL SUCCESS
+create index index_056_07 on test_index_table_056 using gin(to_tsvector('english', name7));
+SQL SUCCESS
+create index index_056_08 on test_index_table_056 using gin(to_tsvector('english', name8));
+SQL SUCCESS
+create index index_056_09 on test_index_table_056 using gin(to_tsvector('english', name9));
+SQL SUCCESS
+create index index_056_10 on test_index_table_056 using gin(to_tsvector('english', name10));
+?.*ERROR: function to_tsvector\(unknown, boolean\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+create index index_056_12 on test_index_table_056 using gin(to_tsvector('english', name12));
+SQL SUCCESS
+create index index_056_13 on test_index_table_056 using gin(to_tsvector('english', name13));
+SQL SUCCESS
+create index index_056_14 on test_index_table_056 using gin(to_tsvector('english', name14));
+SQL SUCCESS
+create index index_056_15 on test_index_table_056 using gin(to_tsvector('english', name15));
+?.*ERROR: function to_tsvector\(unknown, blob\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+create index index_056_16 on test_index_table_056 using gin(to_tsvector('english', name16));
+SQL SUCCESS
+create index index_056_17 on test_index_table_056 using gin(to_tsvector('english', name17));
+?.*ERROR: function to_tsvector\(unknown, bytea\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+create index index_056_18 on test_index_table_056 using gin(to_tsvector('english', name18));
+SQL SUCCESS
+create index index_056_19 on test_index_table_056 using gin(to_tsvector('english', name19));
+SQL SUCCESS
+create index index_056_20 on test_index_table_056 using gin(to_tsvector('english', name20));
+SQL SUCCESS
+create index index_056_21 on test_index_table_056 using gin(to_tsvector('english', name21));
+?.*ERROR: function to_tsvector\(unknown, cidr\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+create index index_056_22 on test_index_table_056 using gin(to_tsvector('english', name22));
+?.*ERROR: function to_tsvector\(unknown, bit\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+create index index_056_23 on test_index_table_056 using gin(to_tsvector('english', name23));
+?.*ERROR: function to_tsvector\(unknown, tsvector\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+create index index_056_24 on test_index_table_056 using gin(to_tsvector('english', name24));
+?.*ERROR: function to_tsvector\(unknown, tsquery\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+--查询索引
+select relname from pg_class where relname like 'index_056_%' order by relname asc;
++--------------+
+| relname      |
++--------------+
+| index_056_01 |
+| index_056_02 |
+| index_056_03 |
+| index_056_04 |
+| index_056_05 |
+| index_056_06 |
+| index_056_07 |
+| index_056_08 |
+| index_056_09 |
+| index_056_12 |
+| index_056_13 |
+| index_056_14 |
+| index_056_16 |
+| index_056_18 |
+| index_056_19 |
+| index_056_20 |
++--------------+
+--清理数据
+DROP TABLE if EXISTS test_index_table_056 CASCADE;
+SQL SUCCESS

@@ -1,0 +1,6 @@
+-- @testpoint: 操作符&，bit少参，合理报错
+SELECT B'101' & AS RESULT;
+?.*ERROR: operator does not exist: bit &
+  Hint: No operator matches the given name and argument type(s). You might need to add explicit type casts.
+?.*
+  Where: referenced column: result

@@ -1,0 +1,66 @@
+-- @testpoint: opengauss关键字Initial(非保留)，作为同义词对象名,部分测试点合理报错
+--前置条件
+drop table if exists explain_test;
+SQL SUCCESS
+create table explain_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists Initial;
+SQL SUCCESS
+create synonym Initial for explain_test;
+SQL SUCCESS
+insert into Initial values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update Initial set Initial.name='cici' where Initial.id=2;
+SQL SUCCESS
+select * from Initial;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--关键字带双引号-成功
+drop synonym if exists "Initial";
+SQL SUCCESS
+create synonym "Initial" for explain_test;
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'Initial';
+?.*ERROR: syntax error at or near "'Initial'".*
+?.*Position: .*
+create synonym 'Initial' for explain_test;
+?.*ERROR: syntax error at or near "'Initial'".*
+?.*Position: .*
+insert into 'Initial' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'Initial'".*
+?.*Position: .*
+update 'Initial' set 'Initial'.name='cici' where 'Initial'.id=2;
+?.*ERROR: syntax error at or near "'Initial'".*
+?.*Position: .*
+select * from 'Initial';
+?.*ERROR: syntax error at or near "'Initial'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop synonym if exists `Initial`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create synonym `Initial` for explain_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+insert into `Initial` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+update `Initial` set `Initial`.name='cici' where `Initial`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+select * from `Initial`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+--清理环境
+drop synonym if exists initial;
+SQL SUCCESS
+drop synonym if exists "Initial";
+SQL SUCCESS
+drop table if exists explain_test;
+SQL SUCCESS

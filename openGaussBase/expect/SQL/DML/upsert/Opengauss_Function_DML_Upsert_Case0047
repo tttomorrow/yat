@@ -1,0 +1,46 @@
+--  @testpoint:使用insert...update插入两条数据,第一条数据主数据主键列数据不存在，其他列数据已存在;第二条数据主键列数据不存在，其他列数据已存在
+----预置条件enable_upsert_to_merge为off
+drop table if exists upsert2;
+SQL SUCCESS
+--建表，指定一列是主键
+create table upsert2(id int primary key,age int,count int);
+SQL SUCCESS
+insert into upsert2 values (1,1,1),(4,4,4);
+SQL SUCCESS
+select * from upsert2;
++----+-----+-------+
+| id | age | count |
++----+-----+-------+
+| 1  | 1   | 1     |
+| 4  | 4   | 4     |
++----+-----+-------+
+--主键不重复，upadte age为1，count为1，新插入两条数据
+insert into upsert2 values(2,1,1),(3,4,4) ON DUPLICATE key update age=1,count=1;
+SQL SUCCESS
+select * from upsert2;
++----+-----+-------+
+| id | age | count |
++----+-----+-------+
+| 1  | 1   | 1     |
+| 4  | 4   | 4     |
+| 2  | 1   | 1     |
+| 3  | 4   | 4     |
++----+-----+-------+
+delete from upsert2;
+SQL SUCCESS
+insert into upsert2 values (1,1,1),(4,4,4);
+SQL SUCCESS
+--主键不重复，upadte age为4，count为4，新插入两条数据
+insert into upsert2 values(2,1,1),(3,4,4) ON DUPLICATE key update age=4,count=4;
+SQL SUCCESS
+select * from upsert2;
++----+-----+-------+
+| id | age | count |
++----+-----+-------+
+| 1  | 1   | 1     |
+| 4  | 4   | 4     |
+| 2  | 1   | 1     |
+| 3  | 4   | 4     |
++----+-----+-------+
+drop table upsert2;
+SQL SUCCESS

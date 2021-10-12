@@ -1,0 +1,20 @@
+-- @describe: 存储过程中调试语句  using  detil
+create or replace procedure password_test(passwords number)
+is
+ failure_password exception;
+begin
+  if passwords<>'123' then
+    raise failure_password;
+    end if;
+exception
+  when failure_password then
+    raise 'failure_password:%',passwords using DETAIL;
+ end;
+ /
+?.*ERROR: syntax error, expected "=" at or near ";"
+call password_test(234);
+?.*ERROR: function "password_test" doesn't exist.*
+call password_test(123);
+?.*ERROR: function "password_test" doesn't exist.*
+drop procedure password_test;
+?.*ERROR: function password_test does not exist

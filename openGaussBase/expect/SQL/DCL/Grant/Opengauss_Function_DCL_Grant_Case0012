@@ -1,0 +1,17 @@
+-- @testpoint: 将视图的访问权限赋予指定的用户或角色
+drop user if exists user_012 cascade;
+SQL SUCCESS
+create user user_012 identified by 'Gauss_234';
+SQL SUCCESS
+drop database if exists ts_test;
+SQL SUCCESS
+create database ts_test;
+SQL SUCCESS
+grant all privileges on database ts_test to user_012;
+SQL SUCCESS
+revoke all privileges on database ts_test from user_012;
+SQL SUCCESS
+drop user if exists user_012;
+SQL SUCCESS
+drop database if exists ts_test;
+SQL SUCCESS

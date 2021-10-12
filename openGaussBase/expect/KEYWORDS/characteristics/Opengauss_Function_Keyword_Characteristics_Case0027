@@ -1,0 +1,25 @@
+--  @testpoint:opengauss关键字characteristics非保留)，作为序列名
+--关键字不带引号-成功
+drop sequence if exists characteristics;
+SQL SUCCESS
+create sequence characteristics start 100 cache 50;
+SQL SUCCESS
+--清理环境
+drop sequence characteristics;
+SQL SUCCESS
+--关键字带双引号-成功
+drop sequence if exists "characteristics";
+SQL SUCCESS
+create sequence "characteristics" start 100 cache 50;
+SQL SUCCESS
+--清理环境
+drop sequence "characteristics";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'characteristics';
+?.*ERROR: syntax error at or near "'characteristics'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop sequence if exists `characteristics`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

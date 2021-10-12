@@ -1,0 +1,48 @@
+--  @testpoint:事务中，调用nextval函数
+--创建序列
+drop SEQUENCE if exists serial_b;
+SQL SUCCESS
+CREATE SEQUENCE serial_b INCREMENT by 2 MAXVALUE 5 cycle;
+SQL SUCCESS
+--开启事务
+start transaction;
+SQL SUCCESS
+--调用函数，从序列中选出下一个数字（1）
+SELECT nextval('serial_b');
++---------+
+| nextval |
++---------+
+| 1       |
++---------+
+--结束事务
+commit;
+SQL SUCCESS
+--调用函数，从序列中选出下一个数字（3）
+select serial_b.nextval;
++---------+
+| nextval |
++---------+
+| 3       |
++---------+
+--再次开启事务，从序列中选出下一个数字（5）
+start transaction;
+SQL SUCCESS
+select serial_b.nextval;
++---------+
+| nextval |
++---------+
+| 5       |
++---------+
+--回滚
+rollback;
+SQL SUCCESS
+--从序列中选出下一个数字（1）,nextval操作不会回滚
+select serial_b.nextval;
++---------+
+| nextval |
++---------+
+| 1       |
++---------+
+--删除序列
+drop SEQUENCE serial_b;
+SQL SUCCESS

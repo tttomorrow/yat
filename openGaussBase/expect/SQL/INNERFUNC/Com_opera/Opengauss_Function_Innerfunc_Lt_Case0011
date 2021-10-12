@@ -1,0 +1,32 @@
+-- @testpoint: opengauss比较操作符<=，文本搜索类型
+-- 文本搜索类型
+SELECT 'a fat cat sat on a mat and ate a fat rat'::tsvector <= 'a'::tsvector;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+SELECT 'b fat cat sat on a mat and ate a fat rat'::tsvector <= 'a'::tsvector;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+SELECT 'b fat cat sat on a mat and ate a fat rat'::tsvector <= 'c'::tsvector;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+SELECT 'fat & rat'::tsquery <= 'gat & rat'::tsquery;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+SELECT 'fat & rat'::tsquery <= 'aat & rat'::tsquery;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+

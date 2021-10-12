@@ -1,0 +1,11 @@
+-- @testpoint: 插入非法字符，合理报错
+drop table if exists dec_09;
+SQL SUCCESS
+CREATE  TABLE dec_09 (id DEC(4,2));
+SQL SUCCESS
+insert into dec_09 values ('……（*');
+?.*ERROR: invalid input syntax for type numeric: "……\（\*"
+?.*
+  Where: referenced column: id
+drop table dec_09;
+SQL SUCCESS

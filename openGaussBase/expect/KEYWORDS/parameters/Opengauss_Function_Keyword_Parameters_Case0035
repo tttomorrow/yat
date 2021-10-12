@@ -1,0 +1,58 @@
+--  @testpoint:opengauss关键字parameters(非保留)，自定义数据类型名为parameters
+--关键字parameters作为数据类型不带引号，创建成功
+drop type if exists parameters;
+SQL SUCCESS
+CREATE TYPE parameters AS (f1 int, f2 text);
+SQL SUCCESS
+select typname from pg_type where typname ='parameters';
++------------+
+| typname    |
++------------+
+| parameters |
+| parameters |
++------------+
+drop type parameters;
+SQL SUCCESS
+--关键字parameters作为数据类型加双引号，创建成功
+drop type if exists "parameters";
+SQL SUCCESS
+CREATE TYPE "parameters" AS (f1 int, f2 text);
+SQL SUCCESS
+select typname from pg_type where typname ='parameters';
++------------+
+| typname    |
++------------+
+| parameters |
+| parameters |
++------------+
+drop type "parameters";
+SQL SUCCESS
+--关键字parameters作为数据类型加单引号，合理报错
+drop type if exists 'parameters';
+?.*ERROR: syntax error at or near "'parameters'"
+?.*Position.*
+CREATE TYPE 'parameters' AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "'parameters'"
+?.*Position.*
+select typname from pg_type where typname ='parameters';
++------------+
+| typname    |
++------------+
+| parameters |
++------------+
+drop type 'parameters';
+?.*ERROR: syntax error at or near "'parameters'"
+?.*Position.*
+--关键字parameters作为数据类型加反引号，合理报错
+drop type if exists `parameters`;
+?.*ERROR: syntax error at or near "`"
+?.*Position.*
+CREATE TYPE `parameters` AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "`"
+?.*Position.*
+select typname from pg_type where typname =`parameters`;
+?.*ERROR: column "parameters" does not exist
+?.*Position.*
+drop type `parameters`;
+?.*ERROR: syntax error at or near "`"
+?.*Position.*

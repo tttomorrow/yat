@@ -1,0 +1,18 @@
+
+
+--  @testpoint:输入为二进制（合理报错）
+
+drop table if exists bitand_test_06;
+SQL SUCCESS
+create table  bitand_test_06(col_bitand1 integer,col_bitand2 integer);
+SQL SUCCESS
+insert into bitand_test_06 values(bitand('11010011','10101010'),bitand('00110011','10101010'));
+SQL SUCCESS
+select * from bitand_test_06;
++-------------+-------------+
+| col_bitand1 | col_bitand2 |
++-------------+-------------+
+| 8528146     | 8466        |
++-------------+-------------+
+drop table if exists bitand_test_06;
+SQL SUCCESS

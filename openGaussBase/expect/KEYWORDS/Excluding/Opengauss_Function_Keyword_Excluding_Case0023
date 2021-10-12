@@ -1,0 +1,36 @@
+-- @testpoint: opengauss关键字excluding(非保留)，作为索引名，部分测试点合理报错
+--前置条件，创建一个表
+drop table if exists excluding_test;
+SQL SUCCESS
+create table excluding_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop index if exists excluding;
+SQL SUCCESS
+create index excluding on excluding_test(id);
+SQL SUCCESS
+drop index excluding;
+SQL SUCCESS
+--关键字带双引号-成功
+drop index if exists "excluding";
+SQL SUCCESS
+create index "excluding" on excluding_test(id);
+SQL SUCCESS
+drop index "excluding";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop index if exists 'excluding';
+?.*ERROR: syntax error at or near "'excluding'"
+?.*Position: .*
+create index 'excluding' on excluding_test(id);
+?.*ERROR: syntax error at or near "'excluding'"
+?.*Position: .*
+--关键字带反引号-合理报错
+drop index if exists `excluding`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+create index `excluding` on excluding_test(id);
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+drop table if exists excluding_test;
+SQL SUCCESS

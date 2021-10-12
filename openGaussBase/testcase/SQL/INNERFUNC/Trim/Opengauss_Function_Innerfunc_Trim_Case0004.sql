@@ -1,0 +1,3 @@
+-- @testpoint: 字符处理函数trim，入参包含replace函数
+
+select trim(both '2' from replace('23984793','3','2'));

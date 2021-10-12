@@ -1,0 +1,47 @@
+-- @testpoint: 创建临时表，使用序列类型，合理报错
+-- @modify at: 2020-11-24
+--建表
+drop table if exists temp_table_066;
+SQL SUCCESS
+create temporary table temp_table_066
+(
+    id    serial,
+    name  text
+);
+?.*ERROR: It's not supported to create serial column on temporary table
+--创建序列，并通过nextval('sequence_name')函数指定为某一字段的默认值
+drop sequence if exists sequence_066 cascade;
+SQL SUCCESS
+create sequence sequence_066 cache 100;
+SQL SUCCESS
+--建表
+drop table if exists temp_table_066_bak;
+SQL SUCCESS
+create temporary table temp_table_066_bak
+(
+    id   int not null default nextval('sequence_066'),
+    name text
+);
+SQL SUCCESS
+--插入数据
+insert into temp_table_066_bak values(1,'2');
+SQL SUCCESS
+insert into temp_table_066_bak  (name) values('3');
+SQL SUCCESS
+insert into temp_table_066_bak (name) values('6');
+SQL SUCCESS
+--查询表
+select * from temp_table_066_bak;
++----+------+
+| id | name |
++----+------+
+| 1  | 2    |
+| 1  | 3    |
+| 2  | 6    |
++----+------+
+--删表
+drop table temp_table_066_bak;
+SQL SUCCESS
+--删除序列
+drop sequence if exists sequence_066 cascade;
+SQL SUCCESS

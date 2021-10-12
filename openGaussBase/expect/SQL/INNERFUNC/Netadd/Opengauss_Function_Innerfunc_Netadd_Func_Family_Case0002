@@ -1,0 +1,83 @@
+-- @testpoint: 网络地址函数family(inet)异常校验，合理报错
+-- v4
+SELECT family('0.0.0.0.0') AS RESULT;
+?.*ERROR: invalid input syntax for type inet: "0.0.0.0.0"
+?.*
+  Where: referenced column: result
+SELECT family('255.255.255.256') AS RESULT;
+?.*ERROR: invalid input syntax for type inet: "255.255.255.256"
+?.*
+  Where: referenced column: result
+SELECT family('192.168.1.6/33') AS RESULT;
+?.*ERROR: invalid input syntax for type inet: "192.168.1.6/33"
+?.*
+  Where: referenced column: result
+SELECT family('192.168.1.6/255.255.255.255') AS RESULT;
+?.*ERROR: invalid input syntax for type inet: "192.168.1.6/255.255.255.255"
+?.*
+  Where: referenced column: result
+-- v6
+SELECT family('::eeff::/128') AS RESULT;
+?.*ERROR: invalid input syntax for type inet: "::eeff::/128"
+?.*
+  Where: referenced column: result
+SELECT family('234e:0:4567::3h') AS RESULT;
+?.*ERROR: invalid input syntax for type inet: "234e:0:4567::3h"
+?.*
+  Where: referenced column: result
+SELECT family('234e:0:4567::3e/129') AS RESULT;
+?.*ERROR: invalid input syntax for type inet: "234e:0:4567::3e/129"
+?.*
+  Where: referenced column: result
+SELECT family('ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff:eedd') AS RESULT;
+?.*ERROR: invalid input syntax for type inet: "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff:eedd"
+?.*
+  Where: referenced column: result
+SELECT family('::ffff:10.4.3.2:1111/64') AS RESULT;
+?.*ERROR: invalid input syntax for type inet: "::ffff:10.4.3.2:1111/64"
+?.*
+  Where: referenced column: result
+SELECT family('10.2.3.4::1') AS RESULT;
+?.*ERROR: invalid input syntax for type inet: "10.2.3.4::1"
+?.*
+  Where: referenced column: result
+-- 其它
+SELECT family('12:34:56:78:90:ab') AS RESULT;
+?.*ERROR: invalid input syntax for type inet: "12:34:56:78:90:ab"
+?.*
+  Where: referenced column: result
+SELECT family('234e::10:4567::3e.ff') AS RESULT;
+?.*ERROR: invalid input syntax for type inet: "234e::10:4567::3e.ff"
+?.*
+  Where: referenced column: result
+SELECT family('') AS RESULT;
++--------+
+| result |
++--------+
+|        |
++--------+
+SELECT family('192.168.1.6/27','192.168.1.6/27') AS RESULT;
+?.*ERROR: function family\(unknown, unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: result
+-- cidr
+SELECT family('192.168.100.128-25'::cidr) AS RESULT;
+?.*ERROR: invalid input syntax for type cidr: "192.168.100.128-25"
+?.*
+  Where: referenced column: result
+SELECT family('192.168/25':cidr) AS RESULT;
+?.*ERROR: syntax error at or near ":cidr"
+?.*
+SELECT family('10'::cidr1) AS RESULT;
+?.*ERROR: type "cidr1" does not exist
+?.*
+  Where: referenced column: result
+SELECT family('2001:4f8:3:ba::/129'::cidr) AS RESULT;
+?.*ERROR: invalid input syntax for type cidr: "2001:4f8:3:ba::/129"
+?.*
+  Where: referenced column: result
+SELECT family('2001:4f8:3:ba:2e0:81ff:fe22:d1gh'::cidr) AS RESULT;
+?.*ERROR: invalid input syntax for type cidr: "2001:4f8:3:ba:2e0:81ff:fe22:d1gh"
+?.*
+  Where: referenced column: result

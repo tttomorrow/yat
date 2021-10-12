@@ -1,0 +1,15 @@
+-- @testpoint: 关键字all带双引号作为普通表的列名在select语句的使用
+drop table if exists  test_all_003;
+SQL SUCCESS
+create table test_all_003 ("all" int);
+SQL SUCCESS
+insert into test_all_003 ("all")values(20);
+SQL SUCCESS
+select "all" from test_all_003 order by "all";
++-----+
+| all |
++-----+
+| 20  |
++-----+
+drop table if exists  test_all_003;
+SQL SUCCESS

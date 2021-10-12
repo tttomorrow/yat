@@ -1,0 +1,27 @@
+-- @testpoint: 指定精度在合理范围值内，插入数据
+-- @modified at: 2020-11-23
+drop table if exists numeric_15;
+SQL SUCCESS
+create table numeric_15 (name numeric(6,2));
+SQL SUCCESS
+insert into numeric_15 values (123.12);
+SQL SUCCESS
+insert into numeric_15 values (1234.12);
+SQL SUCCESS
+insert into numeric_15 values (1234.1234);
+SQL SUCCESS
+insert into numeric_15 values (9999.99);
+SQL SUCCESS
+SQL SUCCESS
+select * from numeric_15;
++---------+
+| name    |
++---------+
+| 123.12  |
+| 1234.12 |
+| 1234.12 |
+| 9999.99 |
+| 1.11    |
++---------+
+drop table numeric_15;
+SQL SUCCESS

@@ -1,0 +1,9 @@
+-- @testpoint: 表达式的输入，合理报错
+select coalesce(2<3,1,null,2);
+?.*ERROR: COALESCE types boolean and integer cannot be matched
+?.*
+  Where: referenced column: coalesce
+select coalesce(1,2<3,null,2);
+?.*ERROR: COALESCE types integer and boolean cannot be matched
+?.*
+  Where: referenced column: coalesce

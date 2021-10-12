@@ -1,0 +1,32 @@
+-- @testpoint: 修改字段的约束，插入数据，违反约束条件，合理报错
+-- @modify at: 2020-11-23
+--建表
+drop table if exists temp_table_alter_013;
+SQL SUCCESS
+create global temporary table temp_table_alter_013 (c1 int,ad varchar(4000) null,ad1 varchar(4000) null)on commit preserve rows;
+SQL SUCCESS
+--创建约束
+alter table temp_table_alter_013 add constraint temp_table_alter_013_check check(ad in ('confirmed','unconfirmed'));
+SQL SUCCESS
+alter table temp_table_alter_013 modify ad not null;
+SQL SUCCESS
+--插入数据，报错（违反检查约束）
+insert into temp_table_alter_013(ad) values (3);
+?.*ERROR: new row for relation "temp_table_alter_013" violates check constraint "temp_table_alter_013_check"
+  Detail: Failing row contains (null, 3, null).
+--删除检查约束
+alter table temp_table_alter_013 drop constraint temp_table_alter_013_check;
+SQL SUCCESS
+--插入数据，成功
+insert into temp_table_alter_013(ad) values(1);
+SQL SUCCESS
+--查询表
+select * from temp_table_alter_013;
++----+----+-----+
+| c1 | ad | ad1 |
++----+----+-----+
+|    | 1  |     |
++----+----+-----+
+--删表
+drop table temp_table_alter_013;
+SQL SUCCESS

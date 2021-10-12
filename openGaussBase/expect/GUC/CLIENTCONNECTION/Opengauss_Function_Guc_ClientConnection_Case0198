@@ -1,0 +1,14 @@
+-- @testpoint: ALTER SYSTEM SET方法设置partition_lock_upgrade_timeout参数，合理报错
+--查看默认
+show partition_lock_upgrade_timeout;
++--------------------------------+
+| partition_lock_upgrade_timeout |
++--------------------------------+
+| 1800                           |
++--------------------------------+
+--设置，报错
+ALTER SYSTEM SET partition_lock_upgrade_timeout to 2000;
+?.*ERROR: unsupport parameter: partition_lock_upgrade_timeout
+ALTER SYSTEM SET only support POSTMASTER-level, SIGHUP-level and BACKEND-level guc variable,
+and it must be allowed to set in postgresql.conf.
+--no need to clean

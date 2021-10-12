@@ -1,0 +1,15 @@
+-- @testpoint: 正常值插入为‘’
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (stringv char);
+SQL SUCCESS
+insert into type_char values ('');
+SQL SUCCESS
+select bit_length(stringv) from type_char;
++------------+
+| bit_length |
++------------+
+|            |
++------------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

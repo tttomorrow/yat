@@ -1,0 +1,66 @@
+-- @testpoint: opengauss关键字trailing(保留)，作为同义词对象名,部分测试点合理报错
+--前置条件
+drop table if exists trailing_test;
+SQL SUCCESS
+create table trailing_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-失败
+drop synonym if exists trailing;
+?.*ERROR: syntax error at or near "trailing"
+?.*Position: .*
+create synonym trailing for trailing_test;
+?.*ERROR: syntax error at or near "trailing"
+?.*Position: .*
+--关键字带双引号-成功
+drop synonym if exists "trailing";
+SQL SUCCESS
+create synonym "trailing" for trailing_test;
+SQL SUCCESS
+insert into "trailing" values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update "trailing" set "trailing".name='cici' where "trailing".id=2;
+SQL SUCCESS
+select * from "trailing";
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+drop synonym "trailing";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'trailing';
+?.*ERROR: syntax error at or near "'trailing'"
+?.*Position: .*
+create synonym 'trailing' for trailing_test;
+?.*ERROR: syntax error at or near "'trailing'"
+?.*Position: .*
+insert into 'trailing' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'trailing'"
+?.*Position: .*
+update 'trailing' set 'trailing'.name='cici' where 'trailing'.id=2;
+?.*ERROR: syntax error at or near "'trailing'"
+?.*Position: .*
+select * from 'trailing';
+?.*ERROR: syntax error at or near "'trailing'"
+?.*Position: .*
+--关键字带反引号-合理报错
+drop synonym if exists `trailing`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+create synonym `trailing` for trailing_test;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+insert into `trailing` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+update `trailing` set `trailing`.name='cici' where `trailing`.id=2;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+select * from `trailing`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+--清理环境
+drop table if exists trailing_test;
+SQL SUCCESS

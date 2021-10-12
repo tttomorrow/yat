@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字sys_refcursor(非保留)，作为用户组名
+--关键字不带引号-成功
+drop group if exists sys_refcursor;
+SQL SUCCESS
+create group sys_refcursor with password 'Gauss@123';
+SQL SUCCESS
+drop group sys_refcursor;
+SQL SUCCESS
+--关键字带双引号-成功
+drop group if exists "sys_refcursor";
+SQL SUCCESS
+create group "sys_refcursor" with password 'Gauss@123';
+SQL SUCCESS
+drop group "sys_refcursor";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop group if exists 'sys_refcursor';
+?.*ERROR: syntax error at or near "'sys_refcursor'".*
+?.*Position: .*
+create group 'sys_refcursor' with password 'Gauss@123';
+?.*ERROR: syntax error at or near "'sys_refcursor'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop group if exists `sys_refcursor`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create group `sys_refcursor` with password 'Gauss@123';
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

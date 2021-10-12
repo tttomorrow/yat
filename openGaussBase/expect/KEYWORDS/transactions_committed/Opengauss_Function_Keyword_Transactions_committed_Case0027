@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字transactions_committed非保留)，作为序列名
+--关键字不带引号-成功
+drop sequence if exists transactions_committed;
+SQL SUCCESS
+create sequence transactions_committed start 100 cache 50;
+SQL SUCCESS
+drop sequence transactions_committed;
+SQL SUCCESS
+--关键字带双引号-成功
+drop sequence if exists "transactions_committed";
+SQL SUCCESS
+create sequence "transactions_committed" start 100 cache 50;
+SQL SUCCESS
+drop sequence "transactions_committed";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'transactions_committed';
+?.*ERROR: syntax error at or near "'transactions_committed'".*
+?.*Position: .*
+create sequence 'transactions_committed' start 100 cache 50;
+?.*ERROR: syntax error at or near "'transactions_committed'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop sequence if exists `transactions_committed`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create sequence `transactions_committed` start 100 cache 50;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

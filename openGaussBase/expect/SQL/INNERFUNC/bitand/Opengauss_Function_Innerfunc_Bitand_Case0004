@@ -1,0 +1,23 @@
+-- @testpoint: 输入无效参数(合理报错)
+
+select bitand(6) as result from sys_dummy;
+?.*ERROR: function bitand\(integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: result
+select bitand(6,) as result from sys_dummy;
+?.*ERROR: syntax error at or near \"\)\"
+?.*
+select bitand(,6) as result from sys_dummy;
+?.*ERROR: syntax error at or near \"\,\"
+?.*
+select bitand(6,0,1) as result from sys_dummy;
+?.*ERROR: function bitand\(integer, integer, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: result
+select bitand() as result from sys_dummy;
+?.*ERROR: function bitand\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: result

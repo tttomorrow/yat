@@ -1,0 +1,65 @@
+-- @testpoint: opengauss关键字end(保留)，作为同义词对象名，部分测试点合理报错
+--前置条件
+drop table if exists end_test;
+SQL SUCCESS
+create table end_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-失败
+drop synonym if exists end;
+?.*ERROR: syntax error at or near "end"
+?.*Position: .*
+create synonym end for end_test;
+?.*ERROR: syntax error at or near "end"
+?.*Position: .*
+--关键字带双引号-成功
+drop synonym if exists "end";
+SQL SUCCESS
+create synonym "end" for end_test;
+SQL SUCCESS
+insert into "end" values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update "end" set "end".name='cici' where "end".id=2;
+SQL SUCCESS
+select * from "end";
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+drop synonym "end";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'end';
+?.*ERROR: syntax error at or near "'end'"
+?.*Position: .*
+create synonym 'end' for end_test;
+?.*ERROR: syntax error at or near "'end'"
+?.*Position: .*
+insert into 'end' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'end'"
+?.*Position: .*
+update 'end' set 'end'.name='cici' where 'end'.id=2;
+?.*ERROR: syntax error at or near "'end'"
+?.*Position: .*
+select * from 'end';
+?.*ERROR: syntax error at or near "'end'"
+?.*Position: .*
+--关键字带反引号-合理报错
+drop synonym if exists `end`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+create synonym `end` for end_test;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+insert into `end` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+update `end` set `end`.name='cici' where `end`.id=2;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+select * from `end`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+drop table if exists end_test;
+SQL SUCCESS

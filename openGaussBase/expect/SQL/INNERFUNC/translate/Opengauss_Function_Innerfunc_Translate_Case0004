@@ -1,0 +1,6 @@
+-- @testpoint: 字符处理函数translate，入参为数组类型_数组元素时合理报错
+select translate(array['100123','22212'],'10','真假');
+?.*ERROR: function translate\(text\[\], unknown, unknown\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: translate

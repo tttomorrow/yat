@@ -1,0 +1,42 @@
+-- @testpoint: 获取truncate触发器的定义信息不以pretty方式展示
+-- @modified at: 2020-12-21
+--创建源表和触发表
+DROP TABLE IF EXISTS test_trigger_src_tbl;
+SQL SUCCESS
+DROP TABLE IF EXISTS test_trigger_des_tbl;
+SQL SUCCESS
+CREATE TABLE test_trigger_src_tbl(id1 INT, id2 INT, id3 INT);
+SQL SUCCESS
+CREATE TABLE test_trigger_des_tbl(id1 INT, id2 INT, id3 INT);
+SQL SUCCESS
+--创建触发器函数
+CREATE OR REPLACE FUNCTION TRI_TRUNCATE_FUNC() RETURNS TRIGGER AS
+$$
+DECLARE
+BEGIN
+	TRUNCATE test_trigger_des_tbl;
+	RETURN OLD;
+END
+$$ LANGUAGE PLPGSQL;
+/
+SQL SUCCESS
+--创建触发器
+CREATE TRIGGER truncate_trigger BEFORE TRUNCATE ON test_trigger_src_tbl EXECUTE PROCEDURE TRI_TRUNCATE_FUNC();
+/
+SQL SUCCESS
+--获取truncate触发器的定义信息不以pretty方式展示
+SELECT pg_get_triggerdef(oid,false) FROM pg_trigger WHERE oid IN (SELECT oid FROM pg_trigger where tgname='truncate_trigger');
++----------------------------------------------------------------------------------------------------------------------------------+
+| pg_get_triggerdef                                                                                                                |
++----------------------------------------------------------------------------------------------------------------------------------+
+| CREATE TRIGGER truncate_trigger BEFORE TRUNCATE ON test_trigger_src_tbl FOR EACH STATEMENT EXECUTE PROCEDURE tri_truncate_func() |
++----------------------------------------------------------------------------------------------------------------------------------+
+--清理资源
+DROP TRIGGER truncate_trigger ON test_trigger_src_tbl;
+SQL SUCCESS
+DROP FUNCTION TRI_TRUNCATE_FUNC() cascade;
+SQL SUCCESS
+DROP TABLE test_trigger_src_tbl;
+SQL SUCCESS
+DROP TABLE test_trigger_des_tbl;
+SQL SUCCESS

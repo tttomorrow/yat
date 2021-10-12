@@ -1,0 +1,19 @@
+-- @testpoint: 插入字符串类型，合理报错
+drop table if exists bigserial_09;
+SQL SUCCESS
+create table bigserial_09 (name bigserial);
+SQL SUCCESS
+insert into bigserial_09 values ('123abc');
+?.*ERROR: invalid input syntax for type bigint: "123abc"
+?.*
+  Where: referenced column: name
+insert into bigserial_09 values ('1235ss4563');
+?.*ERROR: invalid input syntax for type bigint: "1235ss4563"
+?.*
+  Where: referenced column: name
+insert into bigserial_09 values ('abc456');
+?.*ERROR: invalid input syntax for type bigint: "abc456"
+?.*
+  Where: referenced column: name
+drop table bigserial_09;
+SQL SUCCESS

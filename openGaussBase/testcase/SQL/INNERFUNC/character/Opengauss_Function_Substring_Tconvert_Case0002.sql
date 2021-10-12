@@ -1,0 +1,3 @@
+-- @testpoint: 函数tconvert(key text, value text，将字符串转换为hstore格式.入参为无效值时合理报错
+
+select tconvert(123, bb);

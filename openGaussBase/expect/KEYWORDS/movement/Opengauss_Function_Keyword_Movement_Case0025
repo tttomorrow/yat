@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字movement(非保留)，作为角色名
+--关键字不带引号-成功
+drop role if exists movement;
+SQL SUCCESS
+create role movement with password 'gauss@123' valid until '2020-12-31';
+SQL SUCCESS
+drop role movement;
+SQL SUCCESS
+--关键字带双引号-成功
+drop role if exists "movement";
+SQL SUCCESS
+create role "movement" with password 'gauss@123' valid until '2020-12-31';
+SQL SUCCESS
+drop role "movement";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop role if exists 'movement';
+?.*ERROR: syntax error at or near "'movement'".*
+?.*Position: .*
+create role 'movement' with password 'gauss@123' valid until '2020-12-31';
+?.*ERROR: syntax error at or near "'movement'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop role if exists `movement`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create role `movement` with password 'gauss@123' valid until '2020-12-31';
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

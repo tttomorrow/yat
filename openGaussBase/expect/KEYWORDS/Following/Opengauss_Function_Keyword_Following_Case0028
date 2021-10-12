@@ -1,0 +1,65 @@
+-- @testpoint: opengauss关键字following(非保留)，作为同义词对象名，部分测试点合理报错
+--前置条件
+drop table if exists following_test;
+SQL SUCCESS
+create table following_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists following;
+SQL SUCCESS
+create synonym following for following_test;
+SQL SUCCESS
+insert into following values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update following set following.name='cici' where following.id=2;
+SQL SUCCESS
+select * from following;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+drop synonym if exists following;
+SQL SUCCESS
+--关键字带双引号-成功
+drop synonym if exists "following";
+SQL SUCCESS
+create synonym "following" for following_test;
+SQL SUCCESS
+drop synonym if exists "following";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'following';
+?.*ERROR: syntax error at or near "'following'"
+?.*Position: .*
+create synonym 'following' for following_test;
+?.*ERROR: syntax error at or near "'following'"
+?.*Position: .*
+insert into 'following' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'following'"
+?.*Position: .*
+update 'following' set 'following'.name='cici' where 'following'.id=2;
+?.*ERROR: syntax error at or near "'following'"
+?.*Position: .*
+select * from 'following';
+?.*ERROR: syntax error at or near "'following'"
+?.*Position: .*
+--关键字带反引号-合理报错
+drop synonym if exists `following`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+create synonym `following` for following_test;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+insert into `following` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+update `following` set `following`.name='cici' where `following`.id=2;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+select * from `following`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+drop table if exists following_test;
+SQL SUCCESS

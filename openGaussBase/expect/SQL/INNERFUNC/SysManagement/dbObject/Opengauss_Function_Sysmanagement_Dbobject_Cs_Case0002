@@ -1,0 +1,68 @@
+-- @testpoint: pg_column_size(any)函数的异常校验，合理报错
+-- 未压缩
+-- 整数
+-- TINYINT
+SELECT pg_column_size(-90::TINYINT);
++----------------+
+| pg_column_size |
++----------------+
+| 8              |
++----------------+
+SELECT pg_column_size('0x89'::TINYINT);
+?.*ERROR: invalid input syntax for integer: "0x89"
+?.*
+  Where: referenced column: pg_column_size
+SELECT pg_column_size(256::TINYINT);
+?.*ERROR: tinyint out of range
+  Where: referenced column: pg_column_size
+SELECT pg_column_size(255::TINYINT,255::TINYINT);
+?.*ERROR: function pg_column_size\(tinyint, tinyint\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_column_size
+-- SMALLINT
+SELECT pg_column_size(-32768::SMALLINT);
+?.*ERROR: smallint out of range
+  Where: referenced column: pg_column_size
+SELECT pg_column_size('*&&^&'9::SMALLINT);
+?.*ERROR: syntax error at or near "9"
+?.*
+SELECT pg_column_size(32768::SMALLINT);
+?.*ERROR: smallint out of range
+  Where: referenced column: pg_column_size
+-- INTEGER
+?.*ERROR: integer out of range
+  Where: referenced column: pg_column_size
+SELECT pg_column_size('hijk'::clob);
++----------------+
+| pg_column_size |
++----------------+
+| 8              |
++----------------+
+?.*ERROR: integer out of range
+  Where: referenced column: pg_column_size
+-- BINARY_INTEGER
+?.*ERROR: integer out of range
+  Where: referenced column: pg_column_size
+SELECT pg_column_size(高斯);
+?.*ERROR: column \"高斯\" does not exist
+?.*
+  Where: referenced column: pg_column_size
+?.*ERROR: integer out of range
+  Where: referenced column: pg_column_size
+-- BIGINT
+SELECT pg_column_size();
+?.*ERROR: function pg_column_size\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_column_size
+SELECT pg_column_size(‘’);
+?.*ERROR: column \"\‘\’\" does not exist
+?.*
+  Where: referenced column: pg_column_size
+SELECT pg_column_size('');
++----------------+
+| pg_column_size |
++----------------+
+|                |
++----------------+

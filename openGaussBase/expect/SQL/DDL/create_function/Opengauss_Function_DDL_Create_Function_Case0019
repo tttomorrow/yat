@@ -1,0 +1,23 @@
+drop function if exists "func_test1*#"(integer, integer);
+SQL SUCCESS
+CREATE FUNCTION "func_test1*#"(integer, integer) RETURNS integer
+    AS 'select $1 + $2;'
+    LANGUAGE SQL
+    IMMUTABLE
+    RETURNS NULL ON NULL INPUT;
+ /
+SQL SUCCESS
+select proname from pg_proc where proname='func_test1*#';
++--------------+
+| proname      |
++--------------+
+| func_test1*# |
++--------------+
+call "func_test1*#"(999,1);
++--------------+
+| func_test1*# |
++--------------+
+| 1000         |
++--------------+
+drop FUNCTION "func_test1*#";
+SQL SUCCESS

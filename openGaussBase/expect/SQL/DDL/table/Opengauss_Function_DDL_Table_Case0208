@@ -1,0 +1,52 @@
+-- @testpoint: alter table partition_clauses  枚举分区表插入'',合理报错
+drop table if exists alter_table_tb004;
+SQL SUCCESS
+create table alter_table_tb004
+(c1 int PRIMARY KEY,
+c2 bigint,
+c3 varchar(20)
+) PARTITION BY RANGE (c1) (PARTITION p1 VALUES less than (25), PARTITION p2 VALUES less than (50),PARTITION p3 VALUES less than (75),PARTITION p4 VALUES less than (100));
+SQL SUCCESS
+insert into alter_table_tb004 values('11',null,'sss');
+SQL SUCCESS
+insert into alter_table_tb004 values('21','','ss');
+SQL SUCCESS
+insert into alter_table_tb004 values('31',66,'');
+SQL SUCCESS
+insert into alter_table_tb004 values('41',66,null);
+SQL SUCCESS
+insert into alter_table_tb004 values('51',66,'null');
+SQL SUCCESS
+insert into alter_table_tb004 values('61',66,'cc');
+SQL SUCCESS
+--error
+alter table alter_table_tb004  ADD PARTITION p5 values less than(' ') ;
+?.*ERROR: invalid input syntax for integer: " ".*
+insert into alter_table_tb004 values('21','','bb');
+?.*ERROR: duplicate key value violates unique constraint "alter_table_tb004_pkey".*
+  Detail: Key (c1)=(21) already exists.
+insert into alter_table_tb004 values('21','','ss');
+?.*ERROR: duplicate key value violates unique constraint "alter_table_tb004_pkey".*
+  Detail: Key (c1)=(21) already exists.
+insert into alter_table_tb004 values('81','','');
+SQL SUCCESS
+--error
+alter table alter_table_tb004  drop  PARTITION p5 ;
+?.*ERROR: partition "p5" does not exist.*
+alter table alter_table_tb004 modify c1 varchar(20) DEFAULT 'we';
+?.*ERROR: syntax error at or near "DEFAULT".*
+?.*Position:.*
+SELECT COUNT(*) FROM alter_table_tb004 PARTITION ;
++-------+
+| count |
++-------+
+| 7     |
++-------+
+SELECT COUNT(*) FROM alter_table_tb004 PARTITION (p3);
++-------+
+| count |
++-------+
+| 2     |
++-------+
+drop table if exists alter_table_tb004;
+SQL SUCCESS

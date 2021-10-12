@@ -1,0 +1,18 @@
+-- @testpoint: 使用alter system set方法设置参数extra_float_digits，合理报错
+--查看默认值
+show extra_float_digits;
++--------------------+
+| extra_float_digits |
++--------------------+
+| 3                  |
++--------------------+
+--设置，报错
+alter system set extra_float_digits to 3;
+?.*ERROR: unsupport parameter: extra_float_digits
+ALTER SYSTEM SET only support POSTMASTER-level, SIGHUP-level and BACKEND-level guc variable,
+and it must be allowed to set in postgresql.conf.
+alter system set extra_float_digits to -15;
+?.*ERROR: unsupport parameter: extra_float_digits
+ALTER SYSTEM SET only support POSTMASTER-level, SIGHUP-level and BACKEND-level guc variable,
+and it must be allowed to set in postgresql.conf.
+--no need to clean

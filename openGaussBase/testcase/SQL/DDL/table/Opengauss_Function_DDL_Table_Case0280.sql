@@ -1,0 +1,35 @@
+-- @testpoint: 插入数据为null后修改default为null
+drop table if exists test_modify cascade;
+create table test_modify(
+c_id int, c_integer integer,
+c_real real,c_float float, c_cdouble binary_double,
+c_decimal decimal(38), c_number number(38),c_number1 number,c_number2 number(20,10),c_numeric numeric(38),
+c_char char(50) default null, c_varchar varchar(20), c_varchar2 varchar2(4000),
+c_clob clob,
+c_raw raw(20),
+c_blob blob,
+c_date date,
+c_timestamp timestamp
+);
+insert into test_modify values(null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null);
+
+--alter table test_modify MODIFY(c_id int default null, c_integer integer default null,c_real real default null,c_float float default null, c_cdouble binary_double default null,c_decimal decimal(38) default null, c_number number(38) default null,c_number1 number default null,c_number2 number(20,10) default null,c_numeric numeric(38) default null,c_char char(50) default null, c_varchar varchar(20) default null, c_varchar2 varchar2(4000) default null,c_raw raw(20) default null,c_date date default null,c_timestamp timestamp default null,c_clob clob default null,c_blob blob default null);
+alter table test_modify alter c_id set default null;
+alter table test_modify alter c_integer set default null;
+alter table test_modify alter c_real set default null;
+alter table test_modify alter c_float set default null;
+alter table test_modify alter c_cdouble set default null;
+alter table test_modify alter c_decimal set default null;
+alter table test_modify alter c_number set default null;
+alter table test_modify alter c_number1 set default null;
+alter table test_modify alter c_number2 set default null;
+alter table test_modify alter c_numeric set default null;
+alter table test_modify alter c_char set default null;
+alter table test_modify alter c_varchar set default null;
+alter table test_modify alter c_varchar2 set default null;
+alter table test_modify alter c_clob set default null;
+alter table test_modify alter c_raw set default null;
+alter table test_modify alter c_blob set default null;
+alter table test_modify alter c_date set default null;
+alter table test_modify alter c_timestamp set default null;
+drop table if exists test_modify;

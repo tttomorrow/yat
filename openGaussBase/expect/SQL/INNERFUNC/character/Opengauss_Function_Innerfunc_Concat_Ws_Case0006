@@ -1,0 +1,16 @@
+-- @testpoint: 只有分隔符其他参数全缺失，合理报错
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values (concat_ws(' '));
+?.*ERROR: function concat_ws\(unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+SELECT * from type_char;
++---------+
+| string1 |
++---------+
++---------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

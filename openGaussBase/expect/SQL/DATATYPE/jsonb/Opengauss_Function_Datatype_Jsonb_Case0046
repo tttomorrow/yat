@@ -1,0 +1,147 @@
+-- @testpoint: Jsonb额外支持的操作符:<=判断左边的jsonb是否小于等于右边的jsonb
+--同类型
+select '"str"'::jsonb <= '"string"'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select 'null'::jsonb <= 'null' ::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select 'false'::jsonb <= 'false'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select 'false'::jsonb <= 'true'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '{"a":1, "b": [10,2,3],"c":{"b":"d"}}'::jsonb <= '{"b":[10,2,3]}'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '[null, false, 123,{"a":true},"test"]'::jsonb <= '[123,{"a":false},"test",null, false]'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '105.2e-3'::jsonb <= '1.0520e-1'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+--不同类型
+select '"str"'::jsonb <=  'null'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select 'null'::jsonb <= 'true' ::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select 'null'::jsonb <= '0' ::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select 'null'::jsonb <=  '{"b":[10,2,3]}'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select 'null'::jsonb <= '[12,"test",null, false]'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select 'true'::jsonb <= '1'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '{"a":1, "b": [10,2,3],"c":{"b":"d"}}'::jsonb <= '[{"b":[10,2,3]},{"a":1},{"c":{"b":"d"}}]'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '[{"a":false},{"a":true}]'::jsonb <= '{"a": true,"a": false}'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '105.2e3'::jsonb <= '"0.1052"'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '0'::jsonb <= 'false'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '258'::jsonb <= '{"a":258}'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '0.369'::jsonb <= '[0.369]'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '"true"'::jsonb <= 'true' ::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '"true"'::jsonb <= '{"a":"true"}' ::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '"true"'::jsonb <= '["true"]' ::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '{"a":1, "b": [10,2,3],"c":{"b":"d"}}'::jsonb <= 'true'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '[{"a":false},{"a":true}]'::jsonb <= 'false'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+

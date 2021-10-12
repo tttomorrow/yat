@@ -1,0 +1,33 @@
+-- @testpoint: 分区表创建本地和全局索引后，执行analyze verify fast
+--step1:创建分区; expect:成功
+drop table if exists t_partition_0079;
+SQL SUCCESS
+create table t_partition_0079(inv_date_sk integer not null,inv_item_sk decimal not null,inv_warehouse_sk integer not null,inv_quantity_on_hand integer,primary key (inv_item_sk, inv_date_sk))
+partition by range(inv_date_sk)
+(partition p1 values less than(10000),
+ partition p2 values less than(20000),
+ partition p3 values less than(30000),
+ partition p4 values less than(40000),
+ partition p5 values less than(50000),
+ partition p6 values less than(60000),
+ partition p7 values less than(maxvalue));
+SQL SUCCESS
+--step2:创建本地和全局索引;  expect:成功
+create index i_partition_0079_01 on t_partition_0079(inv_warehouse_sk, inv_date_sk) global;
+SQL SUCCESS
+create index i_partition_0079_02 on t_partition_0079(inv_date_sk, inv_quantity_on_hand) global;
+SQL SUCCESS
+create index i_partition_0079_03 on t_partition_0079(inv_warehouse_sk) local;
+SQL SUCCESS
+create index i_partition_0079_04 on t_partition_0079(inv_warehouse_sk) local;
+SQL SUCCESS
+--step3:对全局索引执行analyze verify fast;   expect:成功
+analyze verify fast i_partition_0079_01;
+SQL SUCCESS
+analyze verify fast i_partition_0079_02;
+SQL SUCCESS
+analyze verify fast;
+SQL SUCCESS
+--step4:清理环境;  expect:成功
+drop table t_partition_0079 cascade;
+SQL SUCCESS

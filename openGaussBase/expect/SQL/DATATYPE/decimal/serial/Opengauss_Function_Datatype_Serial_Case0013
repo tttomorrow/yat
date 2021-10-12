@@ -1,0 +1,21 @@
+-- @testpoint: 插入0值
+drop table if exists serial_13;
+SQL SUCCESS
+create table serial_13 (name serial);
+SQL SUCCESS
+insert into serial_13 values (0);
+SQL SUCCESS
+insert into serial_13 values (0);
+SQL SUCCESS
+insert into serial_13 values (0);
+SQL SUCCESS
+select * from serial_13;
++------+
+| name |
++------+
+| 0    |
+| 0    |
+| 0    |
++------+
+drop table serial_13;
+SQL SUCCESS

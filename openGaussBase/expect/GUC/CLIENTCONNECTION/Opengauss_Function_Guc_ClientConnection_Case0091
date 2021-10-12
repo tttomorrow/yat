@@ -1,0 +1,13 @@
+-- @testpoint: alter system set方法设置参数vacuum_freeze_min_age值，合理报错
+--查询默认
+show vacuum_freeze_min_age;
++-----------------------+
+| vacuum_freeze_min_age |
++-----------------------+
++-----------------------+
+--设置，报错
+alter system set vacuum_freeze_min_age to 52002333;
+?.*ERROR: unsupport parameter: vacuum_freeze_min_age
+ALTER SYSTEM SET only support POSTMASTER-level, SIGHUP-level and BACKEND-level guc variable,
+and it must be allowed to set in postgresql.conf.
+--no need to clean

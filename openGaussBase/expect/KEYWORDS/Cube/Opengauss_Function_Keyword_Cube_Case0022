@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字cube(非保留)，作为用户组名
+--关键字不带引号-成功
+drop group if exists cube;
+SQL SUCCESS
+create group cube with password 'gauss@123';
+SQL SUCCESS
+drop group cube;
+SQL SUCCESS
+--关键字带双引号-成功
+drop group if exists "cube";
+SQL SUCCESS
+create group "cube" with password 'gauss@123';
+SQL SUCCESS
+drop group "cube";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop group if exists 'cube';
+?.*ERROR: syntax error at or near "'cube'"
+?.*
+create group 'cube' with password 'gauss@123';
+?.*ERROR: syntax error at or near "'cube'"
+?.*
+--关键字带反引号-合理报错
+drop group if exists `cube`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create group `cube` with password 'gauss@123';
+?.*ERROR: syntax error at or near "`"
+?.*

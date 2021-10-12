@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字preceding(非保留)，作为数据库名
+--关键字不带引号-成功
+drop database if exists preceding;
+SQL SUCCESS
+create database preceding;
+SQL SUCCESS
+drop database preceding;
+SQL SUCCESS
+--关键字带双引号-成功
+drop database if exists "preceding";
+SQL SUCCESS
+create database "preceding";
+SQL SUCCESS
+drop database "preceding";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop database if exists 'preceding';
+?.*ERROR: syntax error at or near "'preceding'".*
+?.*Position: .*
+create database 'preceding';
+?.*ERROR: syntax error at or near "'preceding'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop database if exists `preceding`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create database `preceding`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

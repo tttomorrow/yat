@@ -1,0 +1,18 @@
+-- @testpoint: mod函数用于自定义函数返回值
+drop function if exists dd_mod;
+SQL SUCCESS
+create or replace function dd_mod() return number
+is
+begin
+return mod('434234',454);
+end;
+/
+SQL SUCCESS
+select dd_mod();
++--------+
+| dd_mod |
++--------+
+| 210    |
++--------+
+drop function if exists dd_mod;
+SQL SUCCESS

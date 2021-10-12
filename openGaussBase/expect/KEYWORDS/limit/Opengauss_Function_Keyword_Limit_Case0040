@@ -1,0 +1,23 @@
+-- @testpoint: 关键字limit作为普通表的列名在delete语句的使用 部分测试点合理报错
+drop table if exists test_limit_005;
+SQL SUCCESS
+create table test_limit_005 ("LIMIT" int);
+SQL SUCCESS
+insert into test_limit_005 values (1);
+SQL SUCCESS
+commit;
+SQL SUCCESS
+select "LIMIT" from test_limit_005 order by "LIMIT";
++-------+
+| LIMIT |
++-------+
+| 1     |
++-------+
+delete from test_limit_005 where "LIMIT" = 1;
+SQL SUCCESS
+select LIMIT from test_limit_005 order by "LIMIT";
+?.*ERROR: syntax error at or near "LIMIT"
+?.*Position: .*
+--清理环境
+drop table if exists test_limit_005;
+SQL SUCCESS

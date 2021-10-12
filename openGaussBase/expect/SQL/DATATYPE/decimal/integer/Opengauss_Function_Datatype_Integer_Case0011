@@ -1,0 +1,27 @@
+-- @testpoint: 插入负整数
+drop table if exists integer11;
+SQL SUCCESS
+create table integer11 (name integer);
+SQL SUCCESS
+insert into integer11 values (-1223340);
+SQL SUCCESS
+insert into integer11 values (-99999999);
+SQL SUCCESS
+insert into integer11 values (-1);
+SQL SUCCESS
+insert into integer11 values (-2);
+SQL SUCCESS
+insert into integer11 values (-3);
+SQL SUCCESS
+select * from integer11;
++-----------+
+| name      |
++-----------+
+| -1223340  |
+| -99999999 |
+| -1        |
+| -2        |
+| -3        |
++-----------+
+drop table integer11;
+SQL SUCCESS

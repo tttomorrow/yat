@@ -1,0 +1,66 @@
+-- @testpoint: opengauss关键字nothing(非保留)，作为同义词对象名,部分测试点合理报错
+--前置条件
+drop table if exists explain_test;
+SQL SUCCESS
+create table explain_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists nothing;
+SQL SUCCESS
+create synonym nothing for explain_test;
+SQL SUCCESS
+insert into nothing values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update nothing set nothing.name='cici' where nothing.id=2;
+SQL SUCCESS
+select * from nothing;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--关键字带双引号-成功
+drop synonym if exists "nothing";
+SQL SUCCESS
+create synonym "nothing" for explain_test;
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'nothing';
+?.*ERROR: syntax error at or near "'nothing'".*
+?.*Position: .*
+create synonym 'nothing' for explain_test;
+?.*ERROR: syntax error at or near "'nothing'".*
+?.*Position: .*
+insert into 'nothing' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'nothing'".*
+?.*Position: .*
+update 'nothing' set 'nothing'.name='cici' where 'nothing'.id=2;
+?.*ERROR: syntax error at or near "'nothing'".*
+?.*Position: .*
+select * from 'nothing';
+?.*ERROR: syntax error at or near "'nothing'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop synonym if exists `nothing`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create synonym `nothing` for explain_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+insert into `nothing` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+update `nothing` set `nothing`.name='cici' where `nothing`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+select * from `nothing`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+--清理环境
+drop synonym if exists "nothing";
+SQL SUCCESS
+drop synonym if exists nothing;
+SQL SUCCESS
+drop table if exists explain_test;
+SQL SUCCESS

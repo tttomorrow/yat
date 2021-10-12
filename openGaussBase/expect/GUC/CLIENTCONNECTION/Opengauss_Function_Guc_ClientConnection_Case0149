@@ -1,0 +1,14 @@
+-- @testpoint: ALTER SYSTEM SET方法设置lc_monetary参数，合理报错
+--查询默认
+show lc_monetary;
++-------------+
+| lc_monetary |
++-------------+
+| C           |
++-------------+
+--设置，报错
+ALTER SYSTEM SET lc_monetary to 'C';
+?.*ERROR: unsupport parameter: lc_monetary
+ALTER SYSTEM SET only support POSTMASTER-level, SIGHUP-level and BACKEND-level guc variable,
+and it must be allowed to set in postgresql.conf.
+--no need to clean

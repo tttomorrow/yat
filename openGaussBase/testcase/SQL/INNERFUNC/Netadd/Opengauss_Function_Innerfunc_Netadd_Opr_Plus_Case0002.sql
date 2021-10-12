@@ -1,0 +1,13 @@
+-- @testpoint: 网络地址操作符+的异常校验，合理报错
+
+-- 整数直接向前进位255制
+SELECT inet '192.168.1.6' + 0x25 AS RESULT;
+SELECT inet '192.168.1.257' + 250 AS RESULT;
+SELECT inet '255.255.255.250' * 5 AS RESULT;
+SELECT inet '255.255.255.250/24' &* 5 AS RESULT;
+SELECT '234e:0:4567::3d/64' + inet '255.255.255.250' AS RESULT;
+
+SELECT cidr '192.168' + 2&5 AS RESULT;
+SELECT cidr '2001:4f8:3:ba::/64' + '55.255.255.250' AS RESULT;
+SELECT cidr '192.168' + '' AS RESULT;
+SELECT cidr '' + '1.2.3.4' AS RESULT;

@@ -1,0 +1,21 @@
+-- @testpoint: 表空间赋予全部权限时返回为true
+DROP USER IF EXISTS joe CASCADE;
+SQL SUCCESS
+drop TABLESPACE if exists tpcds_tbspc;
+SQL SUCCESS
+CREATE TABLESPACE tpcds_tbspc RELATIVE LOCATION 'tablespace/tablespace_1';
+SQL SUCCESS
+CREATE USER joe PASSWORD 'Bigdata@123';
+SQL SUCCESS
+GRANT ALL PRIVILEGES ON TABLESPACE tpcds_tbspc TO joe;
+SQL SUCCESS
+select has_tablespace_privilege ('joe', 'tpcds_tbspc', 'CREATE');
++--------------------------+
+| has_tablespace_privilege |
++--------------------------+
+| true                     |
++--------------------------+
+drop TABLESPACE if exists tpcds_tbspc;
+SQL SUCCESS
+DROP USER IF EXISTS joe CASCADE;
+SQL SUCCESS

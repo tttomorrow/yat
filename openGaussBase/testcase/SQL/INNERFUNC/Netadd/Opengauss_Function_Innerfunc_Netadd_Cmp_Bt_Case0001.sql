@@ -1,0 +1,27 @@
+-- @testpoint: 网络地址操作符>(大于)合法值测试
+
+-- ip同 看掩码长度
+SELECT inet '192.168.1.8/16' > inet '192.168.1.8/24' AS RESULT;
+SELECT inet '192.168.1.8/16' > inet '192.168.1.8/16' AS RESULT;
+SELECT inet '192.168.1.8/24' > inet '192.168.1.8/16' AS RESULT;
+SELECT inet '192.168.1.8/24' > inet '192.168.1.8/32' AS RESULT;
+SELECT inet '234e:0:4567::3f/1' > inet '234e:0:4567::3f/0' AS RESULT;
+SELECT inet '234e:0:4567::3f/127' > inet '234e:0:4567::3f/128' AS RESULT;
+SELECT inet '234e:0:4567::3f/128' > inet '234e:0:4567::3f/128' AS RESULT;
+
+-- 交叉带掩码各类ip比，掩码不足32的位数补0去比
+SELECT inet '8.168.1.3' > inet '8.168.1.4/24' AS RESULT;
+SELECT inet '8.168.1.3' > inet '8.168.1.4/32' AS RESULT;
+SELECT inet '8.168.1.3/24' > inet '8.168.1.4/32' AS RESULT;
+SELECT inet '8.168.1.3/24' > inet '8.168.1.4/15' AS RESULT;
+SELECT inet '8.168.1.3/24' > inet '192.168.1.8/16' AS RESULT;
+SELECT inet '234e:0:4567::3/128' > inet '234e:0:4567::3f' AS RESULT;
+SELECT inet '234e:0:4567::3e/128' > inet '234e:0:4567::3f' AS RESULT;
+SELECT inet '234e:0:4567::3e' > inet '234e:0:4567::3f/128' AS RESULT;
+SELECT inet '234e:0:4567::3e' > inet '234e:0:4567::3f/125' AS RESULT;
+SELECT inet '::1/127' > inet '::/128' AS RESULT;
+SELECT inet '::5/127' > inet '::/128' AS RESULT;
+SELECT inet '0001::aaa:192.168.1.5/112' = inet '1::aaa:192.168.1.5/112' AS RESULT;
+SELECT inet '234e:0:4567::3d/64' > inet '192.168.1.6' AS RESULT;
+SELECT inet '192.168.1.6' > inet '234e:0:4567::3d/64' AS RESULT;
+SELECT inet '192.168.1.6' > inet '::192.168.1.6/32' AS RESULT;

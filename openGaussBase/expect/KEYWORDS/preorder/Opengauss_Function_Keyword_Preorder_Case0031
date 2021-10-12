@@ -1,0 +1,20 @@
+--  @testpoint:opengauss关键字preorder(非保留)，作为字段数据类型(合理报错)
+--前置条件
+drop table if exists preorder_test cascade;
+SQL SUCCESS
+--关键字不带引号-合理报错
+create table preorder_test(id int,name preorder);
+?.*ERROR: type "preorder" does not exist.*
+?.*Position: .*
+--关键字带双引号-合理报错
+create table preorder_test(id int,name "preorder");
+?.*ERROR: type "preorder" does not exist.*
+?.*Position: .*
+--关键字带单引号-合理报错
+create table preorder_test(id int,name 'preorder');
+?.*ERROR: syntax error at or near "'preorder'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+create table preorder_test(id int,name `preorder`);
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

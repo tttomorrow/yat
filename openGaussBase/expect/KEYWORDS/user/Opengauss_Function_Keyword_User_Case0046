@@ -1,0 +1,30 @@
+-- @testpoint: 结合case when条件查询，部分测试点合理报错
+drop table if exists t2;
+SQL SUCCESS
+create table t2 (a int,b char(10));
+SQL SUCCESS
+insert into t2 values(10,'abc');
+SQL SUCCESS
+insert into t2 values(20,'abc');
+SQL SUCCESS
+insert into t2 values(20,'abc');
+SQL SUCCESS
+insert into t2 values(82,'cd');
+SQL SUCCESS
+insert into t2 values(43,'cd');
+SQL SUCCESS
+insert into t2 values(89,'abc');
+SQL SUCCESS
+select case when user='SYS' then 'a' else 'b' end from t2;
++------+
+| case |
++------+
+| b    |
+| b    |
+| b    |
+| b    |
+| b    |
+| b    |
++------+
+drop table if exists t2;
+SQL SUCCESS

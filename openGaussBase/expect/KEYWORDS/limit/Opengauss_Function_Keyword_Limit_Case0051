@@ -1,0 +1,28 @@
+-- @testpoint: 关键字limit作为全局临时表的列名在update语句的使用
+drop table if exists t_global_temporary_limit_003;
+SQL SUCCESS
+create global temporary table t_global_temporary_limit_003("limit" int) on commit preserve rows;
+SQL SUCCESS
+insert into t_global_temporary_limit_003 values (1);
+SQL SUCCESS
+commit;
+SQL SUCCESS
+select "limit" from t_global_temporary_limit_003 order by "limit";
++-------+
+| limit |
++-------+
+| 1     |
++-------+
+update t_global_temporary_limit_003 set "limit" = 2;
+SQL SUCCESS
+commit;
+SQL SUCCESS
+select"limit" from t_global_temporary_limit_003 order by "limit";
++-------+
+| limit |
++-------+
+| 2     |
++-------+
+--清理环境
+drop table if exists t_global_temporary_limit_003;
+SQL SUCCESS

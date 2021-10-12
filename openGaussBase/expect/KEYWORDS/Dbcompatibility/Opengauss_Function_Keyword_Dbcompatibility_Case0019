@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字dbcompatibility(非保留)，作为外部数据源名
+--关键字不带引号-成功
+drop data source if exists dbcompatibility;
+SQL SUCCESS
+create data source dbcompatibility;
+SQL SUCCESS
+drop data source dbcompatibility;
+SQL SUCCESS
+--关键字带双引号-成功
+drop data source if exists "dbcompatibility";
+SQL SUCCESS
+create data source "dbcompatibility";
+SQL SUCCESS
+drop data source "dbcompatibility";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop data source if exists 'dbcompatibility';
+?.*ERROR: syntax error at or near "'dbcompatibility'"
+?.*
+create data source 'dbcompatibility';
+?.*ERROR: syntax error at or near "'dbcompatibility'"
+?.*
+--关键字带反引号-合理报错
+drop data source if exists `dbcompatibility`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create data source `dbcompatibility`;
+?.*ERROR: syntax error at or near "`"
+?.*

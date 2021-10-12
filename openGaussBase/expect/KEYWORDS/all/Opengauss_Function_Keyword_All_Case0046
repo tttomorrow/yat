@@ -1,0 +1,18 @@
+-- @testpoint: 表名和列名同时出现关键字all，与dml结合
+drop table if exists "all";
+SQL SUCCESS
+create table "all" ("all" char(20),stu_age int,sex char(10),score int,address char(10));
+SQL SUCCESS
+insert into "all" ("all",stu_age)values('zhangsan',20);
+SQL SUCCESS
+update "all" set "all"='lisi';
+SQL SUCCESS
+delete from "all" where "all"='lisi';
+SQL SUCCESS
+select * from "all";
++-----+---------+-----+-------+---------+
+| all | stu_age | sex | score | address |
++-----+---------+-----+-------+---------+
++-----+---------+-----+-------+---------+
+drop table if exists "all";
+SQL SUCCESS

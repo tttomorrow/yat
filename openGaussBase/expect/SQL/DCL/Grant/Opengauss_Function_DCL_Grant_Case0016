@@ -1,0 +1,19 @@
+-- @testpoint: 回收权限
+drop user if exists manager cascade;
+SQL SUCCESS
+CREATE ROLE manager PASSWORD 'Bigdata@123';
+SQL SUCCESS
+drop user if exists user_016;
+SQL SUCCESS
+CREATE USER user_016 PASSWORD 'Bigdata@123';
+SQL SUCCESS
+GRANT ALL PRIVILEGES TO user_016;
+SQL SUCCESS
+GRANT user_016 TO manager WITH ADMIN OPTION;
+SQL SUCCESS
+REVOKE ADMIN OPTION FOR user_016 FROM manager CASCADE;
+SQL SUCCESS
+drop user  user_016;
+SQL SUCCESS
+drop user  manager;
+SQL SUCCESS

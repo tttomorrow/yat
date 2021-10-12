@@ -1,0 +1,39 @@
+-- @testpoint: 关键字variadic（保留），用作字符串，部分测试点合理报错
+drop table if exists variadic_test cascade;
+SQL SUCCESS
+create table variadic_test(id int,name varchar(20));
+SQL SUCCESS
+create or replace procedure variadic_insert
+as
+begin
+ for i in 1..10 loop
+    insert into variadic_test values(i,'variadic');
+    end loop;
+ end;
+/
+SQL SUCCESS
+call variadic_insert();
++-----------------+
+| variadic_insert |
++-----------------+
+|                 |
++-----------------+
+select * from variadic_test;
++----+----------+
+| id | name     |
++----+----------+
+| 1  | variadic |
+| 2  | variadic |
+| 3  | variadic |
+| 4  | variadic |
+| 5  | variadic |
+| 6  | variadic |
+| 7  | variadic |
+| 8  | variadic |
+| 9  | variadic |
+| 10 | variadic |
++----+----------+
+drop table if exists variadic_test cascade;
+SQL SUCCESS
+drop procedure variadic_insert;
+SQL SUCCESS

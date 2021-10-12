@@ -1,0 +1,19 @@
+--  @testpoint:创建函数指定参数数据类型是特殊字符类型
+drop FUNCTION if EXISTS y_testfun5;
+SQL SUCCESS
+CREATE FUNCTION y_testfun5 (c_name name,c_char "char") RETURNS name  AS $$
+        BEGIN
+                RETURN (c_name,c_char);
+        END;
+$$ LANGUAGE plpgsql;
+/
+SQL SUCCESS
+--"char"只存储1字节
+call y_testfun5('abc','helloworld');
++------------+
+| y_testfun5 |
++------------+
+| (abc,h)    |
++------------+
+drop FUNCTION y_testfun5;
+SQL SUCCESS

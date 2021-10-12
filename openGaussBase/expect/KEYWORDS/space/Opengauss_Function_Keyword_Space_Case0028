@@ -1,0 +1,65 @@
+-- @testpoint: opengauss关键字space(非保留)，作为同义词对象名，部分测试点合理报错
+--前置条件
+drop table if exists explain_test;
+SQL SUCCESS
+create table explain_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists space;
+SQL SUCCESS
+create synonym space for explain_test;
+SQL SUCCESS
+insert into space values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update space set space.name='cici' where space.id=2;
+SQL SUCCESS
+select * from space;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+drop synonym if exists space;
+SQL SUCCESS
+--关键字带双引号-成功
+drop synonym if exists "space";
+SQL SUCCESS
+create synonym "space" for explain_test;
+SQL SUCCESS
+drop synonym if exists "space";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'space';
+?.*ERROR: syntax error at or near "'space'".*
+?.*Position: .*
+create synonym 'space' for explain_test;
+?.*ERROR: syntax error at or near "'space'".*
+?.*Position: .*
+insert into 'space' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'space'".*
+?.*Position: .*
+update 'space' set 'space'.name='cici' where 'space'.id=2;
+?.*ERROR: syntax error at or near "'space'".*
+?.*Position: .*
+select * from 'space';
+?.*ERROR: syntax error at or near "'space'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop synonym if exists `space`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create synonym `space` for explain_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+insert into `space` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+update `space` set `space`.name='cici' where `space`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+select * from `space`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+drop table if exists explain_test;
+SQL SUCCESS

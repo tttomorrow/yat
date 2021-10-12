@@ -1,0 +1,7 @@
+--  @testpoint:修改OPTIONS中的字段,增加（ADD）字段，待增加字段已经存在，合理报错
+drop DATA SOURCE if exists ds_test9;
+CREATE DATA SOURCE ds_test9 TYPE 'unknown' VERSION '11.2.3' OPTIONS (dsn 'openGauss',encoding 'utf_8');
+--添加字段，使用add，待增加字段存在,合理报错
+ALTER DATA SOURCE ds_test9 OPTIONS (dsn 'gauss',encoding 'GBK');
+--删除数据源对象
+DROP DATA SOURCE ds_test9;

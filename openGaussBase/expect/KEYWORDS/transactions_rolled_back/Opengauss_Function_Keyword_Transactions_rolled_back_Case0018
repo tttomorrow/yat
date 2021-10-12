@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字transactions_rolled_back(非保留)，作为数据库名
+--关键字不带引号-成功
+drop database if exists transactions_rolled_back;
+SQL SUCCESS
+create database transactions_rolled_back;
+SQL SUCCESS
+drop database transactions_rolled_back;
+SQL SUCCESS
+--关键字带双引号-成功
+drop database if exists "transactions_rolled_back";
+SQL SUCCESS
+create database "transactions_rolled_back";
+SQL SUCCESS
+drop database "transactions_rolled_back";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop database if exists 'transactions_rolled_back';
+?.*ERROR: syntax error at or near "'transactions_rolled_back'".*
+?.*Position: .*
+create database 'transactions_rolled_back';
+?.*ERROR: syntax error at or near "'transactions_rolled_back'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop database if exists `transactions_rolled_back`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create database `transactions_rolled_back`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

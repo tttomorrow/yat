@@ -1,0 +1,9 @@
+-- @testpoint: 指定字符串长度，不足补空格
+drop table if exists char_type_t1;
+SQL SUCCESS
+CREATE TABLE char_type_t1(CT_COL1 CHARACTER(5));
+SQL SUCCESS
+insert into char_type_t1 (CT_COL1) values('hi');
+SQL SUCCESS
+drop table if exists char_type_t1;
+SQL SUCCESS

@@ -1,0 +1,57 @@
+-- @testpoint: date_part函数入参给reltime类型的时间段
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (clo1 reltime);
+SQL SUCCESS
+insert into test_date01 values ('-13 months -10 hours');
+SQL SUCCESS
+select date_part('month', clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| 0.0       |
++-----------+
+SELECT date_part('month', reltime '-13 months -10 hours');
++-----------+
+| date_part |
++-----------+
+| 0.0       |
++-----------+
+select date_part('day', clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| -25.0     |
++-----------+
+SELECT date_part('day', reltime '-13 months -10 hours');
++-----------+
+| date_part |
++-----------+
+| -25.0     |
++-----------+
+select date_part('year', clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| -1.0      |
++-----------+
+SELECT date_part('year', reltime '-13 months -10 hours');
++-----------+
+| date_part |
++-----------+
+| -1.0      |
++-----------+
+select date_part('hour', clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| -4.0      |
++-----------+
+SELECT date_part('hour', reltime '-13 months -10 hours');
++-----------+
+| date_part |
++-----------+
+| -4.0      |
++-----------+
+drop table if exists test_date01;
+SQL SUCCESS

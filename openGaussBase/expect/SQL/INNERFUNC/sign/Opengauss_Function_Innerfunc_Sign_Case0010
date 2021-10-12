@@ -1,0 +1,36 @@
+-- @testpoint: sign函数与常用关键字结合使用
+drop table if exists tb1;
+SQL SUCCESS
+create table tb1(a int,b int);
+SQL SUCCESS
+insert into tb1 values(1,234),(2,0),(3,-123),(4,-0),(4,-0);
+SQL SUCCESS
+select count(*) from tb1 where sign(b) = 1;
++-------+
+| count |
++-------+
+| 1     |
++-------+
+select distinct b from tb1 where sign(b) =1 order by b;
++-----+
+| b   |
++-----+
+| 234 |
++-----+
+select a,b from tb1 union all select sign(a),sign(b) from tb1 order by a;
++-----+--------+
+| a   | b      |
++-----+--------+
+| 1.0 | 0.0    |
+| 1.0 | 0.0    |
+| 1.0 | -1.0   |
+| 1.0 | 0.0    |
+| 1.0 | 234.0  |
+| 1.0 | 1.0    |
+| 2.0 | 0.0    |
+| 3.0 | -123.0 |
+| 4.0 | 0.0    |
+| 4.0 | 0.0    |
++-----+--------+
+drop table tb1;
+SQL SUCCESS

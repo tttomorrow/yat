@@ -1,0 +1,99 @@
+-- @testpoint: 网络地址函数set_masklen(inet, int)异常校验，合理报错
+-- v4
+-- 带掩码
+SELECT set_masklen('192.168.1.5/0',-0.000) AS RESULT;
++---------------+
+| result        |
++---------------+
+| 192.168.1.5/0 |
++---------------+
+SELECT set_masklen('192.168.1.5/0',-3) AS RESULT;
+?.*ERROR: invalid mask length: -3
+  Where: referenced column: result
+SELECT set_masklen('192.168.1.5/7',-7.9) AS RESULT;
+?.*ERROR: invalid mask length: -8
+  Where: referenced column: result
+SELECT set_masklen('192.168.1.5/24',16.1234) AS RESULT;
++----------------+
+| result         |
++----------------+
+| 192.168.1.5/16 |
++----------------+
+SELECT set_masklen('192.168.1.5/25',0x17) AS RESULT;
+?.*ERROR: syntax error at or near "x17"
+?.*
+SELECT set_masklen('192.168.1.5/32',33) AS RESULT;
+?.*ERROR: invalid mask length: 33
+  Where: referenced column: result
+SELECT set_masklen(inet1 '192.168.1.5/0',-0) AS RESULT;
+?.*ERROR: type "inet1" does not exist
+?.*
+  Where: referenced column: result
+SELECT set_masklen('192.168.1.5/0'::inet,true) AS RESULT;
++---------------+
+| result        |
++---------------+
+| 192.168.1.5/1 |
++---------------+
+SELECT set_masklen('192.168.1.5/0'::inet, yes) AS RESULT;
+?.*ERROR: column "yes" does not exist
+?.*
+  Where: referenced column: result
+SELECT set_masklen('192.168.1.5/0'::inet,'false') AS RESULT;
+?.*ERROR: invalid input syntax for integer: "false"
+?.*
+  Where: referenced column: result
+-- 不带掩码
+SELECT set_masklen('127.0.0.1','+31.987') AS RESULT;
+?.*ERROR: invalid input syntax for integer: \"\+31.987\"
+?.*
+  Where: referenced column: result
+SELECT set_masklen('127.0.0.1',(-2)*(3)) AS RESULT;
+?.*ERROR: invalid mask length: -6
+  Where: referenced column: result
+-- 特殊地址
+SELECT set_masklen('0.0.0.0',234) AS RESULT;
+?.*ERROR: invalid mask length: 234
+  Where: referenced column: result
+SELECT set_masklen('255.255.255.256',17) AS RESULT;
+?.*ERROR: invalid input syntax for type inet: "255.255.255.256"
+?.*
+  Where: referenced column: result
+-- v6
+-- 带前缀
+SELECT set_masklen('1::1:ddff/64',-9/3.7) AS RESULT;
+?.*ERROR: invalid mask length: -2
+  Where: referenced column: result
+SELECT set_masklen('1::1:ddff/89',129) AS RESULT;
+?.*ERROR: invalid mask length: 129
+  Where: referenced column: result
+-- 不带前缀
+SELECT set_masklen('1:1:897d::ddff', ) AS RESULT;
+?.*ERROR: syntax error at or near \"\)\"
+?.*
+SELECT set_masklen('1:1:897d::ddff') AS RESULT;
+?.*ERROR: function set_masklen\(unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: result
+-- 特殊地址
+SELECT set_masklen('::/128',0,9) AS RESULT;
+?.*ERROR: function set_masklen\(unknown, integer, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: result
+SELECT set_masklen('FC00::/7',127,1) AS RESULT;
+?.*ERROR: function set_masklen\(unknown, integer, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: result
+SELECT set_masklen('::10.2.3.4','') AS RESULT;
++--------+
+| result |
++--------+
+|        |
++--------+
+-- 此处验证text转换int时函数校验前缀长度
+SELECT set_masklen('::ffff:10.4.3.2/128','129'::text) AS RESULT;
+?.*ERROR: invalid mask length: 129
+  Where: referenced column: result

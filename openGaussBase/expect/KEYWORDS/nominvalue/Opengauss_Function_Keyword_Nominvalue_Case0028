@@ -1,0 +1,66 @@
+-- @testpoint: opengauss关键字nominvalue(非保留)，作为同义词对象名,部分测试点合理报错
+--前置条件
+drop table if exists explain_test;
+SQL SUCCESS
+create table explain_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists nominvalue;
+SQL SUCCESS
+create synonym nominvalue for explain_test;
+SQL SUCCESS
+insert into nominvalue values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update nominvalue set nominvalue.name='cici' where nominvalue.id=2;
+SQL SUCCESS
+select * from nominvalue;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--关键字带双引号-成功
+drop synonym if exists "nominvalue";
+SQL SUCCESS
+create synonym "nominvalue" for explain_test;
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'nominvalue';
+?.*ERROR: syntax error at or near "'nominvalue'".*
+?.*Position: .*
+create synonym 'nominvalue' for explain_test;
+?.*ERROR: syntax error at or near "'nominvalue'".*
+?.*Position: .*
+insert into 'nominvalue' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'nominvalue'".*
+?.*Position: .*
+update 'nominvalue' set 'nominvalue'.name='cici' where 'nominvalue'.id=2;
+?.*ERROR: syntax error at or near "'nominvalue'".*
+?.*Position: .*
+select * from 'nominvalue';
+?.*ERROR: syntax error at or near "'nominvalue'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop synonym if exists `nominvalue`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create synonym `nominvalue` for explain_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+insert into `nominvalue` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+update `nominvalue` set `nominvalue`.name='cici' where `nominvalue`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+select * from `nominvalue`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+--清理环境
+drop synonym if exists "nominvalue";
+SQL SUCCESS
+drop synonym if exists nominvalue;
+SQL SUCCESS
+drop table if exists explain_test;
+SQL SUCCESS

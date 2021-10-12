@@ -1,0 +1,56 @@
+-- @testpoint: 与group by、having语句联用验证count计数结果
+drop table if exists tbc;
+SQL SUCCESS
+create table tbc
+(
+id integer,
+name char(50),
+sex char(50)
+);
+SQL SUCCESS
+create index tbc_index on tbc(id);
+SQL SUCCESS
+insert into tbc values(1,'wang','male');
+SQL SUCCESS
+insert into tbc values(2,'zhang','female');
+SQL SUCCESS
+insert into tbc values(3,'zhang','male');
+SQL SUCCESS
+insert into tbc values(4,'wang','female');
+SQL SUCCESS
+insert into tbc values(5,'sun');
+SQL SUCCESS
+insert into tbc values(6,'sun','male');
+SQL SUCCESS
+select count(*) from tbc;
++-------+
+| count |
++-------+
+| 6     |
++-------+
+select sex from tbc group by sex having count(1) is not null order by 1;
++----------------------------------------------------+
+| sex                                                |
++----------------------------------------------------+
+| female                                             |
+| male                                               |
+|                                                    |
++----------------------------------------------------+
+select sex from tbc group by sex having count(*) order by 1;
++----------------------------------------------------+
+| sex                                                |
++----------------------------------------------------+
+| female                                             |
+| male                                               |
+|                                                    |
++----------------------------------------------------+
+select name from tbc group by name having count(*) is not null order by 1;
++----------------------------------------------------+
+| name                                               |
++----------------------------------------------------+
+| sun                                                |
+| wang                                               |
+| zhang                                              |
++----------------------------------------------------+
+drop table if exists tbc;
+SQL SUCCESS

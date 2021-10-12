@@ -1,0 +1,17 @@
+-- @testpoint: 创建列类型是货币类型的列存表
+drop table if exists table_2;
+SQL SUCCESS
+create table table_2(a money)with (ORIENTATION=COLUMN);
+SQL SUCCESS
+insert into table_2 values(123.253),(124.253),(125.253);
+SQL SUCCESS
+select * from table_2;
++--------+
+| a      |
++--------+
+| 123.25 |
+| 124.25 |
+| 125.25 |
++--------+
+drop table if exists table_2;
+SQL SUCCESS

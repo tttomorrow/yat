@@ -1,0 +1,27 @@
+-- @testpoint: 插入正整数
+drop table if exists serial_01;
+SQL SUCCESS
+create table serial_01 (name serial);
+SQL SUCCESS
+insert into serial_01 values (120);
+SQL SUCCESS
+insert into serial_01 values (99999);
+SQL SUCCESS
+insert into serial_01 values (1);
+SQL SUCCESS
+insert into serial_01 values (2);
+SQL SUCCESS
+insert into serial_01 values (3);
+SQL SUCCESS
+select * from serial_01;
++-------+
+| name  |
++-------+
+| 120   |
+| 99999 |
+| 1     |
+| 2     |
+| 3     |
++-------+
+drop table serial_01;
+SQL SUCCESS

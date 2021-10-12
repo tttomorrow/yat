@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字prepared非保留)，作为序列名
+--关键字不带引号-成功
+drop sequence if exists prepared;
+SQL SUCCESS
+create sequence prepared start 100 cache 50;
+SQL SUCCESS
+drop sequence prepared;
+SQL SUCCESS
+--关键字带双引号-成功
+drop sequence if exists "prepared";
+SQL SUCCESS
+create sequence "prepared" start 100 cache 50;
+SQL SUCCESS
+drop sequence "prepared";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'prepared';
+?.*ERROR: syntax error at or near "'prepared'".*
+?.*Position: .*
+create sequence 'prepared' start 100 cache 50;
+?.*ERROR: syntax error at or near "'prepared'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop sequence if exists `prepared`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create sequence `prepared` start 100 cache 50;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

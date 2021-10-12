@@ -1,0 +1,7 @@
+-- @testpoint: opengauss内置函数numnode，获取tsquery类型的单词加上操作符的数量
+select numnode('(fat & rat) | cat'::tsquery);
++---------+
+| numnode |
++---------+
+| 5       |
++---------+

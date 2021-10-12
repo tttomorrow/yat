@@ -1,0 +1,45 @@
+-- @testpoint: date_trunc 函数入参给小数的时分秒
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (clo1 interval);
+SQL SUCCESS
+insert into test_date01 values ('2 years 3 months 3 days 1.5 hours 1.5 minute 1.5 s');
+SQL SUCCESS
+select date_trunc('hour', clo1) from test_date01;
++------------------------------------------------+
+| date_trunc                                     |
++------------------------------------------------+
+| 2 years 3 mons 3 days 1 hours 0 mins 0.00 secs |
++------------------------------------------------+
+SELECT date_trunc('hour', interval '2 years 3 months 3 days 1.5 hours 1.5 minute 1.5 s');
++------------------------------------------------+
+| date_trunc                                     |
++------------------------------------------------+
+| 2 years 3 mons 3 days 1 hours 0 mins 0.00 secs |
++------------------------------------------------+
+select date_trunc('minute', clo1) from test_date01;
++-------------------------------------------------+
+| date_trunc                                      |
++-------------------------------------------------+
+| 2 years 3 mons 3 days 1 hours 31 mins 0.00 secs |
++-------------------------------------------------+
+SELECT date_trunc('minute', interval '2 years 3 months 3 days 1.5 hours 1.5 minute 1.5 s');
++-------------------------------------------------+
+| date_trunc                                      |
++-------------------------------------------------+
+| 2 years 3 mons 3 days 1 hours 31 mins 0.00 secs |
++-------------------------------------------------+
+select date_trunc('second', clo1) from test_date01;
++--------------------------------------------------+
+| date_trunc                                       |
++--------------------------------------------------+
+| 2 years 3 mons 3 days 1 hours 31 mins 31.00 secs |
++--------------------------------------------------+
+SELECT date_trunc('second', interval '2 years 3 months 3 days 1.5 hours 1.5 minute 1.5 s');
++--------------------------------------------------+
+| date_trunc                                       |
++--------------------------------------------------+
+| 2 years 3 mons 3 days 1 hours 31 mins 31.00 secs |
++--------------------------------------------------+
+drop table if exists test_date01;
+SQL SUCCESS

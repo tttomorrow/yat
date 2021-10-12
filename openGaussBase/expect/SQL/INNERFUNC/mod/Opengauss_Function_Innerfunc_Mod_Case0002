@@ -1,0 +1,28 @@
+-- @testpoint: mod函数入参超过固定个数，合理报错
+select mod(154414,56598,44) from sys_dummy;
+?.*ERROR: function mod\(integer, integer, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: mod
+select mod(154414,0,44) from sys_dummy;
+?.*ERROR: function mod\(integer, integer, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: mod
+select mod(154414,null44) from sys_dummy;
+?.*ERROR: column \"null44\" does not exist
+?.*
+  Where: referenced column: mod
+select mod(154414,null,44) from sys_dummy;
+?.*ERROR: function mod\(integer, unknown, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: mod
+select mod(154414,,44) from sys_dummy;
+?.*ERROR: syntax error at or near \"\,\"
+?.*
+select mod(0,0,0) from sys_dummy;
+?.*ERROR: function mod\(integer, integer, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: mod

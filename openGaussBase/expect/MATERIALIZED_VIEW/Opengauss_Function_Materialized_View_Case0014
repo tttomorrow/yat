@@ -1,0 +1,146 @@
+-- @testpoint: 一些发散性测试，合理报错
+--发散测试
+--唯一性索引约束
+drop materialized view if exists student_mv;
+SQL SUCCESS
+create materialized view student_mv(id, name) as values (1, 'aaa'), (1, 'bbb');
+SQL SUCCESS
+select * from student_mv;
++----+------+
+| id | name |
++----+------+
+| 1  | aaa  |
+| 1  | bbb  |
++----+------+
+create unique index index_test on student_mv(id);
+?.*ERROR: could not create unique index "index_test"
+  Detail: Key (id)=(1) is duplicated.
+--error
+select * from student_mv;
++----+------+
+| id | name |
++----+------+
+| 1  | aaa  |
+| 1  | bbb  |
++----+------+
+drop materialized view student_mv;
+SQL SUCCESS
+--建立索引后更新数据
+drop table if exists student cascade;
+SQL SUCCESS
+create table student
+(
+    id int,
+    name varchar(10) not null
+);
+SQL SUCCESS
+insert into student values (1, 'aaa');
+SQL SUCCESS
+insert into student values (2, 'bbb');
+SQL SUCCESS
+insert into student values (3, 'ccc');
+SQL SUCCESS
+create materialized view student_mv(id, name) as select * from student;
+SQL SUCCESS
+create unique index index_test on student_mv(id);
+SQL SUCCESS
+insert into student values (1, 'aaa');
+SQL SUCCESS
+refresh materialized view student_mv;
+?.*ERROR: could not create unique index "index_test"
+  Detail: Key (id)=(1) is duplicated.
+--error
+--外键约束
+drop table if exists student cascade;
+SQL SUCCESS
+create table student
+(
+    id int primary key,
+    name varchar(10) not null
+);
+SQL SUCCESS
+insert into student values (1, 'aaa');
+SQL SUCCESS
+insert into student values (2, 'bbb');
+SQL SUCCESS
+insert into student values (3, 'ccc');
+SQL SUCCESS
+insert into student values (4, 'ddd');
+SQL SUCCESS
+insert into student values (5, 'eee');
+SQL SUCCESS
+insert into student values (6, 'fff');
+SQL SUCCESS
+create materialized view student_mv as select * from student;
+SQL SUCCESS
+create table foreign_key_table
+(
+    id int primary key,
+    s_id int references student_mv(id) on update cascade on delete no action
+);
+?.*ERROR: referenced relation "student_mv" is not a table
+--error
+--事务回滚
+insert into student values (7, 'ggg');
+SQL SUCCESS
+select * from student_mv;
++----+------+
+| id | name |
++----+------+
+| 1  | aaa  |
+| 2  | bbb  |
+| 3  | ccc  |
+| 4  | ddd  |
+| 5  | eee  |
+| 6  | fff  |
++----+------+
+--6
+start transaction;
+SQL SUCCESS
+refresh materialized view student_mv;
+SQL SUCCESS
+select * from student_mv;
++----+------+
+| id | name |
++----+------+
+| 1  | aaa  |
+| 2  | bbb  |
+| 3  | ccc  |
+| 4  | ddd  |
+| 5  | eee  |
+| 6  | fff  |
+| 7  | ggg  |
++----+------+
+--7
+abort;
+SQL SUCCESS
+select * from student_mv;
++----+------+
+| id | name |
++----+------+
+| 1  | aaa  |
+| 2  | bbb  |
+| 3  | ccc  |
+| 4  | ddd  |
+| 5  | eee  |
+| 6  | fff  |
++----+------+
+--6
+--vacuum
+delete from student where id > 4;
+SQL SUCCESS
+vacuum;
+SQL SUCCESS
+select * from student_mv;
++----+------+
+| id | name |
++----+------+
+| 1  | aaa  |
+| 2  | bbb  |
+| 3  | ccc  |
+| 4  | ddd  |
+| 5  | eee  |
+| 6  | fff  |
++----+------+
+drop table student cascade;
+SQL SUCCESS

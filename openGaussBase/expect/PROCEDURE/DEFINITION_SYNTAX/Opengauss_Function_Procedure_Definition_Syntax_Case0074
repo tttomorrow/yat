@@ -1,0 +1,30 @@
+-- @testpoint: 匿名块使用操作符 字符串连接操作符 ||
+DROP TABLE IF EXISTS test_procedure_insert_074;
+SQL SUCCESS
+create table test_procedure_insert_074 (id int,
+name varchar2(20));
+SQL SUCCESS
+begin
+ FOR I IN 1 .. 10 LOOP
+    insert into test_procedure_insert_074  values (I,'ÀîÃ÷'||i);
+ END LOOP;
+end;
+/
+SQL SUCCESS
+select * from test_procedure_insert_074;
++----+--------+
+| id | name   |
++----+--------+
+| 1  | ÀîÃ÷1  |
+| 2  | ÀîÃ÷2  |
+| 3  | ÀîÃ÷3  |
+| 4  | ÀîÃ÷4  |
+| 5  | ÀîÃ÷5  |
+| 6  | ÀîÃ÷6  |
+| 7  | ÀîÃ÷7  |
+| 8  | ÀîÃ÷8  |
+| 9  | ÀîÃ÷9  |
+| 10 | ÀîÃ÷10 |
++----+--------+
+drop table test_procedure_insert_074;
+SQL SUCCESS

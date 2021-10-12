@@ -1,0 +1,28 @@
+-- @testpoint: 创建索引同义词：创建不报错，查询时，合理报错
+--建表
+drop table if EXISTS test_SYN_063 cascade;
+SQL SUCCESS
+create table test_SYN_063(a int,b varchar);
+SQL SUCCESS
+--创建索引
+drop index if exists test_syn_index063;
+SQL SUCCESS
+CREATE UNIQUE INDEX test_syn_index063 ON test_SYN_063(b);
+SQL SUCCESS
+--创建同义词
+drop SYNONYM if exists syn_063;
+SQL SUCCESS
+create SYNONYM syn_063 for test_syn_index063;
+SQL SUCCESS
+--查询
+select * from syn_063;
+?.*ERROR: "test_syn_index063" is an index
+  Detail: Maybe you want to use synonym to reference a unsupported object, but it is not yet supported.
+?.*
+--清理环境
+drop table if EXISTS test_SYN_063 cascade;
+SQL SUCCESS
+drop SYNONYM if exists syn_index;
+SQL SUCCESS
+drop SYNONYM if exists syn_063;
+SQL SUCCESS

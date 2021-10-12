@@ -1,0 +1,116 @@
+-- @testpoint: pg_stat_get_db_xact_rollback(oid)返回数据库中回滚事务的数量。
+--清理环境
+alter system set autovacuum to off;
+SQL SUCCESS
+drop table if exists test;
+SQL SUCCESS
+select pg_stat_reset();
++---------------+
+| pg_stat_reset |
++---------------+
+|               |
++---------------+
+CREATE TABLE test
+ (
+     name          VARCHAR(20)                   ,
+     grade              DECIMAL(5,2)
+ );
+SQL SUCCESS
+-- testpoint:建表不统计0
+SELECT pg_sleep(1);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+select pg_stat_get_db_xact_rollback(a.oid) from PG_DATABASE a where a.datname = CURRENT_CATALOG;
++------------------------------+
+| pg_stat_get_db_xact_rollback |
++------------------------------+
+| 0                            |
++------------------------------+
+-- testpoint:commit不统计0
+begin;
+/
+SQL SUCCESS
+insert into test values('joe',3);
+SQL SUCCESS
+end;
+SQL SUCCESS
+SELECT pg_sleep(1);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+select pg_stat_get_db_xact_rollback(a.oid)  from PG_DATABASE a where a.datname = CURRENT_CATALOG;
++------------------------------+
+| pg_stat_get_db_xact_rollback |
++------------------------------+
+| 0                            |
++------------------------------+
+-- testpoint:rollback计数
+begin;
+/
+SQL SUCCESS
+insert into test values('joe',4);
+SQL SUCCESS
+ROLLBACK;
+SQL SUCCESS
+SELECT pg_sleep(1);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+--查询是1
+select pg_stat_get_db_xact_rollback(a.oid)  from PG_DATABASE a where a.datname = CURRENT_CATALOG;
++------------------------------+
+| pg_stat_get_db_xact_rollback |
++------------------------------+
+| 1                            |
++------------------------------+
+begin;
+/
+SQL SUCCESS
+delete from test where grade = 3;
+SQL SUCCESS
+ROLLBACK;
+SQL SUCCESS
+SELECT pg_sleep(1);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+--查询是2
+select pg_stat_get_db_xact_rollback(a.oid)  from PG_DATABASE a where a.datname = CURRENT_CATALOG;
++------------------------------+
+| pg_stat_get_db_xact_rollback |
++------------------------------+
+| 2                            |
++------------------------------+
+-- 清计数后是0
+select pg_stat_reset();
++---------------+
+| pg_stat_reset |
++---------------+
+|               |
++---------------+
+SELECT pg_sleep(1);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+select pg_stat_get_db_xact_rollback(a.oid) from PG_DATABASE a where a.datname = CURRENT_CATALOG;
++------------------------------+
+| pg_stat_get_db_xact_rollback |
++------------------------------+
+| 0                            |
++------------------------------+
+-- 恢复环境
+drop table if exists test;
+SQL SUCCESS
+alter system set autovacuum to on;
+SQL SUCCESS

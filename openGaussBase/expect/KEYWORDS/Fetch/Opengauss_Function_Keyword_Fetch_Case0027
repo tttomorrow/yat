@@ -1,0 +1,32 @@
+--  @testpoint:opengauss关键字fetch(保留)，作为序列名
+--关键字不带引号-失败
+drop sequence if exists fetch;
+?.*ERROR: syntax error at or near "fetch"
+?.*Position: .*
+create sequence fetch start 100 cache 50;
+?.*ERROR: syntax error at or near "fetch"
+?.*Position: .*
+drop sequence fetch;
+?.*ERROR: syntax error at or near "fetch"
+?.*Position: .*
+--关键字带双引号-成功
+drop sequence if exists "fetch";
+SQL SUCCESS
+create sequence "fetch" start 100 cache 50;
+SQL SUCCESS
+drop sequence "fetch";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'fetch';
+?.*ERROR: syntax error at or near "'fetch'"
+?.*Position: .*
+create sequence 'fetch' start 100 cache 50;
+?.*ERROR: syntax error at or near "'fetch'"
+?.*Position: .*
+--关键字带反引号-合理报错
+drop sequence if exists `fetch`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+create sequence `fetch` start 100 cache 50;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*

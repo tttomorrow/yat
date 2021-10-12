@@ -1,0 +1,173 @@
+-- @testpoint: jsonb额外支持操作函数：jsonb_ne(not equal(<>)，不等于，判断两个jsonb是不是不相等,输入不合理，合理报错）
+-- 比较规则:object-jsonb > array-jsonb > bool-jsonb > num-jsonb > str-jsonb > null-jsonb
+--同类型
+select jsonb_ne('"str"','"string"');
++----------+
+| jsonb_ne |
++----------+
+| true     |
++----------+
+select jsonb_ne('null','null' );
++----------+
+| jsonb_ne |
++----------+
+| false    |
++----------+
+select jsonb_ne('false','false');
++----------+
+| jsonb_ne |
++----------+
+| false    |
++----------+
+select jsonb_ne('false','true');
++----------+
+| jsonb_ne |
++----------+
+| true     |
++----------+
+select jsonb_ne('{"a":1, "b": [10,2,3],"c":{"b":"d"}}','{"b":[10,2,3]}');
++----------+
+| jsonb_ne |
++----------+
+| true     |
++----------+
+select jsonb_ne('[null, false, 123,{"a":true},"test"]','[123,{"a":false},"test",null, false]');
++----------+
+| jsonb_ne |
++----------+
+| true     |
++----------+
+select jsonb_ne('105.2e-3','1.0520e-1');
++----------+
+| jsonb_ne |
++----------+
+| false    |
++----------+
+--不同类型
+select jsonb_ne('"str"', 'null');
++----------+
+| jsonb_ne |
++----------+
+| true     |
++----------+
+select jsonb_ne('null','true' );
++----------+
+| jsonb_ne |
++----------+
+| true     |
++----------+
+select jsonb_ne('null','0' );
++----------+
+| jsonb_ne |
++----------+
+| true     |
++----------+
+select jsonb_ne('null', '{"b":[10,2,3]}');
++----------+
+| jsonb_ne |
++----------+
+| true     |
++----------+
+select jsonb_ne('null','[12,"test",null, false]');
++----------+
+| jsonb_ne |
++----------+
+| true     |
++----------+
+select jsonb_ne('true','1');
++----------+
+| jsonb_ne |
++----------+
+| true     |
++----------+
+select jsonb_ne('{"a":1, "b": [10,2,3],"c":{"b":"d"}}','[{"b":[10,2,3]},{"a":1},{"c":{"b":"d"}}]');
++----------+
+| jsonb_ne |
++----------+
+| true     |
++----------+
+select jsonb_ne('[{"a":false},{"a":true}]','{"a": true,"a": false}');
++----------+
+| jsonb_ne |
++----------+
+| true     |
++----------+
+select jsonb_ne('105.2e3','"0.1052"');
++----------+
+| jsonb_ne |
++----------+
+| true     |
++----------+
+select jsonb_ne('0','false');
++----------+
+| jsonb_ne |
++----------+
+| true     |
++----------+
+select jsonb_ne('258','{"a":258}');
++----------+
+| jsonb_ne |
++----------+
+| true     |
++----------+
+select jsonb_ne('0.369','[0.369]');
++----------+
+| jsonb_ne |
++----------+
+| true     |
++----------+
+select jsonb_ne('"true"','true' );
++----------+
+| jsonb_ne |
++----------+
+| true     |
++----------+
+select jsonb_ne('"true"','{"a":"true"}' );
++----------+
+| jsonb_ne |
++----------+
+| true     |
++----------+
+select jsonb_ne('"true"','["true"]' );
++----------+
+| jsonb_ne |
++----------+
+| true     |
++----------+
+select jsonb_ne('{"a":1, "b": [10,2,3],"c":{"b":"d"}}','true');
++----------+
+| jsonb_ne |
++----------+
+| true     |
++----------+
+select jsonb_ne('[{"a":false},{"a":true}]','false');
++----------+
+| jsonb_ne |
++----------+
+| true     |
++----------+
+--入参非jsonb
+select jsonb_ne('{a:1, b: [10,2,3],c:{b:d}}','true');
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "a" is invalid.
+?.*
+  Where: JSON data, line 1: {a...
+referenced column: jsonb_ne
+select jsonb_ne('{a:1, a: [10,2,3],a:{b:d}}','{a:1}');
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "a" is invalid.
+?.*
+  Where: JSON data, line 1: {a...
+referenced column: jsonb_ne
+select jsonb_ne('[{a:false},{a:true},123,'qwer','null']','{"a":false}');
+?.*ERROR: syntax error at or near "qwer.*
+?.*
+select jsonb_ne('[{a:false},{a:true},123,'qwer','null']','123');
+?.*ERROR: syntax error at or near "qwer.*
+?.*
+select jsonb_ne('[{a:false},{a:true},123,'qwer','null']','qwer');
+?.*ERROR: syntax error at or near "qwer.*
+?.*
+select jsonb_ne('[{a:false},{a:true},123,'"qwer"','null']','qwer');
+?.*ERROR: syntax error at or near ""qwer".*
+?.*

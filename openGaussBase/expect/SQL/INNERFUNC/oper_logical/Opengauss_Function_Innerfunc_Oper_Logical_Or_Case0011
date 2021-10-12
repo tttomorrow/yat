@@ -1,0 +1,12 @@
+-- @testpoint: opengauss逻辑操作符OR,两个null
+drop table if exists ts_zhparser;
+SQL SUCCESS
+CREATE TABLE ts_zhparser(id int, index int);
+SQL SUCCESS
+select id OR index from ts_zhparser;
++----------+
+| ?column? |
++----------+
++----------+
+drop table if exists ts_zhparser;
+SQL SUCCESS

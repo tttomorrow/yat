@@ -1,0 +1,36 @@
+-- @testpoint: char_length函数合法值校验
+select char_length('jjslf');
++-------------+
+| char_length |
++-------------+
+| 5           |
++-------------+
+select char_length('jj          slf');
++-------------+
+| char_length |
++-------------+
+| 15          |
++-------------+
+select char_length('jj''slf');
++-------------+
+| char_length |
++-------------+
+| 6           |
++-------------+
+select char_length('jjslf'::text);
++-------------+
+| char_length |
++-------------+
+| 5           |
++-------------+
+select char_length(123.45);
++-------------+
+| char_length |
++-------------+
+| 6           |
++-------------+
++-------------+
+| char_length |
++-------------+
+| 9           |
++-------------+

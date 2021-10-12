@@ -1,0 +1,18 @@
+-- @testpoint: time没有输入时区
+DROP TABLE IF EXISTS test_time12;
+SQL SUCCESS
+CREATE TABLE test_time12 (name time without time zone);
+SQL SUCCESS
+insert into  test_time12 values (time '00:00:00');
+SQL SUCCESS
+insert into  test_time12 values (time '12:59:59');
+SQL SUCCESS
+select * from test_time12;
++----------+
+| name     |
++----------+
+| 00:00:00 |
+| 12:59:59 |
++----------+
+DROP TABLE IF EXISTS test_time12;
+SQL SUCCESS

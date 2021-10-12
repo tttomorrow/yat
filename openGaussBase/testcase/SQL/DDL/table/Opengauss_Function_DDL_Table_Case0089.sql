@@ -1,0 +1,11 @@
+-- @testpoint: 创建带DEFAULT约束的表(列级),默认值和数据类型不匹配合理报错
+DROP TABLE IF EXISTS tab_11;
+--ERROR:  invalid input syntax for type numeric: "aaa"
+CREATE TABLE tab_11
+(id                     NUMBER(7)  DEFAULT 'aaa',
+ use_filename              VARCHAR2(20) ,
+ filename                  VARCHAR2(255),
+ text                       VARCHAR2(2000)
+ );
+
+

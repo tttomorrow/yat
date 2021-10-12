@@ -1,0 +1,18 @@
+-- @testpoint: 无效边界值测试，合理报错
+drop table if exists test_timestamp15;
+SQL SUCCESS
+create table test_timestamp15 (name timestamp);
+SQL SUCCESS
+insert into test_timestamp15 values (to_timestamp('0000-00-00 00:00:00.000000','yyyy-mm-dd hh24:mi:ss.ff'));
+?.*ERROR: invalid data for "year =  0" ,value must be between 1 and 9999, and not be 0
+?.*
+insert into test_timestamp15 values (to_timestamp('9999-12-32 23:59:59.999999','yyyy-mm-dd hh24:mi:ss.ff'));
+?.*ERROR: invalid data for "day of month =  32" ,value must be between 1 and 31
+?.*
+select * from test_timestamp15;
++------+
+| name |
++------+
++------+
+drop table if exists test_timestamp15;
+SQL SUCCESS

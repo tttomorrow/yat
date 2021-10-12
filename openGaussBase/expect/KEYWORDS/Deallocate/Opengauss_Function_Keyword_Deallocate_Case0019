@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字deallocate(非保留)，作为外部数据源名
+--关键字不带引号-成功
+drop data source if exists deallocate;
+SQL SUCCESS
+create data source deallocate;
+SQL SUCCESS
+drop data source deallocate;
+SQL SUCCESS
+--关键字带双引号-成功
+drop data source if exists "deallocate";
+SQL SUCCESS
+create data source "deallocate";
+SQL SUCCESS
+drop data source "deallocate";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop data source if exists 'deallocate';
+?.*ERROR: syntax error at or near "'deallocate'"
+?.*
+create data source 'deallocate';
+?.*ERROR: syntax error at or near "'deallocate'"
+?.*
+--关键字带反引号-合理报错
+drop data source if exists `deallocate`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create data source `deallocate`;
+?.*ERROR: syntax error at or near "`"
+?.*

@@ -1,0 +1,19 @@
+-- @testpoint: 插入字符串类型，合理报错
+drop table if exists binary_double10;
+SQL SUCCESS
+create table binary_double10 (name binary_double);
+SQL SUCCESS
+insert into binary_double10 values ('123abc');
+?.*ERROR: invalid input syntax for type double precision: "123abc"
+?.*
+  Where: referenced column: name
+insert into binary_double10 values ('111a222');
+?.*ERROR: invalid input syntax for type double precision: "111a222"
+?.*
+  Where: referenced column: name
+insert into binary_double10 values ('abc456');
+?.*ERROR: invalid input syntax for type double precision: "abc456"
+?.*
+  Where: referenced column: name
+drop table binary_double10;
+SQL SUCCESS

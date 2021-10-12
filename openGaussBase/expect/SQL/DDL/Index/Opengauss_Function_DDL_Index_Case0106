@@ -1,0 +1,94 @@
+--  @testpoint: PARTITION:global和local
+--行存
+DROP TABLE if EXISTS test_index_table_106 CASCADE;
+SQL SUCCESS
+create table test_index_table_106(
+c_int int,
+c_date date
+) WITH (ORIENTATION = row) partition by range(c_date)(
+partition p1 values less than ('1990-01-01 00:00:00')
+);
+SQL SUCCESS
+--建索引同一列建本地和全局索引：合理报错
+drop index if exists index_106_01;
+SQL SUCCESS
+create index index_106_01 on test_index_table_106(c_date) local;
+SQL SUCCESS
+create index index_106_01 on test_index_table_106(c_date) global;
+?.*ERROR: Global and local partition index should not be on same column
+select relname from pg_class where relname like 'index_106_%' order by relname;
++--------------+
+| relname      |
++--------------+
+| index_106_01 |
++--------------+
+DROP TABLE if EXISTS test_index_table_106 CASCADE;
+SQL SUCCESS
+create table test_index_table_106(
+c_int int,
+c_date date
+) WITH (ORIENTATION = row) partition by range(c_date) interval ('10 day') (
+partition p1 values less than ('1990-01-01 00:00:00')
+);
+SQL SUCCESS
+--建索引
+drop index if exists index_106_01;
+SQL SUCCESS
+create index index_106_01 on test_index_table_106(c_date) local;
+SQL SUCCESS
+create index index_106_01 on test_index_table_106(c_date) global;
+?.*ERROR: Global and local partition index should not be on same column
+select relname from pg_class where relname like 'index_106_%' order by relname;
++--------------+
+| relname      |
++--------------+
+| index_106_01 |
++--------------+
+--列存
+DROP TABLE if EXISTS test_index_table_106 CASCADE;
+SQL SUCCESS
+create table test_index_table_106(
+c_int int,
+c_date date
+) WITH (ORIENTATION = column) partition by range(c_date)(
+partition p1 values less than ('1990-01-01 00:00:00')
+);
+SQL SUCCESS
+--建索引：合理报错
+drop index if exists index_106_01;
+SQL SUCCESS
+create index index_106_01 on test_index_table_106(c_date) local;
+SQL SUCCESS
+create index index_106_01 on test_index_table_106(c_date) global;
+?.*ERROR: Global partition index does not support column store.
+select relname from pg_class where relname like 'index_106_%' order by relname;
++--------------+
+| relname      |
++--------------+
+| index_106_01 |
++--------------+
+DROP TABLE if EXISTS test_index_table_106 CASCADE;
+SQL SUCCESS
+create table test_index_table_106(
+c_int int,
+c_date date
+) WITH (ORIENTATION = column) partition by range(c_date) interval ('10 day') (
+partition p1 values less than ('1990-01-01 00:00:00')
+);
+?.*ERROR: Unsupport feature
+  Detail: cstore/timeseries don't support interval partition type.
+--建索引同一列建本地和全局索引：合理报错
+drop index if exists index_106_01;
+SQL SUCCESS
+create index index_106_01 on test_index_table_106(c_date) local;
+?.*ERROR: relation "test_index_table_106" does not exist
+create index index_106_01 on test_index_table_106(c_date) global;
+?.*ERROR: relation "test_index_table_106" does not exist
+select relname from pg_class where relname like 'index_106_%' order by relname;
++---------+
+| relname |
++---------+
++---------+
+--清理环境
+DROP TABLE if EXISTS test_index_table_106 CASCADE;
+SQL SUCCESS

@@ -1,0 +1,15 @@
+-- @testpoint: 中文匹配
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('我是一个');
+SQL SUCCESS
+SELECT regexp_matches(string1,'是') from type_char;
++----------------+
+| regexp_matches |
++----------------+
+| {是}            |
++----------------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

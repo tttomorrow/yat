@@ -1,0 +1,20 @@
+--  @testpoint:修改文本搜索配置的所有者语法测试
+--创建文本搜索配置
+DROP TEXT SEARCH CONFIGURATION if exists ngram2;
+SQL SUCCESS
+CREATE TEXT SEARCH CONFIGURATION ngram2 (parser=ngram) WITH (gram_size = 2, grapsymbol_ignore = false);
+SQL SUCCESS
+--创建用户
+DROP user if exists joe;
+SQL SUCCESS
+CREATE USER joe IDENTIFIED BY 'Bigdata@123';
+SQL SUCCESS
+--修改所有者(用户存在)
+ALTER TEXT SEARCH CONFIGURATION ngram2 owner to joe;
+SQL SUCCESS
+--删除文本搜索配置
+DROP TEXT SEARCH CONFIGURATION ngram2;
+SQL SUCCESS
+--删除用户
+drop user joe;
+SQL SUCCESS

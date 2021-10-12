@@ -1,0 +1,27 @@
+-- @testpoint: 使用别名int2
+drop table if exists smallint15;
+SQL SUCCESS
+create table smallint15 (name int2);
+SQL SUCCESS
+insert into smallint15 values (121);
+SQL SUCCESS
+insert into smallint15 values (11111);
+SQL SUCCESS
+insert into smallint15 values (1);
+SQL SUCCESS
+insert into smallint15 values (2);
+SQL SUCCESS
+insert into smallint15 values (3);
+SQL SUCCESS
+select * from smallint15;
++-------+
+| name  |
++-------+
+| 121   |
+| 11111 |
+| 1     |
+| 2     |
+| 3     |
++-------+
+drop table smallint15;
+SQL SUCCESS

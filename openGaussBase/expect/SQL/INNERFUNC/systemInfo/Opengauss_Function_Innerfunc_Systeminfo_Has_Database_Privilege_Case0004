@@ -1,0 +1,27 @@
+-- @testpoint: 数据库参数为数据库oid时有权限和无权限时返回值校验
+DROP USER IF EXISTS joe CASCADE;
+SQL SUCCESS
+CREATE USER joe PASSWORD 'Bigdata@123';
+SQL SUCCESS
+DROP database IF EXISTS dbtest_001;
+SQL SUCCESS
+create database dbtest_001;
+SQL SUCCESS
+GRANT connect on database dbtest_001 TO joe ;
+SQL SUCCESS
+select has_database_privilege('joe',oid, 'create' ) from PG_DATABASE where datname = 'dbtest_001';
++------------------------+
+| has_database_privilege |
++------------------------+
+| false                  |
++------------------------+
+select has_database_privilege('joe',oid, 'connect' ) from PG_DATABASE where datname = 'dbtest_001';
++------------------------+
+| has_database_privilege |
++------------------------+
+| true                   |
++------------------------+
+DROP USER IF EXISTS joe CASCADE;
+SQL SUCCESS
+DROP database IF EXISTS dbtest_001;
+SQL SUCCESS

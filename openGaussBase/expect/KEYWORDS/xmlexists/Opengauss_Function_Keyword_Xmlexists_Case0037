@@ -1,0 +1,39 @@
+-- @testpoint: 关键字xmlexists，用作字段名
+drop table if exists xmlexists_test cascade;
+SQL SUCCESS
+create table xmlexists_test(id int,xmlexists varchar(20));
+SQL SUCCESS
+create or replace procedure xmlexists_insert
+as
+begin
+ for i in 1..10 loop
+    insert into xmlexists_test values(i,'val'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call xmlexists_insert();
++------------------+
+| xmlexists_insert |
++------------------+
+|                  |
++------------------+
+select * from xmlexists_test;
++----+-----------+
+| id | xmlexists |
++----+-----------+
+| 1  | val1      |
+| 2  | val2      |
+| 3  | val3      |
+| 4  | val4      |
+| 5  | val5      |
+| 6  | val6      |
+| 7  | val7      |
+| 8  | val8      |
+| 9  | val9      |
+| 10 | val10     |
++----+-----------+
+drop table if exists xmlexists_test cascade;
+SQL SUCCESS
+drop procedure xmlexists_insert;
+SQL SUCCESS

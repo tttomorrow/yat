@@ -1,0 +1,46 @@
+-- @testpoint: 创建行存表（ 组合索引）
+drop table if exists table_1;
+SQL SUCCESS
+drop table if exists table_2;
+SQL SUCCESS
+DROP INDEX if exists table_index;
+SQL SUCCESS
+create table table_1(id int,sname char(20),city varchar(20),number number);
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+select * from table_1;
++----+----------------------+------+--------------+
+| id | sname                | city | number       |
++----+----------------------+------+--------------+
++----+----------------------+------+--------------+
+create table table_2(id int,sname char(20),course varchar(20),score number);
+SQL SUCCESS
+insert into table_2 values(1,'joe','english',123);
+SQL SUCCESS
+insert into table_2 values(2,'jojo','math',124);
+SQL SUCCESS
+insert into table_2 values(3,'jane','history',85);
+SQL SUCCESS
+select * from table_2;
++----+----------------------+---------+-------+
+| id | sname                | course  | score |
++----+----------------------+---------+-------+
+| 1  | joe                  | english | 123   |
+| 2  | jojo                 | math    | 124   |
+| 3  | jane                 | history | 85    |
++----+----------------------+---------+-------+
+create index table_index on table_1(id,sname);
+SQL SUCCESS
+select * from table_1 as t1,table_2 as t2 where t1.id=t2.id and t1.sname=t2.sname;
++----+----------------------+------+--------------+----+----------------------+---------+-------+
+| id | sname                | city | number       | id | sname                | course  | score |
++----+----------------------+------+--------------+----+----------------------+---------+-------+
++----+----------------------+------+--------------+----+----------------------+---------+-------+
+DROP INDEX if exists table_index;
+SQL SUCCESS
+drop table if exists table_1;
+SQL SUCCESS
+drop table if exists table_2;
+SQL SUCCESS

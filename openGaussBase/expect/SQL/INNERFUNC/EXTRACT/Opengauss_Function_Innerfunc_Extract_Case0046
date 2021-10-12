@@ -1,0 +1,8 @@
+-- @testpoint: extract(field from timestamp)从给定的时间戳里获取年份的值
+--（field的取值范围：decade年份除以10）
+select extract(decade from timestamp '2001-02-16 20:38:40') from sys_dummy;
++-----------+
+| date_part |
++-----------+
+| 200.0     |
++-----------+

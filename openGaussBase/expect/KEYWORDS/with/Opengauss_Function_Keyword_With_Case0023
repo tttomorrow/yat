@@ -1,0 +1,37 @@
+-- @testpoint: opengauss关键字with(保留)，作为索引名，部分测试点合理报错
+--前置条件，创建一个表
+drop table if exists with_test;
+SQL SUCCESS
+create table with_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-合理报错
+drop index if exists with;
+?.*ERROR: syntax error at or near "with".*
+?.*Position.*
+create index with on with_test(id);
+?.*ERROR: syntax error at or near "with on".*
+?.*Position.*
+--关键字带双引号-成功
+drop index if exists "with";
+SQL SUCCESS
+create index "with" on with_test(id);
+SQL SUCCESS
+--清理环境
+drop index "with";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop index if exists 'with';
+?.*ERROR: syntax error at or near "'with'".*
+?.*Position.*
+create index 'with' on with_test(id);
+?.*ERROR: syntax error at or near "'with'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop index if exists `with`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create index `with` on with_test(id);
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+drop table if exists with_test;
+SQL SUCCESS

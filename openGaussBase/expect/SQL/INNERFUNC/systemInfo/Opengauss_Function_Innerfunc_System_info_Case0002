@@ -1,0 +1,7 @@
+-- @testpoint: 函数get_nodename(),返回当前节点的名字
+select get_nodename();
+?.*
+?.*get_nodename.*
+?.*
+?.*dn_6001.*
+?.*

@@ -1,0 +1,31 @@
+-- @testpoint: 插入其他无效类型，合理报错
+drop table if exists dec_07;
+SQL SUCCESS
+CREATE  TABLE dec_07 (id DEC(4,2));
+SQL SUCCESS
+insert into dec_07 values ('test');
+?.*ERROR: invalid input syntax for type numeric: "test"
+?.*
+  Where: referenced column: id
+insert into dec_07 values (date'2020-02-02');
+?.*ERROR: column "id" is of type numeric but expression is of type timestamp without time zone
+  Hint: You will need to rewrite or cast the expression.
+?.*
+  Where: referenced column: id
+insert into dec_07 values (TRUE);
+?.*ERROR: column "id" is of type numeric but expression is of type boolean
+  Hint: You will need to rewrite or cast the expression.
+?.*
+  Where: referenced column: id
+insert into dec_07 values (HEXTORAW('DEADBEEF'));
+?.*ERROR: column "id" is of type numeric but expression is of type raw
+  Hint: You will need to rewrite or cast the expression.
+?.*
+  Where: referenced column: id
+select * from dec_07;
++----+
+| id |
++----+
++----+
+drop table dec_07;
+SQL SUCCESS

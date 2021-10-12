@@ -1,0 +1,13 @@
+--  @testpoint:opengauss关键字Least(非保留),获取并返回参数列表中值最小的表达式的值
+SELECT least(1*2,2-3,4-1);
++-------+
+| least |
++-------+
+| -1    |
++-------+
+SELECT least('HARRY','HARRIOT','HAROLD');
++--------+
+| least  |
++--------+
+| HAROLD |
++--------+

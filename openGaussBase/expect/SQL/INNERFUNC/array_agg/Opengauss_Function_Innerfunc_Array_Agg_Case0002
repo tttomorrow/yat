@@ -1,0 +1,14 @@
+
+
+-- @testpoint: array_agg函数多参数少参数测试，合理报错
+
+select array_agg(342321,5454) from sys_dummy;
+?.*ERROR: function array_agg\(integer, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: array_agg
+select array_agg() from sys_dummy;
+?.*ERROR: function array_agg\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: array_agg

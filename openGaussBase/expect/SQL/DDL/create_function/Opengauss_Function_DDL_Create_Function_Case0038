@@ -1,0 +1,25 @@
+-- @testpoint: 只有一个参数，指定参数模式为OUT
+DROP FUNCTION if EXISTS i_testfun1 (i integer);
+SQL SUCCESS
+CREATE  FUNCTION i_testfun1 (i OUT integer) RETURNS integer AS $$
+        BEGIN
+                RETURN i + 1;
+        END;
+$$ LANGUAGE plpgsql;
+/
+SQL SUCCESS
+call i_testfun1(999);
++---+
+| i |
++---+
+|   |
++---+
+--查询pg_proc表，proargmodes字段的值为o，表示参数模式是OUT
+select proargmodes from pg_proc where proname='i_testfun1';
++-------------+
+| proargmodes |
++-------------+
+| {o}         |
++-------------+
+drop function  i_testfun1;
+SQL SUCCESS

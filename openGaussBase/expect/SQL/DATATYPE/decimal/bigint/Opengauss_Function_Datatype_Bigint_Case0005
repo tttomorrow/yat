@@ -1,0 +1,10 @@
+-- @testpoint: 插入特殊字符，合理报错
+drop table if exists bigint05;
+SQL SUCCESS
+create table bigint05 (name bigint);
+SQL SUCCESS
+insert into bigint05 values (!@#$%……&);
+?.*ERROR: syntax error at or near "\$"
+?.*
+drop table bigint05;
+SQL SUCCESS

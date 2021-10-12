@@ -1,0 +1,6 @@
+--  @testpoint: ◾将epoch值转换为时间戳的方法加时区
+
+SELECT TIMESTAMP WITH TIME ZONE 'epoch' + 1 * INTERVAL '1 second' AS RESULT;
+SELECT TIMESTAMP WITH TIME ZONE 'epoch' + 1.5 * INTERVAL '1 second' AS RESULT;
+SELECT TIMESTAMP WITH TIME ZONE 'epoch' + 0 * INTERVAL '1 second' AS RESULT;
+SELECT TIMESTAMP WITH TIME ZONE 'epoch' + 1 * INTERVAL '1 year 1 month 30day 24h 60m 60s' AS RESULT;

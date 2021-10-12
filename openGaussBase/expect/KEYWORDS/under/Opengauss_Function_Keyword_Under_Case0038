@@ -1,0 +1,24 @@
+-- @testpoint: 关键字under,用作字段类型，合理报错
+drop table if exists under_test cascade;
+SQL SUCCESS
+create table if not exists under_test(id int,name under);
+?.*ERROR: type "under" does not exist.*
+?.*
+create or replace procedure under_insert
+as
+begin
+ for i in 1..10 loop
+    insert into under_test values(i,'under'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call under_insert();
+?.*ERROR: relation "under_test" does not exist.*
+?.*
+select * from under_test;
+?.*ERROR: relation "under_test" does not exist.*
+?.*
+--清理环境
+drop procedure under_insert;
+SQL SUCCESS

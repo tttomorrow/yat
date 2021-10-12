@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字unlock(非保留)，作为外部数据源名
+--关键字不带引号-成功
+drop data source if exists unlock;
+SQL SUCCESS
+create data source unlock;
+SQL SUCCESS
+drop data source unlock;
+SQL SUCCESS
+--关键字带双引号-成功
+drop data source if exists "unlock";
+SQL SUCCESS
+create data source "unlock";
+SQL SUCCESS
+drop data source "unlock";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop data source if exists 'unlock';
+?.*ERROR: syntax error at or near "'unlock'".*
+?.*Position: .*
+create data source 'unlock';
+?.*ERROR: syntax error at or near "'unlock'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop data source if exists `unlock`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create data source `unlock`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

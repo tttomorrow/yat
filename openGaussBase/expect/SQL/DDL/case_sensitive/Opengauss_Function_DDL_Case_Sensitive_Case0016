@@ -1,0 +1,32 @@
+--  @testpoint: --函数验证字段名大小写
+insert into false_1 values(2,5);
+SQL SUCCESS
+select length(a) from false_1 where a=2;
++--------+
+| length |
++--------+
+| 1      |
++--------+
+insert into false_1 values(2,657);
+SQL SUCCESS
+select length(A) from false_1 where a=2;
++--------+
+| length |
++--------+
+| 1      |
+| 1      |
++--------+
+select length(B) from false_1 where a=2;
++--------+
+| length |
++--------+
+| 10     |
+| 10     |
++--------+
+select length(b) from false_1 where a=2;
++--------+
+| length |
++--------+
+| 10     |
+| 10     |
++--------+

@@ -1,0 +1,14 @@
+--  @testpoint:cursor声明游标，使用value子句，子句类型为几何类型；
+start transaction;
+SQL SUCCESS
+cursor cursor24 for values(box(circle '((0,0),2.0)'),diameter(circle '((0,0),2.0)'));
+SQL SUCCESS
+fetch from cursor24;
++-------------------------------------------------------------------------------+---------+
+| column1                                                                       | column2 |
++-------------------------------------------------------------------------------+---------+
++-------------------------------------------------------------------------------+---------+
+close cursor24;
+SQL SUCCESS
+end;
+SQL SUCCESS

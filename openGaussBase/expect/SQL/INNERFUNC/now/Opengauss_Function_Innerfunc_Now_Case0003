@@ -1,0 +1,11 @@
+-- @testpoint: now()给多个入参，合理报错
+select now(1,2) from sys_dummy;
+?.*ERROR: function now\(integer, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: now
+select now(1,2,3,45,6) from sys_dummy;
+?.*ERROR: function now\(integer, integer, integer, integer, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: now

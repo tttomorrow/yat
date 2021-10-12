@@ -1,0 +1,11 @@
+-- @testpoint: 插入非法空值，合理报错
+drop table if exists binary_double13;
+SQL SUCCESS
+create table binary_double13 (id int,name binary_double);
+SQL SUCCESS
+insert into binary_double13 values (1,' ');
+?.*ERROR: invalid input syntax for type double precision: " "
+?.*
+  Where: referenced column: name
+drop table binary_double13;
+SQL SUCCESS

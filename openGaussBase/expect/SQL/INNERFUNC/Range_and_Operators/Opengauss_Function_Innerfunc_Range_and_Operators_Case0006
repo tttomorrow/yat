@@ -1,0 +1,18 @@
+-- @testpoint: upper(anyrange) 描述：范围的上界,无效入参时，合理报错
+select upper(macaddr('08:00:2b:01:02:03'::macaddr ,'08:00:2b:01:02:03'::macaddr)) as result;
+?.*ERROR: function macaddr\(macaddr, macaddr\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: result
+create type bugstatus as enum ('create', 'modify', 'closed');
+SQL SUCCESS
+drop type bugstatus;
+SQL SUCCESS
+select upper(bugstatus (create, closed)) as result;
+?.*ERROR: syntax error at or near "create.*
+?.*
+select upper(uuid('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::uuid,'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22'::uuid)) as result;
+?.*ERROR: function uuid\(uuid, uuid\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: result

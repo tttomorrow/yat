@@ -1,0 +1,31 @@
+--  @testpoint:opengauss关键字abs(非保留)，作为数据库名
+--关键字不带引号-成功
+drop database if exists abs;
+SQL SUCCESS
+create database abs;
+SQL SUCCESS
+--清理环境
+drop database abs;
+SQL SUCCESS
+--关键字带双引号-成功
+drop database if exists "abs";
+SQL SUCCESS
+create database "abs";
+SQL SUCCESS
+--清理环境
+drop database "abs";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop database if exists 'abs';
+?.*ERROR: syntax error at or near "'abs'".*
+?.*Position: .*
+create database 'abs';
+?.*ERROR: syntax error at or near "'abs'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop database if exists `abs`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create database `abs`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

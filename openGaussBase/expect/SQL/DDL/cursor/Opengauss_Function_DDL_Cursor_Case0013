@@ -1,0 +1,39 @@
+-- @testpoint: cursor声明游标，使用select限定条件(union)查询，指定游标返回的行；
+--前置条件
+drop table if exists cur_test_13_01;
+SQL SUCCESS
+drop table if exists cur_test_13_02;
+SQL SUCCESS
+create table cur_test_13_01(c_id int,c_num int,c_name varchar(10),c_city varchar(10),c_add varchar(20));
+SQL SUCCESS
+insert into cur_test_13_01 values(1,18,'Allen','Beijing','AAAAABAAAAA'),(21,368,'Bob','Shanghai','AAAAACAAAAA'),
+                           (3,59,'Cathy','Shenzhen','AAAAADAAAAA'),(4,96,'David','Suzhou','AAAAAEAAAAA'),
+                           (5,17,'Edrwd','Fenghuang','AAAAAFAAAAA'),(61,253,'Fendi','Changsha','AAAAAGAAAAA');
+SQL SUCCESS
+create table cur_test_13_02(c_id int,c_num int,c_name varchar(10),c_city varchar(10));
+SQL SUCCESS
+insert into cur_test_13_02 values(2,22,'Geoge','Hainan'),(32,54,'Hebe','Taiwan'),
+                           (12,59,'Ivail','HongKong'),(24,946,'Jack','Shanghai'),
+                           (51,117,'Kathy','Qinghai'),(26,253,'Laura','Xian');
+SQL SUCCESS
+start transaction;
+SQL SUCCESS
+cursor cursor13 for
+select c_name from cur_test_13_01 where c_id like '%1'
+union
+select c_name from cur_test_13_02 where c_id like '2%' order by 1;
+SQL SUCCESS
+fetch from cursor13;
++--------+
+| c_name |
++--------+
+| Allen  |
++--------+
+close cursor13;
+SQL SUCCESS
+end;
+SQL SUCCESS
+drop table cur_test_13_01;
+SQL SUCCESS
+drop table cur_test_13_02;
+SQL SUCCESS

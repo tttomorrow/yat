@@ -1,0 +1,15 @@
+-- @testpoint: 查看block_size,报告当前数据库所使用的块大小
+--通过show方式查看
+show block_size;
++------------+
+| block_size |
++------------+
+| 8192       |
++------------+
+--通过系统视图pg_settings查看
+select setting from pg_settings where name='block_size';
++---------+
+| setting |
++---------+
+| 8192    |
++---------+

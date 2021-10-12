@@ -1,0 +1,9 @@
+-- @testpoint: nvl函数参数二不能隐式转换为第一个参数的类型，合理报错
+select nvl(1,'string');
+?.*ERROR: invalid input syntax for integer: "string"
+?.*
+  Where: referenced column: nvl
+select nvl(1,'o2');
+?.*ERROR: invalid input syntax for integer: "o2"
+?.*
+  Where: referenced column: nvl

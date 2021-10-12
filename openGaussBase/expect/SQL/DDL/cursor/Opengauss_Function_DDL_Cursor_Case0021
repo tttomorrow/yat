@@ -1,0 +1,15 @@
+--  @testpoint:cursor声明游标，使用value子句，子句类型为字符类型；
+start transaction;
+SQL SUCCESS
+cursor cursor21 for values(char 'char',varchar(10) 'cursor test',cast('type clob' as clob),text 'type text');
+SQL SUCCESS
+fetch from cursor21;
++---------+------------+-----------+-----------+
+| column1 | column2    | column3   | column4   |
++---------+------------+-----------+-----------+
+| char    | cursor tes | type clob | type text |
++---------+------------+-----------+-----------+
+close cursor21;
+SQL SUCCESS
+end;
+SQL SUCCESS

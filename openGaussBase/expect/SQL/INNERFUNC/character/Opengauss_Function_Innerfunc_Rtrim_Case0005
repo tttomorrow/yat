@@ -1,0 +1,15 @@
+-- @testpoint: 搜索文本是被搜索串的末尾字符
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('sdffxxx');
+SQL SUCCESS
+SELECT rtrim(string1,'xx') from type_char;
++-------+
+| rtrim |
++-------+
+| sdff  |
++-------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

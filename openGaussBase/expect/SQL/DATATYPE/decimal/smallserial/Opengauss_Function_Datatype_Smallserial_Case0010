@@ -1,0 +1,18 @@
+-- @testpoint: 插入bool类型
+drop table if exists smallserial_10;
+SQL SUCCESS
+create table smallserial_10 (name smallserial);
+SQL SUCCESS
+insert into smallserial_10 values (false);
+SQL SUCCESS
+insert into smallserial_10 values (true);
+SQL SUCCESS
+select * from smallserial_10;
++------+
+| name |
++------+
+| 0    |
+| 1    |
++------+
+drop table smallserial_10;
+SQL SUCCESS

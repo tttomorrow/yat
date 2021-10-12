@@ -1,0 +1,13 @@
+-- @testpoint: alter system set方法设置参数xmloption值，合理报错
+--查询默认
+show xmloption;
++-----------+
+| xmloption |
++-----------+
+| content   |
++-----------+
+--设置，报错
+alter system set xmloption to document;
+?.*ERROR: unsupport parameter: xmloption
+ALTER SYSTEM SET only support POSTMASTER-level, SIGHUP-level and BACKEND-level guc variable,
+and it must be allowed to set in postgresql.conf.

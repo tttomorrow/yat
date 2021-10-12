@@ -1,0 +1,46 @@
+-- @testpoint:  create index：存在的模式名：success
+--建模式
+drop schema if exists testschema cascade;
+SQL SUCCESS
+create schema testschema;
+SQL SUCCESS
+drop table if exists testschema.test_index_schema_01 cascade;
+SQL SUCCESS
+create table testschema.test_index_schema_01(id int);
+SQL SUCCESS
+--插入数据
+BEGIN
+  for i in 1..10000 LOOP
+    insert into testschema.test_index_schema_01 values(i);
+  end LOOP;
+end;
+/
+SQL SUCCESS
+explain select * from testschema.test_index_schema_01 where id = 1;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*Seq Scan on test_index_schema_01.*
+|   Filter: (id = 1)                                                    |
+?.*
+--建索引
+drop index if exists testschema.schema_index_01;
+SQL SUCCESS
+create index testschema.schema_index_01 on testschema.test_index_schema_01(id);
+SQL SUCCESS
+explain select * from testschema.test_index_schema_01 where id = 1;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*Bitmap Heap Scan on test_index_schema_01.*
+|   Recheck Cond: (id = 1)                                                      |
+?.*Bitmap Index Scan on schema_index_01.*
+|         Index Cond: (id = 1)                                                  |
+?.*
+--清理数据
+drop index testschema.schema_index_01;
+SQL SUCCESS
+drop table if exists testschema.test_index_schema_01 cascade;
+SQL SUCCESS
+drop schema if exists testschema cascade;
+SQL SUCCESS

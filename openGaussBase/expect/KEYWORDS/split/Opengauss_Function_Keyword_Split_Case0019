@@ -1,0 +1,27 @@
+--  @testpoint:opengauss关键字split(保留)，作为外部数据源名
+--关键字不带引号-成功
+drop data source if exists split;
+SQL SUCCESS
+create data source split;
+SQL SUCCESS
+--关键字带双引号-成功
+drop data source if exists "split";
+SQL SUCCESS
+create data source "split";
+SQL SUCCESS
+drop data source "split";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop data source if exists 'split';
+?.*ERROR: syntax error at or near "'split'"
+?.*Position: .*
+create data source 'split';
+?.*ERROR: syntax error at or near "'split'"
+?.*Position: .*
+--关键字带反引号-合理报错
+drop data source if exists `split`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+create data source `split`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*

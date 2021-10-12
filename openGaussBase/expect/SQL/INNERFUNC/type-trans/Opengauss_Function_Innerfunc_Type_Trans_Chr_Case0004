@@ -1,0 +1,21 @@
+-- @testpoint: 类型转换函数to_char(interval, text)时间间隔类型的值转换为指定格式的字符串，入参为无效值时合理报错
+select to_char(interval'1月2日','month dy');
+?.*ERROR: invalid input syntax for type interval: "1月2日".*
+?.*
+  Where: referenced column: to_char
+select to_char(interval '15h-2m$12s', 'hh32:mi:ss');
+?.*ERROR: invalid input syntax for type interval: \"15h\-2m\$12s\"
+?.*
+  Where: referenced column: to_char
+select to_char(interval '2' year ,'yyyy','yyyy');
+?.*ERROR: function to\_char\(interval, unknown, unknown\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: to_char
+select to_char(interval '&**&%' ,'yyyy');
+?.*ERROR: invalid input syntax for type interval.*
+?.*
+  Where: referenced column: to_char
+select to_char(interval 2 year);
+?.*ERROR: syntax error at or near "2".*
+?.*

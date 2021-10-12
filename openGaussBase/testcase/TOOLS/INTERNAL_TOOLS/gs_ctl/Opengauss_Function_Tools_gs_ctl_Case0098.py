@@ -1,0 +1,102 @@
+"""
+Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+
+openGauss is licensed under Mulan PSL v2.
+You can use this software according to the terms and conditions of the Mulan PSL v2.
+You may obtain a copy of Mulan PSL v2 at:
+
+          http://license.coscl.org.cn/MulanPSL2
+
+THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+See the Mulan PSL v2 for more details.
+"""
+"""
+Case Type   : 系统内部使用工具
+Case Name   : 主机指定用户名与密码执行gs_ctl notify是否成功
+Description :
+    1.以pending的方式启动主机
+    2.查看集群状态，主节点是否为pending状态
+    3.主机指定用户名与密码执行notify
+    4.查看集群状态，主节点是否为primary
+Expect      :
+    1.以pending的方式启动主机成功
+    2.查看集群状态成功，主节点为pending状态
+    3.主机指定指定用户名与密码执行notify成功
+    4.查看集群状态，主节点为primary
+History     :
+"""
+
+import unittest
+
+from testcase.utils.CommonSH import CommonSH
+from testcase.utils.Constant import Constant
+from testcase.utils.Logger import Logger
+from yat.test import Node
+from yat.test import macro
+
+LOG = Logger()
+
+
+class SystemInternalTools(unittest.TestCase):
+    def setUp(self):
+        LOG.info('----this is setup------')
+        LOG.info('---Opengauss_Function_Tools_gs_ctl_Case0098开始执行-----')
+        self.constant = Constant()
+        self.PrimaryNode = Node('PrimaryDbUser')
+        self.sh_primary = CommonSH('PrimaryDbUser')
+
+    def test_system_internal_tools(self):
+        LOG.info('-------若为单机环境，后续不执行，直接通过-------')
+        query_cmd = f'''source {macro.DB_ENV_PATH};
+                    gs_om -t status --detail;
+                    '''
+        LOG.info(query_cmd)
+        query_msg = self.PrimaryNode.sh(query_cmd).result()
+        LOG.info(query_msg)
+        if 'Standby' not in query_msg:
+            return '单机环境，后续不执行，直接通过'
+        else:
+            self.StandbyNode = Node('Standby1DbUser')
+            self.sh_standby = CommonSH('Standby1DbUser')
+
+        LOG.info('--------------以pending的方式启动主机------------------')
+        start_cmd = f'''source {macro.DB_ENV_PATH};
+                    gs_ctl restart -D {macro.DB_INSTANCE_PATH} -M pending ;
+                    '''
+        LOG.info(start_cmd)
+        start_msg = self.PrimaryNode.sh(start_cmd).result()
+        LOG.info(start_msg)
+        self.assertIn(self.constant.RESTART_SUCCESS_MSG, start_msg)
+
+        LOG.info('----------------查看主机状态-------------------')
+        status_cmd = f'''source {macro.DB_ENV_PATH};
+            gs_ctl query -D {macro.DB_INSTANCE_PATH}; 
+            '''
+        LOG.info(status_cmd)
+        status_msg = self.PrimaryNode.sh(status_cmd).result()
+        LOG.info(status_msg)
+        self.assertIn('Pending', status_msg)
+
+        LOG.info('---------主机指定正确的数据库实录目录执行notify------')
+        notify_cmd = f'''source {macro.DB_ENV_PATH};
+            gs_ctl notify  -D {macro.DB_INSTANCE_PATH} -M primary -U \
+            {self.PrimaryNode.ssh_user} -P {self.PrimaryNode.ssh_password};
+            '''
+        LOG.info(notify_cmd)
+        notify_msg = self.StandbyNode.sh(notify_cmd).result()
+        LOG.info(notify_msg)
+        status = self.sh_primary.get_db_instance_status()
+        self.assertTrue(status)
+
+    def tearDown(self):
+        LOG.info('--------------this is tearDown--------------')
+        LOG.info('----------------恢复集群状态------------------')
+        query_cmd = f'''source {macro.DB_ENV_PATH};
+            gs_ctl restart -D {macro.DB_INSTANCE_PATH} -M primary ;
+            '''
+        LOG.info(query_cmd)
+        query_msg = self.PrimaryNode.sh(query_cmd).result()
+        LOG.info(query_msg)
+        LOG.info('---Opengauss_Function_Tools_gs_ctl_Case0098执行完成---')

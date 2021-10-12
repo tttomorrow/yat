@@ -1,0 +1,38 @@
+-- @testpoint: to_date(text, text)字符串类型的值转换为指定格式的日期，入参为无效值时合理报错
+-- 多参少参
+select to_date('1999 1 8','YY-MM-DD','999');
+?.*ERROR: function to_date\(unknown, unknown, unknown\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: to_date
+select to_date();
+?.*ERROR: function to_date\(\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: to_date
+-- 不对应
+select to_date('1999 1 8','YY-Mon-DD');
+?.*ERROR: invalid value "1 8" for "Mon".*
+  Detail: The given value did not match any of the allowed values for this field.
+  Where: referenced column: to_date
+select to_date('8-Jan-99', 'DD MONTH YY');
+?.*ERROR: invalid value "Jan-99" for "MONTH".*
+  Detail: The given value did not match any of the allowed values for this field.
+  Where: referenced column: to_date
+select to_date('二零二零年','YYYY年');
+?.*ERROR: invalid value.*
+  Detail: Value must be an integer.
+  Where: referenced column: to_date
+select to_date('1999 13 8','YY-MM-DD');
+?.*ERROR: invalid data for "month =  13" ,value must be between 1 and 12.*
+  Where: referenced column: to_date
+select to_date('1999 1 98','YY-MM-DD');
+?.*ERROR: invalid data for "day of month =  98" ,value must be between 1 and 31.*
+  Where: referenced column: to_date
+-- 特殊月份
+select to_date('1999 2 29','YYYY-MM-DD');
+?.*ERROR: invalid data for "day of month =  29" ,value must be be fit for current month.*
+  Where: referenced column: to_date
+select to_date('1999 2 31','YYYY-MM-DD');
+?.*ERROR: invalid data for "day of month =  31" ,value must be be fit for current month.*
+  Where: referenced column: to_date

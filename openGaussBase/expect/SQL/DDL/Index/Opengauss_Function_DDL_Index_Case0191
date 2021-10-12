@@ -1,0 +1,18 @@
+--  @testpoint: create index CONCURRENTLY：指定多个索引名:合理报错
+--建普通表
+DROP TABLE if EXISTS test_index_table_191 CASCADE;
+SQL SUCCESS
+create table test_index_table_191(
+c_int int);
+SQL SUCCESS
+--建索引
+drop index if exists index_191_01;
+SQL SUCCESS
+drop index if exists index_191_02;
+SQL SUCCESS
+create index CONCURRENTLY index_191_01,index_191_02 on test_index_table_191(c_int) ;
+?.*ERROR: syntax error at or near ","
+?.*
+--清理环境
+DROP TABLE if EXISTS test_index_table_191 CASCADE;
+SQL SUCCESS

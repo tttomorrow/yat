@@ -1,0 +1,57 @@
+-- @testpoint: openGauss可否正确判断JSON类型:字符串（不符合规范的合理报错）
+--符合规范(使用反斜杠转义后，数据库显示包含反斜杠)
+select '"abcdefg"'::JSON;
++-----------+
+| json      |
++-----------+
+| "abcdefg" |
++-----------+
+select '"1"'::JSON;
++------+
+| json |
++------+
+| "1"  |
++------+
+select '"$$"'::JSON;
++------+
+| json |
++------+
+| "$$" |
++------+
+select '"\"$$\""'::JSON;
++----------+
+| json     |
++----------+
+| "\"$$\"" |
++----------+
+select '"[\"www@13^\", 1, {\"name\": \"john\"}, \"2\"]"'::JSON;
++-------------------------------------------------+
+| json                                            |
++-------------------------------------------------+
+| "[\"www@13^\", 1, {\"name\": \"john\"}, \"2\"]" |
++-------------------------------------------------+
+--不符合规范
+select 'abcdefg'::JSON;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "abcdefg" is invalid.
+?.*
+  Where: JSON data, line 1: abcdefg
+referenced column: json
+select '''abcdefg'''::JSON;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "'" is invalid.
+?.*
+  Where: JSON data, line 1: '...
+referenced column: json
+select '\"$$\"'::JSON;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "\" is invalid.
+?.*
+  Where: JSON data, line 1: \...
+referenced column: json
+select '"["www@13^", 1, {"name": "john"}, "2"]"'::JSON;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "www" is invalid.
+?.*
+  Where: JSON data, line 1: "["www...
+referenced column: json

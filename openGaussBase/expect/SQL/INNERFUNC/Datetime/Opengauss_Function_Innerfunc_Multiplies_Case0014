@@ -1,0 +1,15 @@
+-- @testpoint: 时间和日期操作符*，reltime乘以负数
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (col1 reltime);
+SQL SUCCESS
+insert into test_date01 values ('60');
+SQL SUCCESS
+select '-10' * col1  from test_date01;
++--------------------------------------------------+
+| ?column?                                         |
++--------------------------------------------------+
+| -1 years -8 mons 0 days 0 hours 0 mins 0.00 secs |
++--------------------------------------------------+
+drop table if exists test_date01;
+SQL SUCCESS

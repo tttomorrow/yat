@@ -1,0 +1,49 @@
+-- @testpoint: 关键字xmlserialize，用作字符串
+drop table if exists xmlserialize_test cascade;
+SQL SUCCESS
+create table xmlserialize_test(id int,xmlserialize varchar(20));
+SQL SUCCESS
+create or replace procedure xmlserialize_insert
+as
+begin
+ for i in 1..20 loop
+    insert into xmlserialize_test values(i,'xmlserialize'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call xmlserialize_insert();
++---------------------+
+| xmlserialize_insert |
++---------------------+
+|                     |
++---------------------+
+select * from xmlserialize_test;
++----+----------------+
+| id | xmlserialize   |
++----+----------------+
+| 1  | xmlserialize1  |
+| 2  | xmlserialize2  |
+| 3  | xmlserialize3  |
+| 4  | xmlserialize4  |
+| 5  | xmlserialize5  |
+| 6  | xmlserialize6  |
+| 7  | xmlserialize7  |
+| 8  | xmlserialize8  |
+| 9  | xmlserialize9  |
+| 10 | xmlserialize10 |
+| 11 | xmlserialize11 |
+| 12 | xmlserialize12 |
+| 13 | xmlserialize13 |
+| 14 | xmlserialize14 |
+| 15 | xmlserialize15 |
+| 16 | xmlserialize16 |
+| 17 | xmlserialize17 |
+| 18 | xmlserialize18 |
+| 19 | xmlserialize19 |
+| 20 | xmlserialize20 |
++----+----------------+
+drop table if exists xmlserialize_test cascade;
+SQL SUCCESS
+drop procedure xmlserialize_insert;
+SQL SUCCESS

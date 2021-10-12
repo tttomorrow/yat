@@ -1,0 +1,14 @@
+-- @testpoint: 参数2不为十六进制，合理报错
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 RAW,string2 char(100));
+SQL SUCCESS
+insert into type_char values ('DEADBEEF','khj');
+SQL SUCCESS
+SELECT rawcat(string1,string2) from type_char;
+?.*ERROR: function rawcat\(raw, character\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: rawcat
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

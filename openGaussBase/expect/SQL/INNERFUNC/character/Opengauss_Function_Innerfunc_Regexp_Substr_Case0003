@@ -1,0 +1,15 @@
+-- @testpoint: 不带括号中文特殊符号匹配
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('str中文￥&*');
+SQL SUCCESS
+SELECT regexp_substr(string1 ,'str中文￥&*') from type_char;
++---------------+
+| regexp_substr |
++---------------+
+| str中文￥&       |
++---------------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

@@ -1,0 +1,57 @@
+--  @testpoint:to_tsquery函数测试
+--指定分词器
+SELECT to_tsquery('english', 'The & Fat & Rats');
++---------------+
+| to_tsquery    |
++---------------+
+| 'fat' & 'rat' |
++---------------+
+--不指定分词器
+SELECT to_tsquery('The & Fat & Rats');
++---------------+
+| to_tsquery    |
++---------------+
+| 'fat' & 'rat' |
++---------------+
+--检索条件由布尔运算符|组成
+SELECT to_tsquery('english', 'The | Fat | Rats');
++---------------+
+| to_tsquery    |
++---------------+
+| 'fat' | 'rat' |
++---------------+
+--检索条件包含&和 !运算符
+SELECT to_tsquery('fat & rat & ! cat');
++------------------------+
+| to_tsquery             |
++------------------------+
+| 'fat' & 'rat' & !'cat' |
++------------------------+
+--检索条件，附加权重
+SELECT to_tsquery('english', 'Fat | Rats:AB');
++------------------+
+| to_tsquery       |
++------------------+
+| 'fat' | 'rat':AB |
++------------------+
+--指定*，匹配前缀
+SELECT to_tsquery('supern:*A & star:A*B');
++--------------------------+
+| to_tsquery               |
++--------------------------+
+| 'supern':*A & 'star':*AB |
++--------------------------+
+--权重D,输出含有D
+SELECT to_tsquery('supern:*D & star:A*B');
++--------------------------+
+| to_tsquery               |
++--------------------------+
+| 'supern':*D & 'star':*AB |
++--------------------------+
+--权重以小写字母表示（输出为大写）
+SELECT to_tsquery('supern:*d & star:a*b');
++--------------------------+
+| to_tsquery               |
++--------------------------+
+| 'supern':*D & 'star':*AB |
++--------------------------+

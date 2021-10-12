@@ -1,0 +1,44 @@
+-- @testpoint: 创建视图的同义词，修改同义词属主（属主为存在+不存在+存在无create权限）,不存在+存在无create权限,合理报错
+-- @modify at: 2020-11-26
+--建表
+drop table if EXISTS test_synonym cascade;
+SQL SUCCESS
+create table test_synonym(a int,b varchar);
+SQL SUCCESS
+insert into test_synonym values(1,'a');
+SQL SUCCESS
+--建视图
+drop view if exists test_synview;
+SQL SUCCESS
+create view test_synview as select * from test_synonym;
+SQL SUCCESS
+--创建视图同义词
+drop synonym if EXISTS synview cascade;
+SQL SUCCESS
+create synonym synview for test_synview;
+SQL SUCCESS
+--创建用户
+drop user if exists syn006;
+SQL SUCCESS
+create user syn006 password "mima@123";
+SQL SUCCESS
+--修改为存在的属主：新属主无create权限：报错
+alter synonym synview owner to syn006;
+?.*ERROR: permission denied for schema public
+--修改为不存在的属主：报错
+drop user if exists test_syn05;
+SQL SUCCESS
+alter synonym synview owner to test_syn05;
+?.*ERROR: role "test_syn05" does not exist
+--修改为存在的属主：新属主有create权限
+GRANT ALL PRIVILEGES TO syn006;
+SQL SUCCESS
+alter synonym synview owner to syn006;
+SQL SUCCESS
+--清理数据
+drop user if exists syn006 cascade;
+SQL SUCCESS
+drop synonym if exists synview cascade;
+SQL SUCCESS
+drop table if exists test_synonym cascade;
+SQL SUCCESS

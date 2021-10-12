@@ -1,0 +1,29 @@
+--  @testpoint:创建函数和表结合，使用RETURNS TABLE 子句
+--建表
+DROP TABLE IF EXISTS sales2;
+SQL SUCCESS
+create table sales2(itemno integer,quantity integer,price numeric);
+SQL SUCCESS
+insert into sales2 values (100,15,11.2),(101,22,12.3);
+SQL SUCCESS
+--创建函数，使用RETURNS TABLE子句
+DROP FUNCTION if EXISTS extended_sales2(p_itemno IN integer);
+SQL SUCCESS
+CREATE FUNCTION extended_sales2(p_itemno IN integer)RETURNS TABLE(quantity integer, total numeric) AS $$
+BEGIN
+RETURN QUERY SELECT sales2.quantity, sales2.quantity * sales2.price FROM sales2
+WHERE itemno = p_itemno;
+END;
+$$ LANGUAGE plpgsql;
+/
+SQL SUCCESS
+call extended_sales2(101);
++----------+-------+
+| quantity | total |
++----------+-------+
+| 22       | 270.6 |
++----------+-------+
+drop table sales2;
+SQL SUCCESS
+drop FUNCTION extended_sales2;
+SQL SUCCESS

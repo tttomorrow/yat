@@ -1,0 +1,41 @@
+-- @testpoint: 类型转换函数to_char(int, text)，入参超边界值时合理报错
+-- 左边界值取不到
+select to_char(-32768::smallint, '9999999');
+?.*ERROR: smallint out of range.*
+  Where: referenced column: to_char
+?.*ERROR: integer out of range.*
+  Where: referenced column: to_char
+?.*ERROR: bigint out of range.*
+  Where: referenced column: to_char
+-- 边界值上下
+select to_char(-32769::smallint, '9999999');
+?.*ERROR: smallint out of range.*
+  Where: referenced column: to_char
+select to_char(32768::smallint, '9999999');
+?.*ERROR: smallint out of range.*
+  Where: referenced column: to_char
+?.*ERROR: integer out of range.*
+  Where: referenced column: to_char
+?.*ERROR: integer out of range.*
+  Where: referenced column: to_char
+?.*ERROR: bigint out of range.*
+  Where: referenced column: to_char
+?.*ERROR: bigint out of range.*
+  Where: referenced column: to_char
+-- 指定长度不足
+select to_char(32767::smallint, '999');
++---------+
+| to_char |
++---------+
+|  ###    |
++---------+
++---------+
+| to_char |
++---------+
+| -###### |
++---------+
++-----------+
+| to_char   |
++-----------+
+|  ######## |
++-----------+

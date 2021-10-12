@@ -1,0 +1,14 @@
+-- @testpoint: 聚集函数var_pop，入参为二进制类型,合理报错
+drop table if exists t_nvl_rca_tab;
+SQL SUCCESS
+create table t_nvl_rca_tab(col_1 raw);
+SQL SUCCESS
+insert into t_nvl_rca_tab values (HEXTORAW('DEADBEEF'));
+SQL SUCCESS
+select var_pop(col_1) from t_nvl_rca_tab;
+?.*ERROR: function var_pop\(raw\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: var_pop
+drop table if exists t_nvl_rca_tab;
+SQL SUCCESS

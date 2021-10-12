@@ -1,0 +1,27 @@
+-- @testpoint: 删除同义词+CASCADE选项：成功
+-- @modify at: 2020-11-26
+--建表
+drop table if exists SYN_TAB_074_001 cascade;
+SQL SUCCESS
+create table SYN_TAB_074_001 (a int,b clob);
+SQL SUCCESS
+--插入数据
+insert into SYN_TAB_074_001 values(1,'a');
+SQL SUCCESS
+--建表的同义词
+drop synonym if exists SYN_TAB_SYN_074_001;
+SQL SUCCESS
+create or replace synonym SYN_TAB_SYN_074_001 for SYN_TAB_074_001;
+SQL SUCCESS
+select * from SYN_TAB_SYN_074_001;
++---+---+
+| a | b |
++---+---+
+| 1 | a |
++---+---+
+--删除同义词
+drop synonym  SYN_TAB_SYN_074_001 cascade;
+SQL SUCCESS
+--删表
+drop table if exists SYN_TAB_074_001 cascade;
+SQL SUCCESS

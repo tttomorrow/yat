@@ -1,0 +1,18 @@
+
+
+-- @testpoint: 输入为有效值的测试
+
+drop table if exists bitand_test_01;
+SQL SUCCESS
+create table  bitand_test_01(col_bitand1 integer,col_bitand2 integer,col_bitand3 integer);
+SQL SUCCESS
+insert into bitand_test_01 values(bitand(6,3),bitand(-1,1),bitand(-1,-1));
+SQL SUCCESS
+select * from bitand_test_01;
++-------------+-------------+-------------+
+| col_bitand1 | col_bitand2 | col_bitand3 |
++-------------+-------------+-------------+
+| 2           | 1           | -1          |
++-------------+-------------+-------------+
+drop table if exists bitand_test_01;
+SQL SUCCESS

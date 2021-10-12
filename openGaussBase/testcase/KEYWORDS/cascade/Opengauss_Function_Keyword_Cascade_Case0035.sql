@@ -1,0 +1,2 @@
+--  @testpoint:使用CASCADE级联删除表
+drop table if exists t_student cascade;

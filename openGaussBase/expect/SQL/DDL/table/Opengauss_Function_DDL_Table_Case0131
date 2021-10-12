@@ -1,0 +1,21 @@
+-- @testpoint: 创建列类型为字符类型clob的表
+drop table if exists table_2;
+SQL SUCCESS
+create table table_2(a CLOB);
+SQL SUCCESS
+insert into table_2 values('1232');
+SQL SUCCESS
+insert into table_2 values('qewerr');
+SQL SUCCESS
+insert into table_2 values('你好');
+SQL SUCCESS
+select * from table_2;
++--------+
+| a      |
++--------+
+| 1232   |
+| qewerr |
+| 你好     |
++--------+
+drop table if exists table_2;
+SQL SUCCESS

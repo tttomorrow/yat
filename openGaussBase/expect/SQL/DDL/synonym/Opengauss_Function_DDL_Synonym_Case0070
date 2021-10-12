@@ -1,0 +1,47 @@
+-- @testpoint: 创建临时表的同义词，修改同义词属主（属主为存在+不存在+存在无create权限）,不存在+存在无create权限,合理报错
+-- @modify at: 2020-11-26
+--建表
+CREATE TEMPORARY table test_tempsyn(id int);
+SQL SUCCESS
+insert into test_tempsyn values(1);
+SQL SUCCESS
+select * from test_tempsyn;
++----+
+| id |
++----+
+| 1  |
++----+
+--创建同义词
+drop synonym if exists tmp_syn_01;
+SQL SUCCESS
+create synonym tmp_syn_01 for test_tempsyn;
+SQL SUCCESS
+select * from tmp_syn_01;
+?.*ERROR: relation "tmp_syn_01" does not exist.*
+  Detail: translation for synonym "tmp_syn_01" is no longer valid
+?.*
+--创建用户
+drop user if exists syn007 cascade;
+SQL SUCCESS
+create user syn007 password "Test@123";
+SQL SUCCESS
+--修改为存在的属主：新属主无create权限：报错
+alter synonym tmp_syn_01 owner to syn007;
+?.*ERROR: permission denied for schema public
+--修改为不存在的属主：报错
+drop user if exists test_syn05 cascade;
+SQL SUCCESS
+alter synonym tmp_syn_01 owner to test_syn05;
+?.*ERROR: role "test_syn05" does not exist
+--修改为存在的属主：新属主有create权限
+GRANT ALL PRIVILEGES TO syn007;
+SQL SUCCESS
+alter synonym tmp_syn_01 owner to syn007;
+SQL SUCCESS
+--清理环境
+drop user if exists syn007 cascade;
+SQL SUCCESS
+drop table if exists test_synonym cascade;
+SQL SUCCESS
+drop synonym if exists tmp_syn_01;
+SQL SUCCESS

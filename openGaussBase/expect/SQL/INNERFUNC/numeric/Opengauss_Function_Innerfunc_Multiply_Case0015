@@ -1,0 +1,19 @@
+-- @testpoint: 数字操作符*(乘),0作为乘数
+drop table if exists data_01;
+SQL SUCCESS
+create table data_01 (clo1 BIGINT,clo2 BIGINT);
+SQL SUCCESS
+SQL SUCCESS
+select clo1 * 0 from data_01;
++----------+
+| ?column? |
++----------+
+| 0        |
++----------+
++--------+
+| result |
++--------+
+| 0      |
++--------+
+drop table if exists data_01;
+SQL SUCCESS

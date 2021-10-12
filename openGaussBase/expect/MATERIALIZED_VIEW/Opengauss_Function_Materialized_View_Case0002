@@ -1,0 +1,37 @@
+-- @testpoint: 测试创建物化视图时指定指定表空间名
+drop table if exists student cascade;
+SQL SUCCESS
+drop tablespace if exists mv_space;
+SQL SUCCESS
+create table student
+(
+    id int primary key,
+    name varchar(10) not null
+);
+SQL SUCCESS
+insert into student values (1, 'aaa');
+SQL SUCCESS
+insert into student values (2, 'bbb');
+SQL SUCCESS
+insert into student values (3, 'ccc');
+SQL SUCCESS
+insert into student values (4, 'ddd');
+SQL SUCCESS
+insert into student values (5, 'eee');
+SQL SUCCESS
+insert into student values (6, 'fff');
+SQL SUCCESS
+create tablespace mv_space relative location 'postgres_tbs';
+SQL SUCCESS
+create materialized view student_mv tablespace mv_space as select * from student;
+SQL SUCCESS
+select spcname from pg_tablespace where oid = (select reltablespace from pg_class where relname = 'student_mv');
++----------+
+| spcname  |
++----------+
+| mv_space |
++----------+
+drop table student cascade;
+SQL SUCCESS
+drop tablespace mv_space;
+SQL SUCCESS

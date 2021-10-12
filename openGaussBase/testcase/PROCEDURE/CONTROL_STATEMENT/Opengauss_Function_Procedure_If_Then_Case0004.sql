@@ -1,0 +1,24 @@
+-- @testpoint: 条件语句 if ...then ...else
+
+create or replace procedure proc_if_else_004
+as
+  v_int int;
+begin
+	begin
+		v_int:=10;
+		if((v_int*10+100-90)/10>11)
+		then
+			raise info '10*10+100-90)/10>11';
+		elsif(v_int<(100/10-10+9))
+		then
+			raise info '10<(100/10-10+9)';
+		elsif(v_int<11)
+		then
+		    raise info '10<11';
+		end if;
+	end;
+end ;
+/
+
+call proc_if_else_004();
+drop procedure proc_if_else_004;

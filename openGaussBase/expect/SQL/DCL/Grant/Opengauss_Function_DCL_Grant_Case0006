@@ -1,0 +1,18 @@
+-- @testpoint: 可以给用户授权->CREATE TABLE
+drop user if exists user_001 cascade;
+SQL SUCCESS
+create user  user_001 identified by 'Gauss_234';
+SQL SUCCESS
+drop table if exists t1;
+SQL SUCCESS
+create table t1(id int ,name char(255),age int ,city varchar (255));
+SQL SUCCESS
+GRANT ALL  ON t1 TO user_001;
+SQL SUCCESS
+--回收权限
+REVOKE  ALL PRIVILEGES ON  TABLE t1 FROM user_001;
+SQL SUCCESS
+drop table if exists t1;
+SQL SUCCESS
+drop user  user_001;
+SQL SUCCESS

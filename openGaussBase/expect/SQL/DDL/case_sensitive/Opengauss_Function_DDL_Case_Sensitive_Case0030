@@ -1,0 +1,36 @@
+--  @testpoint: --查看视图where条件区分大小写
+drop view if exists VIEW_2 cascade;
+SQL SUCCESS
+create view VIEW_2 as select * from false_2;
+SQL SUCCESS
+create or replace view VIEW_2 as select * from false_2;
+SQL SUCCESS
+insert into false_2 values (null,null);
+SQL SUCCESS
+select * from view_3,VIEW_2 where VIEW_2.B is null;
++----+----+---+---+
+| a  | f  | a | b |
++----+----+---+---+
+| 22 | 33 |   |   |
+| 0  | 1  |   |   |
++----+----+---+---+
+select * from view_3,VIEW_2 where view_2.a is null;
++----+----+---+---+
+| a  | f  | a | b |
++----+----+---+---+
+| 22 | 33 |   |   |
+| 0  | 1  |   |   |
++----+----+---+---+
+select * from view_3,VIEW_2 where VIEW_2.a is null;
++----+----+---+---+
+| a  | f  | a | b |
++----+----+---+---+
+| 22 | 33 |   |   |
+| 0  | 1  |   |   |
++----+----+---+---+
+select * from view_3 where F=1;
++---+---+
+| a | f |
++---+---+
+| 0 | 1 |
++---+---+

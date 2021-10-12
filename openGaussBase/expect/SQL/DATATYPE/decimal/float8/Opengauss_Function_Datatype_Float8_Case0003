@@ -1,0 +1,24 @@
+-- @testpoint: 插入整数
+drop table if exists float8_03;
+SQL SUCCESS
+create table float8_03 (name float8);
+SQL SUCCESS
+insert into float8_03 values (12122);
+SQL SUCCESS
+insert into float8_03 values (9999^2);
+SQL SUCCESS
+insert into float8_03 values (-12122);
+SQL SUCCESS
+insert into float8_03 values (-9999^2);
+SQL SUCCESS
+select * from float8_03;
++-------------+
+| name        |
++-------------+
+| 12122.0     |
+| 9.9980001E7 |
+| -12122.0    |
+| 9.9980001E7 |
++-------------+
+drop table float8_03;
+SQL SUCCESS

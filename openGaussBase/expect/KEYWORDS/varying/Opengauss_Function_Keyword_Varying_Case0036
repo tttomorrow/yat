@@ -1,0 +1,39 @@
+-- @testpoint: 关键字varying,用作表名创建普通表，部分测试点合理报错
+drop table if exists varying cascade;
+SQL SUCCESS
+create table varying(id int,name varchar(20));
+SQL SUCCESS
+create or replace procedure varying_insert
+as
+begin
+ for i in 1..10 loop
+    insert into varying values(i,'vary+'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call varying_insert();
++----------------+
+| varying_insert |
++----------------+
+|                |
++----------------+
+select * from varying;
++----+---------+
+| id | name    |
++----+---------+
+| 1  | vary+1  |
+| 2  | vary+2  |
+| 3  | vary+3  |
+| 4  | vary+4  |
+| 5  | vary+5  |
+| 6  | vary+6  |
+| 7  | vary+7  |
+| 8  | vary+8  |
+| 9  | vary+9  |
+| 10 | vary+10 |
++----+---------+
+drop table if exists varying cascade;
+SQL SUCCESS
+drop procedure varying_insert;
+SQL SUCCESS

@@ -1,0 +1,22 @@
+-- @testpoint: pg_stat_get_xact_tuples_hot_updated(oid)函数的异常校验，合理报错
+select pg_stat_get_xact_tuples_hot_updated('') from PG_CLASS a where a.relname = 'sales';
++-------------------------------------+
+| pg_stat_get_xact_tuples_hot_updated |
++-------------------------------------+
++-------------------------------------+
+select pg_stat_get_xact_tuples_hot_updated() from PG_CLASS a where a.relname = 'sales';
+?.*ERROR: function pg_stat_get_xact_tuples_hot_updated\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_stat_get_xact_tuples_hot_updated
+select pg_stat_get_xact_tuples_hot_updated(a.oid,a.oid,a.oid) from PG_CLASS a where a.relname = 'sales';
+?.*ERROR: function pg_stat_get_xact_tuples_hot_updated\(oid, oid, oid\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_stat_get_xact_tuples_hot_updated
+?.*ERROR: OID out of range
+  Where: referenced column: pg_stat_get_xact_tuples_hot_updated
+select pg_stat_get_xact_tuples_hot_updated('&^%$#') from PG_CLASS a where a.relname = 'sales';
+?.*ERROR: invalid input syntax for type oid: "\&\^\%\$\#"
+?.*
+  Where: referenced column: pg_stat_get_xact_tuples_hot_updated

@@ -1,0 +1,21 @@
+
+
+--  @testpoint:函数嵌套使用
+
+drop table if exists acos_test_04;
+SQL SUCCESS
+create table acos_test_04(COL_ACOS INTEGER);
+SQL SUCCESS
+insert into acos_test_04 values(0);
+SQL SUCCESS
+insert into acos_test_04 values(1);
+SQL SUCCESS
+select cast(ACOS(COL_ACOS)as numeric(3,2)) as RESULT from acos_test_04;
++--------+
+| result |
++--------+
+| 1.57   |
+| 0.00   |
++--------+
+drop table if exists acos_test_04;
+SQL SUCCESS

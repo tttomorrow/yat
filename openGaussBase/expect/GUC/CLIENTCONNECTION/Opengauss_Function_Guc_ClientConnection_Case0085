@@ -1,0 +1,6 @@
+-- @testpoint: ALTER SYSTEM SET方法设置参数statement_timeout，合理报错
+ALTER SYSTEM SET statement_timeout to 10;
+?.*ERROR: unsupport parameter: statement_timeout
+ALTER SYSTEM SET only support POSTMASTER-level, SIGHUP-level and BACKEND-level guc variable,
+and it must be allowed to set in postgresql.conf.
+--no need to clean

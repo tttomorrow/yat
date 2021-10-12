@@ -1,0 +1,19 @@
+-- @testpoint: create index:模式名的标识符规范：不存在的模式名：合理报错
+drop schema if exists testschema cascade;
+SQL SUCCESS
+drop table if exists testschema.test_index_schema_01 cascade;
+?.*ERROR: schema "testschema" does not exist?.*
+drop table if exists test_index_schema_01 cascade;
+SQL SUCCESS
+create table test_index_schema_01(id int);
+SQL SUCCESS
+--建索引
+drop index if exists testschema.schema_index_01;
+?.*ERROR: schema "testschema" does not exist?.*
+create index testschema.schema_index_01 on test_index_schema_01(id);
+?.*ERROR: schema "testschema" does not exist?.*
+--清理数据
+drop table if exists test_index_schema_01 cascade;
+SQL SUCCESS
+drop schema if exists testschema cascade;
+SQL SUCCESS

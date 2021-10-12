@@ -1,0 +1,66 @@
+-- @testpoint: opengauss关键字create(保留)，作为同义词对象名，部分测试点合理报错
+--前置条件
+drop table if exists create_test;
+SQL SUCCESS
+create table create_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-失败
+drop synonym if exists create;
+?.*ERROR: syntax error at or near "create".*
+?.*Position.*
+create synonym create for create_test;
+?.*ERROR: syntax error at or near "create".*
+?.*Position.*
+--关键字带双引号-成功
+drop synonym if exists "create";
+SQL SUCCESS
+create synonym "create" for create_test;
+SQL SUCCESS
+insert into "create" values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update "create" set "create".name='cici' where "create".id=2;
+SQL SUCCESS
+select * from "create";
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--清理环境
+drop synonym "create";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'create';
+?.*ERROR: syntax error at or near "'create'".*
+?.*Position.*
+create synonym 'create' for create_test;
+?.*ERROR: syntax error at or near "'create'".*
+?.*Position.*
+insert into 'create' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'create'".*
+?.*Position.*
+update 'create' set 'create'.name='cici' where 'create'.id=2;
+?.*ERROR: syntax error at or near "'create'".*
+?.*Position.*
+select * from 'create';
+?.*ERROR: syntax error at or near "'create'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop synonym if exists `create`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create synonym `create` for create_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+insert into `create` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+update `create` set `create`.name='cici' where `create`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+select * from `create`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+drop table if exists create_test;
+SQL SUCCESS

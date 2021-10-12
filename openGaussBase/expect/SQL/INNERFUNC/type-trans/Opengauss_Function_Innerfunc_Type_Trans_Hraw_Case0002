@@ -1,0 +1,37 @@
+-- @testpoint: 类型转换函数rawtohex(string)，将一个二进制构成的字符串转换为十六进制的字符串，入参为无效值时合理报错
+--x被当作非a-f
+SELECT hextoraw('0X8');
+?.*ERROR: invalid hexadecimal digit: "X".*
+  Where: referenced column: hextoraw
+SELECT hextoraw(0x8);
+?.*ERROR: syntax error at or near "x8".*
+?.*
+--f以外字符
+SELECT hextoraw('abcdefg');
+?.*ERROR: invalid hexadecimal digit: "g".*
+  Where: referenced column: hextoraw
+SELECT hextoraw('5K');
+?.*ERROR: invalid hexadecimal digit: "K".*
+  Where: referenced column: hextoraw
+--多参、少参、空值
+SELECT hextoraw();
+?.*ERROR: function hextoraw\(\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: hextoraw
+SELECT hextoraw(' ');
+?.*ERROR: invalid hexadecimal digit: " ".*
+  Where: referenced column: hextoraw
+SELECT hextoraw('6D','999');
+?.*ERROR: function hextoraw\(unknown, unknown\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: hextoraw
+--特殊字符
+SELECT hextoraw('@#$');
+?.*ERROR: invalid hexadecimal digit: "@".*
+  Where: referenced column: hextoraw
+-- 浮点数
+SELECT hextoraw('5.4');
+?.*ERROR: invalid hexadecimal digit: ".".*
+  Where: referenced column: hextoraw

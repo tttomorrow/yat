@@ -1,0 +1,9 @@
+-- @testpoint: 关键字all带双引号作为普通表的列名在insert语句的使用
+drop table if exists  test_and_002;
+SQL SUCCESS
+create table test_and_002 ("all" int);
+SQL SUCCESS
+insert into test_and_002 ("all")values(20);
+SQL SUCCESS
+drop table if exists  test_and_002;
+SQL SUCCESS

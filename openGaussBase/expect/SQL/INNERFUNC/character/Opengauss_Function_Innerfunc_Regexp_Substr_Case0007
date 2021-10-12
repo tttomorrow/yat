@@ -1,0 +1,12 @@
+-- @testpoint: 括号为空,合理报错
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('str');
+SQL SUCCESS
+SELECT regexp_substr(string1 ,'[]') from type_char;
+?.*ERROR: invalid regular expression: brackets \[\] not balanced
+  Where: referenced column: regexp_substr
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

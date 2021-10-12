@@ -1,0 +1,65 @@
+-- @testpoint: opengauss关键字disable(非保留)，作为同义词对象名，部分测试点合理报错
+--前置条件
+drop table if exists disable_test;
+SQL SUCCESS
+create table disable_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists disable;
+SQL SUCCESS
+create synonym disable for disable_test;
+SQL SUCCESS
+insert into disable values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update disable set disable.name='cici' where disable.id=2;
+SQL SUCCESS
+select * from disable;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+drop synonym if exists disable;
+SQL SUCCESS
+--关键字带双引号-成功
+drop synonym if exists "disable";
+SQL SUCCESS
+create synonym "disable" for disable_test;
+SQL SUCCESS
+drop synonym if exists "disable";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'disable';
+?.*ERROR: syntax error at or near "'disable'"
+?.*
+create synonym 'disable' for disable_test;
+?.*ERROR: syntax error at or near "'disable'"
+?.*
+insert into 'disable' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'disable'"
+?.*
+update 'disable' set 'disable'.name='cici' where 'disable'.id=2;
+?.*ERROR: syntax error at or near "'disable'"
+?.*
+select * from 'disable';
+?.*ERROR: syntax error at or near "'disable'"
+?.*
+--关键字带反引号-合理报错
+drop synonym if exists `disable`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create synonym `disable` for disable_test;
+?.*ERROR: syntax error at or near "`"
+?.*
+insert into `disable` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`"
+?.*
+update `disable` set `disable`.name='cici' where `disable`.id=2;
+?.*ERROR: syntax error at or near "`"
+?.*
+select * from `disable`;
+?.*ERROR: syntax error at or near "`"
+?.*
+drop table if exists disable_test;
+SQL SUCCESS

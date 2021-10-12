@@ -1,0 +1,11 @@
+-- @testpoint: lower函数作为delete的条件
+drop table if exists TEST_LOWER_005;
+SQL SUCCESS
+create table TEST_LOWER_005 (COL1 varchar2(20));
+SQL SUCCESS
+insert into TEST_LOWER_005 values('alshdhggs');
+SQL SUCCESS
+delete from TEST_LOWER_005 where COL1 = lower('ALSHDHGGS');
+SQL SUCCESS
+drop table if exists TEST_LOWER_005;
+SQL SUCCESS

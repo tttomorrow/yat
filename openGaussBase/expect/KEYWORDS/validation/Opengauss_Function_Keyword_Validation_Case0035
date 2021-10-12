@@ -1,0 +1,39 @@
+-- @testpoint: 关键字validation,用作表名创建普通表
+drop table if exists validation cascade;
+SQL SUCCESS
+create table validation(id int,name varchar(20));
+SQL SUCCESS
+create or replace procedure validation_insert
+as
+begin
+ for i in 1..10 loop
+    insert into validation values(i,'vali+'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call validation_insert();
++-------------------+
+| validation_insert |
++-------------------+
+|                   |
++-------------------+
+select * from validation;
++----+---------+
+| id | name    |
++----+---------+
+| 1  | vali+1  |
+| 2  | vali+2  |
+| 3  | vali+3  |
+| 4  | vali+4  |
+| 5  | vali+5  |
+| 6  | vali+6  |
+| 7  | vali+7  |
+| 8  | vali+8  |
+| 9  | vali+9  |
+| 10 | vali+10 |
++----+---------+
+drop table if exists validation cascade;
+SQL SUCCESS
+drop procedure validation_insert;
+SQL SUCCESS

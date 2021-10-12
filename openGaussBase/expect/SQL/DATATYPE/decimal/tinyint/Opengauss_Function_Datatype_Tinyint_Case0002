@@ -1,0 +1,19 @@
+-- @testpoint: 插入负整数，合理报错
+drop table if exists tinyint02;
+SQL SUCCESS
+create table tinyint02 (name tinyint);
+SQL SUCCESS
+insert into tinyint02 values (-15);
+?.*ERROR: tinyint out of range
+  Where: referenced column: name
+insert into tinyint02 values (-1);
+?.*ERROR: tinyint out of range
+  Where: referenced column: name
+insert into tinyint02 values (-2);
+?.*ERROR: tinyint out of range
+  Where: referenced column: name
+insert into tinyint02 values (-3);
+?.*ERROR: tinyint out of range
+  Where: referenced column: name
+drop table tinyint02;
+SQL SUCCESS

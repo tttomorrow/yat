@@ -1,0 +1,6 @@
+--  @testpoint:C_BLOB_NOT不存在，应该报错
+DROP TABLE IF EXISTS t_case_when_base_002;
+CREATE TABLE t_case_when_base_002(
+c_id VARCHAR(20),
+C_BLOB BLOB
+)LOB(C_BLOB_NOT) STORE AS(DISABLE STORAGE IN ROW);

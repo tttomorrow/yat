@@ -1,0 +1,16 @@
+--  @testpoint:使用insert...nothing语句，插入两条相同数据,主键列和其他列数据不存在，新增一条数据成功
+--预置条件enable_upsert_to_merge为off
+drop table if exists products_c4;
+--建表，指定一列是主键
+CREATE TABLE products_c4 (
+    product_no integer PRIMARY KEY,
+    name text,
+    price numeric
+);
+--常规插入一条数据
+insert into  products_c4 values(10,'grains',5.5);
+select * from  products_c4;
+--使用insert...nothing语句,插入两条数据，新增一条数据(21,'veggies1',8.5)
+insert into products_c4 values(21,'veggies1',8.5),(21,'veggies2',8.5) on DUPLICATE key update nothing;
+select * from  products_c4;
+drop table products_c4;

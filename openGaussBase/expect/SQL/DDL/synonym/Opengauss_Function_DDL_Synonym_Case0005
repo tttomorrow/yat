@@ -1,0 +1,155 @@
+-- @testpoint: 创建同义词为无效标识符，合理报错
+-- @modify at: 2020-11-25
+--建表
+drop table if EXISTS test_synonym cascade;
+SQL SUCCESS
+create table test_synonym(a int,b varchar);
+SQL SUCCESS
+--单个字符
+drop synonym if EXISTS 0 cascade;
+?.*ERROR: syntax error at or near "0"
+?.*
+drop synonym if EXISTS $ cascade;
+?.*ERROR: syntax error at or near "\$"
+?.*
+drop synonym if EXISTS ! cascade;
+?.*ERROR: syntax error at or near "\!"
+?.*
+drop synonym if EXISTS # cascade;
+?.*ERROR: syntax error at or near "\#"
+?.*
+drop synonym if EXISTS @ cascade;
+?.*ERROR: syntax error at or near "\@"
+?.*
+drop synonym if EXISTS ^ cascade;
+?.*ERROR: syntax error at or near "\^"
+?.*
+drop synonym if EXISTS & cascade;
+?.*ERROR: syntax error at or near "\&"
+?.*
+drop synonym if EXISTS * cascade;
+?.*ERROR: syntax error at or near "\*"
+?.*
+drop synonym if EXISTS ( cascade;
+?.*ERROR: syntax error at or near "\("
+?.*
+drop synonym if EXISTS ) cascade;
+?.*ERROR: syntax error at or near "\)"
+?.*
+drop synonym if EXISTS - cascade;
+?.*ERROR: syntax error at or near "\-"
+?.*
+drop synonym if EXISTS = cascade;
+?.*ERROR: syntax error at or near "\="
+?.*
+drop synonym if EXISTS + cascade;
+?.*ERROR: syntax error at or near "\+"
+?.*
+drop synonym if EXISTS ` cascade;
+drop synonym if EXISTS ~ cascade;
+drop synonym if EXISTS . cascade;
+create synonym 0 for test_synonym;
+create synonym $ for test_synonym;
+create synonym ! for test_synonym;
+create synonym # for test_synonym;
+create synonym @ for test_synonym;
+create synonym ^ for test_synonym;
+create synonym & for test_synonym;
+create synonym * for test_synonym;
+create synonym ( for test_synonym;
+create synonym ) for test_synonym;
+create synonym - for test_synonym;
+create synonym = for test_synonym;
+create synonym + for test_synonym;
+create synonym ` for test_synonym;
+?.*ERROR: syntax error at or near "\`"
+?.*
+create synonym ~ for test_synonym;
+?.*ERROR: syntax error at or near "\~"
+?.*
+create synonym . for test_synonym;
+?.*ERROR: syntax error at or near "\."
+?.*
+--组合场景
+drop synonym if EXISTS 0aA cascade;
+?.*ERROR: syntax error at or near "0"
+?.*
+drop synonym if EXISTS $aA cascade;
+?.*ERROR: syntax error at or near "\$"
+?.*
+drop synonym if EXISTS $a cascade;
+?.*ERROR: syntax error at or near "\$"
+?.*
+drop synonym if EXISTS 0__ cascade;
+?.*ERROR: syntax error at or near "0"
+?.*
+drop synonym if EXISTS 0_$ cascade;
+?.*ERROR: syntax error at or near "0"
+?.*
+drop synonym if EXISTS 0_$aA cascade;
+?.*ERROR: syntax error at or near "0"
+?.*
+drop synonym if EXISTS $__ cascade;
+?.*ERROR: syntax error at or near "\$"
+?.*
+drop synonym if EXISTS $_0 cascade;
+?.*ERROR: syntax error at or near "\$"
+?.*
+drop synonym if EXISTS $_0aA cascade;
+?.*ERROR: syntax error at or near "\$"
+?.*
+create synonym 0aA for test_synonym;
+?.*ERROR: syntax error at or near "0"
+?.*
+create synonym $aA for test_synonym;
+?.*ERROR: syntax error at or near "\$"
+?.*
+create synonym $a for test_synonym;
+?.*ERROR: syntax error at or near "\$"
+?.*
+create synonym 0__ for test_synonym;
+?.*ERROR: syntax error at or near "0"
+?.*
+create synonym 0_$ for test_synonym;
+?.*ERROR: syntax error at or near "0"
+?.*
+create synonym 0_$aA for test_synonym;
+?.*ERROR: syntax error at or near "0"
+?.*
+create synonym $__ for test_synonym;
+?.*ERROR: syntax error at or near "\$"
+?.*
+create synonym $_0 for test_synonym;
+?.*ERROR: syntax error at or near "\$"
+?.*
+create synonym $_0aA for test_synonym;
+?.*ERROR: syntax error at or near "\$"
+?.*
+--清理环境
+drop synonym if EXISTS 0aA cascade;
+?.*ERROR: syntax error at or near "0"
+?.*
+drop synonym if EXISTS $aA cascade;
+?.*ERROR: syntax error at or near "\$"
+?.*
+drop synonym if EXISTS $a cascade;
+?.*ERROR: syntax error at or near "\$"
+?.*
+drop synonym if EXISTS 0__ cascade;
+?.*ERROR: syntax error at or near "0"
+?.*
+drop synonym if EXISTS 0_$ cascade;
+?.*ERROR: syntax error at or near "0"
+?.*
+drop synonym if EXISTS 0_$aA cascade;
+?.*ERROR: syntax error at or near "0"
+?.*
+drop synonym if EXISTS $__ cascade;
+?.*ERROR: syntax error at or near "\$"
+?.*
+drop synonym if EXISTS $_0 cascade;
+?.*ERROR: syntax error at or near "\$"
+?.*
+drop synonym if EXISTS $_0aA cascade;
+?.*ERROR: syntax error at or near "\$"
+?.*

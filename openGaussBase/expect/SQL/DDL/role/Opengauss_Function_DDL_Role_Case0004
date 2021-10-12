@@ -1,0 +1,7 @@
+-- @testpoint: 创建一个是系统管理员的角色
+drop ROLE if exists sjk;
+SQL SUCCESS
+create ROLE sjk with SYSADMIN IDENTIFIED BY 'Bigdata@123' ;
+SQL SUCCESS
+drop ROLE if exists sjk;
+SQL SUCCESS

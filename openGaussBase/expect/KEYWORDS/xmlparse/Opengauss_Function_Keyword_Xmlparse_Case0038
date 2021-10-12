@@ -1,0 +1,23 @@
+-- @testpoint: 关键字xmlparse，用作字段类型(合理报错)
+drop table if exists xmlparse_test cascade;
+SQL SUCCESS
+create table xmlparse_test(id int,name xmlparse(20));
+?.*ERROR.*
+?.*Position: .*
+create or replace procedure xmlparse_insert
+as
+begin
+ for i in 1..10 loop
+    insert into xmlparse_test values(i,'xmlparse'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call xmlparse_insert();
+?.*ERROR.*
+  Where: PL/pgSQL function xmlparse_insert() line 4 at SQL statement
+select * from xmlparse_test;
+?.*ERROR.*
+?.*Position: .*
+drop procedure xmlparse_insert;
+SQL SUCCESS

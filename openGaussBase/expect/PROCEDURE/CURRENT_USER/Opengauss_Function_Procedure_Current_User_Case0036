@@ -1,0 +1,32 @@
+-- @testpoint: 匿名块中进行事务管理 commit 和 rollback 同时使用
+drop table if exists test1;
+SQL SUCCESS
+create table test1 (a int);
+SQL SUCCESS
+--创建带有事物的存储过程
+begin
+    for i in 0..9 loop
+        insert into test1 (a) values (i);
+        if i % 2 = 0 then
+            commit;
+        else
+            rollback;
+        end if;
+    end loop;
+end;
+/
+SQL SUCCESS
+--查看表数据
+select * from test1;
++---+
+| a |
++---+
+| 0 |
+| 2 |
+| 4 |
+| 6 |
+| 8 |
++---+
+--清理环境
+drop table test1;
+SQL SUCCESS

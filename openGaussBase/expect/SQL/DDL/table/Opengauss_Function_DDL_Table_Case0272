@@ -1,0 +1,27 @@
+-- @testpoint: 修改主键的数据类型为本身类型，改变长度
+drop table if exists t1 cascade;
+SQL SUCCESS
+create table t1(a CHAR,c VARCHAR(10));
+SQL SUCCESS
+SELECT col_description(a.attrelid,a.attnum) as comment,format_type(a.atttypid,a.atttypmod) as type,a.attname as name, a.attnotnull as notnull
+FROM pg_class as c,pg_attribute as a
+where c.relname = 't1' and a.attrelid = c.oid and a.attnum>0;
++---------+-----------------------+------+---------+
+| comment | type                  | name | notnull |
++---------+-----------------------+------+---------+
+|         | character(1)          | a    | false   |
+|         | character varying(10) | c    | false   |
++---------+-----------------------+------+---------+
+alter table t1 MODIFY (a char(2));
+SQL SUCCESS
+SELECT col_description(a.attrelid,a.attnum) as comment,format_type(a.atttypid,a.atttypmod) as type,a.attname as name, a.attnotnull as notnull
+FROM pg_class as c,pg_attribute as a
+where c.relname = 't1' and a.attrelid = c.oid and a.attnum>0;
++---------+-----------------------+------+---------+
+| comment | type                  | name | notnull |
++---------+-----------------------+------+---------+
+|         | character(2)          | a    | false   |
+|         | character varying(10) | c    | false   |
++---------+-----------------------+------+---------+
+drop table if exists t1 cascade;
+SQL SUCCESS

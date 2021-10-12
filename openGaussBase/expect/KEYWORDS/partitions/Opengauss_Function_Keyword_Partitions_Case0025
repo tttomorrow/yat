@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字partitions(非保留)，作为角色名
+--关键字不带引号-成功
+drop role if exists partitions;
+SQL SUCCESS
+create role partitions with password 'gauss@123' valid until '2020-12-31';
+SQL SUCCESS
+drop role partitions;
+SQL SUCCESS
+--关键字带双引号-成功
+drop role if exists "partitions";
+SQL SUCCESS
+create role "partitions" with password 'gauss@123' valid until '2020-12-31';
+SQL SUCCESS
+drop role "partitions";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop role if exists 'partitions';
+?.*ERROR: syntax error at or near "'partitions'".*
+?.*Position: .*
+create role 'partitions' with password 'gauss@123' valid until '2020-12-31';
+?.*ERROR: syntax error at or near "'partitions'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop role if exists `partitions`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create role `partitions` with password 'gauss@123' valid until '2020-12-31';
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

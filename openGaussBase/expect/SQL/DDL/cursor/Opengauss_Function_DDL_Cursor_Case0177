@@ -1,0 +1,46 @@
+--  @testpoint:关闭所有游标（close all），定义多个游标，查看是否可继续提取数据；
+--前置条件
+drop table if exists cur_test_177;
+SQL SUCCESS
+create table cur_test_177(c_id int,c_num int,c_name varchar(10),c_city varchar(10),c_add varchar(20));
+SQL SUCCESS
+insert into cur_test_177 values(1,18,'Allen','Beijing','AAAAABAAAAA'),(2,368,'Bob','Shanghai','AAAAACAAAAA'),
+                           (3,59,'Cathy','Shenzhen','AAAAADAAAAA'),(4,96,'David','Suzhou','AAAAAEAAAAA'),
+                           (5,17,'Edrwd','Fenghuang','AAAAAFAAAAA'),(6,253,'Fendi','Changsha','AAAAAGAAAAA');
+SQL SUCCESS
+--定义一个游标，采用close all关闭游标
+start transaction;
+SQL SUCCESS
+cursor cursor177_1 for select * from cur_test_177 order by 1;
+SQL SUCCESS
+cursor cursor177_2 for select * from cur_test_177 order by 1;
+SQL SUCCESS
+cursor cursor177_3 for select * from cur_test_177 order by 1;
+SQL SUCCESS
+fetch from cursor177_1;
++------+-------+--------+---------+-------------+
+| c_id | c_num | c_name | c_city  | c_add       |
++------+-------+--------+---------+-------------+
+| 1    | 18    | Allen  | Beijing | AAAAABAAAAA |
++------+-------+--------+---------+-------------+
+fetch from cursor177_2;
++------+-------+--------+---------+-------------+
+| c_id | c_num | c_name | c_city  | c_add       |
++------+-------+--------+---------+-------------+
+| 1    | 18    | Allen  | Beijing | AAAAABAAAAA |
++------+-------+--------+---------+-------------+
+fetch from cursor177_3;
++------+-------+--------+---------+-------------+
+| c_id | c_num | c_name | c_city  | c_add       |
++------+-------+--------+---------+-------------+
+| 1    | 18    | Allen  | Beijing | AAAAABAAAAA |
++------+-------+--------+---------+-------------+
+close all;
+SQL SUCCESS
+--关闭游标后，再次提取数据，合理报错，游标不存在
+fetch from cursor177_2;
+?.*ERROR: cursor "cursor177_2" does not exist
+end;
+SQL SUCCESS
+drop table cur_test_177;
+SQL SUCCESS

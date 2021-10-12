@@ -1,0 +1,72 @@
+-- @testpoint: 插入有效值
+-- @modify at: 2020-11-05
+DROP TABLE IF EXISTS type_boolean01;
+SQL SUCCESS
+CREATE TABLE type_boolean01 (datev boolean);
+SQL SUCCESS
+--有效真值
+insert into type_boolean01 values (true);
+SQL SUCCESS
+insert into type_boolean01 values ('true');
+SQL SUCCESS
+insert into type_boolean01 values (TRUE);
+SQL SUCCESS
+insert into type_boolean01 values ('TRUE');
+SQL SUCCESS
+insert into type_boolean01 values ('t');
+SQL SUCCESS
+insert into type_boolean01 values ('y');
+SQL SUCCESS
+insert into type_boolean01 values ('yes');
+SQL SUCCESS
+insert into type_boolean01 values ('1');
+SQL SUCCESS
+insert into type_boolean01 values (1);
+SQL SUCCESS
+insert into type_boolean01 values (-1);
+SQL SUCCESS
+--有效假值
+insert into type_boolean01 values (false);
+SQL SUCCESS
+insert into type_boolean01 values ('false');
+SQL SUCCESS
+insert into type_boolean01 values (FALSE);
+SQL SUCCESS
+insert into type_boolean01 values ('FALSE');
+SQL SUCCESS
+insert into type_boolean01 values ('f');
+SQL SUCCESS
+insert into type_boolean01 values ('n');
+SQL SUCCESS
+insert into type_boolean01 values ('no');
+SQL SUCCESS
+insert into type_boolean01 values ('0');
+SQL SUCCESS
+insert into type_boolean01 values (0);
+SQL SUCCESS
+select * from type_boolean01;
++-------+
+| datev |
++-------+
+| true  |
+| true  |
+| true  |
+| true  |
+| true  |
+| true  |
+| true  |
+| true  |
+| true  |
+| true  |
+| false |
+| false |
+| false |
+| false |
+| false |
+| false |
+| false |
+| false |
+| false |
++-------+
+drop table type_boolean01;
+SQL SUCCESS

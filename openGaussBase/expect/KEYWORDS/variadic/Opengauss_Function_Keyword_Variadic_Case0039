@@ -1,0 +1,23 @@
+-- @testpoint: 关键字variadic（保留），用作字段类型（合理报错）
+drop table if exists variadic_test cascade;
+SQL SUCCESS
+create table variadic_test(id int,name variadic(20));
+?.*ERROR.*
+?.*Position: .*
+create or replace procedure variadic_insert
+as
+begin
+ for i in 1..10 loop
+    insert into variadic_test values(i,'variadic');
+    end loop;
+ end;
+/
+SQL SUCCESS
+call variadic_insert();
+?.*ERROR.*
+  Where: PL/pgSQL function variadic_insert() line 4 at SQL statement
+select * from variadic_test;
+?.*ERROR.*
+?.*Position: .*
+drop procedure variadic_insert;
+SQL SUCCESS

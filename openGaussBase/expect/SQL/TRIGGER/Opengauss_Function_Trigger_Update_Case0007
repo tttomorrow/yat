@@ -1,0 +1,40 @@
+-- @testpoint: 参数为非boolean类型，获取update触发器的定义信息，合理报错
+-- @modified at: 2020-12-21
+--创建源表和触发表
+DROP TABLE IF EXISTS test_trigger_src_tbl;
+SQL SUCCESS
+DROP TABLE IF EXISTS test_trigger_des_tbl;
+SQL SUCCESS
+CREATE TABLE test_trigger_src_tbl(id1 INT, id2 INT, id3 INT);
+SQL SUCCESS
+CREATE TABLE test_trigger_des_tbl(id1 INT, id2 INT, id3 INT);
+SQL SUCCESS
+--创建触发器函数
+CREATE OR REPLACE FUNCTION tri_update_func() RETURNS TRIGGER AS
+$$
+DECLARE
+BEGIN
+	UPDATE test_trigger_des_tbl SET id3 = NEW.id3 WHERE id1=OLD.id1;
+	RETURN OLD;
+END
+$$ LANGUAGE PLPGSQL;
+/
+SQL SUCCESS
+--创建触发器
+CREATE TRIGGER update_trigger AFTER UPDATE ON test_trigger_src_tbl FOR EACH ROW EXECUTE PROCEDURE tri_update_func();
+/
+SQL SUCCESS
+--参数为非boolean类型，获取update触发器的定义信息
+SELECT pg_get_triggerdef(oid,'eeer') FROM pg_trigger WHERE oid IN (SELECT oid FROM pg_trigger where tgname='update_trigger');
+?.*ERROR: invalid input syntax for type boolean: "eeer"
+?.*
+  Where: referenced column: pg_get_triggerdef
+--清理资源
+DROP TRIGGER update_trigger ON test_trigger_src_tbl;
+SQL SUCCESS
+DROP FUNCTION tri_update_func() cascade;
+SQL SUCCESS
+DROP TABLE test_trigger_src_tbl;
+SQL SUCCESS
+DROP TABLE test_trigger_des_tbl;
+SQL SUCCESS

@@ -1,0 +1,21 @@
+-- @testpoint: DQL语法，覆盖长字符串
+drop table if exists test_clob;
+SQL SUCCESS
+create table test_clob(id int,c_clob clob);
+SQL SUCCESS
+insert into test_clob values(1,lpad('hello',8888,'hello'));
+SQL SUCCESS
+insert into test_clob values(1,lpad('hello',88888,'hello'));
+SQL SUCCESS
+insert into test_clob values(1,lpad('hello',888888,'hello'));
+SQL SUCCESS
+select char_length(c_clob) from test_clob where id=1;
++-------------+
+| char_length |
++-------------+
+| 8888        |
+| 88888       |
+| 888888      |
++-------------+
+drop table test_clob;
+SQL SUCCESS

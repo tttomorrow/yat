@@ -1,0 +1,81 @@
+-- @testpoint: 测试A表主键多个字段对应B表多个字段主键：合理报错
+--建立外键表
+drop table if exists pteacher_table_06 cascade;
+SQL SUCCESS
+drop table if exists pstudent_table_06 cascade;
+SQL SUCCESS
+create table pteacher_table_06
+(
+    t_date timestamp,
+    t_day timestamp,
+    t_name varchar not null,
+    primary key (t_date, t_day)
+)partition by range(t_date) interval ('10 day') (partition part1 values less than ('1990-02-02 00:00:00'));
+SQL SUCCESS
+create table pstudent_table_06
+(
+    s_date timestamp primary key,
+    s_name varchar not null,
+    t_date timestamp,
+    t_day timestamp,
+    CONSTRAINT FK_pstudent_table_06_1 FOREIGN KEY (t_date, t_day) REFERENCES pteacher_table_06 on update cascade on delete set null
+)partition by range(s_date) interval ('10 day') (partition part1 values less than ('1990-02-02 00:00:00'));
+SQL SUCCESS
+--插入数据
+insert into pteacher_table_06 values (date '2020-09-01', date '2020-09-01', '张老师');
+SQL SUCCESS
+insert into pteacher_table_06 values (date '2020-09-02', date '2020-09-02', '李老师');
+SQL SUCCESS
+insert into pteacher_table_06 values (date '2020-09-03', date '2020-09-03', '陈老师');
+SQL SUCCESS
+--测试插入情况，只有主键全部字段都存在才能成功插入
+--应当插入应当执行成功
+insert into pstudent_table_06 values (date '2020-09-01', '王二', date '2020-09-01', date '2020-09-01');
+SQL SUCCESS
+insert into pstudent_table_06 values (date '2020-09-02', '张三', date '2020-09-02', date '2020-09-02');
+SQL SUCCESS
+insert into pstudent_table_06 values (date '2020-09-03', '吴五', date '2020-09-03', null);
+SQL SUCCESS
+select * from pstudent_table_06;
++-------------------------------+--------+-------------------------------+-------------------------------+
+| s_date                        | s_name | t_date                        | t_day                         |
++-------------------------------+--------+-------------------------------+-------------------------------+
++-------------------------------+--------+-------------------------------+-------------------------------+
+--外键约束中加入match full限制
+delete from pstudent_table_06 where s_date = date '2020-09-03';
+SQL SUCCESS
+alter table pstudent_table_06 drop constraint FK_pstudent_table_06_1;
+SQL SUCCESS
+alter table pstudent_table_06 add constraint FK_pstudent_table_06_2 FOREIGN KEY (t_date, t_day) REFERENCES pteacher_table_06 MATCH FULL on update cascade on delete set null;
+SQL SUCCESS
+--以下插入应当执行失败
+insert into pstudent_table_06 values (date '2020-09-04', '陈一', date '2020-09-02', date '2020-09-03');
+?.*ERROR: insert or update on table "pstudent_table_06" violates foreign key constraint "fk_pstudent_table_06_2"
+  Detail: Key (t_date, t_day)=(2020-09-02 00:00:00, 2020-09-03 00:00:00) is not present in table "pteacher_table_06".
+insert into pstudent_table_06 values (date '2020-09-05', '李四', date '2020-09-03', null);
+?.*ERROR: insert or update on table "pstudent_table_06" violates foreign key constraint "fk_pstudent_table_06_2"
+  Detail: MATCH FULL does not allow mixing of null and nonnull key values.
+--测试update和delete情况
+select * from pstudent_table_06;
++-------------------------------+--------+-------------------------------+-------------------------------+
+| s_date                        | s_name | t_date                        | t_day                         |
++-------------------------------+--------+-------------------------------+-------------------------------+
++-------------------------------+--------+-------------------------------+-------------------------------+
+update pteacher_table_06 set t_date = date '2020-09-09' where t_date = date '2020-09-01';
+SQL SUCCESS
+select * from pstudent_table_06;
++-------------------------------+--------+-------------------------------+-------------------------------+
+| s_date                        | s_name | t_date                        | t_day                         |
++-------------------------------+--------+-------------------------------+-------------------------------+
++-------------------------------+--------+-------------------------------+-------------------------------+
+delete from pteacher_table_06 where t_day = date '2020-09-01';
+SQL SUCCESS
+select * from pstudent_table_06;
++-------------------------------+--------+-------------------------------+-------------------------------+
+| s_date                        | s_name | t_date                        | t_day                         |
++-------------------------------+--------+-------------------------------+-------------------------------+
++-------------------------------+--------+-------------------------------+-------------------------------+
+drop table if exists pstudent_table_06 cascade;
+SQL SUCCESS
+drop table if exists pteacher_table_06 cascade;
+SQL SUCCESS

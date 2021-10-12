@@ -1,0 +1,26 @@
+-- @testpoint: 创建数据库指定其字符编码
+drop database if exists music;
+SQL SUCCESS
+CREATE DATABASE music ENCODING 'UTF-8' template = template0;
+SQL SUCCESS
+drop database if exists test_utf8;
+SQL SUCCESS
+CREATE DATABASE test_utf8 ENCODING 'UTF8' template = template0;
+SQL SUCCESS
+drop database if exists test_gbk;
+SQL SUCCESS
+CREATE DATABASE test_gbk ENCODING 'GBK' template = template0;
+SQL SUCCESS
+drop database if exists test_latin1;
+SQL SUCCESS
+CREATE DATABASE test_latin1 ENCODING 'Latin1' template = template0;
+SQL SUCCESS
+--tearDown
+drop database if exists music;
+SQL SUCCESS
+drop database if exists test_utf8;
+SQL SUCCESS
+drop database if exists test_gbk;
+SQL SUCCESS
+drop database if exists test_latin1;
+SQL SUCCESS

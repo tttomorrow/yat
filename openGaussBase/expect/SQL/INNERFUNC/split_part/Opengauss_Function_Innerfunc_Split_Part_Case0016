@@ -1,0 +1,17 @@
+-- @testpoint: split_part多参或少参，合理报错
+-- @description: split_part(string text, delimiter text, field int),根据delimiter分隔string返回生成的第field个子字符串
+select split_part('abc~@~def~@~ghi', 'abc','~@~', 2);
+?.*ERROR: function split_part\(unknown, unknown, unknown, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: split_part
+select split_part('abc~@~def~@~ghi', 2);
+?.*ERROR: function split_part\(unknown, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: split_part
+select split_part('abc~@~def~@~ghi','~@~');
+?.*ERROR: function split_part\(unknown, unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: split_part

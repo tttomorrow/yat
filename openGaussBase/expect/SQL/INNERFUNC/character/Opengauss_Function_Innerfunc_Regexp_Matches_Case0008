@@ -1,0 +1,14 @@
+-- @testpoint: 字符串为空
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('');
+SQL SUCCESS
+SELECT regexp_matches(string1,'[A-z]','g') from type_char;
++----------------+
+| regexp_matches |
++----------------+
++----------------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

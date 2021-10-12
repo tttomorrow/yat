@@ -1,0 +1,16 @@
+-- @testpoint: covar_samp函数参数个数的校验，多参少参合理报错
+select covar_samp(1,343,565,78567,7865,45654);
+?.*ERROR: function covar_samp\(integer, integer, integer, integer, integer, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: covar_samp
+select covar_samp();
+?.*ERROR: function covar_samp\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: covar_samp
+select covar_samp('',null,null);
+?.*ERROR: function covar_samp\(unknown, unknown, unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: covar_samp

@@ -1,0 +1,23 @@
+--  @testpoint:opengauss关键字quote(非保留)，作为表空间名
+--关键字不带引号，创建成功
+drop tablespace if exists quote;
+SQL SUCCESS
+CREATE TABLESPACE quote RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+SQL SUCCESS
+drop tablespace quote;
+SQL SUCCESS
+--关键字带双引号，创建成功
+drop tablespace if exists "quote";
+SQL SUCCESS
+CREATE TABLESPACE "quote" RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+SQL SUCCESS
+drop tablespace "quote";
+SQL SUCCESS
+--关键字带单引号，合理报错
+drop tablespace if exists 'quote';
+?.*ERROR: syntax error at or near "'quote'".*
+?.*Position: .*
+--关键字带反引号，合理报错
+drop tablespace if exists `quote`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

@@ -1,0 +1,76 @@
+-- @testpoint: 通用函数：jsonb_extract_path_op（在指定的路径获取JSON对象,路径不存在则返回空,同操作符 #>，当入参不合理时，合理报错）
+--jsonb_extract_path_op函数，入参合理
+select jsonb_extract_path_op('{"f2":{"f3":1},"f4":{"f5":99,"f6":"stringy"}}','{"f4","f6"}');
++-----------------------+
+| jsonb_extract_path_op |
++-----------------------+
+| "stringy"             |
++-----------------------+
+select jsonb_extract_path_op ('{"f1":[1,2,3],"f2":{"f3":1},"f4":null}','{"f2","f3"}');
++-----------------------+
+| jsonb_extract_path_op |
++-----------------------+
+| 1                     |
++-----------------------+
+select jsonb_extract_path_op ('{"a":1, "b":"test", "a":2,"b":true}','{"a",4}');
++-----------------------+
+| jsonb_extract_path_op |
++-----------------------+
+|                       |
++-----------------------+
+select jsonb_extract_path_op ('{"a": {"b":{"a":{"b":{"a":{"b":88}}}}}}','{"a","b"}');
++--------------------------------+
+| jsonb_extract_path_op          |
++--------------------------------+
+| {"a": {"b": {"a": {"b": 88}}}} |
++--------------------------------+
+select jsonb_extract_path_op ('[{"a":"foo"},{"b":"bar"},{"c":"baz"}]','{"a",4}');
++-----------------------+
+| jsonb_extract_path_op |
++-----------------------+
+|                       |
++-----------------------+
+select jsonb_extract_path_op ('[{"a":"foo"},{"b":"bar"},{"c":"baz"}]','{2}');
++-----------------------+
+| jsonb_extract_path_op |
++-----------------------+
+| {"c": "baz"}          |
++-----------------------+
+--jsonb_extract_path_op函数，入参不合理
+select jsonb_extract_path_op ('[{"a":"foo"},{"b":"bar"},{"c":"baz"}]',{2});
+?.*ERROR: syntax error at or near "\{.*
+?.*
+select jsonb_extract_path_op('true','true');
+?.*ERROR: array value must start with "\{" or dimension informatio.*
+?.*
+  Where: referenced column: jsonb_extract_path_op
+select jsonb_extract_path_op('1389158','138');
+?.*ERROR: array value must start with "\{" or dimension informatio.*
+?.*
+  Where: referenced column: jsonb_extract_path_op
+select jsonb_extract_path_op('null','n');
+?.*ERROR: array value must start with "\{" or dimension informatio.*
+?.*
+  Where: referenced column: jsonb_extract_path_op
+select jsonb_extract_path_op('true,false','true');
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Expected end of input, but found ",".
+?.*
+  Where: JSON data, line 1: true,...
+referenced column: jsonb_extract_path_op
+select jsonb_extract_path_op('138,158,369','138');
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Expected end of input, but found ",".
+?.*
+  Where: JSON data, line 1: 138,...
+referenced column: jsonb_extract_path_op
+select jsonb_extract_path_op('null',‘{1)’;
+?.*ERROR: syntax error at or near "\{.*
+?.*
+--返回结果类型校验：jsonb
+select pg_typeof(jsonb_extract_path_op ('{"f2":{"f3":1},"f4":{"f5":99,"f6":"stringy"}}','{"f4","f6"}'));
++-----------+
+| pg_typeof |
++-----------+
+| jsonb     |
++-----------+

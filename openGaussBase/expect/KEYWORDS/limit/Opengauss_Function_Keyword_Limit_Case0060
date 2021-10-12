@@ -1,0 +1,28 @@
+-- @testpoint: case when条件中使用limit列名
+drop table if exists test_limit_009;
+SQL SUCCESS
+create table test_limit_009 ("LIMIT" int,id int);
+SQL SUCCESS
+insert into test_limit_009 values (-999,1);
+SQL SUCCESS
+insert into test_limit_009 values (-10000,2);
+SQL SUCCESS
+insert into test_limit_009 values (-10000,3);
+SQL SUCCESS
+insert into test_limit_009 values (100,3);
+SQL SUCCESS
+insert into test_limit_009 values (100,2);
+SQL SUCCESS
+select id,(case when "LIMIT" <> -999 then 'a' else 'b' end) t1 from test_limit_009 order by id,t1;
++----+----+
+| id | t1 |
++----+----+
+| 1  | b  |
+| 2  | a  |
+| 2  | a  |
+| 3  | a  |
+| 3  | a  |
++----+----+
+--清理环境
+drop table if exists test_limit_009;
+SQL SUCCESS

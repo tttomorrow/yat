@@ -1,0 +1,25 @@
+-- @testpoint: right函数入参是null或者''
+SELECT right('甘肃中滩',null)AS RESULT;
++--------+
+| result |
++--------+
+|        |
++--------+
+SELECT right('甘肃中滩','')AS RESULT;
++--------+
+| result |
++--------+
+|        |
++--------+
+SELECT right(null,1)AS RESULT;
++--------+
+| result |
++--------+
+|        |
++--------+
+SELECT right('',1)AS RESULT;
++--------+
+| result |
++--------+
+|        |
++--------+

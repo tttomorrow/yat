@@ -1,0 +1,19 @@
+-- @testpoint: sin函数中参数为0及函数嵌套
+drop table if exists TEST_SIN_02;
+SQL SUCCESS
+create table TEST_SIN_02(id int,COL_SIN double precision);
+SQL SUCCESS
+insert into TEST_SIN_02 values(1,sin(sin(1.23)));
+SQL SUCCESS
+insert into TEST_SIN_02 values(2,1.23);
+SQL SUCCESS
+update TEST_SIN_02 set COL_SIN = SIN(0) where id = 2;
+SQL SUCCESS
+select COL_SIN as result from TEST_SIN_02;
++--------------------+
+| result             |
++--------------------+
+| 0.0                |
++--------------------+
+drop table TEST_SIN_02;
+SQL SUCCESS

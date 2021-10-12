@@ -1,0 +1,66 @@
+-- @testpoint: opengauss关键字Collation(保留)，作为同义词对象名，部分测试点合理报错
+--前置条件
+drop table if exists Collation_test;
+SQL SUCCESS
+create table Collation_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-失败
+drop synonym if exists Collation;
+?.*ERROR: syntax error at or near "Collation".*
+?.*Position.*
+create synonym Collation for Collation_test;
+?.*ERROR: syntax error at or near "Collation".*
+?.*Position.*
+--关键字带双引号-成功
+drop synonym if exists "Collation";
+SQL SUCCESS
+create synonym "Collation" for Collation_test;
+SQL SUCCESS
+insert into "Collation" values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update "Collation" set "Collation".name='cici' where "Collation".id=2;
+SQL SUCCESS
+select * from "Collation";
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--清理环境
+drop synonym "Collation";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'Collation';
+?.*ERROR: syntax error at or near "'Collation'".*
+?.*Position.*
+create synonym 'Collation' for Collation_test;
+?.*ERROR: syntax error at or near "'Collation'".*
+?.*Position.*
+insert into 'Collation' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'Collation'".*
+?.*Position.*
+update 'Collation' set 'Collation'.name='cici' where 'Collation'.id=2;
+?.*ERROR: syntax error at or near "'Collation'".*
+?.*Position.*
+select * from 'Collation';
+?.*ERROR: syntax error at or near "'Collation'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop synonym if exists `Collation`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create synonym `Collation` for Collation_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+insert into `Collation` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+update `Collation` set `Collation`.name='cici' where `Collation`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+select * from `Collation`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+drop table if exists Collation_test;
+SQL SUCCESS

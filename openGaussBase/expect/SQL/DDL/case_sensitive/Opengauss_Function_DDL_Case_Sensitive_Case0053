@@ -1,0 +1,9 @@
+--  @testpoint: 创建数据库验证大小写
+CREATE DATABASE TEST_SENSITIVE;
+SQL SUCCESS
+CREATE DATABASE test_sensitive;
+?.*ERROR: database "test_sensitive" already exists
+drop database TEST_SENSITIVE;
+SQL SUCCESS
+drop database test_sensitive;
+?.*ERROR: database "test_sensitive" does not exist

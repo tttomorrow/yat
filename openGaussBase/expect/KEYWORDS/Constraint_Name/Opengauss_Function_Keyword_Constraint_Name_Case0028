@@ -1,0 +1,68 @@
+-- @testpoint: opengauss关键字constraint_name(非保留)，作为同义词对象名，部分测试点合理报错
+--前置条件
+drop table if exists constraint_name_test;
+SQL SUCCESS
+create table constraint_name_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists constraint_name;
+SQL SUCCESS
+create synonym constraint_name for constraint_name_test;
+SQL SUCCESS
+insert into constraint_name values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update constraint_name set constraint_name.name='cici' where constraint_name.id=2;
+SQL SUCCESS
+select * from constraint_name;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--关键字带双引号-成功
+drop synonym if exists "constraint_name";
+SQL SUCCESS
+create synonym "constraint_name" for constraint_name_test;
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'constraint_name';
+?.*ERROR: syntax error at or near "'constraint_name'"
+?.*
+create synonym 'constraint_name' for constraint_name_test;
+?.*ERROR: syntax error at or near "'constraint_name'"
+?.*
+insert into 'constraint_name' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'constraint_name'"
+?.*
+update 'constraint_name' set 'constraint_name'.name='cici' where 'constraint_name'.id=2;
+?.*ERROR: syntax error at or near "'constraint_name'"
+?.*
+select * from 'constraint_name';
+?.*ERROR: syntax error at or near "'constraint_name'"
+?.*
+--关键字带反引号-合理报错
+drop synonym if exists `constraint_name`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create synonym `constraint_name` for constraint_name_test;
+?.*ERROR: syntax error at or near "`"
+?.*
+insert into `constraint_name` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`"
+?.*
+update `constraint_name` set `constraint_name`.name='cici' where `constraint_name`.id=2;
+?.*ERROR: syntax error at or near "`"
+?.*
+select * from `constraint_name`;
+?.*ERROR: syntax error at or near "`"
+?.*
+
+--清理环境
+drop synonym if exists constraint_name;
+SQL SUCCESS
+drop synonym if exists "constraint_name";
+SQL SUCCESS
+drop table if exists constraint_name_test;
+SQL SUCCESS
+

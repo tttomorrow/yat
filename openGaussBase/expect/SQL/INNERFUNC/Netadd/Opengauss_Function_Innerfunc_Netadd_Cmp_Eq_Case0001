@@ -1,0 +1,73 @@
+-- @testpoint: 网络地址操作符=(等于)合法值测试
+-- A&A
+SELECT inet '8.168.1.5' = inet '8.168.1.4' AS RESULT;
++--------+
+| result |
++--------+
+| false  |
++--------+
+SELECT inet '8.168.1.4' = inet '8.168.1.4/24' AS RESULT;
++--------+
+| result |
++--------+
+| false  |
++--------+
+-- B&C
+SELECT inet '121.168.1.5' = inet '192.168.1.4' AS RESULT;
++--------+
+| result |
++--------+
+| false  |
++--------+
+-- C&C
+SELECT inet '192.168.1.5/8' = inet '192.168.1.4/8' AS RESULT;
++--------+
+| result |
++--------+
+| false  |
++--------+
+SELECT inet '192.168.1.8/16' = inet '192.168.1.8/24' AS RESULT;
++--------+
+| result |
++--------+
+| false  |
++--------+
+-- 6&6
+SELECT inet '234e:0:4567::3f/128' = inet '234e:0:4567::3f' AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+-- 6&4
+SELECT inet '::aaa:192.168.1.5' = inet '192.168.1.4' AS RESULT;
++--------+
+| result |
++--------+
+| false  |
++--------+
+SELECT inet '0001::aaa:192.168.1.5/112' = inet '1::aaa:192.168.1.5/112' AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+SELECT inet '0001::aaa:192.168.1.5' = inet '1:0000:0000:0000:0000:aaa:192.168.1.5/128' AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+SELECT inet '0001::0:255.255.255.5' = inet '1:0000:0000:0000:0000:0000:ffff:ff05/128' AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+SELECT  '1::1 /32' =  '1::1 /32' AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+

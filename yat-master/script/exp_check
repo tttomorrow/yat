@@ -1,0 +1,29 @@
+#!/usr/bin/env python
+
+import re
+import sys
+
+
+matchers = [
+    re.compile(r'GS-[0-9]+'),
+    re.compile(r'Logical export (failed|succeeded)\.')
+]
+
+no_matchers = []
+
+
+def is_match(line):
+    for matcher in matchers:
+        if matcher.match(line):
+            for no_matcher in no_matchers:
+                if no_matcher.match(line):
+                    return False
+            return True
+
+    return False
+
+
+for line in sys.stdin:
+    if is_match(line):
+        sys.stdout.write(line)
+        sys.stdout.flush()

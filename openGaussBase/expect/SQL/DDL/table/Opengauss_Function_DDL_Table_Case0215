@@ -1,0 +1,34 @@
+-- @testpoint: create table时复制满足where后面条件的表结构
+DROP TABLE IF EXISTS tools;
+SQL SUCCESS
+create table tools(wide number(10,0),highs number(20,0));
+SQL SUCCESS
+insert into tools values(10,24);
+SQL SUCCESS
+commit;
+SQL SUCCESS
+drop table if exists tools_1;
+SQL SUCCESS
+create table tools_1 as select wide as w from tools;
+SQL SUCCESS
+select * from tools_1;
++----+
+| w  |
++----+
+| 10 |
++----+
+DROP TABLE IF EXISTS tools_2;
+SQL SUCCESS
+create table tools_2 as select * from tools where 1>2;
+SQL SUCCESS
+select * from tools_2;
++------+-------+
+| wide | highs |
++------+-------+
++------+-------+
+DROP TABLE IF EXISTS tools;
+SQL SUCCESS
+drop table if exists tools_1;
+SQL SUCCESS
+DROP TABLE IF EXISTS tools_2;
+SQL SUCCESS

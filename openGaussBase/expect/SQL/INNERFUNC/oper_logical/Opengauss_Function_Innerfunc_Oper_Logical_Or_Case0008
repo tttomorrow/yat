@@ -1,0 +1,25 @@
+-- @testpoint: opengauss逻辑操作符OR,与NOT运算优先级
+select 1 or not 1;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select 1 or not 0;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select 0 or not 1;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select 0 or not 0;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+

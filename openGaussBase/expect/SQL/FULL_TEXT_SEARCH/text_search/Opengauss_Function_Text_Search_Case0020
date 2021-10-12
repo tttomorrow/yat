@@ -1,0 +1,60 @@
+--  @testpoint:函数ts_parse测试
+--测试一个解析，ts_parse解析指定的document并返回一系列的记录，一条记录代表一个解析生成的token。每条记录包括标识token类型的tokid，及token文本
+SELECT * FROM ts_parse('default', '123 - a number');
++-------+--------+
+| tokid | token  |
++-------+--------+
+| 22    | 123    |
+| 12    |        |
+| 12    | -      |
+| 1     | a      |
+| 12    |        |
+| 1     | number |
++-------+--------+
+SELECT ts_parse('default', 'foo - bar');
++-----------+
+| ts_parse  |
++-----------+
+| (1,foo)   |
+| (12," ")  |
+| (12,"- ") |
+| (1,bar)   |
++-----------+
+--解析器为pound
+SELECT * FROM ts_parse('pound', '123 - a number');
++-------+----------------+
+| tokid | token          |
++-------+----------------+
+| 6     | 123 - a number |
++-------+----------------+
+--查看default解析器的oid
+select oid from PG_TS_PARSER where prsname = 'default';
++------+
+| oid  |
++------+
+| 3722 |
++------+
+--ts_parse函数指定parser_oid
+SELECT ts_parse(3722, 'foo - bar');
++-----------+
+| ts_parse  |
++-----------+
+| (1,foo)   |
+| (12," ")  |
+| (12,"- ") |
+| (1,bar)   |
++-----------+
+--查看pound解析器的oid
+select oid from PG_TS_PARSER where prsname = 'pound';
++------+
+| oid  |
++------+
+| 3801 |
++------+
+--ts_parse函数指定parser_oid
+SELECT ts_parse(3801, 'foo - bar');
++-----------------+
+| ts_parse        |
++-----------------+
+| (6,"foo - bar") |
++-----------------+

@@ -1,0 +1,20 @@
+-- @testpoint: 时间/日期函数age，两参数都不带时区
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (col1 timestamp without time zone,clo2 timestamp without time zone);
+SQL SUCCESS
+insert into test_date01 values ('2003-04-13 05:07:07','2050-04-12 04:05:06');
+SQL SUCCESS
+select age(clo2,col1) from test_date01;
++------------------------------------------------------+
+| age                                                  |
++------------------------------------------------------+
+| 46 years 11 mons 28 days 22 hours 57 mins 59.00 secs |
++------------------------------------------------------+
+select * from test_date01;
++-------------------------------+-------------------------------+
+| col1                          | clo2                          |
++-------------------------------+-------------------------------+
++-------------------------------+-------------------------------+
+drop table if exists test_date01;
+SQL SUCCESS

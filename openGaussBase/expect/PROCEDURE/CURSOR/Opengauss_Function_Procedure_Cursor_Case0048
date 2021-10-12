@@ -1,0 +1,42 @@
+-- @testpoint: 游标变量中的sql绑定select into语句 合理报错
+drop table if exists emp_test;
+SQL SUCCESS
+create table emp_test(empno int,ename varchar(10),job varchar(10) ,sal integer);
+SQL SUCCESS
+insert into emp_test values(1,'zhangsan','doctor1',10000);
+SQL SUCCESS
+insert into emp_test values(2,'zhangsan2','doctor2',10000);
+SQL SUCCESS
+insert into emp_test values(123,'zhangsan3','doctor3',10000);
+SQL SUCCESS
+insert into emp_test values(1,'zhansi','doctor1',12000);
+SQL SUCCESS
+insert into emp_test values(2,'lisiabc','doctor2',13000);
+SQL SUCCESS
+insert into emp_test values(123,'zhangwu123','doctor3',14000);
+SQL SUCCESS
+create or replace procedure syscur_048()
+is
+declare
+   cv SYS_REFCURSOR;
+   v_ename varchar2(20);
+   v_ename1 varchar2(20);
+begin
+    open cv for select ename into v_ename from emp_test where empno in(1,2) order by empno;
+    loop
+    fetch cv into v_ename1;
+        exit when cv%notfound;
+        raise info 'the results is %',v_ename1;
+        raise info 'row count is % ',cv%rowcount;
+    end loop;
+    close cv;
+end;
+/
+SQL SUCCESS
+call syscur_048();
+?.*ERROR: cannot open SELECT query as cursor
+  Where: PL/pgSQL function syscur_048() line 7 at OPEN
+drop procedure syscur_048;
+SQL SUCCESS
+drop table emp_test;
+SQL SUCCESS

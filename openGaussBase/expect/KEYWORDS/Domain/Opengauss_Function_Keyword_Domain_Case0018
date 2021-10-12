@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字domain(非保留)，作为数据库名
+--关键字不带引号-成功
+drop database if exists domain;
+SQL SUCCESS
+create database domain;
+SQL SUCCESS
+drop database domain;
+SQL SUCCESS
+--关键字带双引号-成功
+drop database if exists "domain";
+SQL SUCCESS
+create database "domain";
+SQL SUCCESS
+drop database "domain";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop database if exists 'domain';
+?.*ERROR: syntax error at or near "'domain'"
+?.*Position.*
+create database 'domain';
+?.*ERROR: syntax error at or near "'domain'"
+?.*Position.*
+--关键字带反引号-合理报错
+drop database if exists `domain`;
+?.*ERROR: syntax error at or near "`"
+?.*Position.*
+create database `domain`;
+?.*ERROR: syntax error at or near "`"
+?.*Position.*

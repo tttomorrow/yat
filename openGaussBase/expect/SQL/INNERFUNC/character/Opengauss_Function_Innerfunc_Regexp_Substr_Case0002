@@ -1,0 +1,15 @@
+-- @testpoint: 不带括号相等
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('str');
+SQL SUCCESS
+SELECT regexp_substr(string1 ,'str') from type_char;
++---------------+
+| regexp_substr |
++---------------+
+| str           |
++---------------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

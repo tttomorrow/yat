@@ -1,0 +1,7 @@
+-- @testpoint: 查看max_index_keys,报告当前数据库能够支持的索引键值的最大数目
+
+--通过show方式查看
+show max_index_keys;
+
+--通过系统视图pg_settings查看
+select setting from pg_settings where name='max_index_keys';

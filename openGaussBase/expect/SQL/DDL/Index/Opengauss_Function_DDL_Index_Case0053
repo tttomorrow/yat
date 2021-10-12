@@ -1,0 +1,84 @@
+-- @testpoint: 唯一索引：行存表主键约束+唯一索引：success
+--建表
+DROP TABLE if EXISTS test_index_table_053_01 CASCADE;
+SQL SUCCESS
+DROP TABLE if EXISTS test_index_table_053_02 CASCADE;
+SQL SUCCESS
+DROP TABLE if EXISTS test_index_table_053_03 CASCADE;
+SQL SUCCESS
+create table test_index_table_053_01(id int PRIMARY KEY);
+SQL SUCCESS
+create table test_index_table_053_02(id int PRIMARY KEY) WITH (ORIENTATION = row)
+PARTITION BY RANGE(id)(
+        PARTITION P1 VALUES LESS THAN(100),
+        PARTITION P2 VALUES LESS THAN(1000),
+        PARTITION P3 VALUES LESS THAN(MAXVALUE))
+;
+SQL SUCCESS
+create  TEMPORARY table test_index_table_053_03(id int PRIMARY KEY);
+SQL SUCCESS
+--建索引
+DROP INDEX IF EXISTS index_053_01;
+SQL SUCCESS
+DROP INDEX IF EXISTS index_053_02;
+SQL SUCCESS
+DROP INDEX IF EXISTS index_053_03;
+SQL SUCCESS
+create unique index index_053_01 on test_index_table_053_01(id);
+SQL SUCCESS
+create unique index index_053_02 on test_index_table_053_02(id) local;
+SQL SUCCESS
+create unique index index_053_03 on test_index_table_053_03(id);
+SQL SUCCESS
+--查询索引
+select relname from pg_class where relname='index_053_01';
+?.*
+| relname      |
+?.*
+| index_053_01 |
+?.*
+select relname from pg_class where relname='index_053_02';
+?.*
+| relname      |
+?.*
+| index_053_02 |
+?.*
+select relname from pg_class where relname='index_053_03';
+?.*
+| relname      |
+?.*
+| index_053_03 |
+?.*
+explain select * from test_index_table_053_01 where id=1;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*Bypass.*
+?.*Index Only Scan using index_053_01 on test_index_table_053_01.*
+?.*
+?.*
+explain select * from test_index_table_053_02 where id=1;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*Partition Iterator.*
+?.*
+?.*Partitioned Index Only Scan using index_053_02 on test_index_table_053_02.*
+?.*
+?.*
+?.*
+explain select * from test_index_table_053_03 where id=1;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*Bypass.*
+?.*Index Only Scan using index_053_03 on test_index_table_053_03.*
+?.*
+?.*
+--清理数据
+DROP TABLE if EXISTS test_index_table_053_01 CASCADE;
+SQL SUCCESS
+DROP TABLE if EXISTS test_index_table_053_02 CASCADE;
+SQL SUCCESS
+DROP TABLE if EXISTS test_index_table_053_03 CASCADE;
+SQL SUCCESS

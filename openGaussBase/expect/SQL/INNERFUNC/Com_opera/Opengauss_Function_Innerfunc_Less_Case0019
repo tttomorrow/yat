@@ -1,0 +1,15 @@
+-- @testpoint: opengauss比较操作符<,比较类型:RAW
+drop table if exists ts_zhparser;
+SQL SUCCESS
+CREATE TABLE ts_zhparser(mon RAW, mon1 RAW);
+SQL SUCCESS
+INSERT INTO ts_zhparser VALUES('DEADBEE', 'DEADBEEF');
+SQL SUCCESS
+select * from ts_zhparser where mon < mon1;
++----------+----------+
+| mon      | mon1     |
++----------+----------+
+| 0DEADBEE | DEADBEEF |
++----------+----------+
+drop table if exists ts_zhparser;
+SQL SUCCESS

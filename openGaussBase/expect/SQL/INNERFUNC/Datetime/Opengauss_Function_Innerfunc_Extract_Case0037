@@ -1,0 +1,21 @@
+-- @testpoint: 从TIME类型数据（带时区与不带时区）中获取hour
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (clo1 TIME with time zone);
+SQL SUCCESS
+insert into test_date01 values ('23:00:00+08');
+SQL SUCCESS
+select EXTRACT(HOUR FROM clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| 23.0      |
++-----------+
+SELECT EXTRACT(HOUR FROM TIME '00:00:00');
++-----------+
+| date_part |
++-----------+
+| 0.0       |
++-----------+
+drop table if exists test_date01;
+SQL SUCCESS

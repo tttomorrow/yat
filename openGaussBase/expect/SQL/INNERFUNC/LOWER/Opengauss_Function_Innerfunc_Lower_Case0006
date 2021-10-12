@@ -1,0 +1,19 @@
+-- @testpoint: lower函数作为定义函数的返回值
+drop function if exists f_lower;
+SQL SUCCESS
+create or replace function f_lower(A char)
+return char
+as
+begin
+    return lower(A);
+end;
+/
+SQL SUCCESS
+select f_lower('LLKJaJKKaQ');
++------------+
+| f_lower    |
++------------+
+| llkjajkkaq |
++------------+
+drop function if exists f_lower;
+SQL SUCCESS

@@ -1,0 +1,19 @@
+-- @testpoint: 插入有效负整数
+drop table if exists bigserial_02;
+SQL SUCCESS
+create table bigserial_02 (name bigserial);
+SQL SUCCESS
+insert into bigserial_02 values (-1212);
+SQL SUCCESS
+insert into bigserial_02 values (-0004657);
+SQL SUCCESS
+SQL SUCCESS
+select * from bigserial_02;
++------------+
+| name       |
++------------+
+| -1212      |
+| -4657      |
++------------+
+drop table bigserial_02;
+SQL SUCCESS

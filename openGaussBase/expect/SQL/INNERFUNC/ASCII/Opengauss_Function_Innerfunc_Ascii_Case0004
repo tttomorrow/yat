@@ -1,0 +1,7 @@
+
+
+-- @testpoint: 非法字符，特殊字符
+
+select ASCII(#);
+?.*ERROR: syntax error at or near \"\)\"
+?.*

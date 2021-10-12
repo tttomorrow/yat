@@ -1,0 +1,15 @@
+-- @testpoint: 不是一个字符类型
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 int);
+SQL SUCCESS
+insert into type_char values (111);
+SQL SUCCESS
+SELECT quote_ident(string1) from type_char;
++-------------+
+| quote_ident |
++-------------+
+| "111"       |
++-------------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

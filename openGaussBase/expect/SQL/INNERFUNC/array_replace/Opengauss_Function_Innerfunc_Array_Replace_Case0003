@@ -1,0 +1,107 @@
+-- @testpoint: 将anyarray中的所有anyelement1替换为anyelement2，当array为一维数组时，array和element的类型不一致，部分合理报错
+--数值型
+select array_replace(array[1.223,2,3.145],'2.0',8.6);
++-------------------+
+| array_replace     |
++-------------------+
+| {1.223,8.6,3.145} |
++-------------------+
+select array_replace(array[0.3,2,3.145],'0.30',3.8);
++---------------+
+| array_replace |
++---------------+
+| {3.8,2,3.145} |
++---------------+
+select array_replace(array[-1.223,-2,-3.145], '-3.1457',4.5);
++--------------------+
+| array_replace      |
++--------------------+
+| {-1.223,-2,-3.145} |
++--------------------+
+select array_replace(array[-1.2,2,3],'2',3.333);
++----------------+
+| array_replace  |
++----------------+
+| {-1.2,3.333,3} |
++----------------+
+select array_replace(array[1,2,2,3], '2.0',5);
+?.*ERROR: invalid input syntax for integer: "2.0.*
+?.*
+  Where: referenced column: array_replace
+select array_replace(array[-1.2,2,3.145], (2::text),5.6);
+?.*ERROR: function array_replace\(numeric\[\], text, numeric\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: array_replace
+--布尔型
+select array_replace(array[true,false,null],'false'::int,false);
+?.*ERROR: invalid input syntax for integer: "false.*
+?.*
+  Where: referenced column: array_replace
+select array_replace(array[true,false,NULL],'true'::char,'f');
+?.*ERROR: function array_replace\(boolean\[\], character, unknown\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: array_replace
+select array_replace(array[true,false,null],'yes'::text,'1');
+?.*ERROR: function array_replace\(boolean\[\], text, unknown\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: array_replace
+select array_replace(array[TRUE,FALSE],'no'::varchar,'yes');
+?.*ERROR: function array_replace\(boolean\[\], character varying, unknown\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: array_replace
+select array_replace(array[TRUE,FALSE,true,false,null],1,'0');
+?.*ERROR: function array_replace\(boolean\[\], integer, unknown\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: array_replace
+select array_replace(array[TRUE,FALSE,true,false],0,'1');
+?.*ERROR: function array_replace\(boolean\[\], integer, unknown\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: array_replace
+--字符型
+select array_replace(array['abc','efg','null'],123,'qaz');
+?.*ERROR: function array_replace\(text\[\], integer, unknown\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: array_replace
+select array_replace(array['abc','efg','NULL'],TRUE,'database');
+?.*ERROR: function array_replace\(text\[\], boolean, unknown\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: array_replace
+--日期时间型
+select array_replace(array[date'2010-12-10 00:00:00
+',date'2010/12/10 16:40',date'2010-12-10 pst'],(timestamp without time zone'2021-12-10'),(date '08-10-2020'));
++---------------------------------------------------------------------------------------------+
+| array_replace                                                                               |
++---------------------------------------------------------------------------------------------+
++---------------------------------------------------------------------------------------------+
+select array_replace(array[date'2010-12-10 00:00:00
+',date'2010/12/10 16:40',date'2010-12-10 pst'],(2021-12-10 ::text),(date '08-10-2020'));
+?.*ERROR: function array_replace\(timestamp without time zone\[\], bigint, timestamp without time zone\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: array_replace
+select array_replace(array[TIMESTAMP'2010-12-10 00:00:00
+',TIMESTAMP'2010/12/10 16:40',TIMESTAMP'2010-12-10 pst'],((2021-12-10 ::varchar)),(TIMESTAMP '08-02-2020'));
+?.*ERROR: function array_replace\(timestamp without time zone\[\], bigint, timestamp without time zone\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: array_replace
+--JSON类型
+select array_replace(array['{qq,123,null,true,false}'],(select('qq',123,NULL,true,false)::text),'{database,table,view,schema,index}');
++----------------------------+
+| array_replace              |
++----------------------------+
+| {{qq,123,null,true,false}} |
++----------------------------+
+select array_replace(array['{12,123,1234,12345,678}'],(select '{"12","123","1234","12345","678"}'::varchar),'{database,table,view,schema,index}');
+?.*ERROR: function array_replace\(text\[\], character varying, unknown\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: array_replace

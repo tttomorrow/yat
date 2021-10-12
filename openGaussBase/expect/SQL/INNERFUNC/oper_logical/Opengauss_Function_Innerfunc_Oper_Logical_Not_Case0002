@@ -1,0 +1,15 @@
+-- @testpoint: opengauss逻辑操作符NOT,为假
+drop table if exists ts_zhparser;
+SQL SUCCESS
+CREATE TABLE ts_zhparser(id int, stu CHAR(5));
+SQL SUCCESS
+INSERT INTO ts_zhparser VALUES(2, 'stude');
+SQL SUCCESS
+select 'stude' NOT in (select stu from ts_zhparser );
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+drop table if exists ts_zhparser;
+SQL SUCCESS

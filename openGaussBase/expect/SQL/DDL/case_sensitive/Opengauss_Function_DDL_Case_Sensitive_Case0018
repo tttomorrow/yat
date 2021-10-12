@@ -1,0 +1,7 @@
+--  @testpoint: --delete验证字段名大小写
+delete from false_1 where B='xx';
+SQL SUCCESS
+delete from false_1 where B is null;
+SQL SUCCESS
+delete from false_1 where b is null;
+SQL SUCCESS

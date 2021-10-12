@@ -1,0 +1,15 @@
+-- @testpoint: 字母数字特殊字符大小写混写
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('qqAW中国！@￥%');
+SQL SUCCESS
+SELECT lower(string1) from type_char;
++------------+
+| lower      |
++------------+
+| qqaw中国！@￥% |
++------------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

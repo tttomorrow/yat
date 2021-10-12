@@ -1,0 +1,10 @@
+-- @testpoint: 建表时使用check约束，插入检查约束的边界值，插入20，合理报错
+drop table if exists t_student;
+SQL SUCCESS
+create table t_student (stu_name char(20),stu_age int check (stu_age>20),sex char(10),score int,address char(10));
+SQL SUCCESS
+insert into t_student values('lisi',20,'boy',80,'shanxi');
+?.*ERROR: new row for relation "t_student" violates check constraint "t_student_stu_age_check"
+  Detail: Failing row contains (lisi                , 20, boy       , 80, shanxi    ).
+drop table if exists t_student;
+SQL SUCCESS

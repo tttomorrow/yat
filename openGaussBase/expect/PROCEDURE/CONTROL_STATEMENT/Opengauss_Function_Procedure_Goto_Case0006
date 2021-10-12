@@ -1,0 +1,32 @@
+-- @testpoint: 存储过程中goto语句使用 goto跳转到if语句 不支持 合理报错
+create or replace procedure proc_if_else_005(
+n int,
+a varchar2,
+b varchar2,
+c varchar2
+) as
+v_n int :=n;
+v_a char(4) :=a;
+v_b char(4) :=b;
+v_c char(4) :=c;
+v_call_stmt varchar2(128);
+begin
+    goto pos1;
+    if(1=v_n)
+    <<pos1>>
+    then
+        raise info '---->%',v_a;
+        raise info '---->%',v_c;
+    else
+		proc_if_else_005(v_n-1,v_a,v_c,v_b);
+        raise info '---->%',v_a;
+        raise info '---->%',v_c;
+    end if;
+end;
+/
+SQL SUCCESS
+call proc_if_else_005(4,'qq','ww','ee');
+?.*ERROR: GOTO target statement "pos1" is not found in the whole procedure execution context.*
+  Where: PL/pgSQL function proc_if_else_005(integer,character varying,character varying,character varying) line 7 at statement block
+drop procedure proc_if_else_005;
+SQL SUCCESS

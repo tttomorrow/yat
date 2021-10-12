@@ -1,0 +1,166 @@
+-- @testpoint: 创建同义词为关键字，保留关键字，作为同义词名称，合理报错
+--创建同义词为保留关键字，合理报错
+drop synonym if EXISTS ALL cascade;
+?.*ERROR: syntax error at or near "ALL"
+?.*
+drop synonym if EXISTS NULL cascade;
+?.*ERROR: syntax error at or near "NULL"
+?.*
+drop synonym if EXISTS for cascade;
+?.*ERROR: syntax error at or near "for"
+?.*
+drop synonym if EXISTS create cascade;
+?.*ERROR: syntax error at or near "create"
+?.*
+drop synonym if EXISTS select cascade;
+?.*ERROR: syntax error at or near "select"
+?.*
+drop synonym if EXISTS table cascade;
+?.*ERROR: syntax error at or near "table"
+?.*
+drop synonym if EXISTS function cascade;
+SQL SUCCESS
+drop synonym if EXISTS in cascade;
+?.*ERROR: syntax error at or near "in"
+?.*
+drop synonym if EXISTS PROCEDURE cascade;
+?.*ERROR: syntax error at or near "PROCEDURE"
+?.*
+drop synonym if EXISTS true cascade;
+?.*ERROR: syntax error at or near "true"
+?.*
+drop synonym if EXISTS false cascade;
+?.*ERROR: syntax error at or near "false"
+?.*
+drop synonym if EXISTS else cascade;
+?.*ERROR: syntax error at or near "else"
+?.*
+drop synonym if EXISTS FOR cascade;
+?.*ERROR: syntax error at or near "FOR"
+?.*
+create synonym ALL for test_synonym;
+?.*ERROR: syntax error at or near "ALL"
+?.*
+create synonym NULL for test_synonym;
+?.*ERROR: syntax error at or near "NULL"
+?.*
+create synonym create for test_synonym;
+?.*ERROR: syntax error at or near "create"
+?.*
+create synonym create for test_synonym;
+?.*ERROR: syntax error at or near "create"
+?.*
+create synonym select for test_synonym;
+?.*ERROR: syntax error at or near "select"
+?.*
+create synonym table for test_synonym;
+?.*
+?.*
+create synonym in for test_synonym;
+?.*ERROR: syntax error at or near "in"
+?.*
+create synonym PROCEDURE for test_synonym;
+?.*ERROR: syntax error at or near "PROCEDURE"
+?.*
+create synonym true for test_synonym;
+?.*ERROR: syntax error at or near "true"
+?.*
+create synonym false for test_synonym;
+?.*ERROR: syntax error at or near "false"
+?.*
+create synonym else for test_synonym;
+?.*ERROR: syntax error at or near "else"
+?.*
+create synonym for for test_synonym;
+?.*ERROR: syntax error at or near "for"
+?.*
+--非保留关键字，成功
+create synonym function for test_synonym;
+SQL SUCCESS
+drop synonym if EXISTS drop cascade;
+SQL SUCCESS
+drop synonym if EXISTS update cascade;
+SQL SUCCESS
+drop synonym if EXISTS delete cascade;
+SQL SUCCESS
+drop synonym if EXISTS insert cascade;
+SQL SUCCESS
+drop synonym if EXISTS index cascade;
+SQL SUCCESS
+drop synonym if EXISTS sequence cascade;
+SQL SUCCESS
+drop synonym if EXISTS if cascade;
+SQL SUCCESS
+drop synonym if EXISTS TRIGGER cascade;
+SQL SUCCESS
+drop synonym if EXISTS CURSOR cascade;
+SQL SUCCESS
+drop synonym if EXISTS between cascade;
+SQL SUCCESS
+drop synonym if EXISTS int cascade;
+SQL SUCCESS
+drop synonym if EXISTS public cascade;
+SQL SUCCESS
+drop synonym if EXISTS cascade cascade;
+SQL SUCCESS
+drop synonym if EXISTS begin cascade;
+SQL SUCCESS
+create synonym drop for test_synonym;
+SQL SUCCESS
+create synonym update for test_synonym;
+SQL SUCCESS
+create synonym delete for test_synonym;
+SQL SUCCESS
+create synonym insert for test_synonym;
+SQL SUCCESS
+create synonym index for test_synonym;
+SQL SUCCESS
+create synonym sequence for test_synonym;
+SQL SUCCESS
+create synonym TRIGGER for test_synonym;
+SQL SUCCESS
+create synonym if for test_synonym;
+SQL SUCCESS
+create synonym CURSOR for test_synonym;
+SQL SUCCESS
+create synonym between for test_synonym;
+SQL SUCCESS
+create synonym int for test_synonym;
+SQL SUCCESS
+create synonym public for test_synonym;
+SQL SUCCESS
+create synonym cascade for test_synonym;
+SQL SUCCESS
+create synonym begin for test_synonym;
+SQL SUCCESS
+--清理环境
+drop synonym if EXISTS drop cascade;
+SQL SUCCESS
+drop synonym if EXISTS update cascade;
+SQL SUCCESS
+drop synonym if EXISTS delete cascade;
+SQL SUCCESS
+drop synonym if EXISTS insert cascade;
+SQL SUCCESS
+drop synonym if EXISTS index cascade;
+SQL SUCCESS
+drop synonym if EXISTS sequence cascade;
+SQL SUCCESS
+drop synonym if EXISTS if cascade;
+SQL SUCCESS
+drop synonym if EXISTS TRIGGER cascade;
+SQL SUCCESS
+drop synonym if EXISTS CURSOR cascade;
+SQL SUCCESS
+drop synonym if EXISTS between cascade;
+SQL SUCCESS
+drop synonym if EXISTS int cascade;
+SQL SUCCESS
+drop synonym if EXISTS public cascade;
+SQL SUCCESS
+drop synonym if EXISTS cascade cascade;
+SQL SUCCESS
+drop synonym if EXISTS begin cascade;
+SQL SUCCESS
+drop synonym if EXISTS function cascade;
+SQL SUCCESS

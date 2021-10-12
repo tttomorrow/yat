@@ -1,0 +1,38 @@
+-- @testpoint:列存临时表建立，数据插入，数据查询；
+drop table if exists column_store_table_datatype_03;
+SQL SUCCESS
+CREATE TEMPORARY TABLE column_store_table_datatype_03 (
+	c0 smallint,
+	c1 integer,
+	c2 bigint,
+	c3 decimal,
+	c4 numeric,
+	c5 real,
+	c6 double precision,
+	c7 smallserial,
+	c8 serial,
+	c9 bigserial,
+	c10 money,
+	c11 varchar(200),
+	c12 char(320),
+	c13 char,
+	c14 text,
+	c15 nvarchar2,
+	c16 timestamp with time zone,
+	c17 timestamp without time zone,
+	c18 date,
+	c19 time without time zone,
+	c20 time with time zone,
+	c21 interval,
+	c22 clob
+)
+WITH (orientation=COLUMN, compression=no);
+?.*ERROR: It's not supported to create serial column on temporary table.*
+insert into column_store_table_datatype_03 values (1,2,3,1,1,1,1,1,1,1,1,'1','1','1','1','1',date'2020-08-05',date'2020-08-05',date'2020-08-05',date'2020-08-05','21:21:21 pst',interval '3 hours','1');
+?.*ERROR: relation "column_store_table_datatype_03" does not exist on.*
+?.*Position.*
+select * from column_store_table_datatype_03;
+?.*ERROR: relation "column_store_table_datatype_03" does not exist on.*
+?.*Position.*
+drop table if exists column_store_table_datatype_03;
+SQL SUCCESS

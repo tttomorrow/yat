@@ -1,0 +1,5 @@
+--  @testpoint:opengauss关键字Greatest(非保留)，作为数字表达式
+
+SELECT greatest(9000,155555,2.01);
+
+

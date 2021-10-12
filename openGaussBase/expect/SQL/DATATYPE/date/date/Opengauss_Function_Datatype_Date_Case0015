@@ -1,0 +1,18 @@
+-- @testpoint: 插入空值
+DROP TABLE IF EXISTS test_date15;
+SQL SUCCESS
+CREATE TABLE test_date15 (id int,name date);
+SQL SUCCESS
+INSERT INTO test_date15 VALUES (1,null);
+SQL SUCCESS
+INSERT INTO test_date15 VALUES (2,'');
+SQL SUCCESS
+select * from test_date15;
++----+------+
+| id | name |
++----+------+
+| 1  |      |
+| 2  |      |
++----+------+
+DROP TABLE test_date15;
+SQL SUCCESS

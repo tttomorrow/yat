@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字start(非保留)，作为外部数据源名
+--关键字不带引号-成功
+drop data source if exists start;
+SQL SUCCESS
+create data source start;
+SQL SUCCESS
+drop data source start;
+SQL SUCCESS
+--关键字带双引号-成功
+drop data source if exists "start";
+SQL SUCCESS
+create data source "start";
+SQL SUCCESS
+drop data source "start";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop data source if exists 'start';
+?.*ERROR: syntax error at or near "'start'".*
+?.*Position: .*
+create data source 'start';
+?.*ERROR: syntax error at or near "'start'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop data source if exists `start`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create data source `start`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

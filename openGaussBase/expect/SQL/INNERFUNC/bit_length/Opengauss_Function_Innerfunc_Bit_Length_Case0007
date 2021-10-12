@@ -1,0 +1,15 @@
+-- @testpoint: 与max函数结合使用
+drop table if exists test;
+SQL SUCCESS
+create table test(id int,name text);
+SQL SUCCESS
+insert into test values(1,'A'),(1,'c'),(1,'hodheuh;ifhkhoi'),(1,'一条大河波浪宽，风吹稻花香两岸'),(1,'OPENGAUSS');
+SQL SUCCESS
+select max(bit_length(name)) from test;
++-----+
+| max |
++-----+
+| 360 |
++-----+
+drop table if exists test;
+SQL SUCCESS

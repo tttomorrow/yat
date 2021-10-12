@@ -1,0 +1,21 @@
+--  @testpoint: isfinite 年月日时分秒不带时区
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (clo1 date );
+SQL SUCCESS
+insert into test_date01 values ('2018-03-08 18:55:33');
+SQL SUCCESS
+select isfinite(clo1) from test_date01;
++----------+
+| isfinite |
++----------+
+| true     |
++----------+
+SELECT isfinite(date  '2018-03-08 18:55:33');
++----------+
+| isfinite |
++----------+
+| true     |
++----------+
+drop table if exists test_date01;
+SQL SUCCESS

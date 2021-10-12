@@ -1,0 +1,14 @@
+-- @testpoint: ceiling函数入参给非数值类型，合理报错
+drop table if exists data_01;
+SQL SUCCESS
+create table data_01 (clo1 char,clo2 date);
+SQL SUCCESS
+insert into data_01 values ('a','2020-01-12');
+SQL SUCCESS
+select ceiling(clo1), ceiling(clo2) from data_01;
+?.*ERROR: function ceiling\(timestamp without time zone\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: ceiling
+drop table if exists data_01;
+SQL SUCCESS

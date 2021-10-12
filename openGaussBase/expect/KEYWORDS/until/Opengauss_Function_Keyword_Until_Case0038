@@ -1,0 +1,40 @@
+-- @testpoint: 关键字until,用作字符串
+drop table if exists until_test cascade;
+SQL SUCCESS
+create table if not exists until_test(id int,until varchar(20));
+SQL SUCCESS
+create or replace procedure until_insert
+as
+begin
+ for i in 1..10 loop
+    insert into until_test values(i,'until');
+    end loop;
+ end;
+/
+SQL SUCCESS
+call until_insert();
++--------------+
+| until_insert |
++--------------+
+|              |
++--------------+
+select * from until_test;
++----+-------+
+| id | until |
++----+-------+
+| 1  | until |
+| 2  | until |
+| 3  | until |
+| 4  | until |
+| 5  | until |
+| 6  | until |
+| 7  | until |
+| 8  | until |
+| 9  | until |
+| 10 | until |
++----+-------+
+--清理环境
+drop table if exists until_test cascade;
+SQL SUCCESS
+drop procedure until_insert;
+SQL SUCCESS

@@ -1,0 +1,94 @@
+-- @testpoint: upsert子查询表权限验证，没有权限，合理报错
+--创建子查询表，插入数据
+drop table if exists t_dml_upsert_sub0124;
+SQL SUCCESS
+create table t_dml_upsert_sub0124 (a int,b text);
+SQL SUCCESS
+insert into t_dml_upsert_sub0124 values(generate_series(1,10),'name'||generate_series(1,10));
+SQL SUCCESS
+--创建普通用户并切换至该用户
+drop user if exists u_dml_upsert0124 cascade;
+SQL SUCCESS
+create user u_dml_upsert0124 password 'Test@123';
+SQL SUCCESS
+set session session authorization u_dml_upsert0124 password 'Test@123';
+SQL SUCCESS
+--普通用户没有子查询表的读权限
+select * from t_dml_upsert_sub0124;
+?.* ERROR: permission denied for relation t_dml_upsert_sub0124
+--普通用户创建upsert表并插入数据
+drop table if exists t_dml_upsert0124;
+SQL SUCCESS
+create table t_dml_upsert0124 (a int primary key, b int, c int);
+SQL SUCCESS
+insert into t_dml_upsert0124 values (1,1,1),(2,2,2),(3,3,3),(4,4,4);
+SQL SUCCESS
+select * from t_dml_upsert0124;
++---+---+---+
+| a | b | c |
++---+---+---+
+| 1 | 1 | 1 |
+| 2 | 2 | 2 |
+| 3 | 3 | 3 |
+| 4 | 4 | 4 |
++---+---+---+
+--普通用户进行upsert子查询语句执行，报错没有权限
+insert into t_dml_upsert0124 values(1,5) on duplicate key update b = (select min(a) from t_dml_upsert_sub0124 where a > excluded.b);
+?.* ERROR: permission denied for relation t_dml_upsert_sub0124
+--进行普通用户子查询表读权限赋权
+reset session authorization;
+SQL SUCCESS
+grant select on table t_dml_upsert_sub0124 to u_dml_upsert0124;
+SQL SUCCESS
+--普通用户进行upsert子查询语句执行，操作成功
+set session session authorization u_dml_upsert0124 password 'Test@123';
+SQL SUCCESS
+select * from t_dml_upsert_sub0124;
++----+--------+
+| a  | b      |
++----+--------+
+| 1  | name1  |
+| 2  | name2  |
+| 3  | name3  |
+| 4  | name4  |
+| 5  | name5  |
+| 6  | name6  |
+| 7  | name7  |
+| 8  | name8  |
+| 9  | name9  |
+| 10 | name10 |
++----+--------+
+--存在冲突
+insert into t_dml_upsert0124 values(1,5) on duplicate key update b = (select min(a) from t_dml_upsert_sub0124 where a > excluded.b);
+SQL SUCCESS
+select * from t_dml_upsert0124;
++---+---+---+
+| a | b | c |
++---+---+---+
+| 2 | 2 | 2 |
+| 3 | 3 | 3 |
+| 4 | 4 | 4 |
+| 1 | 6 | 1 |
++---+---+---+
+--不存在冲突
+insert into t_dml_upsert0124 values(5,5,5) on duplicate key update b = (select min(a) from t_dml_upsert_sub0124 where a > excluded.b);
+SQL SUCCESS
+select * from t_dml_upsert0124;
++---+---+---+
+| a | b | c |
++---+---+---+
+| 2 | 2 | 2 |
+| 3 | 3 | 3 |
+| 4 | 4 | 4 |
+| 1 | 6 | 1 |
+| 5 | 5 | 5 |
++---+---+---+
+--处理测试数据
+drop table if exists t_dml_upsert0124;
+SQL SUCCESS
+reset session authorization;
+SQL SUCCESS
+drop table if exists t_dml_upsert_sub0124;
+SQL SUCCESS
+drop user if exists u_dml_upsert0124 cascade;
+SQL SUCCESS

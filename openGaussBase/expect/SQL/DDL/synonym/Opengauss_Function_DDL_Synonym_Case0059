@@ -1,0 +1,24 @@
+-- @testpoint: 删除同义词，同义词不存在，省略if exists 选项，合理报错
+-- @modify at: 2020-11-26
+--建表
+drop table if exists test_SYN_056;
+SQL SUCCESS
+create table test_SYN_056(a int);
+SQL SUCCESS
+--创建同义词
+drop synonym if exists test_SYN_056bak;
+SQL SUCCESS
+create synonym test_SYN_056bak for test_SYN_056;
+SQL SUCCESS
+--删除存在的同义词
+drop synonym test_SYN_056bak;
+SQL SUCCESS
+--删除的同义词不存在，不会报错
+drop synonym if exists test_SYN_056bak;
+SQL SUCCESS
+--删除同义词不存在，报错
+drop synonym test_SYN_056bak;
+?.*ERROR: synonym "test_syn_056bak" does not exist
+--删表
+drop table test_SYN_056;
+SQL SUCCESS

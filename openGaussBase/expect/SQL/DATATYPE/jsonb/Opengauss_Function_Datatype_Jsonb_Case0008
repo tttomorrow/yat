@@ -1,0 +1,89 @@
+-- @testpoint: jsonb格式校验：Num-jsonb（不符合格式合理报错）
+--符合格式
+--1.正负数
+select '100'::jsonb;
++-------+
+| jsonb |
++-------+
+| 100   |
++-------+
+select '-99'::jsonb;
++-------+
+| jsonb |
++-------+
+| -99   |
++-------+
+--2.小数
+select '0.99'::jsonb;
++-------+
+| jsonb |
++-------+
+| .99   |
++-------+
+select '99.99'::jsonb;
++-------+
+| jsonb |
++-------+
+| 99.99 |
++-------+
+select '-0.98'::jsonb;
++-------+
+| jsonb |
++-------+
+| -.98  |
++-------+
+--3.0
+select '0'::jsonb;
++-------+
+| jsonb |
++-------+
+| 0     |
++-------+
+--4.科学计数法
+select '-1.5e-5'::jsonb;
++----------+
+| jsonb    |
++----------+
+| -.000015 |
++----------+
+--不符合格式
+--1.不支持多余的前导零
+select '007'::jsonb;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "007" is invalid.
+?.*
+  Where: JSON data, line 1: 007
+referenced column: jsonb
+select '00.7'::jsonb;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "00" is invalid.
+?.*
+  Where: JSON data, line 1: 00...
+referenced column: jsonb
+--2.正数最前面不支持加 +
+select '+100'::jsonb;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "+" is invalid.
+?.*
+  Where: JSON data, line 1: +...
+referenced column: jsonb
+select '+00.7'::jsonb;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "+" is invalid.
+?.*
+  Where: JSON data, line 1: +...
+referenced column: jsonb
+--3.不支持NaN
+select 'NaN'::jsonb;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "NaN" is invalid.
+?.*
+  Where: JSON data, line 1: NaN
+referenced column: jsonb
+--4.不支持infinity
+select 'infinity'::jsonb;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "infinity" is invalid.
+?.*
+  Where: JSON data, line 1: infinity
+referenced column: jsonb

@@ -1,0 +1,173 @@
+-- @testpoint: jsonb额外支持操作函数：jsonb_ge(greater equal(>=)。大于等于。判断两个jsonb是不是左边大于等于右边,输入不合理，合理报错）
+-- 比较规则:object-jsonb > array-jsonb > bool-jsonb > num-jsonb > str-jsonb > null-jsonb
+--同类型
+select jsonb_ge('"str"','"string"');
++----------+
+| jsonb_ge |
++----------+
+| false    |
++----------+
+select jsonb_ge('null','null' );
++----------+
+| jsonb_ge |
++----------+
+| true     |
++----------+
+select jsonb_ge('false','false');
++----------+
+| jsonb_ge |
++----------+
+| true     |
++----------+
+select jsonb_ge('false','true');
++----------+
+| jsonb_ge |
++----------+
+| false    |
++----------+
+select jsonb_ge('{"a":1, "b": [10,2,3],"c":{"b":"d"}}','{"b":[10,2,3]}');
++----------+
+| jsonb_ge |
++----------+
+| true     |
++----------+
+select jsonb_ge('[null, false, 123,{"a":true},"test"]','[123,{"a":false},"test",null, false]');
++----------+
+| jsonb_ge |
++----------+
+| false    |
++----------+
+select jsonb_ge('105.2e-3','1.0520e-1');
++----------+
+| jsonb_ge |
++----------+
+| true     |
++----------+
+--不同类型
+select jsonb_ge('"str"', 'null');
++----------+
+| jsonb_ge |
++----------+
+| true     |
++----------+
+select jsonb_ge('null','true' );
++----------+
+| jsonb_ge |
++----------+
+| false    |
++----------+
+select jsonb_ge('null','0' );
++----------+
+| jsonb_ge |
++----------+
+| false    |
++----------+
+select jsonb_ge('null', '{"b":[10,2,3]}');
++----------+
+| jsonb_ge |
++----------+
+| false    |
++----------+
+select jsonb_ge('null','[12,"test",null, false]');
++----------+
+| jsonb_ge |
++----------+
+| false    |
++----------+
+select jsonb_ge('true','1');
++----------+
+| jsonb_ge |
++----------+
+| true     |
++----------+
+select jsonb_ge('{"a":1, "b": [10,2,3],"c":{"b":"d"}}','[{"b":[10,2,3]},{"a":1},{"c":{"b":"d"}}]');
++----------+
+| jsonb_ge |
++----------+
+| true     |
++----------+
+select jsonb_ge('[{"a":false},{"a":true}]','{"a": true,"a": false}');
++----------+
+| jsonb_ge |
++----------+
+| false    |
++----------+
+select jsonb_ge('105.2e3','"0.1052"');
++----------+
+| jsonb_ge |
++----------+
+| true     |
++----------+
+select jsonb_ge('0','false');
++----------+
+| jsonb_ge |
++----------+
+| false    |
++----------+
+select jsonb_ge('258','{"a":258}');
++----------+
+| jsonb_ge |
++----------+
+| false    |
++----------+
+select jsonb_ge('0.369','[0.369]');
++----------+
+| jsonb_ge |
++----------+
+| false    |
++----------+
+select jsonb_ge('"true"','true' );
++----------+
+| jsonb_ge |
++----------+
+| false    |
++----------+
+select jsonb_ge('"true"','{"a":"true"}' );
++----------+
+| jsonb_ge |
++----------+
+| false    |
++----------+
+select jsonb_ge('"true"','["true"]' );
++----------+
+| jsonb_ge |
++----------+
+| false    |
++----------+
+select jsonb_ge('{"a":1, "b": [10,2,3],"c":{"b":"d"}}','true');
++----------+
+| jsonb_ge |
++----------+
+| true     |
++----------+
+select jsonb_ge('[{"a":false},{"a":true}]','false');
++----------+
+| jsonb_ge |
++----------+
+| true     |
++----------+
+--入参非jsonb
+select jsonb_ge('{a:1, b: [10,2,3],c:{b:d}}','true');
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "a" is invalid.
+?.*
+  Where: JSON data, line 1: {a...
+referenced column: jsonb_ge
+select jsonb_ge('{a:1, a: [10,2,3],a:{b:d}}','{a:1}');
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "a" is invalid.
+?.*
+  Where: JSON data, line 1: {a...
+referenced column: jsonb_ge
+select jsonb_ge('[{a:false},{a:true},123,'qwer','null']','{"a":false}');
+?.*ERROR: syntax error at or near "qwer.*
+?.*
+select jsonb_ge('[{a:false},{a:true},123,'qwer','null']','123');
+?.*ERROR: syntax error at or near "qwer.*
+?.*
+select jsonb_ge('[{a:false},{a:true},123,'qwer','null']','qwer');
+?.*ERROR: syntax error at or near "qwer.*
+?.*
+select jsonb_ge('[{a:false},{a:true},123,'"qwer"','null']','qwer');
+?.*ERROR: syntax error at or near ""qwer".*
+?.*

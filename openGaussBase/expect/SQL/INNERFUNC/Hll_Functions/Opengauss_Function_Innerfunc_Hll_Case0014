@@ -1,0 +1,13 @@
+-- @testpoint: hll_hash_bigint(bigint),当入参为其他类型时，合理报错
+?.*ERROR: bigint out of range.*
+  Where: referenced column: hll_hash_bigint
+?.*ERROR: bigint out of range.*
+  Where: referenced column: hll_hash_bigint
+select hll_hash_bigint('aaa');
+?.*ERROR: invalid input syntax for type bigint: "aaa".*
+?.*
+  Where: referenced column: hll_hash_bigint
+select hll_hash_bigint('@');
+?.*ERROR: invalid input syntax for type bigint: "@".*
+?.*
+  Where: referenced column: hll_hash_bigint

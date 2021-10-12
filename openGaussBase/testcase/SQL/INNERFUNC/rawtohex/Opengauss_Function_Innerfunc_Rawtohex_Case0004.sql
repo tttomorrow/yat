@@ -1,0 +1,2 @@
+-- @testpoint: rawtohex函数入参为其它函数
+SELECT rawtohex(REPLACE('10','0',''));

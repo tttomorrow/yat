@@ -1,0 +1,19 @@
+-- @testpoint: lengthb函数特殊字符
+select lengthb('######&^$*&%*&%#^%^') from sys_dummy;
++---------+
+| lengthb |
++---------+
+| 19      |
++---------+
+select lengthb(-0.336) from sys_dummy;
++---------+
+| lengthb |
++---------+
+| 5       |
++---------+
+select lengthb(3.354009) from sys_dummy;
++---------+
+| lengthb |
++---------+
+| 8       |
++---------+

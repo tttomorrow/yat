@@ -1,0 +1,38 @@
+--  @testpoint: --查看视图字段区分大小写
+insert into false_3 values (0,1);
+SQL SUCCESS
+select * from view_3;
++----+----+
+| a  | f  |
++----+----+
+| 22 | 33 |
+| 0  | 1  |
++----+----+
+select a from view_3;
++----+
+| a  |
++----+
+| 22 |
+| 0  |
++----+
+select A from view_3;
++----+
+| a  |
++----+
+| 22 |
+| 0  |
++----+
+select f from view_3;
++----+
+| f  |
++----+
+| 33 |
+| 1  |
++----+
+select F from view_3;
++----+
+| f  |
++----+
+| 33 |
+| 1  |
++----+

@@ -1,0 +1,12 @@
+select * from aaaa
+ID,NAME,XA,BEEP,
+1,zjw,2017-01-08T13:45:22,xxx,
+2,zjw,1999-01-01T00:00,null,
+1000000000,gcc,1999-01-01T00:00,gcc,
+4,ppp,2000-01-02T12:00:01,null,
+select id from aaaa
+ID,
+1,
+2,
+1000000000,
+4,

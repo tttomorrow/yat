@@ -1,0 +1,58 @@
+-- @testpoint: 表达式做为参数的存储过程测试--函数表达式-数值计算函数-BITAND(exp1,exp2),BITOR,BITXOR 合理报错
+--创建存储过程
+CREATE OR REPLACE PROCEDURE PROC_EXPR_PARAM_008(P1 BIGINT)  AS
+BEGIN
+raise info 'P1=:%',P1;
+EXCEPTION
+WHEN NO_DATA_FOUND THEN raise info 'NO_DATA_FOUND';
+END;
+/
+SQL SUCCESS
+--BITAND
+--调用存储过程
+DECLARE
+V1 INT :=BITAND('10110','00111');
+V2 INT :=BITAND(15,7);
+V3 INT :=BITAND(32,17);
+BEGIN
+ PROC_EXPR_PARAM_008(V1);
+ PROC_EXPR_PARAM_008(V2);
+ PROC_EXPR_PARAM_008(V3); 
+END;
+/
+SQL SUCCESS
+--BITOR
+--调用存储过程
+DECLARE
+V4 INT :=BITOR('10110','00111');
+V5 INT :=BITOR(15,7);
+V6 INT :=BITOR(32,17);
+BEGIN
+ PROC_EXPR_PARAM_008(V4);
+ PROC_EXPR_PARAM_008(V5);
+ PROC_EXPR_PARAM_008(V6); 
+END;
+/
+?.*ERROR: function bitor\(integer, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+  Where: referenced column: bitor
+PL/pgSQL function inline_code_block line 5 during statement block local variable initialization
+--BITXOR
+--调用存储过程
+DECLARE
+V7 INT :=BITXOR('10110','00111');
+V8 INT :=BITXOR(15,7);
+V9 INT :=BITXOR(32,17);
+BEGIN
+ PROC_EXPR_PARAM_008(V7);
+ PROC_EXPR_PARAM_008(V8);
+ PROC_EXPR_PARAM_008(V9); 
+END;
+/
+?.*ERROR: function bitxor\(integer, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+  Where: referenced column: bitxor
+PL/pgSQL function inline_code_block line 5 during statement block local variable initialization
+--清理环境
+drop PROCEDURE PROC_EXPR_PARAM_008;
+SQL SUCCESS

@@ -1,0 +1,15 @@
+-- @testpoint: lseg类型，使用[(x1,y1),(x2,y2)]方式插入0坐标值
+drop table if exists test_lseg03;
+SQL SUCCESS
+create table test_lseg03 (name lseg);
+SQL SUCCESS
+insert into test_lseg03 values (lseg '[(0,0),(0,0)]');
+SQL SUCCESS
+select * from test_lseg03;
++-----------------------+
+| name                  |
++-----------------------+
+| [(0.0,0.0),(0.0,0.0)] |
++-----------------------+
+drop table test_lseg03;
+SQL SUCCESS

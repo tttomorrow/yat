@@ -1,0 +1,26 @@
+--  @testpoint:opengauss关键字end-exec(非保留)，作为用户名
+--关键字end-exec作为用户名不带引号，创建成功
+drop user if exists end-exec;
+?.*ERROR: syntax error at or near "end"
+?.*Position: .*
+CREATE USER end-exec PASSWORD 'Bigdata@123';
+?.*ERROR: syntax error at or near "end"
+?.*Position: .*
+drop user end-exec;
+?.*ERROR: syntax error at or near "end"
+?.*Position: .*
+--关键字end-exec作为用户名加双引号，创建成功
+drop user if exists "end-exec";
+SQL SUCCESS
+CREATE USER "end-exec" PASSWORD 'Bigdata@123';
+?.*ERROR: invalid name: end-exec
+drop user "end-exec";
+?.*ERROR: role "end-exec" does not exist
+--关键字end-exec作为用户名加单引号，合理报错
+CREATE USER 'end-exec' PASSWORD 'Bigdata@123';
+?.*ERROR: syntax error at or near "'end-exec'"
+?.*Position: .*
+--关键字end-exec作为用户名加反引号，合理报错
+CREATE USER `end-exec` PASSWORD 'Bigdata@123';
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*

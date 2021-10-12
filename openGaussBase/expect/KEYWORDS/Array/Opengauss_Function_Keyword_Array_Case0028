@@ -1,0 +1,66 @@
+-- @testpoint: opengauss关键字Array(保留)，作为同义词对象名,部分测试点合理报错
+--前置条件
+drop table if exists Array_test;
+SQL SUCCESS
+create table Array_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-失败
+drop synonym if exists Array;
+?.*ERROR: syntax error at or near "Array".*
+?.*Position.*
+create synonym Array for Array_test;
+?.*ERROR: syntax error at or near "Array".*
+?.*Position.*
+--关键字带双引号-成功
+drop synonym if exists "Array";
+SQL SUCCESS
+create synonym "Array" for Array_test;
+SQL SUCCESS
+insert into "Array" values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update "Array" set "Array".name='cici' where "Array".id=2;
+SQL SUCCESS
+select * from "Array";
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--清理环境
+drop synonym "Array";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'Array';
+?.*ERROR: syntax error at or near "'Array'".*
+?.*Position.*
+create synonym 'Array' for Array_test;
+?.*ERROR: syntax error at or near "'Array'".*
+?.*Position.*
+insert into 'Array' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'Array'".*
+?.*Position.*
+update 'Array' set 'Array'.name='cici' where 'Array'.id=2;
+?.*ERROR: syntax error at or near "'Array'".*
+?.*Position.*
+select * from 'Array';
+?.*ERROR: syntax error at or near "'Array'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop synonym if exists `Array`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create synonym `Array` for Array_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+insert into `Array` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+update `Array` set `Array`.name='cici' where `Array`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+select * from `Array`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+drop table if exists Array_test;
+SQL SUCCESS

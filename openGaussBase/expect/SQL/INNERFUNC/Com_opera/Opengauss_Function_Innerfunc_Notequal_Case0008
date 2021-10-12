@@ -1,0 +1,14 @@
+-- @testpoint: opengauss比较操作符<>，UUID类型
+-- UUID类型，比较的是大小
+SELECT 'A0EEBC99-9C0B-4EF8-BB6D-6BB9BD380A11'::UUID <> 'a0eebc999c0b4ef8bb6d6bb9bd380a11'::UUID;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+SELECT 'A0EEBC99-9C0B-4EF8-BB6D-6BB9BD380A11'::UUID <> 'A0EEBC99-9C0B-4EF8-BB6D-6BB9BD380A10'::UUID;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+

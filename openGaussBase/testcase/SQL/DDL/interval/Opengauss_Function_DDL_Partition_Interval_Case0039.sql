@@ -1,0 +1,27 @@
+-- @testpoint: interval分区,STORE IN中含有未创建的表空间，合理报错
+drop table if exists partiton_table_001;
+drop tablespace if exists tsp1;
+drop tablespace if exists tsp2;
+drop tablespace if exists tsp3;
+
+create tablespace tsp1 relative location 'partition_table_space/tsp1' maxsize '10k';
+create tablespace tsp2 relative location 'partition_table_space/tsp2' maxsize '10k';
+
+create table partiton_table_001(
+col_1 smallint,
+col_2 char(30),
+col_3 int,
+col_4 date,
+col_5 boolean,
+col_6 nchar(30),
+col_7 float
+)
+partition by range (col_4)
+interval ('1 month') store in(tsp1,tsp2,tsp3)
+(
+partition partiton_table_001_p1 values less than ('2020-03-01'),
+partition partiton_table_001_p2 values less than ('2020-04-01'),
+partition partiton_table_001_p3 values less than ('2020-05-01')
+);
+drop tablespace if exists tsp1;
+drop tablespace if exists tsp2;

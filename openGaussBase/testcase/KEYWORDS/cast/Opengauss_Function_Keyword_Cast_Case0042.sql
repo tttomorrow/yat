@@ -1,0 +1,4 @@
+--  @testpoint:验证cast函数是否能将整型数据转换为日期型
+drop table if exists TEST_CAST;
+create table TEST_CAST as select CAST('1989-06-16' AS DATE) AS birthday,CAST('23'AS  INT) AS AGE;
+drop table TEST_CAST;

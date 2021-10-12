@@ -1,0 +1,59 @@
+--  @testpoint: 两张表使用right Join(right outer Join)查询，返回结果为右表的所有记录，左表中字段相等的行，不相等的部分为NULL
+--建表1
+drop table if exists person;
+SQL SUCCESS
+create table person(personcode int,personname varchar(20),addresscode int);
+SQL SUCCESS
+--插入数据
+insert into person values(1,'小赵',1);
+SQL SUCCESS
+insert into person values(2,'小钱',2);
+SQL SUCCESS
+insert into person values(3,'赵四',3);
+SQL SUCCESS
+insert into person values(4,'孙晔',4);
+SQL SUCCESS
+insert into person values(5,'周瑜',6);
+SQL SUCCESS
+--建表2
+drop table if exists address;
+SQL SUCCESS
+create table address(addresscode int,addressname varchar(20));
+SQL SUCCESS
+--插入数据
+insert into address values(1,'北京');
+SQL SUCCESS
+insert into address values(2,'上海');
+SQL SUCCESS
+insert into address values(3,'广州');
+SQL SUCCESS
+insert into address values(4,'深圳');
+SQL SUCCESS
+insert into address values(5,'上海');
+SQL SUCCESS
+--表1和表2使用right Join连接查询
+select * from person per right join address ad on per.addresscode = ad.addresscode;
++------------+------------+-------------+-------------+-------------+
+| personcode | personname | addresscode | addresscode | addressname |
++------------+------------+-------------+-------------+-------------+
+| 1          | 小赵         | 1           | 1           | 北京          |
+| 2          | 小钱         | 2           | 2           | 上海          |
+| 3          | 赵四         | 3           | 3           | 广州          |
+| 4          | 孙晔         | 4           | 4           | 深圳          |
+|            |            |             | 5           | 上海          |
++------------+------------+-------------+-------------+-------------+
+select * from person per right outer join address ad on per.addresscode = ad.addresscode;
++------------+------------+-------------+-------------+-------------+
+| personcode | personname | addresscode | addresscode | addressname |
++------------+------------+-------------+-------------+-------------+
+| 1          | 小赵         | 1           | 1           | 北京          |
+| 2          | 小钱         | 2           | 2           | 上海          |
+| 3          | 赵四         | 3           | 3           | 广州          |
+| 4          | 孙晔         | 4           | 4           | 深圳          |
+|            |            |             | 5           | 上海          |
++------------+------------+-------------+-------------+-------------+
+--删表
+drop table if exists person;
+SQL SUCCESS
+drop table if exists address;
+SQL SUCCESS

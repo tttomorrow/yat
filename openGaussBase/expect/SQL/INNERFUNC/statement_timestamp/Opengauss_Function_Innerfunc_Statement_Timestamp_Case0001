@@ -1,0 +1,31 @@
+-- @testpoint: 给的错误参数，合理报错
+-- @description: statement_timestamp(),获取当前日期及时间
+select statement_timestamp from sys_dummy;
+?.*ERROR: column "statement_timestamp" does not exist
+?.*
+  Where: referenced column: statement_timestamp
+select statement_timestamp('') from sys_dummy;
+?.*ERROR: function statement_timestamp\(unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: statement_timestamp
+select statement_timestamp(' ') from sys_dummy;
+?.*ERROR: function statement_timestamp\(unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: statement_timestamp
+select statement_timestamp(null) from sys_dummy;
+?.*ERROR: function statement_timestamp\(unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: statement_timestamp
+select statement_timestamp('2017-09-01 17:04:39') from sys_dummy;
+?.*ERROR: function statement_timestamp\(unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: statement_timestamp
+select statement_timestamp('2017-09-01 17:04:39.119267+08') from sys_dummy;
+?.*ERROR: function statement_timestamp\(unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: statement_timestamp

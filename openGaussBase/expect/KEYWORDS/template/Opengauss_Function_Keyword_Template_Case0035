@@ -1,0 +1,13 @@
+--  @testpoint:openGauss关键字template(非保留),
+--opengauss模板数据库template0，创建新数据库成功
+DROP DATABASE IF EXISTS music1;
+SQL SUCCESS
+CREATE DATABASE music1 ENCODING 'GBK' template = template0;
+SQL SUCCESS
+DROP DATABASE music1;
+SQL SUCCESS
+--opengauss模板数据库template1，创建新数据库失败，合理报错
+DROP DATABASE IF EXISTS music2;
+SQL SUCCESS
+CREATE DATABASE music2 ENCODING 'GBK' template = template1;
+?.*ERROR: template1 is not supported for using here, just support template0

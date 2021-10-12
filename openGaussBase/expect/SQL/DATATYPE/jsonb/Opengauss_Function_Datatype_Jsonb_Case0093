@@ -1,0 +1,144 @@
+-- @testpoint: jsonb额外支持操作函数：jsonb_exists_any（字符串数组text[]里面，是否任意的元素在JSON的顶层以key\elem\scalar的形式存在，同操作符?\，当入参不合理时，合理报错）
+--合理入参：存在
+select jsonb_exists_any('"str"',array['str']);
++------------------+
+| jsonb_exists_any |
++------------------+
+| true             |
++------------------+
+select jsonb_exists_any('"null"', array['null']);
++------------------+
+| jsonb_exists_any |
++------------------+
+| true             |
++------------------+
+select jsonb_exists_any('{"a":1, "b": [1,2,3],"c":{"b":"d"}}',array['a','b''c']);
++------------------+
+| jsonb_exists_any |
++------------------+
+| true             |
++------------------+
+select jsonb_exists_any('["abcdefg",138,{"db":"test"},null,"true",false]',array['abcdefg']);
++------------------+
+| jsonb_exists_any |
++------------------+
+| true             |
++------------------+
+select jsonb_exists_any('["abcdefg","138",{"db":"test"},null,"true",false]',array['abcdefg','138']);
++------------------+
+| jsonb_exists_any |
++------------------+
+| true             |
++------------------+
+select jsonb_exists_any('[null, false, 123,{"a":true},"test"]',array['test','123']);
++------------------+
+| jsonb_exists_any |
++------------------+
+| true             |
++------------------+
+select jsonb_exists_any('["abcdefg",1,{"db":"test"},null,"true",false]',array(select true ::text));
++------------------+
+| jsonb_exists_any |
++------------------+
+| true             |
++------------------+
+select jsonb_exists_any('"null"', array['null']);
++------------------+
+| jsonb_exists_any |
++------------------+
+| true             |
++------------------+
+select jsonb_exists_any('{"a":1, "b": [1,2,3],"c":{"b":"d"}}', array['a','b''c']);
++------------------+
+| jsonb_exists_any |
++------------------+
+| true             |
++------------------+
+select jsonb_exists_any('{"a":1, "b": [1,2,3],"c":{"b":"d"}}', array['b','c']);
++------------------+
+| jsonb_exists_any |
++------------------+
+| true             |
++------------------+
+--合理入参：不存在
+select jsonb_exists_any('null', array['null']);
++------------------+
+| jsonb_exists_any |
++------------------+
+| false            |
++------------------+
+select jsonb_exists_any('false', array['false']);
++------------------+
+| jsonb_exists_any |
++------------------+
+| false            |
++------------------+
+select jsonb_exists_any('true', array['true']);
++------------------+
+| jsonb_exists_any |
++------------------+
+| false            |
++------------------+
+select jsonb_exists_any('{"a":1, "b": [1,2,3],"c":{"b":"d"}}', array['d']);
++------------------+
+| jsonb_exists_any |
++------------------+
+| false            |
++------------------+
+select jsonb_exists_any('[null, false, 123,{"a":true},"test"]', array['123','a']);
++------------------+
+| jsonb_exists_any |
++------------------+
+| false            |
++------------------+
+select jsonb_exists_any('[null, false, 123,{"a":true},"test"]', array['{"a":true}']);
++------------------+
+| jsonb_exists_any |
++------------------+
+| false            |
++------------------+
+select jsonb_exists_any('105.2e3',array['105200']);
++------------------+
+| jsonb_exists_any |
++------------------+
+| false            |
++------------------+
+select jsonb_exists_any('[{"a":true}, null] ', array['b','null']);
++------------------+
+| jsonb_exists_any |
++------------------+
+| false            |
++------------------+
+--不合理入参：报错
+select jsonb_exists_any('{"a":1, "b": [1,2,3],"c":{"b":"d"}}', array[{'c':'b'}]);
+?.*ERROR: syntax error at or near "\{.*
+?.*
+select jsonb_exists_any('{"a":1, "b":2}', (select '"b"'::jsonb));
+?.*ERROR: function jsonb_exists_any\(unknown, jsonb\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: jsonb_exists_any
+select jsonb_exists_any('["abcdefg",1,{"db":"test"},null,"true",false]', (select 'true'::jsonb));
+?.*ERROR: function jsonb_exists_any\(unknown, jsonb\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: jsonb_exists_any
+select jsonb_exists_any('["abcdefg",138,{"db":"test"},null,"true",false]', abcdefg);
+?.*ERROR: column "abcdefg" does not exist.*
+?.*
+  Where: referenced column: jsonb_exists_any
+select jsonb_exists_any('["abcdefg",138,"{\"db\":\"test\"}",null,"true",false]', "db");
+?.*ERROR: column "db" does not exist.*
+?.*
+  Where: referenced column: jsonb_exists_any
+select jsonb_exists_any('["abcdefg",138,"{\"db\":\"test\"}",null,"true",false]',array{"db":"test"});
+?.*ERROR: syntax error at or near "\{.*
+?.*
+select jsonb_exists_any('["abcdefg",138,"{\"db\":\"test\"}",null,"true",false]',array[{'db':'test'}]);
+?.*ERROR: syntax error at or near "\{.*
+?.*
+select jsonb_exists_any('["abcdefg","138",{"db":"test"},"null","true",false]',(select 'true'::string));
+?.*ERROR: type "string" does not exist.*
+?.*
+  Where: referenced column: string
+referenced column: jsonb_exists_any

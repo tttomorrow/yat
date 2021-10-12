@@ -1,0 +1,82 @@
+--  @testpoint: --对某一列建索引，重复列名:合理报错
+--普通表
+--行存表 btree索引
+drop table if exists test_index_071;
+SQL SUCCESS
+create table test_index_071(id int);
+SQL SUCCESS
+drop index if exists index_01;
+SQL SUCCESS
+create index index_01 on test_index_071(id,id,id) local;
+?.*ERROR: duplicate column name
+--行存表 btree索引
+drop index if exists index_01;
+SQL SUCCESS
+create index index_01 on test_index_071(id,id,id) ;
+?.*ERROR: duplicate column name
+--行存表 gist索引
+drop index if exists index_01;
+SQL SUCCESS
+create index index_01 on test_index_071 using gist(id,id,id);
+?.*ERROR: duplicate column name
+--列存表 btree索引
+drop table if exists test_index_071;
+SQL SUCCESS
+create table test_index_071(id int) with (orientation=column);
+SQL SUCCESS
+drop index if exists index_01;
+SQL SUCCESS
+create index index_01 on test_index_071 using btree(id,id,id);
+?.*ERROR: duplicate column name
+--列存表 psort索引
+drop index if exists index_01;
+SQL SUCCESS
+create index index_01 on test_index_071 using psort(id,id,id);
+?.*ERROR: duplicate column name
+--行存表 gist索引
+drop index if exists index_01;
+SQL SUCCESS
+create index index_01 on test_index_071 using gist(id,id,id);
+?.*ERROR: access method "gist" does not support column store
+---------------------------------------
+--临时表
+--行存表 btree索引
+drop table if exists test_index_071;
+SQL SUCCESS
+create temporary table test_index_071(id int);
+SQL SUCCESS
+drop index if exists index_01;
+SQL SUCCESS
+create index index_01 on test_index_071(id,id,id);
+?.*ERROR: duplicate column name
+--行存表 gist索引
+drop index if exists index_01;
+SQL SUCCESS
+create index index_01 on test_index_071 using gist(id,id,id);
+?.*ERROR: duplicate column name
+--列存表 btree索引
+drop table if exists test_index_071;
+SQL SUCCESS
+create temporary table test_index_071(id int) with (orientation=column);
+SQL SUCCESS
+drop index if exists index_01;
+SQL SUCCESS
+create index index_01 on test_index_071 using btree(id,id,id);
+?.*ERROR: duplicate column name
+--列存表 psort索引
+drop index if exists index_01;
+SQL SUCCESS
+create index index_01 on test_index_071 using psort(id,id,id);
+?.*ERROR: duplicate column name
+--行存表 gist索引
+drop table if exists test_index_071;
+SQL SUCCESS
+create temporary table test_index_071(id text)with (orientation=row);
+SQL SUCCESS
+drop index if exists index_01;
+SQL SUCCESS
+create index index_01 on test_index_071 using gist(id,id,id);
+?.*ERROR: duplicate column name
+--清理数据
+drop table if exists test_index_071 cascade;
+SQL SUCCESS

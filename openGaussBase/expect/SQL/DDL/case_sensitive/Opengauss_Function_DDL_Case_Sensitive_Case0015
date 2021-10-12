@@ -1,0 +1,22 @@
+--  @testpoint: --WITH语句验证临时表名大小写
+with
+cf as (select * from wms)
+select * from CF;
++---+------------+
+| a | b          |
++---+------------+
+| 5 | re         |
+| 3 | aa         |
+| 5 | xx         |
++---+------------+
+with
+cf as (select * from wms),
+cd as (select * from CF)
+select * from cd;
++---+------------+
+| a | b          |
++---+------------+
+| 5 | re         |
+| 3 | aa         |
+| 5 | xx         |
++---+------------+

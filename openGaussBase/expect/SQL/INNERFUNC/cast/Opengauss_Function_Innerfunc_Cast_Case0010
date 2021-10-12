@@ -1,0 +1,12 @@
+-- @testpoint:验证cast函数是否支持group by分组查询
+drop table if exists TEST2;
+SQL SUCCESS
+create table TEST2 (RIQI int);
+SQL SUCCESS
+SELECT * FROM TEST2 WHERE RIQI<CAST('2018-08-30' AS DATE) GROUP BY RIQI ORDER BY RIQI DESC;
++------+
+| riqi |
++------+
++------+
+drop table if exists TEST2;
+SQL SUCCESS

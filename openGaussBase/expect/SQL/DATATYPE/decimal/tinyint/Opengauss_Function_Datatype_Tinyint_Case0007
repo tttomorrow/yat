@@ -1,0 +1,10 @@
+-- @testpoint: 插入超出左边界范围值，合理报错
+drop table if exists tinyint07;
+SQL SUCCESS
+create table tinyint07 (name tinyint);
+SQL SUCCESS
+insert into tinyint07 values (-1);
+?.*ERROR: tinyint out of range
+  Where: referenced column: name
+drop table tinyint07;
+SQL SUCCESS

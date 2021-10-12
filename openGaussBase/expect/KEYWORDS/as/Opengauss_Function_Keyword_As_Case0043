@@ -1,0 +1,18 @@
+-- @testpoint: 排序时，使用as列
+drop table if exists test_as_009;
+SQL SUCCESS
+create table test_as_009 ("as" char(20),stu_age int,sex char(10),score int,address char(10) default 'gauss');
+SQL SUCCESS
+insert into test_as_009("as") values('zhangsan');
+SQL SUCCESS
+insert into test_as_009("as") values('lisi');
+SQL SUCCESS
+select * from  test_as_009 order by "as";
++----------------------+---------+-----+-------+------------+
+| as                   | stu_age | sex | score | address    |
++----------------------+---------+-----+-------+------------+
+| lisi                 |         |     |       | gauss      |
+| zhangsan             |         |     |       | gauss      |
++----------------------+---------+-----+-------+------------+
+drop table if exists test_as_009;
+SQL SUCCESS

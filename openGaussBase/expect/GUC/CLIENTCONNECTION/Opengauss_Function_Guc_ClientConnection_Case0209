@@ -1,0 +1,21 @@
+-- @testpoint: alter system set方法设置参数enable_online_ddl_waitlock为无效值，合理报错
+--查看默认
+show enable_online_ddl_waitlock;
++----------------------------+
+| enable_online_ddl_waitlock |
++----------------------------+
+| off                        |
++----------------------------+
+--设置,报错
+ALTER SYSTEM SET enable_online_ddl_waitlock to 1234;
+?.*ERROR: parameter "enable_online_ddl_waitlock" requires a Boolean value
+ALTER SYSTEM SET enable_online_ddl_waitlock to 'abc';
+?.*ERROR: parameter "enable_online_ddl_waitlock" requires a Boolean value
+ALTER SYSTEM SET enable_online_ddl_waitlock to 'on%$#';
+?.*ERROR: parameter "enable_online_ddl_waitlock" requires a Boolean value
+--设置空串，报错
+ALTER SYSTEM SET enable_online_ddl_waitlock to '';
+?.*ERROR: parameter "enable_online_ddl_waitlock" requires a Boolean value
+ALTER SYSTEM SET enable_online_ddl_waitlock to 'null';
+?.*ERROR: parameter "enable_online_ddl_waitlock" requires a Boolean value
+--no need to clean

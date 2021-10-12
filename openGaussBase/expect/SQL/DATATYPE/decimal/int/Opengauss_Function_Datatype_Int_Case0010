@@ -1,0 +1,25 @@
+-- @testpoint: 插入正整数
+drop table if exists int10;
+SQL SUCCESS
+create table int10 (name int);
+SQL SUCCESS
+insert into int10 values (1223340);
+SQL SUCCESS
+SQL SUCCESS
+insert into int10 values (1);
+SQL SUCCESS
+insert into int10 values (2);
+SQL SUCCESS
+insert into int10 values (3);
+SQL SUCCESS
+select * from int10;
++-----------+
+| name      |
++-----------+
+| 1223340   |
+| 1         |
+| 2         |
+| 3         |
++-----------+
+drop table int10;
+SQL SUCCESS

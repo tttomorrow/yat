@@ -1,0 +1,40 @@
+--  @testpoint:tsquery类型的查询，相关函数测试
+--tsquery && tsquery
+SELECT 'fat | rat'::tsquery && 'cat'::tsquery AS RESULT;
++---------------------------+
+| result                    |
++---------------------------+
+| ( 'fat' | 'rat' ) & 'cat' |
++---------------------------+
+SELECT 'fat & rat'::tsquery && 'cat'::tsquery AS RESULT;
++-----------------------+
+| result                |
++-----------------------+
+| 'fat' & 'rat' & 'cat' |
++-----------------------+
+--tsquery || tsquery
+SELECT 'fat | rat'::tsquery || 'cat'::tsquery AS RESULT;
++---------------------------+
+| result                    |
++---------------------------+
+| ( 'fat' | 'rat' ) | 'cat' |
++---------------------------+
+SELECT 'fat & rat'::tsquery || 'cat'::tsquery AS RESULT;
++-----------------------+
+| result                |
++-----------------------+
+| 'fat' & 'rat' | 'cat' |
++-----------------------+
+--!! tsquery
+SELECT !! 'cat'::tsquery AS RESULT;
++--------+
+| result |
++--------+
+| !'cat' |
++--------+
+SELECT !! 'cat & dog'::tsquery AS RESULT;
++--------------------+
+| result             |
++--------------------+
+| !( 'cat' & 'dog' ) |
++--------------------+

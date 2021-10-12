@@ -1,0 +1,28 @@
+
+
+--  @testpoint:输入参数为null，''
+
+drop table if exists acos_test_06;
+SQL SUCCESS
+create table acos_test_06(COL_ACOS double precision);
+SQL SUCCESS
+insert into acos_test_06 values(null);
+SQL SUCCESS
+insert into acos_test_06 values('');
+SQL SUCCESS
+select ACOS(COL_ACOS) as RESULT from acos_test_06;
++--------+
+| result |
++--------+
+|        |
+|        |
++--------+
+select ACOS(COL_ACOS) as RESULT from acos_test_06;
++--------+
+| result |
++--------+
+|        |
+|        |
++--------+
+drop table if exists acos_test_06;
+SQL SUCCESS

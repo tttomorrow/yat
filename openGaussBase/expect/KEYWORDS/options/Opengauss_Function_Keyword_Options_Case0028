@@ -1,0 +1,66 @@
+-- @testpoint: opengauss关键字options(非保留)，作为同义词对象名,部分测试点合理报错
+--前置条件
+drop table if exists explain_test;
+SQL SUCCESS
+create table explain_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists options;
+SQL SUCCESS
+create synonym options for explain_test;
+SQL SUCCESS
+insert into options values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update options set options.name='cici' where options.id=2;
+SQL SUCCESS
+select * from options;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--关键字带双引号-成功
+drop synonym if exists "options";
+SQL SUCCESS
+create synonym "options" for explain_test;
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'options';
+?.*ERROR: syntax error at or near "'options'".*
+?.*Position: .*
+create synonym 'options' for explain_test;
+?.*ERROR: syntax error at or near "'options'".*
+?.*Position: .*
+insert into 'options' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'options'".*
+?.*Position: .*
+update 'options' set 'options'.name='cici' where 'options'.id=2;
+?.*ERROR: syntax error at or near "'options'".*
+?.*Position: .*
+select * from 'options';
+?.*ERROR: syntax error at or near "'options'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop synonym if exists `options`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create synonym `options` for explain_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+insert into `options` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+update `options` set `options`.name='cici' where `options`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+select * from `options`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+--清理环境
+drop synonym if exists "options";
+SQL SUCCESS
+drop synonym if exists options;
+SQL SUCCESS
+drop table if exists explain_test;
+SQL SUCCESS

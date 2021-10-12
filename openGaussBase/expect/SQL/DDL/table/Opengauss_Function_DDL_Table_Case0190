@@ -1,0 +1,39 @@
+-- @testpoint: drop table RESTRICT删除，有依赖对象时合理报错
+drop table if exists alter_table_tb02;
+SQL SUCCESS
+create table alter_table_tb02
+(
+c1 int,
+c2 bigint,
+c3 varchar(20)
+);
+SQL SUCCESS
+insert into alter_table_tb02 values('11',null,'sss');
+SQL SUCCESS
+insert into alter_table_tb02 values('21','','sss');
+SQL SUCCESS
+insert into alter_table_tb02 values('31',66,'');
+SQL SUCCESS
+insert into alter_table_tb02 values('41',66,null);
+SQL SUCCESS
+insert into alter_table_tb02 values('41',66,null);
+SQL SUCCESS
+CREATE VIEW myView AS
+    SELECT * FROM alter_table_tb02 ;
+SQL SUCCESS
+SELECT * FROM myView ;
++----+----+-----+
+| c1 | c2 | c3  |
++----+----+-----+
+| 11 |    | sss |
+| 21 |    | sss |
+| 31 | 66 |     |
+| 41 | 66 |     |
+| 41 | 66 |     |
++----+----+-----+
+drop table if exists alter_table_tb02 RESTRICT;
+?.*ERROR: cannot drop table alter_table_tb02 because other objects depend on it.*
+  Detail: view myview depends on table alter_table_tb02
+  Hint: Use DROP ... CASCADE to drop the dependent objects too.
+drop table if exists alter_table_tb02 CASCADE;
+SQL SUCCESS

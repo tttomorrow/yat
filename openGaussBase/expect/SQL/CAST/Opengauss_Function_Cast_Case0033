@@ -1,0 +1,868 @@
+-- @testpoint: 二目运算符
+--创建函数
+CREATE or replace FUNCTION test_cast_fun_0032(integer) RETURNS name
+    AS 'select typname from pg_type where oid = $1;'
+    LANGUAGE SQL
+    IMMUTABLE
+    RETURNS NULL ON NULL INPUT;
+/
+SQL SUCCESS
+--testpoint:二目操作符  = ：success
+select oprname,oprkind,test_cast_fun_0032(oprleft::int),test_cast_fun_0032(oprright::int),test_cast_fun_0032(oprresult::int),proname from pg_operator o
+left join pg_proc p on p.oid=o.oprcode
+where oprname ='=' and oprkind = 'b' order by test_cast_fun_0032(oprleft::int) asc;
++---------+---------+-------------------------------+-------------------------------+--------------------+---------------------------------------+
+| oprname | oprkind | test_cast_fun_0032            | test_cast_fun_0032            | test_cast_fun_0032 | proname                               |
++---------+---------+-------------------------------+-------------------------------+--------------------+---------------------------------------+
+| =       | b       | abstime                       | abstime                       | bool               | abstimeeq                             |
+| =       | b       | aclitem                       | aclitem                       | bool               | aclitemeq                             |
+| =       | b       | anyarray                      | anyarray                      | bool               | array_eq                              |
+| =       | b       | anyenum                       | anyenum                       | bool               | enum_eq                               |
+| =       | b       | anyrange                      | anyrange                      | bool               | range_eq                              |
+| =       | b       | bit                           | bit                           | bool               | biteq                                 |
+| =       | b       | bool                          | bool                          | bool               | booleq                                |
+| =       | b       | box                           | box                           | bool               | box_eq                                |
+| =       | b       | bpchar                        | bpchar                        | bool               | bpchareq                              |
+| =       | b       | bytea                         | bytea                         | bool               | byteaeq                               |
+| =       | b       | bytea                         | byteawithoutorderwithequalcol | bool               | byteawithoutorderwithequalcoleqbyteal |
+| =       | b       | byteawithoutorderwithequalcol | bytea                         | bool               | byteawithoutorderwithequalcoleqbytear |
+| =       | b       | byteawithoutorderwithequalcol | byteawithoutorderwithequalcol | bool               | byteawithoutorderwithequalcoleq       |
+| =       | b       | char                          | char                          | bool               | chareq                                |
+| =       | b       | cid                           | cid                           | bool               | cideq                                 |
+| =       | b       | circle                        | circle                        | bool               | circle_eq                             |
+| =       | b       | date                          | date                          | bool               | date_eq                               |
+| =       | b       | date                          | timestamp                     | bool               | date_eq_timestamp                     |
+| =       | b       | date                          | timestamptz                   | bool               | date_eq_timestamptz                   |
+| =       | b       | float4                        | float4                        | bool               | float4eq                              |
+| =       | b       | float4                        | float8                        | bool               | float48eq                             |
+| =       | b       | float8                        | float4                        | bool               | float84eq                             |
+| =       | b       | float8                        | float8                        | bool               | float8eq                              |
+| =       | b       | hll                           | hll                           | bool               | hll_eq                                |
+| =       | b       | hll_hashval                   | hll_hashval                   | bool               | hll_hashval_eq                        |
+| =       | b       | inet                          | inet                          | bool               | network_eq                            |
+| =       | b       | int1                          | int1                          | bool               | int1eq                                |
+| =       | b       | int2                          | int8                          | bool               | int28eq                               |
+| =       | b       | int2                          | int2                          | bool               | int2eq                                |
+| =       | b       | int2                          | int4                          | bool               | int24eq                               |
+| =       | b       | int2vector                    | int2vector                    | bool               | int2vectoreq                          |
+| =       | b       | int4                          | int2                          | bool               | int42eq                               |
+| =       | b       | int4                          | int8                          | bool               | int48eq                               |
+| =       | b       | int4                          | int4                          | bool               | int4eq                                |
+| =       | b       | int8                          | int8                          | bool               | int8eq                                |
+| =       | b       | int8                          | int2                          | bool               | int82eq                               |
+| =       | b       | int8                          | int4                          | bool               | int84eq                               |
+| =       | b       | interval                      | interval                      | bool               | interval_eq                           |
+| =       | b       | jsonb                         | jsonb                         | bool               | jsonb_eq                              |
+| =       | b       | line                          | line                          | bool               | line_eq                               |
+| =       | b       | lseg                          | lseg                          | bool               | lseg_eq                               |
+| =       | b       | macaddr                       | macaddr                       | bool               | macaddr_eq                            |
+| =       | b       | money                         | money                         | bool               | cash_eq                               |
+| =       | b       | name                          | name                          | bool               | nameeq                                |
+| =       | b       | numeric                       | numeric                       | bool               | numeric_eq                            |
+| =       | b       | oid                           | oid                           | bool               | oideq                                 |
+| =       | b       | oidvector                     | oidvector                     | bool               | oidvectoreq                           |
+| =       | b       | path                          | path                          | bool               | path_n_eq                             |
+| =       | b       | raw                           | raw                           | bool               | raweq                                 |
+| =       | b       | record                        | record                        | bool               | record_eq                             |
+| =       | b       | reltime                       | reltime                       | bool               | reltimeeq                             |
+| =       | b       | smalldatetime                 | smalldatetime                 | bool               | smalldatetime_eq                      |
+| =       | b       | text                          | text                          | bool               | texteq                                |
+| =       | b       | tid                           | tid                           | bool               | tideq                                 |
+| =       | b       | time                          | time                          | bool               | time_eq                               |
+| =       | b       | timestamp                     | timestamp                     | bool               | timestamp_eq                          |
+| =       | b       | timestamp                     | date                          | bool               | timestamp_eq_date                     |
+| =       | b       | timestamp                     | timestamptz                   | bool               | timestamp_eq_timestamptz              |
+| =       | b       | timestamptz                   | timestamptz                   | bool               | timestamptz_eq                        |
+| =       | b       | timestamptz                   | date                          | bool               | timestamptz_eq_date                   |
+| =       | b       | timestamptz                   | timestamp                     | bool               | timestamptz_eq_timestamp              |
+| =       | b       | timetz                        | timetz                        | bool               | timetz_eq                             |
+| =       | b       | tinterval                     | tinterval                     | bool               | tintervaleq                           |
+| =       | b       | tsquery                       | tsquery                       | bool               | tsquery_eq                            |
+| =       | b       | tsvector                      | tsvector                      | bool               | tsvector_eq                           |
+| =       | b       | uuid                          | uuid                          | bool               | uuid_eq                               |
+| =       | b       | varbit                        | varbit                        | bool               | varbiteq                              |
+| =       | b       | xid                           | xid                           | bool               | xideq                                 |
+| =       | b       | xid                           | int8                          | bool               | xideqint8                             |
+| =       | b       | xid32                         | int4                          | bool               | xideqint4                             |
+| =       | b       | xid32                         | xid32                         | bool               | xideq4                                |
++---------+---------+-------------------------------+-------------------------------+--------------------+---------------------------------------+
+explain performance select '2020-09-30'::abstime = '2020-09-30'::abstime;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select true = false;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: false                                                                    |
+?.*
+?.*
+?.*
+explain performance select 'test'::text = 'test'::clob;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select circle '((1,1)5)' = circle '((1,1)5)';
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select 21::int4 = 21::int8;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select 1::bool = 1::bool;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select '21'::char = '21'::char;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select '21'::name = '21'::name;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select 21::int2 = 21::int2;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select 21::int4 = 21::int4;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select '21'::text = '21'::text;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select '212121'::xid = '212121'::xid;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select '212121'::xid = '212121'::int8;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select '212121'::xid32 = '212121'::xid32;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select '212121'::xid32 = '212121'::int4;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select '212121'::cid = '212121'::cid;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select '212'::int2vector = '212'::int2vector;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select 21::int8 = 21::int8;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select 21::int8 = 21::int4;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select box '(1,1),(2,2)'::box = box '(1,1),(2,2)'::box;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select 21::int2 = 21::int4;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select 21::int4 = 21::int2;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select '2020-09-29'::abstime = '2020-09-29'::abstime;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select 21::reltime = 21::reltime;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select 21::oid = 21::oid;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select 0.21::float4 = 0.21::float4;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select '21'::oidvector = '21'::oidvector;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select 0.21::float8 = 0.21::float8;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select path '(1,1),(2,2),(3,3),(4,4)'::path = path '(1,1),(2,2),(3,3),(4,4)'::path;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select 21.21::money = 21.21::money;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: ((21.21)::money = (21.21)::money)                                        |
+?.*
+?.*
+?.*
+explain performance select '$ 21.21::money' = '$ 21.20::money';
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: false                                                                    |
+?.*
+?.*
+?.*
+explain performance select 21::bpchar = 21::bpchar;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select '2020-09-29'::date = '2020-09-29'::date;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select 0.21::float4 = 0.21::float8;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: false                                                                    |
+?.*
+?.*
+?.*
+explain performance select 0.21::float8 = 0.21::float4;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: false                                                                    |
+?.*
+?.*
+?.*
+explain performance select '0.0.0.0/24'::inet = '0.0.0.0/24'::inet;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select '2020-09-29'::timestamptz = '2020-09-29'::timestamptz;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select 21::interval = 21::interval;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select circle '1,1,5'::circle = circle '1,1,5'::circle;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select lseg '(1,2),(3,2)'::lseg = lseg '(1,2),(3,2)'::lseg;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select 0.21::numeric = 0.21::numeric;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select B'1'::bit = B'1'::bit;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select B'1'::varbit = B'1'::varbit;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select 21::int2 = 21::int8;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select 21::int8 = 21::int2;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select '2020-09-29'::timestamp = '2020-09-29'::timestamp;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select '2020-09-29'::date = '2020-09-29'::timestamp;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select '2020-09-29'::date = '2020-09-29'::timestamptz;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: ('2020-09-29 00:00:00'::timestamp(0) without time zone = '2020-09-29 00:00:00+08'::timestamp with time zone) |
+?.*
+?.*
+?.*
+explain performance select '2020-09-29'::timestamp = '2020-09-29'::date;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select '2020-09-29'::timestamptz = '2020-09-29'::date;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: ('2020-09-29 00:00:00+08'::timestamp with time zone = '2020-09-29 00:00:00'::timestamp(0) without time zone) |
+?.*
+?.*
+?.*
+explain performance select '2020-09-29'::timestamp = '2020-09-29'::timestamptz;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: ('2020-09-29 00:00:00'::timestamp without time zone = '2020-09-29 00:00:00+08'::timestamp with time zone) |
+?.*
+?.*
+?.*
+explain performance select '2020-09-29'::timestamptz = '2020-09-29'::timestamp;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: ('2020-09-29 00:00:00+08'::timestamp with time zone = '2020-09-29 00:00:00'::timestamp without time zone) |
+?.*
+?.*
+?.*
+explain performance select HEXTORAW('DEADBEEF')::raw = HEXTORAW('DEADBEEF')::raw;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select 21::int1 = 21::int1;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select '2020-09-29'::smalldatetime = '2020-09-29'::smalldatetime;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select '[105.2e3,"test",{"a":1}]'::jsonb = '[105.2e3,"test",{"a":1}]'::jsonb;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+
+explain performance select '[105.2e3,"test",{"a":1}]'::jsonb = '[107.2e3,"test",{"a":1}]'::jsonb;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: false                                                                    |
+?.*
+?.*
+?.*
+
+--testpoint:二目操作符  <= ：success
+select oprname,oprkind,test_cast_fun_0032(oprleft::int),test_cast_fun_0032(oprright::int),test_cast_fun_0032(oprresult::int),proname from pg_operator o
+left join pg_proc p on p.oid=o.oprcode
+where oprname ='<=' and oprkind = 'b' order by test_cast_fun_0032(oprleft::int) asc;
++---------+---------+--------------------+--------------------+--------------------+--------------------------+
+| oprname | oprkind | test_cast_fun_0032 | test_cast_fun_0032 | test_cast_fun_0032 | proname                  |
++---------+---------+--------------------+--------------------+--------------------+--------------------------+
+| <=      | b       | abstime            | abstime            | bool               | abstimele                |
+| <=      | b       | anyarray           | anyarray           | bool               | array_le                 |
+| <=      | b       | anyenum            | anyenum            | bool               | enum_le                  |
+| <=      | b       | anyrange           | anyrange           | bool               | range_le                 |
+| <=      | b       | bit                | bit                | bool               | bitle                    |
+| <=      | b       | bool               | bool               | bool               | boolle                   |
+| <=      | b       | box                | box                | bool               | box_le                   |
+| <=      | b       | bpchar             | bpchar             | bool               | bpcharle                 |
+| <=      | b       | bytea              | bytea              | bool               | byteale                  |
+| <=      | b       | char               | char               | bool               | charle                   |
+| <=      | b       | circle             | circle             | bool               | circle_le                |
+| <=      | b       | date               | date               | bool               | date_le                  |
+| <=      | b       | date               | timestamp          | bool               | date_le_timestamp        |
+| <=      | b       | date               | timestamptz        | bool               | date_le_timestamptz      |
+| <=      | b       | float4             | float4             | bool               | float4le                 |
+| <=      | b       | float4             | float8             | bool               | float48le                |
+| <=      | b       | float8             | float4             | bool               | float84le                |
+| <=      | b       | float8             | float8             | bool               | float8le                 |
+| <=      | b       | inet               | inet               | bool               | network_le               |
+| <=      | b       | int1               | int1               | bool               | int1le                   |
+| <=      | b       | int2               | int8               | bool               | int28le                  |
+| <=      | b       | int2               | int2               | bool               | int2le                   |
+| <=      | b       | int2               | int4               | bool               | int24le                  |
+| <=      | b       | int4               | int8               | bool               | int48le                  |
+| <=      | b       | int4               | int4               | bool               | int4le                   |
+| <=      | b       | int4               | int2               | bool               | int42le                  |
+| <=      | b       | int8               | int4               | bool               | int84le                  |
+| <=      | b       | int8               | int2               | bool               | int82le                  |
+| <=      | b       | int8               | int8               | bool               | int8le                   |
+| <=      | b       | interval           | interval           | bool               | interval_le              |
+| <=      | b       | jsonb              | jsonb              | bool               | jsonb_le                 |
+| <=      | b       | lseg               | lseg               | bool               | lseg_le                  |
+| <=      | b       | macaddr            | macaddr            | bool               | macaddr_le               |
+| <=      | b       | money              | money              | bool               | cash_le                  |
+| <=      | b       | name               | name               | bool               | namele                   |
+| <=      | b       | numeric            | numeric            | bool               | numeric_le               |
+| <=      | b       | oid                | oid                | bool               | oidle                    |
+| <=      | b       | oidvector          | oidvector          | bool               | oidvectorle              |
+| <=      | b       | path               | path               | bool               | path_n_le                |
+| <=      | b       | raw                | raw                | bool               | rawle                    |
+| <=      | b       | record             | record             | bool               | record_le                |
+| <=      | b       | reltime            | reltime            | bool               | reltimele                |
+| <=      | b       | smalldatetime      | smalldatetime      | bool               | smalldatetime_le         |
+| <=      | b       | text               | text               | bool               | text_le                  |
+| <=      | b       | tid                | tid                | bool               | tidle                    |
+| <=      | b       | time               | time               | bool               | time_le                  |
+| <=      | b       | timestamp          | timestamp          | bool               | timestamp_le             |
+| <=      | b       | timestamp          | date               | bool               | timestamp_le_date        |
+| <=      | b       | timestamp          | timestamptz        | bool               | timestamp_le_timestamptz |
+| <=      | b       | timestamptz        | timestamptz        | bool               | timestamptz_le           |
+| <=      | b       | timestamptz        | date               | bool               | timestamptz_le_date      |
+| <=      | b       | timestamptz        | timestamp          | bool               | timestamptz_le_timestamp |
+| <=      | b       | timetz             | timetz             | bool               | timetz_le                |
+| <=      | b       | tinterval          | tinterval          | bool               | tintervalle              |
+| <=      | b       | tsquery            | tsquery            | bool               | tsquery_le               |
+| <=      | b       | tsvector           | tsvector           | bool               | tsvector_le              |
+| <=      | b       | uuid               | uuid               | bool               | uuid_le                  |
+| <=      | b       | varbit             | varbit             | bool               | varbitle                 |
++---------+---------+--------------------+--------------------+--------------------+--------------------------+
+explain performance select '2020-09-29'::date <= '2020-09-30'::timestamp;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select true <= false;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: false                                                                    |
+?.*
+?.*
+?.*
+explain performance select 'test'::varchar <= 'test'::clob;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select circle '((1,1)5)' <= circle '((1,1)5)';
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select '[105.2e3,"test",{"a":1}]'::jsonb <= '[105.2e3,"test",{"a":1}]'::jsonb;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+
+explain performance select '[109.2e3,"test",{"a":1}]'::jsonb <= '[105.2e3,"test",{"a":1}]'::jsonb;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: false                                                                    |
+?.*
+?.*
+?.*
+--testpoint:二目操作符  >= ：success
+select oprname,oprkind,test_cast_fun_0032(oprleft::int),test_cast_fun_0032(oprright::int),test_cast_fun_0032(oprresult::int),proname from pg_operator o
+left join pg_proc p on p.oid=o.oprcode
+where oprname ='>=' and oprkind = 'b' order by test_cast_fun_0032(oprleft::int) asc;
++---------+---------+--------------------+--------------------+--------------------+--------------------------+
+| oprname | oprkind | test_cast_fun_0032 | test_cast_fun_0032 | test_cast_fun_0032 | proname                  |
++---------+---------+--------------------+--------------------+--------------------+--------------------------+
+| >=      | b       | abstime            | abstime            | bool               | abstimege                |
+| >=      | b       | anyarray           | anyarray           | bool               | array_ge                 |
+| >=      | b       | anyenum            | anyenum            | bool               | enum_ge                  |
+| >=      | b       | anyrange           | anyrange           | bool               | range_ge                 |
+| >=      | b       | bit                | bit                | bool               | bitge                    |
+| >=      | b       | bool               | bool               | bool               | boolge                   |
+| >=      | b       | box                | box                | bool               | box_ge                   |
+| >=      | b       | bpchar             | bpchar             | bool               | bpcharge                 |
+| >=      | b       | bytea              | bytea              | bool               | byteage                  |
+| >=      | b       | char               | char               | bool               | charge                   |
+| >=      | b       | circle             | circle             | bool               | circle_ge                |
+| >=      | b       | date               | date               | bool               | date_ge                  |
+| >=      | b       | date               | timestamp          | bool               | date_ge_timestamp        |
+| >=      | b       | date               | timestamptz        | bool               | date_ge_timestamptz      |
+| >=      | b       | float4             | float4             | bool               | float4ge                 |
+| >=      | b       | float4             | float8             | bool               | float48ge                |
+| >=      | b       | float8             | float4             | bool               | float84ge                |
+| >=      | b       | float8             | float8             | bool               | float8ge                 |
+| >=      | b       | inet               | inet               | bool               | network_ge               |
+| >=      | b       | int1               | int1               | bool               | int1ge                   |
+| >=      | b       | int2               | int8               | bool               | int28ge                  |
+| >=      | b       | int2               | int2               | bool               | int2ge                   |
+| >=      | b       | int2               | int4               | bool               | int24ge                  |
+| >=      | b       | int4               | int8               | bool               | int48ge                  |
+| >=      | b       | int4               | int4               | bool               | int4ge                   |
+| >=      | b       | int4               | int2               | bool               | int42ge                  |
+| >=      | b       | int8               | int4               | bool               | int84ge                  |
+| >=      | b       | int8               | int2               | bool               | int82ge                  |
+| >=      | b       | int8               | int8               | bool               | int8ge                   |
+| >=      | b       | interval           | interval           | bool               | interval_ge              |
+| >=      | b       | jsonb              | jsonb              | bool               | jsonb_ge                 |
+| >=      | b       | lseg               | lseg               | bool               | lseg_ge                  |
+| >=      | b       | macaddr            | macaddr            | bool               | macaddr_ge               |
+| >=      | b       | money              | money              | bool               | cash_ge                  |
+| >=      | b       | name               | name               | bool               | namege                   |
+| >=      | b       | numeric            | numeric            | bool               | numeric_ge               |
+| >=      | b       | oid                | oid                | bool               | oidge                    |
+| >=      | b       | oidvector          | oidvector          | bool               | oidvectorge              |
+| >=      | b       | path               | path               | bool               | path_n_ge                |
+| >=      | b       | raw                | raw                | bool               | rawge                    |
+| >=      | b       | record             | record             | bool               | record_ge                |
+| >=      | b       | reltime            | reltime            | bool               | reltimege                |
+| >=      | b       | smalldatetime      | smalldatetime      | bool               | smalldatetime_ge         |
+| >=      | b       | text               | text               | bool               | text_ge                  |
+| >=      | b       | tid                | tid                | bool               | tidge                    |
+| >=      | b       | time               | time               | bool               | time_ge                  |
+| >=      | b       | timestamp          | timestamp          | bool               | timestamp_ge             |
+| >=      | b       | timestamp          | date               | bool               | timestamp_ge_date        |
+| >=      | b       | timestamp          | timestamptz        | bool               | timestamp_ge_timestamptz |
+| >=      | b       | timestamptz        | timestamptz        | bool               | timestamptz_ge           |
+| >=      | b       | timestamptz        | date               | bool               | timestamptz_ge_date      |
+| >=      | b       | timestamptz        | timestamp          | bool               | timestamptz_ge_timestamp |
+| >=      | b       | timetz             | timetz             | bool               | timetz_ge                |
+| >=      | b       | tinterval          | tinterval          | bool               | tintervalge              |
+| >=      | b       | tsquery            | tsquery            | bool               | tsquery_ge               |
+| >=      | b       | tsvector           | tsvector           | bool               | tsvector_ge              |
+| >=      | b       | uuid               | uuid               | bool               | uuid_ge                  |
+| >=      | b       | varbit             | varbit             | bool               | varbitge                 |
++---------+---------+--------------------+--------------------+--------------------+--------------------------+
+explain performance select '2020-09-29'::date >= '2020-09-30'::timestamp;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: false                                                                    |
+?.*
+?.*
+?.*
+explain performance select true >= false;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select 'test'::varchar >= 'test'::clob;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select circle '((1,1)5)' >= circle '((1,1)5)';
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+explain performance select '[105.2e3,"test",{"a":1}]'::jsonb >= '[105.2e3,"test",{"a":1}]'::jsonb;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+
+explain performance select '[101.2e3,"test",{"a":1}]'::jsonb >= '[105.2e3,"test",{"a":1}]'::jsonb;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: false                                                                    |
+?.*
+?.*
+?.*
+
+--testpoint:二目操作符  @@@ ：success
+select oprname,oprkind,test_cast_fun_0032(oprleft::int),test_cast_fun_0032(oprright::int),test_cast_fun_0032(oprresult::int),proname from pg_operator o
+left join pg_proc p on p.oid=o.oprcode
+where oprname ='@@@' and oprkind = 'b' order by test_cast_fun_0032(oprleft::int) asc;
++---------+---------+--------------------+--------------------+--------------------+-------------+
+| oprname | oprkind | test_cast_fun_0032 | test_cast_fun_0032 | test_cast_fun_0032 | proname     |
++---------+---------+--------------------+--------------------+--------------------+-------------+
+| @@@     | b       | tsquery            | tsvector           | bool               | ts_match_qv |
+| @@@     | b       | tsvector           | tsquery            | bool               | ts_match_vq |
++---------+---------+--------------------+--------------------+--------------------+-------------+
+explain performance SELECT to_tsvector('fat cats ate rats') @@@ to_tsquery('cat & rat');
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: true                                                                     |
+?.*
+?.*
+?.*
+--环境清理
+drop function if exists test_cast_fun_0032(integer) cascade;
+SQL SUCCESS

@@ -1,0 +1,65 @@
+-- @testpoint: opengauss关键字collate(保留)，作为同义词对象名，部分测试点合理报错
+--前置条件
+drop table if exists collate_test;
+SQL SUCCESS
+create table collate_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-失败
+drop synonym if exists collate;
+?.*ERROR: syntax error at or near "collate"
+?.*Position: .*
+create synonym collate for collate_test;
+?.*ERROR: syntax error at or near "collate"
+?.*Position: .*
+--关键字带双引号-成功
+drop synonym if exists "collate";
+SQL SUCCESS
+create synonym "collate" for collate_test;
+SQL SUCCESS
+insert into "collate" values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update "collate" set "collate".name='cici' where "collate".id=2;
+SQL SUCCESS
+select * from "collate";
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+drop synonym "collate";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'collate';
+?.*ERROR: syntax error at or near "'collate'"
+?.*Position: .*
+create synonym 'collate' for collate_test;
+?.*ERROR: syntax error at or near "'collate'"
+?.*Position: .*
+insert into 'collate' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'collate'"
+?.*Position: .*
+update 'collate' set 'collate'.name='cici' where 'collate'.id=2;
+?.*ERROR: syntax error at or near "'collate'"
+?.*Position: .*
+select * from 'collate';
+?.*ERROR: syntax error at or near "'collate'"
+?.*Position: .*
+--关键字带反引号-合理报错
+drop synonym if exists `collate`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+create synonym `collate` for collate_test;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+insert into `collate` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+update `collate` set `collate`.name='cici' where `collate`.id=2;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+select * from `collate`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+drop table if exists collate_test;
+SQL SUCCESS

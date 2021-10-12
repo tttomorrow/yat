@@ -1,0 +1,13 @@
+-- @testpoint: cos函数与参数个数及类型校验，合理报错
+select cos(2*pi(),2*pi()));
+?.*ERROR: syntax error at or near "\)"
+?.*
+select cos();
+?.*ERROR: function cos\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: cos
+select cos('yeah');
+?.*ERROR: invalid input syntax for type double precision: "yeah"
+?.*
+  Where: referenced column: cos

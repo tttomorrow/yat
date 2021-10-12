@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字deferred(非保留)，作为用户组名
+--关键字不带引号-成功
+drop group if exists deferred;
+SQL SUCCESS
+create group deferred with password 'gauss@123';
+SQL SUCCESS
+drop group deferred;
+SQL SUCCESS
+--关键字带双引号-成功
+drop group if exists "deferred";
+SQL SUCCESS
+create group "deferred" with password 'gauss@123';
+SQL SUCCESS
+drop group "deferred";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop group if exists 'deferred';
+?.*ERROR: syntax error at or near "'deferred'"
+?.*
+create group 'deferred' with password 'gauss@123';
+?.*ERROR: syntax error at or near "'deferred'"
+?.*
+--关键字带反引号-合理报错
+drop group if exists `deferred`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create group `deferred` with password 'gauss@123';
+?.*ERROR: syntax error at or near "`"
+?.*

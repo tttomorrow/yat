@@ -1,0 +1,30 @@
+--  @testpoint:opengauss关键字constraint(保留)，作为模式名
+--关键字不带引号-合理报错
+drop schema if exists constraint;
+?.*ERROR: syntax error at or near "constraint".*
+?.*Position.*
+create schema constraint;
+?.*ERROR: syntax error at or near "constraint".*
+?.*Position.*
+--关键字带双引号-成功
+drop schema if exists "constraint";
+SQL SUCCESS
+create schema "constraint";
+SQL SUCCESS
+--清理环境
+drop schema "constraint";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop schema if exists 'constraint';
+?.*ERROR: syntax error at or near "'constraint'".*
+?.*Position.*
+create schema 'constraint';
+?.*ERROR: syntax error at or near "'constraint'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop schema if exists `constraint`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create schema `constraint`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*

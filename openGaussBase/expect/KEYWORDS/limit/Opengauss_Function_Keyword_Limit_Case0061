@@ -1,0 +1,38 @@
+-- @testpoint: join on条件后使用
+drop table if exists test_limit_009;
+SQL SUCCESS
+create table test_limit_009 ("LIMIT" int,id int);
+SQL SUCCESS
+insert into test_limit_009 values (-999,1);
+SQL SUCCESS
+insert into test_limit_009 values (-10000,2);
+SQL SUCCESS
+insert into test_limit_009 values (-10000,3);
+SQL SUCCESS
+insert into test_limit_009 values (100,3);
+SQL SUCCESS
+insert into test_limit_009 values (100,2);
+SQL SUCCESS
+drop table if exists test_limit_011;
+SQL SUCCESS
+create table test_limit_011 ("LIMIT" int,id int);
+SQL SUCCESS
+insert into test_limit_011 values (-999,9);
+SQL SUCCESS
+insert into test_limit_011 values (1,10);
+SQL SUCCESS
+insert into test_limit_011 values (2,11);
+SQL SUCCESS
+commit;
+SQL SUCCESS
+select t1.id  from test_limit_011 t1 inner join test_limit_009 t2 on t1."LIMIT" = t2."LIMIT" order by t1.id;
++----+
+| id |
++----+
+| 9  |
++----+
+--清理环境
+drop table if exists test_limit_009;
+SQL SUCCESS
+drop table if exists test_limit_011;
+SQL SUCCESS

@@ -1,0 +1,15 @@
+-- @testpoint: 插入右边界范围值
+drop table if exists binary_double09;
+SQL SUCCESS
+create table binary_double09 (name binary_double);
+SQL SUCCESS
+insert into binary_double09 values (1E+308);
+SQL SUCCESS
+select * from binary_double09;
++---------+
+| name    |
++---------+
+| 1.0E308 |
++---------+
+drop table binary_double09;
+SQL SUCCESS

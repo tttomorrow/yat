@@ -1,0 +1,37 @@
+-- @testpoint: opengauss关键字Both(保留)，作为索引名，部分测试点合理报错
+--前置条件，创建一个表
+drop table if exists Both_test;
+SQL SUCCESS
+create table Both_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-合理报错
+drop index if exists Both;
+?.*ERROR: syntax error at or near "Both".*
+?.*Position.*
+create index Both on Both_test(id);
+?.*ERROR: syntax error at or near "Both".*
+?.*Position.*
+--关键字带双引号-成功
+drop index if exists "Both";
+SQL SUCCESS
+create index "Both" on Both_test(id);
+SQL SUCCESS
+--清理环境
+drop index "Both";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop index if exists 'Both';
+?.*ERROR: syntax error at or near "'Both'".*
+?.*Position.*
+create index 'Both' on Both_test(id);
+?.*ERROR: syntax error at or near "'Both'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop index if exists `Both`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create index `Both` on Both_test(id);
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+drop table if exists Both_test;
+SQL SUCCESS

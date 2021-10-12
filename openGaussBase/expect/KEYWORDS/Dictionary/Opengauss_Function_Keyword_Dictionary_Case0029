@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字dictionary(非保留)，作为表空间名
+--关键字不带引号，创建成功
+drop tablespace if exists dictionary;
+SQL SUCCESS
+CREATE TABLESPACE dictionary RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+SQL SUCCESS
+drop tablespace dictionary;
+SQL SUCCESS
+--关键字带双引号，创建成功
+drop tablespace if exists "dictionary";
+SQL SUCCESS
+CREATE TABLESPACE "dictionary" RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+SQL SUCCESS
+drop tablespace "dictionary";
+SQL SUCCESS
+--关键字带单引号，合理报错
+drop tablespace if exists 'dictionary';
+?.*ERROR: syntax error at or near "'dictionary'"
+?.*
+CREATE TABLESPACE 'dictionary' RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+?.*ERROR: syntax error at or near "'dictionary'"
+?.*
+--关键字带反引号，合理报错
+drop tablespace if exists `dictionary`;
+?.*ERROR: syntax error at or near "`"
+?.*
+CREATE TABLESPACE `dictionary` RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+?.*ERROR: syntax error at or near "`"
+?.*

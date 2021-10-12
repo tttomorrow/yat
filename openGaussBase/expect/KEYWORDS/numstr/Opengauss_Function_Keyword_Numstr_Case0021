@@ -1,0 +1,58 @@
+-- @testpoint: opengauss关键字numstr(非保留)，作为函数名,部分测试点合理报错
+--关键字不带引号
+drop function if exists numstr;
+SQL SUCCESS
+create function numstr(i integer)
+returns integer
+as $$
+begin
+    return i+1;
+end;
+$$ language plpgsql;
+/
+SQL SUCCESS
+--关键字带双引号
+drop function if exists "numstr";
+SQL SUCCESS
+create function "numstr"(i integer)
+returns integer
+as $$
+begin
+    return i+1;
+end;
+$$ language plpgsql;
+/
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop function if exists 'numstr';
+?.*ERROR: syntax error at or near "'numstr'".*
+?.*Position: .*
+create function 'numstr'(i integer)
+returns integer
+as $$
+begin
+    return i+1;
+end;
+$$ language plpgsql;
+/
+?.*ERROR: syntax error at or near "'numstr'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop function if exists `numstr`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create function `numstr`(i integer)
+returns integer
+as $$
+begin
+    return i+1;
+end;
+$$ language plpgsql;
+/
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+--清理环境
+drop function if exists numstr(integer);
+SQL SUCCESS
+drop function if exists "numstr"(integer);
+SQL SUCCESS

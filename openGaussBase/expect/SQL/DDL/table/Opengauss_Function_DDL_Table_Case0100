@@ -1,0 +1,24 @@
+-- @testpoint: 测试表名长度最大支持63字节
+drop table if exists qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq;
+SQL SUCCESS
+create table qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq(a int);
+SQL SUCCESS
+insert into qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq values(1);
+SQL SUCCESS
+insert into qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq values(2);
+SQL SUCCESS
+insert into qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq values(3);
+SQL SUCCESS
+insert into qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq values(1);
+SQL SUCCESS
+select * from qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq;
++---+
+| a |
++---+
+| 1 |
+| 2 |
+| 3 |
+| 1 |
++---+
+drop table if exists qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq;
+SQL SUCCESS

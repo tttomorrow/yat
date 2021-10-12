@@ -1,0 +1,39 @@
+-- @testpoint: >, 判断前面函数是否大于后面函数
+--前面函数大于后面函数时，结果返回true
+select numrange(8.1,10.2,'[]') > numrange(5.1,6.7,'()') as result;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select tsrange('[2013-12-11 pst,2025-03-01 pst)') > ('[2013-12-11 pst,2021-05-01 pst)') as result;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select tsrange('[2021-01-01,2028-03-01)') > ('[2021-01-01,2021-05-01)') as result;
++--------+
+| result |
++--------+
+| true   |
++--------+
+--前面函数不大于后面函数时，结果返回false
+select int4range(1,5) > '[1,4]'::int4range as result;
++--------+
+| result |
++--------+
+| false  |
++--------+
+select int4range(10,10) > '(10,15)'::int4range as result;
++--------+
+| result |
++--------+
+| false  |
++--------+
+select int8range(15,25) > int8range(15,26) as result;
++--------+
+| result |
++--------+
+| false  |
++--------+

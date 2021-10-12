@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字parameter_mode(非保留)，作为外部数据源名
+--关键字不带引号-成功
+drop data source if exists parameter_mode;
+SQL SUCCESS
+create data source parameter_mode;
+SQL SUCCESS
+drop data source parameter_mode;
+SQL SUCCESS
+--关键字带双引号-成功
+drop data source if exists "parameter_mode";
+SQL SUCCESS
+create data source "parameter_mode";
+SQL SUCCESS
+drop data source "parameter_mode";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop data source if exists 'parameter_mode';
+?.*ERROR: syntax error at or near "'parameter_mode'".*
+?.*Position: .*
+create data source 'parameter_mode';
+?.*ERROR: syntax error at or near "'parameter_mode'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop data source if exists `parameter_mode`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create data source `parameter_mode`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

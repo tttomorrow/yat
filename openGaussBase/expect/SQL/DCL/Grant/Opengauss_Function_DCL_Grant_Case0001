@@ -1,0 +1,12 @@
+-- @testpoint:  将系统权限授权给用户或者角色。
+--（系统权限又称为用户属性，包括SYSADMIN、CREATEDB、CREATEROLE、AUDITADMIN和LOGIN。）
+drop user if exists user_001 cascade;
+SQL SUCCESS
+create user  user_001 identified by 'Gauss_234';
+SQL SUCCESS
+GRANT ALL  PRIVILEGES  TO user_001;
+SQL SUCCESS
+REVOKE ALL PRIVILEGES from user_001;
+SQL SUCCESS
+drop user  user_001;
+SQL SUCCESS

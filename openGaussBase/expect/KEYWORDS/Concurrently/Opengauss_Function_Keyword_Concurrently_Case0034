@@ -1,0 +1,50 @@
+-- @testpoint: opengauss关键字concurrently(非保留)，作为游标名，部分测试点合理报错
+--前置条件
+drop table if exists concurrently_test cascade;
+SQL SUCCESS
+create table concurrently_test(cid int,fid int);
+SQL SUCCESS
+--关键字不带引号-成功
+start transaction;
+SQL SUCCESS
+cursor concurrently for select * from concurrently_test order by 1;
+?.*ERROR: syntax error at or near "concurrently"
+?.*
+close concurrently;
+?.*ERROR: syntax error at or near "concurrently"
+?.*
+end;
+SQL SUCCESS
+--关键字带双引号-成功
+start transaction;
+SQL SUCCESS
+cursor "concurrently" for select * from concurrently_test order by 1;
+SQL SUCCESS
+close "concurrently";
+SQL SUCCESS
+end;
+SQL SUCCESS
+--关键字带单引号-合理报错
+start transaction;
+SQL SUCCESS
+cursor 'concurrently' for select * from concurrently_test order by 1;
+?.*ERROR: syntax error at or near "'concurrently'"
+?.*
+close 'concurrently';
+?.*ERROR: syntax error at or near "'concurrently'"
+?.*
+end;
+SQL SUCCESS
+--关键字带反引号-合理报错
+start transaction;
+SQL SUCCESS
+cursor `concurrently` for select * from concurrently_test order by 1;
+?.*ERROR: syntax error at or near "`"
+?.*
+close `concurrently`;
+?.*ERROR: syntax error at or near "`"
+?.*
+end;
+SQL SUCCESS
+drop table if exists concurrently_test cascade;
+SQL SUCCESS

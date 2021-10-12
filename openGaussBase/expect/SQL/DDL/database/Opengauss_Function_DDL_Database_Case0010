@@ -1,0 +1,26 @@
+-- @testpoint: 删除数据库,合理报错
+create database test0010;
+SQL SUCCESS
+drop database test0010;
+SQL SUCCESS
+drop database test0010;
+?.*ERROR: database "test0010" does not exist
+drop database if exists test0010;
+SQL SUCCESS
+drop database postgres;
+?.*ERROR: cannot drop the default database
+drop database TEMPLATE0;
+?.*ERROR: cannot drop a template database
+drop database TEMPLATE1;
+?.*ERROR: cannot drop a template database
+create database test0010;
+SQL SUCCESS
+start transaction;
+SQL SUCCESS
+drop database if exists test0010;
+?.*ERROR: DROP DATABASE cannot run inside a transaction block
+end;
+SQL SUCCESS
+--tearDown
+drop database if exists test0010;
+SQL SUCCESS

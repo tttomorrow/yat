@@ -1,0 +1,24 @@
+-- @testpoint: 关键字unusable,用作字段类型（合理报错）
+drop table if exists unusable_test cascade;
+SQL SUCCESS
+create table if not exists unusable_test(id int,unusable unusable(20));
+?.*ERROR.*
+?.*Position: .*
+create or replace procedure unusable_insert
+as
+begin
+ for i in 1..10 loop
+    insert into unusable_test values(i,'unusable'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call unusable_insert();
+?.*ERROR.*
+  Where: PL/pgSQL function unusable_insert() line 4 at SQL statement
+select * from unusable_test;
+?.*ERROR.*
+?.*Position: .*
+--清理环境
+drop procedure unusable_insert;
+SQL SUCCESS

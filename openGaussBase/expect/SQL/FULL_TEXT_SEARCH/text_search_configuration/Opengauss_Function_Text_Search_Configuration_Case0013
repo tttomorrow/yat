@@ -1,0 +1,29 @@
+--  @testpoint:修改文本搜索配置字串类型语法测试，字串类型与解析器对应
+--创建文本搜索配置
+DROP TEXT SEARCH CONFIGURATION if exists english2;
+SQL SUCCESS
+CREATE TEXT SEARCH CONFIGURATION english2 (parser=default);
+SQL SUCCESS
+--创建simple字典
+DROP TEXT SEARCH DICTIONARY IF EXISTS pg_dict;
+SQL SUCCESS
+CREATE TEXT SEARCH DICTIONARY pg_dict (TEMPLATE = Simple);
+SQL SUCCESS
+--增加文本搜索配置字串类型映射
+ALTER TEXT SEARCH CONFIGURATION english2 ADD MAPPING FOR numword WITH simple,english_stem;
+SQL SUCCESS
+--修改文本搜索配置字串类型(字串类型与解析器对应)
+ALTER TEXT SEARCH CONFIGURATION english2 ALTER MAPPING FOR url WITH simple,english_stem;
+SQL SUCCESS
+--查询文本搜索配置相关信息
+SELECT cfgname,cfoptions  FROM PG_TS_CONFIG where cfgname='ngram2';
++---------+-----------+
+| cfgname | cfoptions |
++---------+-----------+
++---------+-----------+
+--删除文本搜索配置
+DROP TEXT SEARCH CONFIGURATION english2;
+SQL SUCCESS
+--删除字典
+DROP TEXT SEARCH DICTIONARY pg_dict;
+SQL SUCCESS

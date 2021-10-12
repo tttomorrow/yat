@@ -1,0 +1,19 @@
+-- @testpoint: 不指定精度，插入有效正整数
+drop table if exists decimal_01;
+SQL SUCCESS
+create table decimal_01 (name decimal);
+SQL SUCCESS
+insert into decimal_01 values (12);
+SQL SUCCESS
+insert into decimal_01 values (1200034);
+SQL SUCCESS
+SQL SUCCESS
+select * from decimal_01;
++------------+
+| name       |
++------------+
+| 12         |
+| 1200034    |
++------------+
+drop table decimal_01;
+SQL SUCCESS

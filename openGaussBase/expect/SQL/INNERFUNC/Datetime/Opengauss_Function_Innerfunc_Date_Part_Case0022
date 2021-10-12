@@ -1,0 +1,45 @@
+-- @testpoint: date_part给reltime类型的时间段取值小数
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (clo1 reltime);
+SQL SUCCESS
+insert into test_date01 values ('31.25');
+SQL SUCCESS
+select date_part('month', clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| 1.0       |
++-----------+
+SELECT date_part('month', reltime '31.25');
++-----------+
+| date_part |
++-----------+
+| 1.0       |
++-----------+
+select date_part('day', clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| 1.0       |
++-----------+
+SELECT date_part('day', reltime '31.25');
++-----------+
+| date_part |
++-----------+
+| 1.0       |
++-----------+
+select date_part('hour', clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| 6.0       |
++-----------+
+SELECT date_part('hour', reltime '31.25');
++-----------+
+| date_part |
++-----------+
+| 6.0       |
++-----------+
+drop table if exists test_date01;
+SQL SUCCESS
