@@ -1,0 +1,32 @@
+# JDBC settings
+
+#yat.check.sql: 'select 1 from dual'
+#yat.connection.autocommit: true
+
+# Yat system settings
+
+## allow values 'strict' or 'smart'
+#yat.compare.type: smart
+#yat.compare.ignore.case: true
+#yat.compare.disorder: true
+#yat.compare.hash: false
+
+# Yat output setting
+
+#yat.testcase.out.suffix: ''
+## allow values 'pretty', 'simple'
+#yat.output.mode: 'pretty'
+#yat.zsql.path: zsql
+#yat.gsql.path: gsql
+
+# Yat Report settings
+
+#yat.filling: '.'
+#yat.txt.report.width: 100
+
+# Yat checker settings
+
+#yat.limit.case.count.max: 500
+#yat.limit.case.size.max: 15K
+#yat.limit.case.depth.max: 2
+#yat.limit.case.name.pattern: '[a-zA-Z0-9_-]+'

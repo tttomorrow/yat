@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字parameter_specific_name非保留)，作为序列名
+--关键字不带引号-成功
+drop sequence if exists parameter_specific_name;
+SQL SUCCESS
+create sequence parameter_specific_name start 100 cache 50;
+SQL SUCCESS
+drop sequence parameter_specific_name;
+SQL SUCCESS
+--关键字带双引号-成功
+drop sequence if exists "parameter_specific_name";
+SQL SUCCESS
+create sequence "parameter_specific_name" start 100 cache 50;
+SQL SUCCESS
+drop sequence "parameter_specific_name";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'parameter_specific_name';
+?.*ERROR: syntax error at or near "'parameter_specific_name'".*
+?.*Position: .*
+create sequence 'parameter_specific_name' start 100 cache 50;
+?.*ERROR: syntax error at or near "'parameter_specific_name'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop sequence if exists `parameter_specific_name`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create sequence `parameter_specific_name` start 100 cache 50;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

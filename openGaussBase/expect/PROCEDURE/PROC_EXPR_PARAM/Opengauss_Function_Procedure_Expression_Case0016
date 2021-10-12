@@ -1,0 +1,30 @@
+-- @testpoint: 表达式做为参数的存储过程测试——字符串处理函数-LTRIM(),RTRIM()
+--创建存储过程
+CREATE OR REPLACE PROCEDURE PROC_EXPR_PARAM_016(P1 CHAR,P2 VARCHAR,T1 OUT VARCHAR,T2 OUT VARCHAR2,T3 OUT VARCHAR)  AS
+BEGIN
+T1:=P1||p2;
+raise info 'T1=:%',T1;
+T2:=RTRIM(P1)||P2;
+raise info 'T2=:%',T2;
+T3:=RTRIM(P1)||LTRIM(P2);
+raise info 'T3=:%',T3;
+EXCEPTION
+WHEN NO_DATA_FOUND THEN raise info 'NO_DATA_FOUND';
+END;
+/
+SQL SUCCESS
+--调用存储过程
+DECLARE
+V1 CHAR(50):='P1iifhlgASDFYYYVBvhkkend';
+V2 VARCHAR(50):='                 P2字符串@￥%……gjhvjhvg';
+V3 VARCHAR(400); 
+V4 VARCHAR(400);
+V5 VARCHAR(400);      
+BEGIN
+PROC_EXPR_PARAM_016(V1,V2,V3,V4,V5);
+END;
+/
+SQL SUCCESS
+--清理环境
+drop PROCEDURE PROC_EXPR_PARAM_016;
+SQL SUCCESS

@@ -1,0 +1,30 @@
+-- @testpoint: ANALYZE TABLE (表的多列统计信息)
+drop table if exists analyze_001;
+SQL SUCCESS
+create table analyze_001(c_id int,name varchar2(10),time date ,sex clob);
+SQL SUCCESS
+insert into analyze_001 values(1,'m',to_date('2018','yyyy'),'mmmmmm');
+SQL SUCCESS
+insert into analyze_001 values(2,'mmm',to_date('2018','yyyy'),'mmmmmm');
+SQL SUCCESS
+insert into analyze_001 values(3,'mmmmm',to_date('2018','yyyy'),'mmmmmm');
+SQL SUCCESS
+select c_id,name,sex from analyze_001 order by c_id;
++------+-------+--------+
+| c_id | name  | sex    |
++------+-------+--------+
+| 1    | m     | mmmmmm |
+| 2    | mmm   | mmmmmm |
+| 3    | mmmmm | mmmmmm |
++------+-------+--------+
+analyze analyze_001  ((c_id, name));
+SQL SUCCESS
+select * from pg_statistic where starelid = (select oid from pg_class where relname = 'analyze_001');
++----------+------------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------+---------------+------------+
+| starelid | starelkind | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 | stadndistinct | staextinfo |
++----------+------------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------+---------------+------------+
++----------+------------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------+---------------+------------+
+analyze analyze_001;
+SQL SUCCESS
+drop table if exists analyze_001;
+SQL SUCCESS

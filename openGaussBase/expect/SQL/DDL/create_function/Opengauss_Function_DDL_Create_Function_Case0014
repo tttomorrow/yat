@@ -1,0 +1,17 @@
+drop FUNCTION if EXISTS And_func1(integer, integer);
+SQL SUCCESS
+CREATE FUNCTION And_func1(integer, integer) RETURNS integer
+    AS 'select $1 + $2;'
+    LANGUAGE SQL
+    IMMUTABLE
+    RETURNS NULL ON NULL INPUT;
+/
+SQL SUCCESS
+call  And_func1(999,1);
++-----------+
+| and_func1 |
++-----------+
+| 1000      |
++-----------+
+drop function And_func1;
+SQL SUCCESS

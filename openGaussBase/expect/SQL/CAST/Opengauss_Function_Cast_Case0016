@@ -1,0 +1,99 @@
+-- @testpoint: oid类型转换
+--查询源数据类型和目标数据类型间的转化方式：
+--'e'：表示只能进行显式转化（使用CAST或::语法）。
+--'i'：表示只能进行隐式转化。
+--'a'：表示类型间同时支持隐式和显式转化。
+--转化方法：
+--'f'：使用castfunc字段中指定的函数进行转化。
+--'b'：类型间是二进制强制转化，不使用castfunc。
+select typname,proname,castcontext,castmethod from pg_cast c
+join pg_type t on t.oid=c.casttarget
+left join pg_proc p on p.oid=c.castfunc
+where c.oid in (select oid from pg_cast
+where castsource= (select oid from pg_type where typname='oid'));
++---------------+---------+-------------+------------+
+| typname       | proname | castcontext | castmethod |
++---------------+---------+-------------+------------+
+| int8          | int8    | a           | f          |
+| int4          |         | a           | b          |
+| regproc       |         | i           | b          |
+| regprocedure  |         | i           | b          |
+| regoper       |         | i           | b          |
+| regoperator   |         | i           | b          |
+| regclass      |         | i           | b          |
+| regtype       |         | i           | b          |
+| regconfig     |         | i           | b          |
+| regdictionary |         | i           | b          |
++---------------+---------+-------------+------------+
+--建表
+drop table if exists test_cast_0016 cascade;
+SQL SUCCESS
+create table test_cast_0016(
+c_int8 int8,
+c_int4 int4,
+c_regproc regproc,
+c_regprocedure regprocedure,
+c_regoper regoper,
+c_regoperator regoperator,
+c_regclass regclass,
+c_regtype regtype,
+c_regconfig regconfig,
+c_regdictionary regdictionary
+);
+SQL SUCCESS
+--查询转换计划
+--test point：隐式转换:success
+explain performance insert into test_cast_0016 values(
+'16'::oid,
+'16'::oid,
+'16'::oid,
+'16'::oid,
+'16'::oid,
+'16'::oid,
+'16'::oid,
+'16'::oid,
+'16'::oid,
+'16'::oid
+);
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*
+?.*
+?.*
+|         Output: 16::bigint, 16, '16'::regproc, '16'::regprocedure, '16'::regoper, '16'::regoperator, '16'::regclass, 'boolean'::regtype, '16'::regconfig, '16'::regdictionary |
+?.*
+?.*
+?.*
+--test point：显式转换:success
+explain performance insert into test_cast_0016(c_int8) values('16'::oid::int8);
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*
+?.*
+?.*
+|         Output: 16::bigint, NULL::integer, NULL::regproc, NULL::regprocedure, NULL::regoper, NULL::regoperator, NULL::regclass, NULL::regtype, NULL::regconfig, NULL::regdictionary |
+?.*
+?.*
+?.*
+explain performance insert into test_cast_0016(c_int4) values(cast('16'::oid as int4));
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*
+?.*
+?.*
+|         Output: NULL::bigint, 16, NULL::regproc, NULL::regprocedure, NULL::regoper, NULL::regoperator, NULL::regclass, NULL::regtype, NULL::regconfig, NULL::regdictionary |
+?.*
+?.*
+?.*
+--清理数据
+drop table if exists test_cast_0016 cascade;
+SQL SUCCESS

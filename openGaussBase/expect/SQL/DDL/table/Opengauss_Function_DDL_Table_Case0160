@@ -1,0 +1,24 @@
+-- @testpoint: 创建类型是大对象的列存表，不支持blob，合理报错
+drop table if exists table_1;
+SQL SUCCESS
+create table table_1(a clob )with (ORIENTATION=COLUMN);
+SQL SUCCESS
+insert into table_1 values('1010'),('1001'),('1011'),('1111');
+SQL SUCCESS
+select * from table_1;
++------+
+| a    |
++------+
+| 1010 |
+| 1001 |
+| 1011 |
+| 1111 |
++------+
+drop table if exists table_1;
+SQL SUCCESS
+drop table if exists table_2;
+SQL SUCCESS
+create table table_2(a blob )with (ORIENTATION=COLUMN);
+?.*ERROR: type "blob" is not supported in column store.*
+drop table if exists table_2;
+SQL SUCCESS

@@ -1,0 +1,15 @@
+--  @testpoint:cursor声明游标，使用value子句，子句长度为单行；
+start transaction;
+SQL SUCCESS
+cursor cursor16 for values(0,1) ;
+SQL SUCCESS
+fetch from cursor16;
++---------+---------+
+| column1 | column2 |
++---------+---------+
+| 0       | 1       |
++---------+---------+
+close cursor16;
+SQL SUCCESS
+end;
+SQL SUCCESS

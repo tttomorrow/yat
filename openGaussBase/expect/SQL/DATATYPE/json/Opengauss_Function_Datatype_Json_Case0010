@@ -1,0 +1,17 @@
+-- @testpoint: json数据类型转换至text;
+drop table if exists test_json_10;
+SQL SUCCESS
+create  table test_json_10 (id json);
+SQL SUCCESS
+insert into test_json_10 values ('{"f1":1,"f2":true,"f3":"Hi"}');
+SQL SUCCESS
+alter table test_json_10 alter column id type text;
+SQL SUCCESS
+select * from test_json_10;
++------------------------------+
+| id                           |
++------------------------------+
+| {"f1":1,"f2":true,"f3":"Hi"} |
++------------------------------+
+drop table test_json_10;
+SQL SUCCESS

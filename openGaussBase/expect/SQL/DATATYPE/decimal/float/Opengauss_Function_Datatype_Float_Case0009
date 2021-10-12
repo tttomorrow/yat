@@ -1,0 +1,19 @@
+-- @testpoint: 插入字符串类型，合理报错
+drop table if exists float09;
+SQL SUCCESS
+create table float09 (name float);
+SQL SUCCESS
+insert into float09 values ('123abc');
+?.*ERROR: invalid input syntax for type double precision: "123abc"
+?.*
+  Where: referenced column: name
+insert into float09 values ('1235ss4563');
+?.*ERROR: invalid input syntax for type double precision: "1235ss4563"
+?.*
+  Where: referenced column: name
+insert into float09 values ('abc456');
+?.*ERROR: invalid input syntax for type double precision: "abc456"
+?.*
+  Where: referenced column: name
+drop table float09;
+SQL SUCCESS

@@ -1,0 +1,16 @@
+-- @testpoint: 带.表达式切分
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('hello world');
+SQL SUCCESS
+SELECT regexp_split_to_table(string1,'e.l') from type_char;
++-----------------------+
+| regexp_split_to_table |
++-----------------------+
+| h                     |
+| o world               |
++-----------------------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

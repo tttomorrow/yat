@@ -1,0 +1,142 @@
+--  @testpoint: alter 循环修改索引名 分区表
+SET ENABLE_SEQSCAN=off;
+SQL SUCCESS
+RESET ENABLE_INDEXSCAN;
+SQL SUCCESS
+RESET ENABLE_BITMAPSCAN;
+SQL SUCCESS
+show ENABLE_SEQSCAN;
++----------------+
+| enable_seqscan |
++----------------+
+| off            |
++----------------+
+show ENABLE_INDEXSCAN;
++------------------+
+| enable_indexscan |
++------------------+
+| on               |
++------------------+
+show ENABLE_BITMAPSCAN;
++-------------------+
+| enable_bitmapscan |
++-------------------+
+| on                |
++-------------------+
+--partition table
+DROP TABLE IF EXISTS test_gin_student_row;
+SQL SUCCESS
+CREATE TABLE test_gin_student_row
+(
+    num int,
+    data1 text,
+    data2 text
+)
+PARTITION BY RANGE(num)
+(
+    PARTITION num1 VALUES LESS THAN(10000),
+    PARTITION num2 VALUES LESS THAN(20000),
+    PARTITION num3 VALUES LESS THAN(300000)
+);
+SQL SUCCESS
+--insert data
+INSERT INTO test_gin_student_row SELECT num, md5(random()::text), md5(random()::text) FROM (SELECT * FROM generate_series(1,200000) AS num) AS x;
+SQL SUCCESS
+--refer to special partition
+CREATE INDEX test_gin_student_index_row2 ON test_gin_student_row USING GIN(to_tsvector('english', data2)) LOCAL
+(
+    PARTITION data2_index_1,
+    PARTITION data2_index_2,
+    PARTITION data2_index_3 
+) ;
+SQL SUCCESS
+--insert data
+INSERT INTO test_gin_student_row VALUES(1, 'China, officially the People''s Republic of China (PRC), located in Asia, is the world''s most populous state.', 'China');
+SQL SUCCESS
+INSERT INTO test_gin_student_row VALUES(2, 'America is a rock band, formed in England in 1970 by multi-instrumentalists Dewey Bunnell, Dan Peek, and Gerry Beckley.', 'America');
+SQL SUCCESS
+INSERT INTO test_gin_student_row VALUES(3, 'England is a country that is part of the United Kingdom. It shares land borders with Scotland to the north and Wales to the west.', 'England');
+SQL SUCCESS
+INSERT INTO test_gin_student_row VALUES(4, 'Australia, officially the Commonwealth of Australia, is a country comprising the mainland of the Australian continent, the island of Tasmania, and numerous smaller islands.', 'Australia');
+SQL SUCCESS
+INSERT INTO test_gin_student_row VALUES(5, 'Russia, also officially known as the Russian Federation, is a sovereign state in northern Eurasia.', 'Russia');
+SQL SUCCESS
+INSERT INTO test_gin_student_row VALUES(6, 'Japan is an island country in East Asia.', 'Japan');
+SQL SUCCESS
+INSERT INTO test_gin_student_row VALUES(7, 'Germany, officially the Federal Republic of Germany, is a sovereign state and federal parliamentary republic in central-western Europe.');
+SQL SUCCESS
+INSERT INTO test_gin_student_row VALUES(8, 'France, is a sovereign state comprising territory in western Europe and several overseas regions and territories.', 'France');
+SQL SUCCESS
+INSERT INTO test_gin_student_row VALUES(9, 'Italy officially the Italian Republic, is a unitary parliamentary republic in Europe.', 'Italy');
+SQL SUCCESS
+INSERT INTO test_gin_student_row VALUES(10, 'India, officially the Republic of India, is a country in South Asia.', 'India');
+SQL SUCCESS
+INSERT INTO test_gin_student_row VALUES(11, 'Brazil, officially the Federative Republic of Brazil, is the largest country in both South America and Latin America.', 'Brazil');
+SQL SUCCESS
+INSERT INTO test_gin_student_row VALUES(12, 'Canada is a country in the northern half of North America.', 'Canada');
+SQL SUCCESS
+INSERT INTO test_gin_student_row VALUES(13, 'Mexico, officially the United Mexican States, is a federal republic in the southern part of North America.', 'Mexico');
+SQL SUCCESS
+--alter 
+alter index test_gin_student_index_row2 rename to test_gin_student_index_row1;
+SQL SUCCESS
+alter index test_gin_student_index_row1 rename to test_gin_student_index_row2;
+SQL SUCCESS
+--query
+SELECT * FROM test_gin_student_row WHERE to_tsvector('english', data1) @@ to_tsquery('english', 'formed');
++-----+-------------------------------------------------------------------------------------------------------------------------+---------+
+| num | data1                                                                                                                   | data2   |
++-----+-------------------------------------------------------------------------------------------------------------------------+---------+
+| 2   | America is a rock band, formed in England in 1970 by multi-instrumentalists Dewey Bunnell, Dan Peek, and Gerry Beckley. | America |
++-----+-------------------------------------------------------------------------------------------------------------------------+---------+
+explain SELECT * FROM test_gin_student_row WHERE to_tsvector('english', data1) @@ to_tsquery('english', 'formed');
++----------------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                                     |
++----------------------------------------------------------------------------------------------------------------+
+?.*| Partition Iterator  .*
+|   Iterations: 3                                                                                                |
+?.*|   ->  Partitioned Seq Scan on test_gin_student_row  .*
+|         Filter: (to_tsvector('english'::regconfig, data1) @@ '''form'''::tsquery)                              |
+|         Selected Partitions:  1..3                                                                             |
++----------------------------------------------------------------------------------------------------------------+
+SELECT * FROM test_gin_student_row WHERE to_tsvector('english', data2) @@ to_tsquery('english', 'America');
++-----+-------------------------------------------------------------------------------------------------------------------------+---------+
+| num | data1                                                                                                                   | data2   |
++-----+-------------------------------------------------------------------------------------------------------------------------+---------+
+| 2   | America is a rock band, formed in England in 1970 by multi-instrumentalists Dewey Bunnell, Dan Peek, and Gerry Beckley. | America |
++-----+-------------------------------------------------------------------------------------------------------------------------+---------+
+explain SELECT * FROM test_gin_student_row WHERE to_tsvector('english', data2) @@ to_tsquery('english', 'America');
++----------------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                                     |
++----------------------------------------------------------------------------------------------------------------+
+| Partition Iterator  (cost=27.98..1951.92 rows=1030 width=68)                                                   |
+|   Iterations: 3                                                                                                |
+?.*|   ->  Partitioned Bitmap Heap Scan on test_gin_student_row  .*
+|         Recheck Cond: (to_tsvector('english'::regconfig, data2) @@ '''america'''::tsquery)                     |
+|         Selected Partitions:  1..3                                                                             |
+?.*|         ->  Partitioned Bitmap Index Scan on test_gin_student_index_row2  .*
+|               Index Cond: (to_tsvector('english'::regconfig, data2) @@ '''america'''::tsquery)                 |
+|               Selected Partitions:  1..3                                                                       |
++----------------------------------------------------------------------------------------------------------------+
+SELECT * FROM test_gin_student_row partition(num1) WHERE to_tsvector('english', data2) @@ to_tsquery('english', 'America');
++-----+-------------------------------------------------------------------------------------------------------------------------+---------+
+| num | data1                                                                                                                   | data2   |
++-----+-------------------------------------------------------------------------------------------------------------------------+---------+
+| 2   | America is a rock band, formed in England in 1970 by multi-instrumentalists Dewey Bunnell, Dan Peek, and Gerry Beckley. | America |
++-----+-------------------------------------------------------------------------------------------------------------------------+---------+
+explain SELECT * FROM test_gin_student_row partition(num1) WHERE to_tsvector('english', data2) @@ to_tsquery('english', 'America');
++----------------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                                     |
++----------------------------------------------------------------------------------------------------------------+
+?.*| Partition Iterator  .*                                                    |
+|   Iterations: 1                                                                                                |
+?.*|   ->  Partitioned Bitmap Heap Scan on test_gin_student_row.*
+|         Recheck Cond: (to_tsvector('english'::regconfig, data2) @@ '''america'''::tsquery)                     |
+|         Selected Partitions:  1                                                                                |
+?.*|         ->  Partitioned Bitmap Index Scan on test_gin_student_index_row2.*
+|               Index Cond: (to_tsvector('english'::regconfig, data2) @@ '''america'''::tsquery)                 |
+|               Selected Partitions:  1                                                                          |
++----------------------------------------------------------------------------------------------------------------+
+--tearDown drop table
+DROP TABLE test_gin_student_row;
+SQL SUCCESS

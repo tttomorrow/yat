@@ -1,0 +1,23 @@
+-- @testpoint: 关键字variable，用作字段类型（合理报错）
+drop table if exists variable_test cascade;
+SQL SUCCESS
+create table variable_test(id int,name variable(20));
+?.*ERROR.*
+?.*Position: .*
+create or replace procedure variable_insert
+as
+begin
+ for i in 1..10 loop
+    insert into variable_test values(i,'variable');
+    end loop;
+ end;
+/
+SQL SUCCESS
+call variable_insert();
+?.*ERROR.*
+  Where: PL/pgSQL function variable_insert() line 4 at SQL statement
+select * from variable_test;
+?.*ERROR.*
+?.*Position: .*
+drop procedure variable_insert;
+SQL SUCCESS

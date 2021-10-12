@@ -1,0 +1,42 @@
+-- @testpoint: 使用set方法设置参数check_function_bodies为off，默认为on下，创建函数无参返回值有参函数，合理报错
+--查看默认
+show check_function_bodies;
++-----------------------+
+| check_function_bodies |
++-----------------------+
+| on                    |
++-----------------------+
+--创建函数,报错
+CREATE or replace FUNCTION bad051_bak() RETURNS void
+LANGUAGE sql
+AS 'SELECT $1';
+/
+?.*ERROR: there is no parameter \$1
+?.*
+--设置
+set check_function_bodies to off;
+SQL SUCCESS
+--查看
+show check_function_bodies;
++-----------------------+
+| check_function_bodies |
++-----------------------+
+| off                   |
++-----------------------+
+--创建函数,成功
+CREATE or replace FUNCTION bad051() RETURNS void
+LANGUAGE sql
+AS 'SELECT $1';
+/
+SQL SUCCESS
+--恢复默认
+set check_function_bodies to on;
+SQL SUCCESS
+show check_function_bodies;
++-----------------------+
+| check_function_bodies |
++-----------------------+
+| on                    |
++-----------------------+
+drop FUNCTION bad051;
+SQL SUCCESS

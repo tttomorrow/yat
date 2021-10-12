@@ -1,0 +1,18 @@
+-- @testpoint: 日期类型有效值测试
+DROP TABLE IF EXISTS test_date10;
+SQL SUCCESS
+CREATE TABLE test_date10 (A INT,B date);
+SQL SUCCESS
+INSERT INTO test_date10 VALUES (1,'2018-09-13');
+SQL SUCCESS
+INSERT INTO test_date10 VALUES (2,'2018-09-17');
+SQL SUCCESS
+SELECT * FROM test_date10;
++---+-------------------------------+
+| a | b                             |
++---+-------------------------------+
+?.*| 1 | 2018-09-13 00:00:00.*
+?.*| 2 | 2018-09-17 00:00:00.*
++---+-------------------------------+
+DROP TABLE test_date10;
+SQL SUCCESS

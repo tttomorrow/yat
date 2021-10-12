@@ -1,0 +1,213 @@
+-- @testpoint:  reindex table：分区表设置索引不可用重建表
+--建普通表
+DROP TABLE if EXISTS test_index_table_164 CASCADE;
+SQL SUCCESS
+create table test_index_table_164(
+c_int int
+) WITH (ORIENTATION = row) partition by range(c_int)(
+partition p1 values less than (100),
+partition p2 values less than (1000),
+partition p3 values less than (5000),
+partition p4 values less than (10001)
+);
+SQL SUCCESS
+begin
+    for i in 0..10000 loop
+        insert into test_index_table_164 values(i);
+    end loop;
+end;
+/
+SQL SUCCESS
+--建local索引
+drop index if exists index_164_01;
+SQL SUCCESS
+create index index_164_01 on test_index_table_164(c_int) local (PARTITION p1,PARTITION p2,PARTITION p3,PARTITION p4);
+SQL SUCCESS
+select relname from pg_class where relname like 'index_164_%' order by relname;
+?.*
+| relname      |
+?.*
+| index_164_01 |
+?.*
+explain select * from test_index_table_164 where c_int > 5 group by c_int;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*Partition Iterator.*
+?.*
+?.*Partitioned Bitmap Heap Scan on test_index_table_164.*
+?.*
+?.*
+?.*Partitioned Bitmap Index Scan on index_164_01.*
+?.*
+?.*
+?.*
+explain select * from test_index_table_164 where c_int > 500 group by c_int;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*Partition Iterator.*
+?.*
+?.*Partitioned Bitmap Heap Scan on test_index_table_164.*
+?.*
+?.*
+?.*Partitioned Bitmap Index Scan on index_164_01.*
+?.*
+?.*
+?.*
+explain select * from test_index_table_164 where c_int > 2000 group by c_int;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*Partition Iterator.*
+?.*
+?.*Partitioned Bitmap Heap Scan on test_index_table_164.*
+?.*
+?.*
+?.*Partitioned Bitmap Index Scan on index_164_01.*
+?.*
+?.*
+?.*
+explain select * from test_index_table_164 where c_int > 5000 group by c_int;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*Partition Iterator.*
+?.*
+?.*Partitioned Bitmap Heap Scan on test_index_table_164.*
+?.*
+?.*
+?.*Partitioned Bitmap Index Scan on index_164_01.*
+?.*
+?.*
+?.*
+--reindex
+alter index index_164_01 MODIFY PARTITION p1 UNUSABLE;
+SQL SUCCESS
+explain select * from test_index_table_164 where c_int > 5 group by c_int;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*Partition Iterator.*
+?.*
+?.*Partitioned Seq Scan on test_index_table_164.*
+?.*
+?.*
+?.*
+alter index index_164_01 MODIFY PARTITION p2 UNUSABLE;
+SQL SUCCESS
+explain select * from test_index_table_164 where c_int > 500 group by c_int;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*Partition Iterator.*
+?.*
+?.*Partitioned Seq Scan on test_index_table_164.*
+?.*
+?.*
+?.*
+alter index index_164_01 MODIFY PARTITION p3 UNUSABLE;
+SQL SUCCESS
+explain select * from test_index_table_164 where c_int > 2000 group by c_int;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*Partition Iterator.*
+?.*
+?.*Partitioned Seq Scan on test_index_table_164.*
+?.*
+?.*
+?.*
+alter index index_164_01 MODIFY PARTITION p4 UNUSABLE;
+SQL SUCCESS
+explain select * from test_index_table_164 where c_int > 5000 group by c_int;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*Partition Iterator.*
+?.*
+?.*Partitioned Seq Scan on test_index_table_164.*
+?.*
+?.*
+?.*
+REINDEX table test_index_table_164;
+SQL SUCCESS
+explain select * from test_index_table_164 where c_int > 5 group by c_int;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*Partition Iterator.*
+?.*
+?.*Partitioned Bitmap Heap Scan on test_index_table_164.*
+?.*
+?.*
+?.*Partitioned Bitmap Index Scan on index_164_01.*
+?.*
+?.*
+?.*
+explain select * from test_index_table_164 where c_int > 500 group by c_int;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*Partition Iterator.*
+?.*
+?.*Partitioned Bitmap Heap Scan on test_index_table_164.*
+?.*
+?.*
+?.*Partitioned Bitmap Index Scan on index_164_01.*
+?.*
+?.*
+?.*
+explain select * from test_index_table_164 where c_int > 2000 group by c_int;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*Partition Iterator.*
+?.*
+?.*Partitioned Bitmap Heap Scan on test_index_table_164.*
+?.*
+?.*
+?.*Partitioned Bitmap Index Scan on index_164_01.*
+?.*
+?.*
+?.*
+explain select * from test_index_table_164 where c_int > 5000 group by c_int;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*Partition Iterator.*
+?.*
+?.*Partitioned Bitmap Heap Scan on test_index_table_164.*
+?.*
+?.*
+?.*Partitioned Bitmap Index Scan on index_164_01.*
+?.*
+?.*
+?.*
+--清理环境
+DROP TABLE if EXISTS test_index_table_164 CASCADE;
+SQL SUCCESS

@@ -1,0 +1,22 @@
+-- @testpoint: 匿名块使用操作符 ||/  立方根
+DROP TABLE IF EXISTS test_procedure_insert_081;
+SQL SUCCESS
+create table test_procedure_insert_081 (id int,
+name varchar2(20));
+SQL SUCCESS
+declare
+sqlstr varchar(1024);
+begin
+sqlstr := 'insert into test_procedure_insert_081 (SELECT ||/ 27.0 AS RESULT, 5)';
+execute immediate sqlstr;
+end;
+/
+SQL SUCCESS
+select * from test_procedure_insert_081;
++----+------+
+| id | name |
++----+------+
+| 3  | 5    |
++----+------+
+drop table test_procedure_insert_081;
+SQL SUCCESS

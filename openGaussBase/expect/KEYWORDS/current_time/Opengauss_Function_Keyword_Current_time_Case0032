@@ -1,0 +1,21 @@
+--  @testpoint:openGauss保留关键字current_time作为 用户名，
+--不带引号，合理报错
+CREATE USER current_time PASSWORD 'Bigdata@123';
+?.*ERROR: syntax error at or near "current_time".*
+?.*Position.*
+--加双引号，创建成功
+drop user if exists "current_time";
+SQL SUCCESS
+CREATE USER "current_time" PASSWORD 'Bigdata@123';
+SQL SUCCESS
+--清理环境
+drop user "current_time";
+SQL SUCCESS
+--加单引号，合理报错
+CREATE USER 'current_time' PASSWORD 'Bigdata@123';
+?.*ERROR: syntax error at or near "'current_time'".*
+?.*Position.*
+--加反引号，合理报错
+CREATE USER `current_time` PASSWORD 'Bigdata@123';
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*

@@ -1,0 +1,33 @@
+-- @testpoint: 使用inner join语句，查询成功
+-- @modify at: 2020-11-13
+--建表
+drop table if exists all_datatype_table;
+SQL SUCCESS
+create table all_datatype_table(id int not null,c_intger integer,c_char char(10))
+PARTITION BY RANGE (c_intger)
+(
+partition P_max values less than (2050)
+);
+SQL SUCCESS
+--插入数据
+insert into all_datatype_table values(1,1000,1000);
+SQL SUCCESS
+insert into all_datatype_table values(2,2000,1000);
+SQL SUCCESS
+insert into all_datatype_table values(3,2001,null);
+SQL SUCCESS
+insert into all_datatype_table values(4,2002,'a');
+SQL SUCCESS
+--查询表
+select * from all_datatype_table t1 inner join all_datatype_table t2 on t1.id=t2.id where t1.id<10;
++----+----------+------------+----+----------+------------+
+| id | c_intger | c_char     | id | c_intger | c_char     |
++----+----------+------------+----+----------+------------+
+| 1  | 1000     | 1000       | 1  | 1000     | 1000       |
+| 2  | 2000     | 1000       | 2  | 2000     | 1000       |
+| 3  | 2001     |            | 3  | 2001     |            |
+| 4  | 2002     | a          | 4  | 2002     | a          |
++----+----------+------------+----+----------+------------+
+--删表
+drop table if exists all_datatype_table;
+SQL SUCCESS

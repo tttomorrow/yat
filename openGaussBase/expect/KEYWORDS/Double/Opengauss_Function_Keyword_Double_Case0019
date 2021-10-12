@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字double(非保留)，作为外部数据源名
+--关键字不带引号-成功
+drop data source if exists double;
+SQL SUCCESS
+create data source double;
+SQL SUCCESS
+drop data source double;
+SQL SUCCESS
+--关键字带双引号-成功
+drop data source if exists "double";
+SQL SUCCESS
+create data source "double";
+SQL SUCCESS
+drop data source "double";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop data source if exists 'double';
+?.*ERROR: syntax error at or near "'double'"
+?.*Position.*
+create data source 'double';
+?.*ERROR: syntax error at or near "'double'"
+?.*Position.*
+--关键字带反引号-合理报错
+drop data source if exists `double`;
+?.*ERROR: syntax error at or near "`"
+?.*Position.*
+create data source `double`;
+?.*ERROR: syntax error at or near "`"
+?.*Position.*

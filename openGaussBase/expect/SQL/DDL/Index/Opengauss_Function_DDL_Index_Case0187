@@ -1,0 +1,65 @@
+--  @testpoint: 修改索引字段类型和长度查看索引
+--建普通表
+DROP TABLE if EXISTS test_index_table_187 CASCADE;
+SQL SUCCESS
+create table test_index_table_187(
+c_int int);
+SQL SUCCESS
+drop index if exists index_187_01;
+SQL SUCCESS
+create index index_187_01 on test_index_table_187(c_int) ;
+SQL SUCCESS
+select relname from pg_class where relname like 'index_187_%';
++--------------+
+| relname      |
++--------------+
+| index_187_01 |
++--------------+
+explain select * from test_index_table_187 where c_int >= 50 group by c_int;
++--------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                           |
++--------------------------------------------------------------------------------------+
+?.*
+?.*
+?.*Bitmap.*
+?.*
+?.*Bitmap.*
+?.*
++--------------------------------------------------------------------------------------+
+--修改索引列类型
+alter table test_index_table_187 modify c_int varchar;
+SQL SUCCESS
+explain select * from test_index_table_187 where c_int >= 50 group by c_int;
++------------------------------------------------------------------------------+
+| QUERY PLAN                                                                   |
++------------------------------------------------------------------------------+
+?.*
+?.*
+?.*
+?.*
++------------------------------------------------------------------------------+
+explain select * from test_index_table_187 where c_int = '50' group by c_int;
++------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                         |
++------------------------------------------------------------------------------------+
+?.*
+?.*
+?.*Bitmap.*
+?.*
+?.*Bitmap.*
+?.*
++------------------------------------------------------------------------------------+
+alter table test_index_table_187 modify c_int varchar(3900);
+SQL SUCCESS
+explain select * from test_index_table_187 where c_int = '3000' group by c_int;
++------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                           |
++------------------------------------------------------------------------------------------------------+
+?.*
+?.*
+?.*index_187_01.*
+?.*
++------------------------------------------------------------------------------------------------------+
+--清理环境
+DROP TABLE if EXISTS test_index_table_187 CASCADE;
+SQL SUCCESS

@@ -1,0 +1,35 @@
+--  @testpoint:不同数据表，支持创建同名的行访问控制策略，成功
+--创建表1
+drop table if exists products;
+SQL SUCCESS
+CREATE TABLE products(product_id INTEGER,product_name VARCHAR2(60),category VARCHAR2(60));
+SQL SUCCESS
+INSERT INTO products VALUES (1501, 'vivitar 35mm', 'electrncs');
+SQL SUCCESS
+--创建表2
+drop table if exists  newproducts;
+SQL SUCCESS
+CREATE TABLE newproducts(product_id INTEGER,product_name VARCHAR2(60),category VARCHAR2(60));
+SQL SUCCESS
+INSERT INTO newproducts VALUES (1502, 'olympus camera', 'electrncs');
+SQL SUCCESS
+--表1创建行访问控制策略test_pol1
+drop POLICY if exists test_pol1 ON products;
+SQL SUCCESS
+CREATE POLICY test_pol1 ON products FOR select TO PUBLIC USING (product_id = 1501);
+SQL SUCCESS
+--表2创建同名行访问控制策略test_pol1
+drop POLICY if exists test_pol1 ON newproducts;
+SQL SUCCESS
+CREATE POLICY test_pol1 ON newproducts FOR select TO PUBLIC USING (product_id = 1502);
+SQL SUCCESS
+--删除行访问控制策略
+drop POLICY test_pol1 ON products;
+SQL SUCCESS
+drop POLICY test_pol1 ON newproducts;
+SQL SUCCESS
+--删除表
+drop table products;
+SQL SUCCESS
+drop table newproducts;
+SQL SUCCESS

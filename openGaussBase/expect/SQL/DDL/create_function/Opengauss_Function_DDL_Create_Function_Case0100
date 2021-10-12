@@ -1,0 +1,19 @@
+--  @testpoint:创建函数时指定参数RETURNS NULL ON NULL INPUT
+drop FUNCTION if EXISTS v_testfun2(c_int int);
+SQL SUCCESS
+CREATE FUNCTION v_testfun2 (c_int int) RETURNS int  AS $$
+        BEGIN
+                RETURN (c_int);
+        END;
+$$ LANGUAGE plpgsql
+RETURNS NULL ON NULL INPUT;
+/
+SQL SUCCESS
+call v_testfun2(null);
++------------+
+| v_testfun2 |
++------------+
+|            |
++------------+
+drop FUNCTION v_testfun2;
+SQL SUCCESS

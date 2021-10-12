@@ -1,0 +1,15 @@
+-- @testpoint: 最后一个参数不为字符为数字
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('xxxxTRIaM');
+SQL SUCCESS
+SELECT ltrim(string1,1) from type_char;
++-----------+
+| ltrim     |
++-----------+
+| xxxxTRIaM |
++-----------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

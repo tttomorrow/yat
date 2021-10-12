@@ -1,0 +1,39 @@
+-- @testpoint: 关键字xmlparse，用作字段名
+drop table if exists xmlparse_test cascade;
+SQL SUCCESS
+create table xmlparse_test(id int,xmlparse varchar(20));
+SQL SUCCESS
+create or replace procedure xmlparse_insert
+as
+begin
+ for i in 1..10 loop
+    insert into xmlparse_test values(i,'xcd'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call xmlparse_insert();
++-----------------+
+| xmlparse_insert |
++-----------------+
+|                 |
++-----------------+
+select * from xmlparse_test;
++----+----------+
+| id | xmlparse |
++----+----------+
+| 1  | xcd1     |
+| 2  | xcd2     |
+| 3  | xcd3     |
+| 4  | xcd4     |
+| 5  | xcd5     |
+| 6  | xcd6     |
+| 7  | xcd7     |
+| 8  | xcd8     |
+| 9  | xcd9     |
+| 10 | xcd10    |
++----+----------+
+drop table if exists xmlparse_test cascade;
+SQL SUCCESS
+drop procedure xmlparse_insert;
+SQL SUCCESS

@@ -1,0 +1,55 @@
+-- @testpoint: 多维数组时，Array_remove(anyarray, anyelement) ：不支持，合理报错
+--数值型
+select array_remove('{{1,2,2},{1,4,3}}',2);
+?.*ERROR: removing elements from multidimensional arrays is not supporte.*
+  Where: referenced column: array_remove
+select array_remove(array[[1,2,2,3],[0.3,2,3.145]],'2');
+?.*ERROR: multidimensional arrays must have array expressions with matching dimension.*
+  Where: referenced column: array_remove
+select array_remove(array[[-1.2,2,3.145],[-1.223,-2,-3.145]],'-1.2');
+?.*ERROR: removing elements from multidimensional arrays is not supporte.*
+  Where: referenced column: array_remove
+--布尔型
+select array_remove(array[[true,false,null],[true,false,null]],'0');
+?.*ERROR: removing elements from multidimensional arrays is not supporte.*
+  Where: referenced column: array_remove
+select array_remove(array[[TRUE,false,null],[true,false,null]],'t');
+?.*ERROR: removing elements from multidimensional arrays is not supporte.*
+  Where: referenced column: array_remove
+select array_remove(array[[true,false,null],[FALSE,null,true]],'0');
+?.*ERROR: removing elements from multidimensional arrays is not supporte.*
+  Where: referenced column: array_remove
+select array_remove(array[[true,FALSE,true,false],[TRUE,false,null,true]],'t');
+?.*ERROR: removing elements from multidimensional arrays is not supporte.*
+  Where: referenced column: array_remove
+--字符型
+select array_remove(array[['123','efg','null'],['true','false','null']], '{123,efg,null}');
+?.*ERROR: removing elements from multidimensional arrays is not supporte.*
+  Where: referenced column: array_remove
+select array_remove(array[['123','efg','null'],['true','false','null']], '[123,efg,null]');
+?.*ERROR: removing elements from multidimensional arrays is not supporte.*
+  Where: referenced column: array_remove
+--日期时间型
+select array_remove(array[[date'2010-12-10 00:00:00
+',date'2010/12/10 16:40',date'2010-12-10 pst'],[date'2020-12-10 00:00:00
+',date'2020/12/10 16:40',date'2020-12-10 pst']], (TIMESTAMP '12-10-2010'));
+?.*ERROR: removing elements from multidimensional arrays is not supporte.*
+  Where: referenced column: array_remove
+select array_remove(array[[TIMESTAMP'2010-12-10 00:00:00
+',TIMESTAMP'2010/12/10 16:40',TIMESTAMP'2010-12-10 pst'],[TIMESTAMP'2020-12-10 00:00:00
+',TIMESTAMP'2020/12/10 16:40',TIMESTAMP'2020-12-10 cst']],(date '12-10-2010'));
+?.*ERROR: removing elements from multidimensional arrays is not supporte.*
+  Where: referenced column: array_remove
+--JSON类型
+select array_remove(array[['{qq,123,null,true,false}'],['{qq,123,null,true,false}']], '[qq,123,null,true,false]');
+?.*ERROR: removing elements from multidimensional arrays is not supporte.*
+  Where: referenced column: array_remove
+select array_remove(array[['{qq,123,null,true,false}'],['{qq,123,null,true,false}']], 'text([qq,123,null,true,false])');
+?.*ERROR: removing elements from multidimensional arrays is not supporte.*
+  Where: referenced column: array_remove
+select array_remove(array[['{qq,123,null,true,false}'],['{qq,123,null,true,false}']], 'int([qq,123,null,true,false])');
+?.*ERROR: removing elements from multidimensional arrays is not supporte.*
+  Where: referenced column: array_remove
+select array_remove(array[['{qq,123,null,true,false}'],['{qq,123,null,true,false}']], 'varchar([qq,123,null,true,false])');
+?.*ERROR: removing elements from multidimensional arrays is not supporte.*
+  Where: referenced column: array_remove

@@ -1,0 +1,3 @@
+-- @testpoint: 字符处理函数to_hex，转换类型为小数时
+
+select to_hex(-3647.4);

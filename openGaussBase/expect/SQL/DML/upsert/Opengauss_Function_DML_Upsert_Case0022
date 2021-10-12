@@ -1,0 +1,66 @@
+--  @testpoint:事务中，使用insert...update语句，再使用rollback
+--预置条件enable_upsert_to_merge为off
+drop table if exists products19;
+SQL SUCCESS
+--建表，指定一列是主键
+CREATE TABLE products19 (
+    product_no integer PRIMARY KEY,
+    name text,
+    price numeric
+);
+SQL SUCCESS
+--常规insert插入一条数据
+insert into  products19 values(01,'grains',5.5);
+SQL SUCCESS
+select * from  products19;
++------------+--------+-------+
+| product_no | name   | price |
++------------+--------+-------+
+| 1          | grains | 5.5   |
++------------+--------+-------+
+--使用insert...update语句插入一条数据，主键重复，upadte name列，数据(01,'grains',5.5)更改为(01,'meat',5.5)
+start transaction;
+SQL SUCCESS
+insert into  products19 values(01,'meat',22.8) on DUPLICATE key update name='meat';
+SQL SUCCESS
+select * from  products19;
++------------+------+-------+
+| product_no | name | price |
++------------+------+-------+
+| 1          | meat | 5.5   |
++------------+------+-------+
+--使用rollback
+rollback;
+SQL SUCCESS
+--products19表数据和使用insert...update语句前一样，数据是(01,'grains',5.5)
+select * from  products19;
++------------+--------+-------+
+| product_no | name   | price |
++------------+--------+-------+
+| 1          | grains | 5.5   |
++------------+--------+-------+
+--commit后再执行rollback
+start transaction;
+SQL SUCCESS
+--使用insert...update语句插入一条数据，主键重复，upadte name列，数据(01,'grains',5.5)更改为(01,'meat',5.5)
+insert into  products19 values(01,'meat',22.8) on DUPLICATE key update name='meat';
+SQL SUCCESS
+select * from  products19;
++------------+------+-------+
+| product_no | name | price |
++------------+------+-------+
+| 1          | meat | 5.5   |
++------------+------+-------+
+commit;
+SQL SUCCESS
+rollback;
+SQL SUCCESS
+--数据仍是(01,'meat',5.5)
+select * from  products19;
++------------+------+-------+
+| product_no | name | price |
++------------+------+-------+
+| 1          | meat | 5.5   |
++------------+------+-------+
+drop table products19;
+SQL SUCCESS

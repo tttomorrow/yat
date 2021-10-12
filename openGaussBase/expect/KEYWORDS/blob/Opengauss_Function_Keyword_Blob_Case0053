@@ -1,0 +1,19 @@
+-- @testpoint: BLOB数据类型设置为NULL
+DROP TABLE if exists t_blob;
+SQL SUCCESS
+CREATE TABLE t_blob(ID blob);
+SQL SUCCESS
+alter table t_blob modify ID null;
+SQL SUCCESS
+INSERT INTO t_blob VALUES('35466');
+SQL SUCCESS
+INSERT INTO t_blob VALUES('100000');
+SQL SUCCESS
+INSERT INTO t_blob VALUES('C4711A1097876CC');
+SQL SUCCESS
+INSERT INTO t_blob VALUES('');
+SQL SUCCESS
+INSERT INTO t_blob VALUES(NULL);
+SQL SUCCESS
+drop table if exists t_blob;
+SQL SUCCESS

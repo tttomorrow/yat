@@ -1,0 +1,16 @@
+-- @testpoint: max函数与groupby orderby联用
+drop table if exists SYS_FUNCTION_MAX_TABLE2;
+SQL SUCCESS
+CREATE TABLE  SYS_FUNCTION_MAX_TABLE2(COL_ID INTEGER,COL_PLACE char(40),COL_MONEY number);
+SQL SUCCESS
+INSERT INTO SYS_FUNCTION_MAX_TABLE2 (COL_ID,COL_PLACE,COL_MONEY) VALUES (1,'gansu',2.4),(2,'xinjiang',3.5),(6,'gansu',6.6);
+SQL SUCCESS
+SELECT COL_PLACE , MAX(COL_ID)AS MAX_ID,MAX(COL_MONEY)AS MAX_MONEY FROM SYS_FUNCTION_MAX_TABLE2 GROUP BY COL_PLACE ORDER BY COL_PLACE,MAX_ID,MAX_MONEY;
++------------------------------------------+--------+-----------+
+| col_place                                | max_id | max_money |
++------------------------------------------+--------+-----------+
+| gansu                                    | 6      | 6.6       |
+| xinjiang                                 | 2      | 3.5       |
++------------------------------------------+--------+-----------+
+drop table if exists SYS_FUNCTION_MAX_TABLE2;
+SQL SUCCESS

@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字snapshot(非保留)，作为模式名
+--关键字不带引号-成功
+drop schema if exists snapshot;
+?.*ERROR: The schema 'snapshot' doesn't allow to drop.*
+create schema snapshot;
+?.*ERROR: schema "snapshot" already exists.*
+drop schema snapshot;
+?.*ERROR: The schema 'snapshot' doesn't allow to drop.*
+--关键字带双引号-成功
+drop schema if exists "snapshot";
+?.*ERROR: The schema 'snapshot' doesn't allow to drop.*
+create schema "snapshot";
+?.*ERROR: schema "snapshot" already exists.*
+drop schema "snapshot";
+?.*ERROR: The schema 'snapshot' doesn't allow to drop.*
+--关键字带单引号-合理报错
+drop schema if exists 'snapshot';
+?.*ERROR: syntax error at or near "'snapshot'".*
+?.*Position: .*
+create schema 'snapshot';
+?.*ERROR: syntax error at or near "'snapshot'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop schema if exists `snapshot`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create schema `snapshot`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

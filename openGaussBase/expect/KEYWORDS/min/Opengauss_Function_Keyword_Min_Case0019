@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字min(非保留)，作为外部数据源名
+--关键字不带引号-成功
+drop data source if exists min;
+SQL SUCCESS
+create data source min;
+SQL SUCCESS
+drop data source min;
+SQL SUCCESS
+--关键字带双引号-成功
+drop data source if exists "min";
+SQL SUCCESS
+create data source "min";
+SQL SUCCESS
+drop data source "min";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop data source if exists 'min';
+?.*ERROR: syntax error at or near "'min'".*
+?.*Position: .*
+create data source 'min';
+?.*ERROR: syntax error at or near "'min'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop data source if exists `min`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create data source `min`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

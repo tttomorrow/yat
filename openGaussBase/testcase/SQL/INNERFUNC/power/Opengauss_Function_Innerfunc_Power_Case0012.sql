@@ -1,0 +1,3 @@
+-- @testpoint: power函数,幂为null
+select power(2,null) as result from sys_dummy;
+select power(25.00,null) as result from sys_dummy;

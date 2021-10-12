@@ -1,0 +1,13 @@
+-- @testpoint: 修改用户名
+-- @modified at: 2020-11-20
+--创建用户
+drop user if exists test_user007 cascade;
+SQL SUCCESS
+create user test_user007 identified by 'Tt@123456';
+SQL SUCCESS
+--修改用户名
+ALTER USER test_user007 RENAME TO jimy;
+SQL SUCCESS
+--删除用户
+drop user jimy;
+SQL SUCCESS

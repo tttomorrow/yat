@@ -1,0 +1,42 @@
+--  @testpoint:opengauss关键字coalesce(非保留)，表达式函数,返回它的第一个非NULL的参数值。如果参数都为NULL，则返回NULL
+CREATE TABLE c_tabl(description varchar(10), short_description varchar(10), last_value varchar(10));
+SQL SUCCESS
+INSERT INTO c_tabl VALUES('abc', 'efg', '123');
+SQL SUCCESS
+INSERT INTO c_tabl VALUES(NULL, 'efg', '123');
+SQL SUCCESS
+INSERT INTO c_tabl VALUES(NULL, NULL, '123');
+SQL SUCCESS
+INSERT INTO c_tabl VALUES(NULL, NULL, NULL);
+SQL SUCCESS
+SELECT description, short_description, last_value, COALESCE(description, short_description, last_value) FROM c_tabl ORDER BY 1, 2, 3, 4;
++-------------+-------------------+------------+----------+
+| description | short_description | last_value | coalesce |
++-------------+-------------------+------------+----------+
+| abc         | efg               | 123        | abc      |
+|             | efg               | 123        | efg      |
+|             |                   | 123        | 123      |
+|             |                   |            |          |
++-------------+-------------------+------------+----------+
+--清理环境
+drop table c_tabl;
+SQL SUCCESS
+--条件表达式函数,返回它的第一个非NULL的参数值。如果参数都为NULL，则返回NULL
+SELECT coalesce(NULL,'hello');
++----------+
+| coalesce |
++----------+
+| hello    |
++----------+
+SELECT coalesce('hello',NULL);
++----------+
+| coalesce |
++----------+
+| hello    |
++----------+
+SELECT coalesce(NULL,NULL);
++----------+
+| coalesce |
++----------+
+|          |
++----------+

@@ -1,0 +1,17 @@
+-- @testpoint: 使用or逻辑运算符查询
+drop table  if exists t_student;
+SQL SUCCESS
+create table  t_student(stu_name char(20),stu_age int,sex char(10),score int,address char(10) default 'gauss');
+SQL SUCCESS
+insert into  t_student(stu_age,stu_name) values(25,'wangwuxiao'),(28,'lizi'),(40,'zhaosi');
+SQL SUCCESS
+select * from t_student where stu_age >25 or stu_age >28;
++----------------------+---------+-----+-------+------------+
+| stu_name             | stu_age | sex | score | address    |
++----------------------+---------+-----+-------+------------+
+| lizi                 | 28      |     |       | gauss      |
+| zhaosi               | 40      |     |       | gauss      |
++----------------------+---------+-----+-------+------------+
+--清理环境
+drop table if exists t_student cascade;
+SQL SUCCESS

@@ -1,0 +1,16 @@
+-- @testpoint: 聚集函数var_samp，入参为字符串（数值型）
+drop table if exists t_nvl_rca_tab;
+SQL SUCCESS
+create table t_nvl_rca_tab(col_1 varchar);
+SQL SUCCESS
+insert into t_nvl_rca_tab values ('123');
+SQL SUCCESS
+insert into t_nvl_rca_tab values ('456');
+SQL SUCCESS
+select var_samp(col_1) from t_nvl_rca_tab;
++--------------------+
+| var_samp           |
++--------------------+
++--------------------+
+drop table if exists t_nvl_rca_tab;
+SQL SUCCESS

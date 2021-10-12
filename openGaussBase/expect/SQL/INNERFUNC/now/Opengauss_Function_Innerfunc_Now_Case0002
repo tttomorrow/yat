@@ -1,0 +1,11 @@
+-- @testpoint: now()给入参空值，合理报错
+select now(null) from sys_dummy;
+?.*ERROR: function now\(unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: now
+select now('') from sys_dummy;
+?.*ERROR: function now\(unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: now

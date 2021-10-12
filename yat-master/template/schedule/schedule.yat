@@ -1,0 +1,91 @@
+# schedule file with yat format
+
+import {
+    import: sub-schedule-1.schd
+    import: sub-schedule-2.schd
+}
+
+# run with name basic-test to run suite with name default
+run {
+    suite: default
+    name: basic-test
+    interval: interval
+    type: random-concurrent
+    level: group
+    random-sleep: 1 5
+    each-run-count: 50
+    checker: checker
+}
+
+# run with name long-name-test to run suite with name long-name
+run {
+    suite: long-name
+    name: long-name-test
+
+    daemon: daemon
+    # set the macro value with name long_name
+    macro: long_name 23BBC423423FC34F34BB432AA3244F
+}
+
+# normal
+run {
+    suite: long-name
+    name: long-name-test
+
+    type: suite  # default type is suite
+    macro: long_name 23BBC423423FC34F34BB432AA3244F
+}
+
+interval {
+    name: interval
+    interval: 30
+    group: shell_008
+}
+
+daemon {
+    name: daemon
+    group: python_003
+}
+
+# test suite with name default
+suite {
+    name: default
+
+    # shell test case
+    group: shell_001
+           shell_003
+           shell_004
+    group: shell_002
+
+    # test case with properties
+    group: data_type_test_gauss(valid=false)
+           data_type_test_oracle
+
+    group: setup_l setup_r
+    group: create
+    group: user
+    group: insert
+    group: select multi_select
+    group: error
+    group: function procedure declare
+    group: shell
+
+}
+
+# test suite with name long-name
+suite {
+    name: long-name
+    group: test_long_name_00000000000000001
+           test_long_name_000000000000000002
+           test_long_name_000000000000003
+           test_long_name_00000000000004
+           test_long_name_00000000000000000005
+    group: zsql
+}
+
+suite {
+    name: checker
+    group: checker_001
+    group: checker_002
+    group: checker_003
+}

@@ -1,0 +1,13 @@
+-- @testpoint: nvl函数俩参数同时为null
+select nvl(null,null);
++-----+
+| nvl |
++-----+
+|     |
++-----+
+select nvl(null+1-2*3/4,null);
++-----+
+| nvl |
++-----+
+|     |
++-----+

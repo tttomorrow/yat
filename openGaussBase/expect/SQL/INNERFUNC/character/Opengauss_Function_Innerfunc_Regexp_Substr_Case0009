@@ -1,0 +1,15 @@
+-- @testpoint: 大小写匹配
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('str');
+SQL SUCCESS
+SELECT regexp_substr(string1 ,'[St][r]') from type_char;
++---------------+
+| regexp_substr |
++---------------+
+| tr            |
++---------------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

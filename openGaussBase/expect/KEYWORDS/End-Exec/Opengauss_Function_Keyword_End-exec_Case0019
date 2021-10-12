@@ -1,0 +1,32 @@
+--  @testpoint:opengauss关键字end-exec(非保留)，作为外部数据源名
+--关键字不带引号-成功
+drop data source if exists end-exec;
+?.*ERROR: syntax error at or near "end"
+?.*Position: .*
+create data source end-exec;
+?.*ERROR: syntax error at or near "end"
+?.*Position: .*
+drop data source end-exec;
+?.*ERROR: syntax error at or near "end"
+?.*Position: .*
+--关键字带双引号-成功
+drop data source if exists "end-exec";
+SQL SUCCESS
+create data source "end-exec";
+SQL SUCCESS
+drop data source "end-exec";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop data source if exists 'end-exec';
+?.*ERROR: syntax error at or near "'end-exec'"
+?.*Position: .*
+create data source 'end-exec';
+?.*ERROR: syntax error at or near "'end-exec'"
+?.*Position: .*
+--关键字带反引号-合理报错
+drop data source if exists `end-exec`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+create data source `end-exec`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*

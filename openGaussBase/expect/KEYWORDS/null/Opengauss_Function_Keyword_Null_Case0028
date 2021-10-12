@@ -1,0 +1,67 @@
+-- @testpoint: opengauss关键字null(保留)，作为同义词对象名,部分测试点合理报错
+--前置条件
+drop table if exists null_test;
+SQL SUCCESS
+create table null_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-失败
+drop synonym if exists null;
+?.*ERROR: syntax error at or near "null".*
+?.*Position.*
+create synonym null for null_test;
+?.*ERROR: syntax error at or near "null".*
+?.*Position.*
+--关键字带双引号-成功
+drop synonym if exists "null";
+SQL SUCCESS
+create synonym "null" for null_test;
+SQL SUCCESS
+insert into "null" values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update "null" set "null".name='cici' where "null".id=2;
+SQL SUCCESS
+select * from "null";
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--清理环境
+drop synonym "null";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'null';
+?.*ERROR: syntax error at or near "'null'".*
+?.*Position.*
+create synonym 'null' for null_test;
+?.*ERROR: syntax error at or near "'null'".*
+?.*Position.*
+insert into 'null' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'null'".*
+?.*Position.*
+update 'null' set 'null'.name='cici' where 'null'.id=2;
+?.*ERROR: syntax error at or near "'null'".*
+?.*Position.*
+select * from 'null';
+?.*ERROR: syntax error at or near "'null'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop synonym if exists `null`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create synonym `null` for null_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+insert into `null` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+update `null` set `null`.name='cici' where `null`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+select * from `null`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+--清理环境
+drop table if exists null_test cascade;
+SQL SUCCESS

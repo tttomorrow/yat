@@ -1,0 +1,30 @@
+--  @testpoint:opengauss关键字modify(保留)，作为序列名
+--关键字不带引号-合理报错
+drop sequence if exists modify;
+?.*ERROR: syntax error at or near "modify".*
+?.*Position.*
+create sequence modify start 100 cache 50;
+?.*ERROR: syntax error at or near "modify start".*
+?.*Position.*
+--关键字带双引号-成功
+drop sequence if exists "modify";
+SQL SUCCESS
+create sequence "modify" start 100 cache 50;
+SQL SUCCESS
+--清理环境
+drop sequence "modify";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'modify';
+?.*ERROR: syntax error at or near "'modify'".*
+?.*Position.*
+create sequence 'modify' start 100 cache 50;
+?.*ERROR: syntax error at or near "'modify'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop sequence if exists `modify`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create sequence `modify` start 100 cache 50;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*

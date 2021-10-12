@@ -1,0 +1,67 @@
+-- @testpoint: opengauss关键字notnull(保留)，作为同义词对象名,部分测试点合理报错
+--前置条件
+drop table if exists notnull_test;
+SQL SUCCESS
+create table notnull_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-失败
+drop synonym if exists notnull;
+?.*ERROR: syntax error at or near "notnull".*
+?.*Position.*
+create synonym notnull for notnull_test;
+?.*ERROR: syntax error at or near "notnull".*
+?.*Position.*
+--关键字带双引号-成功
+drop synonym if exists "notnull";
+SQL SUCCESS
+create synonym "notnull" for notnull_test;
+SQL SUCCESS
+insert into "notnull" values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update "notnull" set "notnull".name='cici' where "notnull".id=2;
+SQL SUCCESS
+select * from "notnull";
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--清理环境
+drop synonym "notnull";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'notnull';
+?.*ERROR: syntax error at or near "'notnull'".*
+?.*Position.*
+create synonym 'notnull' for notnull_test;
+?.*ERROR: syntax error at or near "'notnull'".*
+?.*Position.*
+insert into 'notnull' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'notnull'".*
+?.*Position.*
+update 'notnull' set 'notnull'.name='cici' where 'notnull'.id=2;
+?.*ERROR: syntax error at or near "'notnull'".*
+?.*Position.*
+select * from 'notnull';
+?.*ERROR: syntax error at or near "'notnull'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop synonym if exists `notnull`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create synonym `notnull` for notnull_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+insert into `notnull` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+update `notnull` set `notnull`.name='cici' where `notnull`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+select * from `notnull`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+--清理环境
+drop table if exists notnull_test;
+SQL SUCCESS

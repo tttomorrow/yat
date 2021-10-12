@@ -1,0 +1,16 @@
+-- @testpoint: 自然对数lnx输入为比较表达式，合理报错
+select ln(2<3) as result;
+?.*ERROR: function ln\(boolean\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: result
+select ln(2!=3) as result;
+?.*ERROR: function ln\(boolean\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: result
+select ln(2<>3) as result;
+?.*ERROR: function ln\(boolean\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: result

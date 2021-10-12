@@ -1,0 +1,61 @@
+-- @testpoint: opengauss关键字preceding(非保留)，作为同义词对象名,部分测试点合理报错
+--前置条件
+drop table if exists preceding_test;
+SQL SUCCESS
+create table preceding_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists preceding;
+SQL SUCCESS
+create synonym preceding for preceding_test;
+SQL SUCCESS
+insert into preceding values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update preceding set preceding.name='cici' where preceding.id=2;
+SQL SUCCESS
+select * from preceding;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--关键字带双引号-成功
+drop synonym if exists "preceding";
+SQL SUCCESS
+create synonym "preceding" for preceding_test;
+SQL SUCCESS
+insert into "preceding" values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update "preceding" set "preceding".name='cici' where "preceding".id=2;
+SQL SUCCESS
+select * from "preceding";
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 1  | ada  |
+| 2  | cici |
+| 2  | cici |
++----+------+
+--关键字带单引号-合理报错
+drop synonym if exists 'preceding';
+?.*ERROR: syntax error at or near "'preceding'"
+?.*Position.*
+create synonym 'preceding' for preceding_test;
+?.*ERROR: syntax error at or near "'preceding'"
+?.*Position.*
+--关键字带反引号-合理报错
+drop synonym if exists `preceding`;
+?.*ERROR: syntax error at or near "`"
+?.*Position.*
+create synonym `preceding` for preceding_test;
+?.*ERROR: syntax error at or near "`"
+?.*Position.*
+--清理环境
+drop synonym if exists "preceding";
+SQL SUCCESS
+drop synonym if exists preceding;
+SQL SUCCESS
+drop table if exists preceding_test;
+SQL SUCCESS

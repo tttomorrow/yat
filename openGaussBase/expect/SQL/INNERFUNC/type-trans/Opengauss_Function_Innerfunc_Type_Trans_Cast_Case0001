@@ -1,0 +1,154 @@
+-- @testpoint: 类型转换函数，cast(x as y)将x转换成y指定的类型
+-- 时间/日期型
+select cast('22-oct-1997' as timestamp with time zone);
++-------------------------------+
+| timestamptz                   |
++-------------------------------+
++-------------------------------+
+select cast('23-jan-2020' as date);
++-------------------------------+
+| timestamp                     |
++-------------------------------+
++-------------------------------+
+select cast('12-september-10 14:10:10.123000' as timestamp with time zone);
++-------------------------------+
+| timestamptz                   |
++-------------------------------+
++-------------------------------+
+-- 字符型
+select cast(interval '15h 2m 12s' as text);
++----------+
+| text     |
++----------+
+| 15:02:12 |
++----------+
+select cast(date 'epoch' as nchar(37));
++---------------------------------------+
+| bpchar                                |
++---------------------------------------+
+| 1970-01-01 00:00:00                   |
++---------------------------------------+
++------------+
+| varchar    |
++------------+
++------------+
+select cast(-125.8 as char);
++--------+
+| bpchar |
++--------+
+| -      |
++--------+
+select cast('a'::raw as varchar2);
++---------+
+| varchar |
++---------+
+| 0A      |
++---------+
+-- 数值类型
+select cast('32'::char as tinyint);
++------+
+| int1 |
++------+
+| 3    |
++------+
+select cast('-32'::varchar2 as smallint);
++------+
+| int2 |
++------+
+| -32  |
++------+
+select cast('-32768'::clob as integer);
++--------+
+| int4   |
++--------+
+| -32768 |
++--------+
++------------+
+| int8       |
++------------+
++------------+
+select cast('9' as decimal);
++---------+
+| numeric |
++---------+
+| 9       |
++---------+
+select cast('9.5' as decimal(10,3));
++---------+
+| numeric |
++---------+
+| 9.500   |
++---------+
+select cast('999.8788' as decimal(10,3));
++---------+
+| numeric |
++---------+
+| 999.879 |
++---------+
+-- 布尔型
+select cast('y'::nchar as boolean);
++------+
+| bool |
++------+
+| true |
++------+
+select cast('1'::varchar as boolean);
++------+
+| bool |
++------+
+| true |
++------+
+select cast(1::int1 as boolean);
++------+
+| bool |
++------+
+| true |
++------+
+select cast('yes' as boolean);
++------+
+| bool |
++------+
+| true |
++------+
+select cast('n'::text as boolean);
++-------+
+| bool  |
++-------+
+| false |
++-------+
+select cast('0'::char as boolean);
++-------+
+| bool  |
++-------+
+| false |
++-------+
+select cast(0::tinyint as boolean);
++-------+
+| bool  |
++-------+
+| false |
++-------+
+select cast('false'::clob as boolean);
++-------+
+| bool  |
++-------+
+| false |
++-------+
+select cast(988::smallint as boolean);
++------+
+| bool |
++------+
+| true |
++------+
+select cast('000'::char as boolean);
++-------+
+| bool  |
++-------+
+| false |
++-------+
+select cast(-988::smallint as boolean);
++------+
+| bool |
++------+
+| true |
++------+

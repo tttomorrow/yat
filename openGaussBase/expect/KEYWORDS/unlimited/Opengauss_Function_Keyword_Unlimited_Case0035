@@ -1,0 +1,40 @@
+-- @testpoint: 关键字unlimited,用作表名创建普通表
+drop table if exists unlimited cascade;
+SQL SUCCESS
+create table if not exists unlimited(id int,name varchar(20));
+SQL SUCCESS
+create or replace procedure unlimited_insert
+as
+begin
+ for i in 1..10 loop
+    insert into unlimited values(i,'unlimi+'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call unlimited_insert();
++------------------+
+| unlimited_insert |
++------------------+
+|                  |
++------------------+
+select * from unlimited;
++----+-----------+
+| id | name      |
++----+-----------+
+| 1  | unlimi+1  |
+| 2  | unlimi+2  |
+| 3  | unlimi+3  |
+| 4  | unlimi+4  |
+| 5  | unlimi+5  |
+| 6  | unlimi+6  |
+| 7  | unlimi+7  |
+| 8  | unlimi+8  |
+| 9  | unlimi+9  |
+| 10 | unlimi+10 |
++----+-----------+
+--清理环境
+drop table if exists unlimited cascade;
+SQL SUCCESS
+drop procedure unlimited_insert;
+SQL SUCCESS

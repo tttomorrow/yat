@@ -1,0 +1,24 @@
+--  @testpoint: reindex：行存表使用REINDEX INTERNAL TABLE：合理报错
+DROP TABLE if EXISTS test_index_table_190 CASCADE;
+SQL SUCCESS
+create table test_index_table_190(
+c_int1 int
+) with (orientation = row);
+SQL SUCCESS
+--建btree索引:
+drop index if exists index_190_01;
+SQL SUCCESS
+create index index_190_01 on test_index_table_190 using btree(c_int1);
+SQL SUCCESS
+select relname from pg_class where relname like 'index_190_%' order by relname;
++--------------+
+| relname      |
++--------------+
+| index_190_01 |
++--------------+
+--重建
+REINDEX INTERNAL TABLE test_index_table_190;
+?.*ERROR: The table "test_index_table_190" doesn't support the operation of 'REINDEX INTERNAL TABLE'. There is no Desc table on it.
+--清理环境
+DROP TABLE if EXISTS test_index_table_190 CASCADE;
+SQL SUCCESS

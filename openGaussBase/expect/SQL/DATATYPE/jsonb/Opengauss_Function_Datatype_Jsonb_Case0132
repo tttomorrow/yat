@@ -1,0 +1,33 @@
+-- @testpoint: 序列与包含jsonb类型的表
+drop table if exists tab1321;
+SQL SUCCESS
+drop sequence if exists seq1 cascade;
+SQL SUCCESS
+drop table if exists tab1322;
+SQL SUCCESS
+create table tab1321(id serial,name jsonb);
+SQL SUCCESS
+create sequence seq1 cache 100;
+SQL SUCCESS
+create table tab1322(id int not null default nextval('seq1'),name jsonb);
+SQL SUCCESS
+insert into tab1322 values(0,'"json"');
+SQL SUCCESS
+insert into tab1322 (name) values('"jay"');
+SQL SUCCESS
+insert into tab1322 (name) values('"jack"');
+SQL SUCCESS
+select * from tab1322;
++----+--------+
+| id | name   |
++----+--------+
+| 0  | "json" |
+| 1  | "jay"  |
+| 2  | "jack" |
++----+--------+
+drop table if exists tab1322;
+SQL SUCCESS
+drop table if exists tab1321;
+SQL SUCCESS
+drop sequence if exists seq1 cascade;
+SQL SUCCESS

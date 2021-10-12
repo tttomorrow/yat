@@ -1,0 +1,18 @@
+-- @testpoint: 定义函数名为begin_non_anoyblock
+CREATE FUNCTION begin_non_anoyblock(integer, integer) RETURNS integer
+    AS 'select $1 + $2;'
+    LANGUAGE SQL
+    IMMUTABLE
+    RETURNS NULL ON NULL INPUT;
+/
+SQL SUCCESS
+select begin_non_anoyblock (1,2);
++---------------------+
+| begin_non_anoyblock |
++---------------------+
+| 3                   |
++---------------------+
+drop function begin_non_anoyblock;
+SQL SUCCESS
+
+

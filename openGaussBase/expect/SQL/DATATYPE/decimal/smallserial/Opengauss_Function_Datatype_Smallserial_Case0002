@@ -1,0 +1,27 @@
+-- @testpoint: 插入负整数
+drop table if exists smallserial_02;
+SQL SUCCESS
+create table smallserial_02 (name smallserial);
+SQL SUCCESS
+insert into smallserial_02 values (-121);
+SQL SUCCESS
+insert into smallserial_02 values (-11111);
+SQL SUCCESS
+insert into smallserial_02 values (-1);
+SQL SUCCESS
+insert into smallserial_02 values (-2);
+SQL SUCCESS
+insert into smallserial_02 values (-3);
+SQL SUCCESS
+select * from smallserial_02;
++--------+
+| name   |
++--------+
+| -121   |
+| -11111 |
+| -1     |
+| -2     |
+| -3     |
++--------+
+drop table smallserial_02;
+SQL SUCCESS

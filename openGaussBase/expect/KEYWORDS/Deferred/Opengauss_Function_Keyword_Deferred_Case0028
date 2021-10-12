@@ -1,0 +1,65 @@
+-- @testpoint: opengauss关键字deferred(非保留)，作为同义词对象名，部分测试点合理报错
+--前置条件
+drop table if exists deferred_test;
+SQL SUCCESS
+create table deferred_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists deferred;
+SQL SUCCESS
+create synonym deferred for deferred_test;
+SQL SUCCESS
+insert into deferred values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update deferred set deferred.name='cici' where deferred.id=2;
+SQL SUCCESS
+select * from deferred;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+drop synonym if exists deferred;
+SQL SUCCESS
+--关键字带双引号-成功
+drop synonym if exists "deferred";
+SQL SUCCESS
+create synonym "deferred" for deferred_test;
+SQL SUCCESS
+drop synonym if exists "deferred";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'deferred';
+?.*ERROR: syntax error at or near "'deferred'"
+?.*
+create synonym 'deferred' for deferred_test;
+?.*ERROR: syntax error at or near "'deferred'"
+?.*
+insert into 'deferred' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'deferred'"
+?.*
+update 'deferred' set 'deferred'.name='cici' where 'deferred'.id=2;
+?.*ERROR: syntax error at or near "'deferred'"
+?.*
+select * from 'deferred';
+?.*ERROR: syntax error at or near "'deferred'"
+?.*
+--关键字带反引号-合理报错
+drop synonym if exists `deferred`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create synonym `deferred` for deferred_test;
+?.*ERROR: syntax error at or near "`"
+?.*
+insert into `deferred` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`"
+?.*
+update `deferred` set `deferred`.name='cici' where `deferred`.id=2;
+?.*ERROR: syntax error at or near "`"
+?.*
+select * from `deferred`;
+?.*ERROR: syntax error at or near "`"
+?.*
+drop table if exists deferred_test;
+SQL SUCCESS

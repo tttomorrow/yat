@@ -1,0 +1,20 @@
+-- @testpoint: 关键字usage，作为字段类型，合理报错
+drop table if exists usage_test cascade;
+SQL SUCCESS
+create table usage_test(id int,name usage);
+?.*ERROR: type "usage" does not exist.*
+?.*Position.*
+create or replace procedure usage_insert
+as
+begin
+ for i in 1..10 loop
+    insert into usage_test values(i,'usage'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call usage_insert();
+?.*ERROR: relation "usage_test" does not exist.*
+  Where: PL/pgSQL function usage_insert() line 4 at SQL statement
+drop procedure usage_insert;
+SQL SUCCESS

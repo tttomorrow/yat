@@ -1,0 +1,49 @@
+--  @testpoint:约束默认是no deferable的，使用SET CONSTRAINTS语句设置当前事务检查行为的约束条件（检查约束）
+--建表同时定义检查约束
+drop table if exists t4;
+SQL SUCCESS
+create table t4 (id int check (id >5),name varchar(40));
+SQL SUCCESS
+--查看约束名字
+select conname,condeferrable,condeferred from pg_constraint where conrelid = (select oid from pg_class where relname='t4');
++-------------+---------------+-------------+
+| conname     | condeferrable | condeferred |
++-------------+---------------+-------------+
+| t4_id_check | false         | false       |
++-------------+---------------+-------------+
+--开启事务
+start transaction;
+SQL SUCCESS
+--设置当前事务检查行为的约束条件，合理报错（默认是不能推迟的，即NOT DEFERRABLE不能用set命令改变）
+SET CONSTRAINTS t4_id_check DEFERRED;
+?.*ERROR: constraint "t4_id_check" is not deferrable
+--关闭事务
+end;
+SQL SUCCESS
+--插入数据
+insert into t4 values(6,'tom'),(7,'lily');
+SQL SUCCESS
+--开启事务
+start transaction;
+SQL SUCCESS
+--设置约束检查条件为IMMEDIATE
+SET CONSTRAINTS t4_id_check IMMEDIATE;
+SQL SUCCESS
+--修改数据，合理报错（约束在每条语句后进行检查）
+update t4 set id=id-2;
+?.*ERROR: new row for relation "t4" violates check constraint "t4_id_check"
+  Detail: Failing row contains (4, tom).
+--关闭事务
+end;
+SQL SUCCESS
+--查询表数据
+select * from t4;
++----+------+
+| id | name |
++----+------+
+| 6  | tom  |
+| 7  | lily |
++----+------+
+--删表
+drop table t4;
+SQL SUCCESS

@@ -1,0 +1,15 @@
+-- @testpoint: 与json串连接
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values (concat_ws('，', 'ABCDE', '{"f1":1,"f2":true,"f3":"Hi"}'));
+SQL SUCCESS
+SELECT * from type_char;
++----------------------------------------------------------------------------------------------------+
+| string1                                                                                            |
++----------------------------------------------------------------------------------------------------+
+| ABCDE，{"f1":1,"f2":true,"f3":"Hi"}                                                                 |
++----------------------------------------------------------------------------------------------------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

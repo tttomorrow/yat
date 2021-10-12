@@ -1,0 +1,18 @@
+-- @testpoint: 相对时间间隔类型reltime,插入空值
+drop table if exists reltime03;
+SQL SUCCESS
+create table reltime03 (id int,name reltime);
+SQL SUCCESS
+insert into reltime03 values (1,'');
+SQL SUCCESS
+insert into reltime03 values (2,null);
+SQL SUCCESS
+select * from reltime03;
++----+------+
+| id | name |
++----+------+
+| 1  |      |
+| 2  |      |
++----+------+
+drop table reltime03;
+SQL SUCCESS

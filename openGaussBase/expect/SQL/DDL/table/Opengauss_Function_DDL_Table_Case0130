@@ -1,0 +1,19 @@
+-- @testpoint: 创建列类型为字符类型NVARCHAR2(n)的表
+drop table if exists table_1;
+SQL SUCCESS
+create table table_1(a NVARCHAR2(10));
+SQL SUCCESS
+insert into  table_1 values ('张三');
+SQL SUCCESS
+insert into  table_1 values ('qazw');
+SQL SUCCESS
+SQL SUCCESS
+select * from table_1;
++-----------+
+| a         |
++-----------+
+| 张三        |
+| qazw      |
++-----------+
+drop table if exists table_1;
+SQL SUCCESS

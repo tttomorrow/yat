@@ -1,0 +1,19 @@
+-- @testpoint: 插入特殊字符,合理报错
+drop table if exists test_json_09;
+SQL SUCCESS
+create table test_json_09 (id json);
+SQL SUCCESS
+insert into test_json_09 values ('……（*');
+?.*ERROR: invalid input syntax for type json
+  Detail: Token "……（" is invalid.
+?.*
+  Where: JSON data, line 1: ……（...
+referenced column: id
+insert into test_json_09 values ('{"@":@,"#":#,"$":$}');
+?.*ERROR: invalid input syntax for type json
+  Detail: Token "@" is invalid.
+?.*
+  Where: JSON data, line 1: {"@":@...
+referenced column: id
+drop table test_json_09;
+SQL SUCCESS

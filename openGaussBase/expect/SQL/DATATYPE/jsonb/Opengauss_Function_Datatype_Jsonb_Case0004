@@ -1,0 +1,45 @@
+-- @testpoint: openGauss可否正确判断JSON类型:字面值（不符合规范的合理报错）
+--符合规范
+select 'true'::JSON;
++------+
+| json |
++------+
+| true |
++------+
+select 'false'::JSON;
++-------+
+| json  |
++-------+
+| false |
++-------+
+select 'null'::JSON;
++------+
+| json |
++------+
+| null |
++------+
+--不符合规范
+select 'TRUE'::JSON;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "TRUE" is invalid.
+?.*
+  Where: JSON data, line 1: TRUE
+referenced column: json
+select 'FALSE'::JSON;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "FALSE" is invalid.
+?.*
+  Where: JSON data, line 1: FALSE
+referenced column: json
+select 'NULL'::JSON;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "NULL" is invalid.
+?.*
+  Where: JSON data, line 1: NULL
+referenced column: json
+select 'ALL'::JSON;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "ALL" is invalid.
+?.*
+  Where: JSON data, line 1: ALL
+referenced column: json

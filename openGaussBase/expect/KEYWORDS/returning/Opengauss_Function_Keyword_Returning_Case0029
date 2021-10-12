@@ -1,0 +1,30 @@
+--  @testpoint:openGauss保留关键字returning作为作为表空间名，
+--不带引号，合理报错
+drop tablespace if exists returning;
+?.*ERROR: syntax error at or near "returning".*
+?.*Position.*
+CREATE TABLESPACE returning RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+?.*ERROR: syntax error at or near "returning".*
+?.*Position.*
+--加双引号，创建成功
+drop tablespace if exists "returning";
+SQL SUCCESS
+CREATE TABLESPACE "returning" RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+SQL SUCCESS
+--清理环境
+drop tablespace "returning";
+SQL SUCCESS
+--加单引号，合理报错
+drop tablespace if exists 'returning';
+?.*ERROR: syntax error at or near "'returning'".*
+?.*Position.*
+CREATE TABLESPACE 'returning' RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+?.*ERROR: syntax error at or near "'returning'".*
+?.*Position.*
+--加反引号，合理报错
+drop tablespace if exists `returning`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+CREATE TABLESPACE `returning` RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*

@@ -1,0 +1,15 @@
+-- @testpoint: opengauss比较操作符<,比较类型:inet
+drop table if exists ts_zhparser;
+SQL SUCCESS
+CREATE TABLE ts_zhparser(col inet, col1 inet);
+SQL SUCCESS
+INSERT INTO ts_zhparser VALUES('192.168.31/24','192.168.31.32/24');
+SQL SUCCESS
+select * from ts_zhparser where col < col1;
++-----------------+------------------+
+| col             | col1             |
++-----------------+------------------+
+| 192.168.31.0/24 | 192.168.31.32/24 |
++-----------------+------------------+
+drop table if exists ts_zhparser;
+SQL SUCCESS

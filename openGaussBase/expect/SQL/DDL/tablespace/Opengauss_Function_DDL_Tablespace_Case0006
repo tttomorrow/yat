@@ -1,0 +1,6 @@
+-- @testpoint: 创建一个以‘pg’开头的表空间,合理报错
+DROP TABLESPACE IF EXISTS pg_location1;
+SQL SUCCESS
+CREATE TABLESPACE pg_location1 RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_2';
+?.*ERROR: unacceptable tablespace name "pg_location1".*
+  Detail: The prefix "pg_" is reserved for system tablespaces.

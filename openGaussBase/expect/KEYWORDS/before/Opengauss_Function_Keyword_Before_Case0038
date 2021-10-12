@@ -1,0 +1,17 @@
+-- @testpoint: 定义函数名为before
+CREATE FUNCTION before(integer, integer) RETURNS integer
+    AS 'select $1 + $2;'
+    LANGUAGE SQL
+    IMMUTABLE
+    RETURNS NULL ON NULL INPUT;
+/
+SQL SUCCESS
+select before (1,2);
++--------+
+| before |
++--------+
+| 3      |
++--------+
+drop function before;
+SQL SUCCESS
+

@@ -1,0 +1,26 @@
+--  @testpoint:opengauss关键字Both(保留)，作为外部数据源名
+--关键字不带引号-合理报错
+create data source Both;
+?.*ERROR: syntax error at or near "Both".*
+?.*Position.*
+--关键字带双引号-成功
+drop data source if exists "Both";
+SQL SUCCESS
+create data source "Both";
+SQL SUCCESS
+drop data source "Both";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop data source if exists 'Both';
+?.*ERROR: syntax error at or near "'Both'".*
+?.*Position.*
+create data source 'Both';
+?.*ERROR: syntax error at or near "'Both'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop data source if exists `Both`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create data source `Both`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*

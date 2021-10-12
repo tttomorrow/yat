@@ -1,0 +1,2 @@
+--  @testpoint:关键字variadic，函数参数的模式，只有out模式参数后能跟variadic
+Sql parse error: [11:42] expect token, EOF found

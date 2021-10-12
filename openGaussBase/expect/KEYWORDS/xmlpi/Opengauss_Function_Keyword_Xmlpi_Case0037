@@ -1,0 +1,49 @@
+-- @testpoint: 关键字xmlpi，用作字符串
+drop table if exists xmlpi_test cascade;
+SQL SUCCESS
+create table xmlpi_test(id int,name varchar(20));
+SQL SUCCESS
+create or replace procedure xmlpi_insert
+as
+begin
+ for i in 1..20 loop
+    insert into xmlpi_test values(i,'xmlpi'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call xmlpi_insert();
++--------------+
+| xmlpi_insert |
++--------------+
+|              |
++--------------+
+select * from xmlpi_test;
++----+---------+
+| id | name    |
++----+---------+
+| 1  | xmlpi1  |
+| 2  | xmlpi2  |
+| 3  | xmlpi3  |
+| 4  | xmlpi4  |
+| 5  | xmlpi5  |
+| 6  | xmlpi6  |
+| 7  | xmlpi7  |
+| 8  | xmlpi8  |
+| 9  | xmlpi9  |
+| 10 | xmlpi10 |
+| 11 | xmlpi11 |
+| 12 | xmlpi12 |
+| 13 | xmlpi13 |
+| 14 | xmlpi14 |
+| 15 | xmlpi15 |
+| 16 | xmlpi16 |
+| 17 | xmlpi17 |
+| 18 | xmlpi18 |
+| 19 | xmlpi19 |
+| 20 | xmlpi20 |
++----+---------+
+drop table if exists xmlpi_test cascade;
+SQL SUCCESS
+drop procedure xmlpi_insert;
+SQL SUCCESS

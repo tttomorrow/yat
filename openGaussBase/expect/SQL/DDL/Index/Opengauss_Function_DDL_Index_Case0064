@@ -1,0 +1,55 @@
+--  @testpoint: column_name：行存分区表常用数据类型3列
+DROP TABLE if EXISTS test_index_table_064 CASCADE;
+SQL SUCCESS
+create table test_index_table_064(
+c_int INTEGER,
+c_float FLOAT,
+c_varchar VARCHAR
+) WITH (ORIENTATION = row) PARTITION BY RANGE(c_int)(PARTITION P1 VALUES LESS THAN(100));
+SQL SUCCESS
+--建psort索引：合理报错
+drop index if exists index_064_01;
+SQL SUCCESS
+create index index_064_01 on test_index_table_064 using psort(c_int,c_float,c_varchar);
+?.*ERROR: Global partition index only support btree.
+select relname from pg_class where relname like 'index_064_%' order by relname;
++---------+
+| relname |
++---------+
++---------+
+--btree：success
+drop index if exists index_064_01;
+SQL SUCCESS
+create index index_064_01 on test_index_table_064 using btree(c_int,c_varchar,c_float);
+SQL SUCCESS
+select relname from pg_class where relname like 'index_064_%' order by relname;
++--------------+
+| relname      |
++--------------+
+| index_064_01 |
++--------------+
+--gist：合理报错
+drop index if exists index_064_01;
+SQL SUCCESS
+create index index_064_01 on test_index_table_064 using gist(c_int,c_varchar,c_float);
+?.*ERROR: Global partition index only support btree.
+select relname from pg_class where relname like 'index_064_%' order by relname;
++---------+
+| relname |
++---------+
++---------+
+--gin：合理报错
+drop index if exists index_064_01;
+SQL SUCCESS
+create index index_064_01 on test_index_table_064 using gin(to_tsvector('english', c_int),to_tsvector('english', c_varchar),to_tsvector('english', c_float));
+?.*ERROR: Global partition index only support btree.
+select relname from pg_class where relname like 'index_064_%' order by relname;
++---------+
+| relname |
++---------+
++---------+
+--清理环境
+drop index if exists index_064_01;
+SQL SUCCESS
+DROP TABLE if EXISTS test_index_table_064 CASCADE;
+SQL SUCCESS

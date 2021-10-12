@@ -1,0 +1,65 @@
+-- @testpoint: opengauss关键字data(非保留)，作为同义词对象名，部分测试点合理报错
+--前置条件
+drop table if exists data_test;
+SQL SUCCESS
+create table data_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists data;
+SQL SUCCESS
+create synonym data for data_test;
+SQL SUCCESS
+insert into data values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update data set data.name='cici' where data.id=2;
+SQL SUCCESS
+select * from data;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+drop synonym if exists data;
+SQL SUCCESS
+--关键字带双引号-成功
+drop synonym if exists "data";
+SQL SUCCESS
+create synonym "data" for data_test;
+SQL SUCCESS
+drop synonym if exists "data";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'data';
+?.*ERROR: syntax error at or near "'data'"
+?.*Position.*
+create synonym 'data' for data_test;
+?.*ERROR: syntax error at or near "'data'"
+?.*Position.*
+insert into 'data' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'data'"
+?.*Position.*
+update 'data' set 'data'.name='cici' where 'data'.id=2;
+?.*ERROR: syntax error at or near "'data'"
+?.*Position.*
+select * from 'data';
+?.*ERROR: syntax error at or near "'data'"
+?.*Position.*
+--关键字带反引号-合理报错
+drop synonym if exists `data`;
+?.*ERROR: syntax error at or near "`"
+?.*Position.*
+create synonym `data` for data_test;
+?.*ERROR: syntax error at or near "`"
+?.*Position.*
+insert into `data` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`"
+?.*Position.*
+update `data` set `data`.name='cici' where `data`.id=2;
+?.*ERROR: syntax error at or near "`"
+?.*Position.*
+select * from `data`;
+?.*ERROR: syntax error at or near "`"
+?.*Position.*
+drop table if exists data_test;
+SQL SUCCESS

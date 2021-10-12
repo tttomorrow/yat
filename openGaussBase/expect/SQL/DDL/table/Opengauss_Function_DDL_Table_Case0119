@@ -1,0 +1,28 @@
+-- @testpoint: 创建列类型是浮点类型REAL、FLOAT4的表
+drop table if exists table_1;
+SQL SUCCESS
+create table table_1(a real);
+SQL SUCCESS
+insert into table_1 values(12345646.123456);
+SQL SUCCESS
+select * from table_1;
++-------------+
+| a           |
++-------------+
+| 1.2345646E7 |
++-------------+
+drop table if exists table_1;
+SQL SUCCESS
+drop table if exists table_2;
+SQL SUCCESS
+create table table_2(a FLOAT4);
+SQL SUCCESS
+SQL SUCCESS
+select * from table_2;
++---------------+
+| a             |
++---------------+
+| 1.23456465E13 |
++---------------+
+drop table if exists table_2;
+SQL SUCCESS

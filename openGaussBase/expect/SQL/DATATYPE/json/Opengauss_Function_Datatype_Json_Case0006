@@ -1,0 +1,11 @@
+-- @testpoint: 插入空值
+drop table if exists test_json_06;
+SQL SUCCESS
+create table test_json_06 (id json);
+SQL SUCCESS
+insert into test_json_06 values (null);
+SQL SUCCESS
+insert into test_json_06 values ('');
+SQL SUCCESS
+drop table test_json_06;
+SQL SUCCESS

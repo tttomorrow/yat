@@ -1,0 +1,18 @@
+-- @testpoint: 创建带约束名字的单列约束
+-- @modify at: 2020-11-23
+--建表
+DROP TABLE IF EXISTS test_unique_constraint008;
+SQL SUCCESS
+CREATE TABLE test_unique_constraint008 (Id_P int NOT NULL, LastName varchar(255) NOT NULL, FirstName varchar(255),
+Address varchar(255), City varchar(255),CONSTRAINT uc_PersonID UNIQUE (Id_P));
+SQL SUCCESS
+--通过系统表查询约束信息
+select conname,contype from pg_constraint where conrelid = (select oid from pg_class where relname = 'test_unique_constraint008');
++-------------+---------+
+| conname     | contype |
++-------------+---------+
+| uc_personid | u       |
++-------------+---------+
+--删表
+drop table if exists test_unique_constraint008;
+SQL SUCCESS

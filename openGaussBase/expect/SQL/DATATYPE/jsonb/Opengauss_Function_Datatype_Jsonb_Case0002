@@ -1,0 +1,39 @@
+-- @testpoint: openGauss可否正确判断JSON类型:数组（不符合规范的合理报错）
+--符合规范
+select '["www@13^", 1, {"name": "john"}, "2", []]'::JSON;
++-------------------------------------------+
+| json                                      |
++-------------------------------------------+
+| ["www@13^", 1, {"name": "john"}, "2", []] |
++-------------------------------------------+
+select '["www@13^", 1, {"name": "john"}, "2", " ",true,"null"]'::JSON;
++--------------------------------------------------------+
+| json                                                   |
++--------------------------------------------------------+
+| ["www@13^", 1, {"name": "john"}, "2", " ",true,"null"] |
++--------------------------------------------------------+
+--不符合规范
+select '["name": ["john", false],  "age"，18,  "assress":  {"country" :"china", "zip-code": "10000"}, "NULL"，null, "true",true]'::JSON;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Expected "," or "]", but found ":".
+?.*
+  Where: JSON data, line 1: ["name":...
+referenced column: json
+select '"www@13^", 1, {"name": "john"}, "2", " ",true,"null"'::JSON;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Expected end of input, but found ",".
+?.*
+  Where: JSON data, line 1: "www@13^",...
+referenced column: json
+select '{"www@13^", 1, {"name": "john"}, "2", " ",true,"null"}'::JSON;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Expected ":", but found ",".
+?.*
+  Where: JSON data, line 1: {"www@13^",...
+referenced column: json
+select ["www@13^", 1, {"name": "john"}, "2", " ",true,"null"]::JSON;
+?.*ERROR: syntax error at or near "\[.*
+?.*
+select '["www@13^", 1, {"name": "john"}, '2',,true,"null"]'::JSON;
+?.*ERROR: syntax error at or near "2.*
+?.*

@@ -1,0 +1,10 @@
+-- @testpoint: 非空binary_integer类型插入空值,合理报错
+drop table if exists binary_integer14;
+SQL SUCCESS
+create table binary_integer14 (name binary_integer,name2 binary_integer not null);
+SQL SUCCESS
+insert into binary_integer14 values (122,'');
+?.*ERROR: null value in column "name2" violates not-null constraint
+  Detail: Failing row contains (122, null).
+drop table binary_integer14;
+SQL SUCCESS

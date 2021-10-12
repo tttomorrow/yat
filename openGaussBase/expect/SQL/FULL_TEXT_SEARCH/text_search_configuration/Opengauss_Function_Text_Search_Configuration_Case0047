@@ -1,0 +1,33 @@
+--  @testpoint:文本搜索配置token_type测试
+--创建文本搜索配置，解析器为默认pg_catalog.default
+DROP TEXT SEARCH CONFIGURATION if exists english2 cascade;
+SQL SUCCESS
+CREATE TEXT SEARCH CONFIGURATION english2 (parser=default);
+SQL SUCCESS
+--创建simple字典
+DROP TEXT SEARCH DICTIONARY IF EXISTS pg_dict cascade;
+SQL SUCCESS
+CREATE TEXT SEARCH DICTIONARY pg_dict (TEMPLATE = Simple);
+SQL SUCCESS
+--增加文本搜索配置字串类型映射，token为numword
+ALTER TEXT SEARCH CONFIGURATION english2 ADD MAPPING FOR numword WITH pg_dict;
+SQL SUCCESS
+--使用文本检索函数对所创建的词典配置english2进行测试
+SELECT ts_debug('english','beta1');
++--------------------------------------------------------------------+
+| ts_debug                                                           |
++--------------------------------------------------------------------+
+| (numword,"Word, letters and digits",beta1,{simple},simple,{beta1}) |
++--------------------------------------------------------------------+
+SELECT ts_debug('beta1');
++--------------------------------------------------------------------+
+| ts_debug                                                           |
++--------------------------------------------------------------------+
+| (numword,"Word, letters and digits",beta1,{simple},simple,{beta1}) |
++--------------------------------------------------------------------+
+--删除文本搜索配置
+DROP TEXT SEARCH CONFIGURATION english2 cascade;
+SQL SUCCESS
+--删除词典
+DROP TEXT SEARCH DICTIONARY pg_dict cascade;
+SQL SUCCESS

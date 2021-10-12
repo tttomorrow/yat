@@ -1,0 +1,15 @@
+-- @testpoint: 中文检索
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (stringv char(20));
+SQL SUCCESS
+insert into type_char values ('我是中国');
+SQL SUCCESS
+SELECT position('我' in stringv) from type_char;
++----------+
+| position |
++----------+
+| 1        |
++----------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

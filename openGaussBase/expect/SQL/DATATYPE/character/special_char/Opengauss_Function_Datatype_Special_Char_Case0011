@@ -1,0 +1,15 @@
+-- @testpoint: 创建列存本地临时表，字段类型为“char”
+drop table if exists special_char_11;
+SQL SUCCESS
+CREATE TEMPORARY TABLE special_char_11 (id "char") WITH (orientation=COLUMN, compression=no);
+SQL SUCCESS
+insert into special_char_11 values ('t');
+SQL SUCCESS
+select * from special_char_11;
++----+
+| id |
++----+
+| t  |
++----+
+drop table if exists special_char_11;
+SQL SUCCESS

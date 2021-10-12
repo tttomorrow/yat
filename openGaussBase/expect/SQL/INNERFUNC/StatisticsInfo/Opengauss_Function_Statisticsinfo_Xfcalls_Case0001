@@ -1,0 +1,163 @@
+-- @testpoint: pg_stat_get_xact_function_calls(oid)返回在当前事务中调用某函数的次数
+alter system set autovacuum to off;
+SQL SUCCESS
+begin;
+/
+SQL SUCCESS
+-- 自定义函数
+set track_functions to 'all';
+SQL SUCCESS
+set track_io_timing to 'on';
+SQL SUCCESS
+DROP FUNCTION IF EXISTS func_add_sql;
+SQL SUCCESS
+CREATE FUNCTION func_add_sql(integer, integer) RETURNS integer AS 'select $1 + $2;' LANGUAGE SQL IMMUTABLE RETURNS NULL ON NULL INPUT;
+/
+SQL SUCCESS
+select func_add_sql(3,7);
++--------------+
+| func_add_sql |
++--------------+
+| 10           |
++--------------+
+SELECT pg_sleep(1);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+select pg_stat_get_xact_function_calls(a.oid) from PG_PROC a where a.proname = 'func_add_sql';
++---------------------------------+
+| pg_stat_get_xact_function_calls |
++---------------------------------+
+| 1                               |
++---------------------------------+
+select func_add_sql(3,7);
++--------------+
+| func_add_sql |
++--------------+
+| 10           |
++--------------+
+select func_add_sql(8,9);
++--------------+
+| func_add_sql |
++--------------+
+| 17           |
++--------------+
+SELECT pg_sleep(1);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+select pg_stat_get_xact_function_calls(a.oid) from PG_PROC a where a.proname = 'func_add_sql';
++---------------------------------+
+| pg_stat_get_xact_function_calls |
++---------------------------------+
+| 3                               |
++---------------------------------+
+set track_functions to 'none';
+SQL SUCCESS
+set track_io_timing to 'off';
+SQL SUCCESS
+select pg_stat_get_xact_function_calls(a.oid) from PG_PROC a where a.proname = 'func_add_sql';
++---------------------------------+
+| pg_stat_get_xact_function_calls |
++---------------------------------+
+| 3                               |
++---------------------------------+
+drop FUNCTION func_add_sql;
+SQL SUCCESS
+select pg_stat_get_xact_function_calls(a.oid)  from PG_PROC a where a.proname = 'func_add_sql';
++---------------------------------+
+| pg_stat_get_xact_function_calls |
++---------------------------------+
++---------------------------------+
+-- 过程函数
+set track_functions to 'all';
+SQL SUCCESS
+set track_io_timing to 'on';
+SQL SUCCESS
+DROP TABLE IF EXISTS integertable;
+SQL SUCCESS
+DROP PROCEDURE IF EXISTS proc_while_loop;
+SQL SUCCESS
+CREATE TABLE integertable(c1 integer);
+SQL SUCCESS
+CREATE OR REPLACE PROCEDURE proc_while_loop(maxval in integer)
+AS
+    DECLARE
+    i int :=1;
+    BEGIN
+        WHILE i < maxval LOOP
+            INSERT INTO integertable VALUES(i);
+            i:=i+1;
+        END LOOP;
+    END;
+/
+SQL SUCCESS
+CALL proc_while_loop(10);
++-----------------+
+| proc_while_loop |
++-----------------+
+|                 |
++-----------------+
+SELECT pg_sleep(1);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+select pg_stat_get_xact_function_calls(a.oid) from PG_PROC a where a.proname = 'proc_while_loop';
++---------------------------------+
+| pg_stat_get_xact_function_calls |
++---------------------------------+
+| 1                               |
++---------------------------------+
+CALL proc_while_loop(10);
++-----------------+
+| proc_while_loop |
++-----------------+
+|                 |
++-----------------+
+CALL proc_while_loop(10);
++-----------------+
+| proc_while_loop |
++-----------------+
+|                 |
++-----------------+
+SELECT pg_sleep(1);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+select pg_stat_get_xact_function_calls(a.oid) from PG_PROC a where a.proname = 'proc_while_loop';
++---------------------------------+
+| pg_stat_get_xact_function_calls |
++---------------------------------+
+| 3                               |
++---------------------------------+
+set track_functions to 'none';
+SQL SUCCESS
+set track_io_timing to 'off';
+SQL SUCCESS
+select pg_stat_get_xact_function_calls(a.oid) from PG_PROC a where a.proname = 'proc_while_loop';
++---------------------------------+
+| pg_stat_get_xact_function_calls |
++---------------------------------+
+| 3                               |
++---------------------------------+
+DROP PROCEDURE proc_while_loop;
+SQL SUCCESS
+DROP TABLE integertable;
+SQL SUCCESS
+select pg_stat_get_xact_function_calls(a.oid) from PG_PROC a where a.proname = 'proc_while_loop';
++---------------------------------+
+| pg_stat_get_xact_function_calls |
++---------------------------------+
++---------------------------------+
+end;
+SQL SUCCESS
+alter system set autovacuum to on;
+SQL SUCCESS

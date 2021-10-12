@@ -1,0 +1,36 @@
+--  @testpoint:openGauss关键字savepoint(非保留),使用RELEASE SAVEPOINT删除一个保存点，但是保留该保存点建立后执行的命令的效果
+--清理环境，删除表格
+DROP TABLE if exists table2;
+SQL SUCCESS
+--创建一个新表。
+CREATE TABLE table2(a int);
+SQL SUCCESS
+--开启事务。
+start  TRANSACTION;
+SQL SUCCESS
+--插入数据。
+INSERT INTO table2 VALUES (3);
+SQL SUCCESS
+--建立保存点。
+SAVEPOINT my_savepoint;
+SQL SUCCESS
+--插入数据。
+INSERT INTO table2 VALUES (4);
+SQL SUCCESS
+--回滚保存点。
+RELEASE SAVEPOINT my_savepoint;
+SQL SUCCESS
+--提交事务。
+COMMIT;
+SQL SUCCESS
+--查询表的内容，会同时看到3和4。
+SELECT * FROM table2;
++---+
+| a |
++---+
+| 3 |
+| 4 |
++---+
+--删除表。
+DROP TABLE table2;
+SQL SUCCESS

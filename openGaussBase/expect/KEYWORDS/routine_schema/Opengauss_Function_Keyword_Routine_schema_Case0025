@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字routine_schema(非保留)，作为角色名
+--关键字不带引号-成功
+drop role if exists routine_schema;
+SQL SUCCESS
+create role routine_schema with password 'Gauss@123' valid until '2020-12-31';
+SQL SUCCESS
+drop role routine_schema;
+SQL SUCCESS
+--关键字带双引号-成功
+drop role if exists "routine_schema";
+SQL SUCCESS
+create role "routine_schema" with password 'Gauss@123' valid until '2020-12-31';
+SQL SUCCESS
+drop role "routine_schema";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop role if exists 'routine_schema';
+?.*ERROR: syntax error at or near "'routine_schema'".*
+?.*Position: .*
+create role 'routine_schema' with password 'Gauss@123' valid until '2020-12-31';
+?.*ERROR: syntax error at or near "'routine_schema'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop role if exists `routine_schema`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create role `routine_schema` with password 'Gauss@123' valid until '2020-12-31';
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

@@ -1,0 +1,21 @@
+-- @testpoint: lpad函数参数异常校验，合理报错
+select lpad();
+?.*ERROR: function lpad\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: lpad
+select lpad(null);
+?.*ERROR: function lpad\(unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: lpad
+select lpad(0);
+?.*ERROR: function lpad\(integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: lpad
+select lpad(' ');
+?.*ERROR: function lpad\(unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: lpad

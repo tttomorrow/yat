@@ -1,0 +1,18 @@
+-- @testpoint: 创建列类型为特殊字符类型name的表
+drop table if exists table_2;
+SQL SUCCESS
+create table table_2(a name);
+SQL SUCCESS
+insert into table_2 values('qwweerth');
+SQL SUCCESS
+insert into table_2 values(122);
+SQL SUCCESS
+select * from table_2;
++----------+
+| a        |
++----------+
+| qwweerth |
+| 122      |
++----------+
+drop table if exists table_2;
+SQL SUCCESS

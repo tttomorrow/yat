@@ -1,0 +1,22 @@
+-- @testpoint: point类型，插入无效坐标值，合理报错
+drop table if exists test_point06;
+SQL SUCCESS
+create table test_point06 (name point);
+SQL SUCCESS
+insert into test_point06 values (point'(a,b)');
+?.*ERROR: invalid input syntax for type point: "\(a,b\)"
+?.*
+insert into test_point06 values (point'(~,~)');
+?.*ERROR: invalid input syntax for type point: "\(~,~\)"
+?.*
+insert into test_point06 values (point'(@,@)');
+?.*ERROR: invalid input syntax for type point: "\(@,@\)"
+?.*
+insert into test_point06 values (point'(#,#)');
+?.*ERROR: invalid input syntax for type point: "\(#,#\)"
+?.*
+insert into test_point06 values (point'(,)');
+?.*ERROR: invalid input syntax for type point: "\(,\)"
+?.*
+drop table test_point06;
+SQL SUCCESS

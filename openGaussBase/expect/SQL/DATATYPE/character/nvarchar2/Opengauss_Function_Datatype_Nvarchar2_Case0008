@@ -1,0 +1,18 @@
+-- @testpoint: 插入汉字和英文
+drop table if exists test_nvarchar2_08;
+SQL SUCCESS
+create table test_nvarchar2_08 (name nvarchar2(20));
+SQL SUCCESS
+insert into test_nvarchar2_08 values ('gkb中国');
+SQL SUCCESS
+insert into test_nvarchar2_08 values ('中国gkb');
+SQL SUCCESS
+select * from test_nvarchar2_08;
++-------+
+| name  |
++-------+
+| gkb中国 |
+| 中国gkb |
++-------+
+drop table if exists test_nvarchar2_08;
+SQL SUCCESS

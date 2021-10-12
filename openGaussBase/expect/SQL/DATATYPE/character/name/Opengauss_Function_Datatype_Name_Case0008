@@ -1,0 +1,15 @@
+-- @testpoint: 插入中文字符
+drop table if exists name_08;
+SQL SUCCESS
+CREATE TABLE name_08 (id name);
+SQL SUCCESS
+insert into name_08 values ('我是测试数据我是测试数据我是测试数据我是测试数据');
+SQL SUCCESS
+select * from name_08;
++-----------------------+
+| id                    |
++-----------------------+
+| 我是测试数据我是测试数据我是测试数据我是测 |
++-----------------------+
+drop table name_08;
+SQL SUCCESS

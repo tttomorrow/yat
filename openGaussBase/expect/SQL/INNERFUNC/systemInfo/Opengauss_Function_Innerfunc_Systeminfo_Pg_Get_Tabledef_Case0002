@@ -1,0 +1,17 @@
+-- @testpoint: pg_get_tabledef函数根据oid获取表定义
+drop table if exists table_test;
+SQL SUCCESS
+create table table_test(a varchar);
+SQL SUCCESS
+select pg_get_tabledef(oid) from PG_CLASS where relname='table_test';
+?.*
+?.*pg_get_tabledef?.*
+?.*
+| SET search_path = public;
+CREATE TABLE table_test (
+	a character varying
+)
+WITH (orientation=row, compression=no); |
+?.*
+drop table if exists table_test;
+SQL SUCCESS

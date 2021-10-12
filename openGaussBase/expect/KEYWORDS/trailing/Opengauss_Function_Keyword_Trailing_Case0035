@@ -1,0 +1,31 @@
+--  @testpoint:opengauss关键字trailing(保留)，结合函数使用验证功能正常
+select trim(trailing 'x' from 'xxABCDxx') as result;
++--------+
+| result |
++--------+
+| xxABCD |
++--------+
+select trim(trailing 'x' from 'ABCDxx') as result;
++--------+
+| result |
++--------+
+| ABCD   |
++--------+
+select trim(trailing 'x' from 'xxABCD') as result;
++--------+
+| result |
++--------+
+| xxABCD |
++--------+
+select trim(trailing 'x' from 'ABxxCD') as result;
++--------+
+| result |
++--------+
+| ABxxCD |
++--------+
+select trim(trailing 'x' from 'ABCD') as result;
++--------+
+| result |
++--------+
+| ABCD   |
++--------+

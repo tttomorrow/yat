@@ -1,0 +1,7 @@
+-- @testpoint: 列名出现关键字authid；authid大小写混合
+drop table if exists test_authid_001 ;
+SQL SUCCESS
+create table test_authid_001 ("authid" int);
+SQL SUCCESS
+drop table if exists test_authid_001 ;
+SQL SUCCESS

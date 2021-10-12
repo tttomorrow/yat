@@ -1,0 +1,17 @@
+-- @testpoint: 10. 测试add_months的参数为特殊字符，合理报错
+select ADD_MONTHS(current_timestamp,'@') - current_timestamp  from  sys_dummy;
+?.*ERROR: function add_months\(timestamp with time zone, unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+select ADD_MONTHS(current_timestamp,'*') - current_timestamp  from  sys_dummy;
+?.*ERROR: function add_months\(timestamp with time zone, unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+select ADD_MONTHS(current_timestamp,'!') - current_timestamp  from  sys_dummy;
+?.*ERROR: function add_months\(timestamp with time zone, unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+select ADD_MONTHS(current_timestamp,'#') - current_timestamp  from  sys_dummy;
+?.*ERROR: function add_months\(timestamp with time zone, unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*

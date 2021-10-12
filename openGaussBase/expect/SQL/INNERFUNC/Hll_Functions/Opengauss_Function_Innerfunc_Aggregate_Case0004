@@ -1,0 +1,14 @@
+-- @testpoint: hll_add_agg(hll_hashval, int32 log2m),入参为其他类型时，合理报错
+select hll_add_agg(1215,10);
+?.*ERROR: function hll_add_agg\(integer, integer\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: hll_add_agg
+select hll_add_agg(hll_hash_boolean(true), 9);
+?.*ERROR: log2m = 9 is out of range, it should be in range 10 to 16.*
+select hll_add_agg(hll_hash_boolean(true), 'a');
+?.*ERROR: invalid input syntax for integer: "a".*
+?.*
+  Where: referenced column: hll_add_agg
+select hll_add_agg (hll_hash_smallint(32767, 0), 17);
+?.*ERROR: log2m = 17 is out of range, it should be in range 10 to 16.*

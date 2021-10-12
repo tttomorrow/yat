@@ -1,0 +1,38 @@
+-- @testpoint: opengauss比较操作符<>，数值类型
+-- 数值类型
+SELECT 222::TINYINT <> 221::TINYINT;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+SELECT -222::SMALLINT <> 221::SMALLINT;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+SELECT -222::INTEGER <> 221::INTEGER;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+SELECT -222::BINARY_INTEGER <> 221::BINARY_INTEGER;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+SELECT -222::INTEGER <> 221::INTEGER;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+SELECT 0::BIGINT <> -1::BIGINT;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+

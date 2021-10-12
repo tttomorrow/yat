@@ -1,0 +1,11 @@
+-- @testpoint: 插入值为汉字和英文混合
+drop table if exists test_character_09;
+SQL SUCCESS
+create table test_character_09 (name character(20));
+SQL SUCCESS
+insert into test_character_09 values ('gkb中国');
+SQL SUCCESS
+insert into test_character_09 values ('中国gkb');
+SQL SUCCESS
+drop table test_character_09;
+SQL SUCCESS

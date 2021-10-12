@@ -1,0 +1,23 @@
+--  @testpoint:opengauss关键字Lc_Ctype(非保留)，作为视图名
+--关键字explain作为视图名，不带引号，创建成功
+CREATE or replace VIEW Lc_Ctype AS
+SELECT * FROM pg_tablespace WHERE spcname = 'pg_default';
+SQL SUCCESS
+drop view Lc_Ctype;
+SQL SUCCESS
+--关键字explain作为视图名，加双引号，创建成功
+CREATE  or replace VIEW "Lc_Ctype" AS
+SELECT * FROM pg_tablespace WHERE spcname = 'pg_default';
+SQL SUCCESS
+drop VIEW "Lc_Ctype";
+SQL SUCCESS
+--关键字explain作为视图名，加单引号，合理报错
+CREATE or replace VIEW 'Lc_Ctype' AS
+SELECT * FROM pg_tablespace WHERE spcname = 'pg_default';
+?.*ERROR: syntax error at or near "'Lc_Ctype'".*
+?.*Position: .*
+--关键字explain作为视图名，加反引号，合理报错
+CREATE or replace VIEW `Lc_Ctype` AS
+SELECT * FROM pg_tablespace WHERE spcname = 'pg_default';
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

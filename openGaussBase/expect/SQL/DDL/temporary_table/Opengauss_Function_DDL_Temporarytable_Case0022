@@ -1,0 +1,23 @@
+-- @testpoint: 创建临时分区表，合理报错
+-- @modify at: 2020-11-24
+--建表
+drop table if exists temp_table_022;
+SQL SUCCESS
+create temporary table temp_table_022
+(
+  empno    varchar2(20) not null,
+  empname  varchar2(20),
+  job      varchar2(20),
+  mgr      number(38),
+  hiredate date,
+  salary   number(38),
+  deptno   number(38)
+)
+partition by range(salary)
+(
+partition user_part_tables1_part01 values less than (1000),
+partition user_part_tables1_part02 values less than (2000),
+partition user_part_tables1_part03 values less than (6000)
+);
+?.*ERROR: unsupported feature with temporary/unlogged table for partitioned table
+--清理环境:no need to clean

@@ -1,0 +1,15 @@
+-- @testpoint: 正常值插入NVARCHAR2(n)
+DROP TABLE IF EXISTS type_nchar2;
+SQL SUCCESS
+CREATE TABLE type_nchar2 (stringv NVARCHAR2(100));
+SQL SUCCESS
+insert into type_nchar2 values ('ou mygod中>%');
+SQL SUCCESS
+select bit_length(stringv) from type_nchar2;
++------------+
+| bit_length |
++------------+
+| 104        |
++------------+
+DROP TABLE IF EXISTS type_nchar2;
+SQL SUCCESS

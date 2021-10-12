@@ -1,0 +1,15 @@
+-- @testpoint: 插入正常范围值
+drop table if exists test_varchar_04;
+SQL SUCCESS
+create table test_varchar_04 (name varchar(20));
+SQL SUCCESS
+insert into test_varchar_04 values ('abcdef');
+SQL SUCCESS
+select * from test_varchar_04;
++--------+
+| name   |
++--------+
+| abcdef |
++--------+
+drop table test_varchar_04;
+SQL SUCCESS

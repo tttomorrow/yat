@@ -1,0 +1,2 @@
+-- @testpoint:与distinct结合
+select distinct concat(0,1);

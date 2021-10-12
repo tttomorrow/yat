@@ -1,0 +1,17 @@
+-- @testpoint: 在事务中执行vacuum内存清理，不能成功（合理报错）
+start transaction;
+SQL SUCCESS
+drop table if exists vacuum_test_02;
+SQL SUCCESS
+create table vacuum_test_02(id_src int,name_src varchar(10));
+SQL SUCCESS
+drop index if exists vacuum_index_02;
+SQL SUCCESS
+create unique index vacuum_index_02 on vacuum_test(id_src);
+?.*ERROR: relation "vacuum_test" does not exist.*
+vacuum (verbose,analyse) vacuum_test;
+?.*ERROR: current transaction is aborted, commands ignored until end of transaction block.*
+commit;
+SQL SUCCESS
+drop table if exists vacuum_test_02;
+SQL SUCCESS

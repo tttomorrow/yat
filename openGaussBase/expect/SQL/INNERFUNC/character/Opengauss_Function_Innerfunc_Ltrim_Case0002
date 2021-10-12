@@ -1,0 +1,15 @@
+-- @testpoint: 字符串的非首位有该字符
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('xxxxTRIaM');
+SQL SUCCESS
+SELECT ltrim(string1,'a') from type_char;
++-----------+
+| ltrim     |
++-----------+
+| xxxxTRIaM |
++-----------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

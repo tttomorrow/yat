@@ -1,0 +1,15 @@
+-- @testpoint: opengauss比较操作符<,比较类型:money
+drop table if exists ts_zhparser;
+SQL SUCCESS
+CREATE TABLE ts_zhparser(mon money, mon1 money);
+SQL SUCCESS
+INSERT INTO ts_zhparser VALUES(2, 100);
+SQL SUCCESS
+select * from ts_zhparser where mon < mon1;
++-----+-------+
+| mon | mon1  |
++-----+-------+
+| 2.0 | 100.0 |
++-----+-------+
+drop table if exists ts_zhparser;
+SQL SUCCESS

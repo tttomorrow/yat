@@ -1,0 +1,40 @@
+-- @testpoint: 关键字unusable,用作字符串
+drop table if exists unusable_test cascade;
+SQL SUCCESS
+create table if not exists unusable_test(id int,unusable varchar(20));
+SQL SUCCESS
+create or replace procedure unusable_insert
+as
+begin
+ for i in 1..10 loop
+    insert into unusable_test values(i,'unusable');
+    end loop;
+ end;
+/
+SQL SUCCESS
+call unusable_insert();
++-----------------+
+| unusable_insert |
++-----------------+
+|                 |
++-----------------+
+select * from unusable_test;
++----+----------+
+| id | unusable |
++----+----------+
+| 1  | unusable |
+| 2  | unusable |
+| 3  | unusable |
+| 4  | unusable |
+| 5  | unusable |
+| 6  | unusable |
+| 7  | unusable |
+| 8  | unusable |
+| 9  | unusable |
+| 10 | unusable |
++----+----------+
+--清理环境
+drop table if exists unusable_test cascade;
+SQL SUCCESS
+drop procedure unusable_insert;
+SQL SUCCESS

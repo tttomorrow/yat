@@ -1,0 +1,123 @@
+-- @testpoint: 网络地址函数abbrev(cidr)异常校验，合理报错
+-- v4
+-- 带掩码
+SELECT abbrev(cidr '256.168.1.5/0') AS RESULT;
+?.*ERROR: invalid input syntax for type cidr: "256.168.1.5/0"
+?.*
+  Where: referenced column: result
+SELECT abbrev(cidr '192.168.1.5/33') AS RESULT;
+?.*ERROR: invalid input syntax for type cidr: "192.168.1.5/33"
+?.*
+  Where: referenced column: result
+SELECT abbrev(cidr '192.168.1.5-24') AS RESULT;
+?.*ERROR: invalid input syntax for type cidr: "192.168.1.5-24"
+?.*
+  Where: referenced column: result
+SELECT abbrev('192:168:1:5/25'::cidr) AS RESULT;
+?.*ERROR: invalid input syntax for type cidr: "192:168:1:5/25"
+?.*
+  Where: referenced column: result
+SELECT abbrev('192.168.1.5.9/32'::cidr) AS RESULT;
+?.*ERROR: invalid input syntax for type cidr: "192.168.1.5.9/32"
+?.*
+  Where: referenced column: result
+-- 不带掩码
+SELECT abbrev(cidr '256.168.1.5') AS RESULT;
+?.*ERROR: invalid input syntax for type cidr: "256.168.1.5"
+?.*
+  Where: referenced column: result
+SELECT abbrev(cidr '192:168:1') AS RESULT;
+?.*ERROR: invalid input syntax for type cidr: "192:168:1"
+?.*
+  Where: referenced column: result
+SELECT abbrev('192.168.1.5.9'::cidr) AS RESULT;
+?.*ERROR: invalid input syntax for type cidr: "192.168.1.5.9"
+?.*
+  Where: referenced column: result
+-- 特殊地址
+SELECT abbrev('0.0.0.0/3.9'::cidr) AS RESULT;
+?.*ERROR: invalid input syntax for type cidr: "0.0.0.0/3.9"
+?.*
+  Where: referenced column: result
+SELECT abbrev(cidr '255.255.255.255/0x40') AS RESULT;
+?.*ERROR: invalid input syntax for type cidr: "255.255.255.255/0x40"
+?.*
+  Where: referenced column: result
+-- v6
+-- 带前缀
+SELECT abbrev(cidr '1::1::ddff/64') AS RESULT;
+?.*ERROR: invalid input syntax for type cidr: "1::1::ddff/64"
+?.*
+  Where: referenced column: result
+SELECT abbrev(cidr'1::1:ddff/133') AS RESULT;
+?.*ERROR: invalid input syntax for type cidr: "1::1:ddff/133"
+?.*
+  Where: referenced column: result
+SELECT abbrev('1::1:ddff-128'::cidr) AS RESULT;
+?.*ERROR: invalid input syntax for type cidr: "1::1:ddff-128"
+?.*
+  Where: referenced column: result
+-- 不带前缀
+SELECT abbrev('00001:1:897d::ddff'::cidr) AS RESULT;
+?.*ERROR: invalid input syntax for type cidr: "00001:1:897d::ddff"
+?.*
+  Where: referenced column: result
+-- 特殊地址
+SELECT abbrev('FC00::/7%'::cidr) AS RESULT;
+?.*ERROR: invalid input syntax for type cidr: "FC00::/7%"
+?.*
+  Where: referenced column: result
+SELECT abbrev(cidr '::1/0.0') AS RESULT;
+?.*ERROR: invalid input syntax for type cidr: "::1/0.0"
+?.*
+  Where: referenced column: result
+SELECT abbrev(cidr '::10.2.3.4:ffff') AS RESULT;
+?.*ERROR: invalid input syntax for type cidr: "::10.2.3.4:ffff"
+?.*
+  Where: referenced column: result
+SELECT abbrev('::ffff:10.4.3.2/129'::cidr1) AS RESULT;
+?.*ERROR: type "cidr1" does not exist
+?.*
+  Where: referenced column: result
+-- 多参少参空值
+SELECT abbrev(cidr '') AS RESULT;
++--------+
+| result |
++--------+
+|        |
++--------+
+SELECT abbrev('192.168.1.5','192.1.1.1') AS RESULT;
+?.*ERROR: function abbrev\(unknown, unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: result
+SELECT abbrev('1::1:ddff/64'::cidr) AS RESULT;
+?.*ERROR: invalid cidr value: "1::1:ddff/64"
+  Detail: Value has bits set to right of mask.
+?.*
+  Where: referenced column: result
+SELECT abbrev(cidr '1::1:ddff/89') AS RESULT;
+?.*ERROR: invalid cidr value: "1::1:ddff/89"
+  Detail: Value has bits set to right of mask.
+?.*
+  Where: referenced column: result
+SELECT abbrev(cidr '192.168.1.5/0') AS RESULT;
+?.*ERROR: invalid cidr value: "192.168.1.5/0"
+  Detail: Value has bits set to right of mask.
+?.*
+  Where: referenced column: result
+SELECT abbrev('192.168.1.5/7'::cidr) AS RESULT;
+?.*ERROR: invalid cidr value: "192.168.1.5/7"
+  Detail: Value has bits set to right of mask.
+?.*
+  Where: referenced column: result
+SELECT abbrev('192.168.1.5/24'::cidr) AS RESULT;
+?.*ERROR: invalid cidr value: "192.168.1.5/24"
+  Detail: Value has bits set to right of mask.
+?.*
+  Where: referenced column: result
+SELECT abbrev(cidr '192.168.1.5/25') AS RESULT;
+?.*ERROR: invalid cidr value: "192.168.1.5/25"
+  Detail: Value has bits set to right of mask.
+?.*
+  Where: referenced column: result

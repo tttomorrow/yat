@@ -1,0 +1,26 @@
+--  @testpoint:开启事务提取数据，初始位置为0，抓取上一行数据，提取为空
+--前置条件
+drop table if exists cur_test_96;
+SQL SUCCESS
+create table cur_test_96(c_id int,c_num int,c_name varchar(10),c_city varchar(10),c_add varchar(20));
+SQL SUCCESS
+insert into cur_test_96 values(1,18,'Allen','Beijing','AAAAABAAAAA'),(2,368,'Bob','Shanghai','AAAAACAAAAA'),
+                           (3,59,'Cathy','Shenzhen','AAAAADAAAAA'),(4,96,'David','Suzhou','AAAAAEAAAAA'),
+                           (5,17,'Edrwd','Fenghuang','AAAAAFAAAAA'),(6,253,'Fendi','Changsha','AAAAAGAAAAA');
+SQL SUCCESS
+--初始位置
+start transaction;
+SQL SUCCESS
+cursor cursor96 for select * from cur_test_96;
+SQL SUCCESS
+fetch backward from cursor96;
++------+-------+--------+--------+-------+
+| c_id | c_num | c_name | c_city | c_add |
++------+-------+--------+--------+-------+
++------+-------+--------+--------+-------+
+close cursor96;
+SQL SUCCESS
+end;
+SQL SUCCESS
+drop table cur_test_96;
+SQL SUCCESS

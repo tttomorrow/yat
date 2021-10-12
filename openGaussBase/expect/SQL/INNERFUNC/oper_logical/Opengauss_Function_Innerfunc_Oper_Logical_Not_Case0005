@@ -1,0 +1,15 @@
+-- @testpoint: opengauss逻辑操作符NOT,与其它逻辑操作符连用
+drop table if exists ts_zhparser;
+SQL SUCCESS
+CREATE TABLE ts_zhparser(id int, stu int);
+SQL SUCCESS
+INSERT INTO ts_zhparser VALUES(2, 100);
+SQL SUCCESS
+select * from ts_zhparser where stu >50 AND id  is  NOT null ;
++----+-----+
+| id | stu |
++----+-----+
+| 2  | 100 |
++----+-----+
+drop table if exists ts_zhparser;
+SQL SUCCESS

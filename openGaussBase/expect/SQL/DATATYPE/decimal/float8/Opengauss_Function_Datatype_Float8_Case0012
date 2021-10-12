@@ -1,0 +1,11 @@
+-- @testpoint: 插入非法空值，合理报错
+drop table if exists float4_12;
+SQL SUCCESS
+create table float4_12 (id int,name float8);
+SQL SUCCESS
+insert into float4_12 values (1,' ');
+?.*ERROR: invalid input syntax for type double precision: " "
+?.*
+  Where: referenced column: name
+drop table float4_12;
+SQL SUCCESS

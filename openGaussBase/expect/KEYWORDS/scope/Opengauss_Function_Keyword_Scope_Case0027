@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字scope非保留)，作为序列名
+--关键字不带引号-成功
+drop sequence if exists scope;
+SQL SUCCESS
+create sequence scope start 100 cache 50;
+SQL SUCCESS
+drop sequence scope;
+SQL SUCCESS
+--关键字带双引号-成功
+drop sequence if exists "scope";
+SQL SUCCESS
+create sequence "scope" start 100 cache 50;
+SQL SUCCESS
+drop sequence "scope";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'scope';
+?.*ERROR: syntax error at or near "'scope'".*
+?.*Position: .*
+create sequence 'scope' start 100 cache 50;
+?.*ERROR: syntax error at or near "'scope'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop sequence if exists `scope`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create sequence `scope` start 100 cache 50;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

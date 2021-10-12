@@ -1,0 +1,32 @@
+--  @testpoint:opengauss关键字unique(保留)，作为序列名
+--关键字不带引号-失败
+drop sequence if exists unique;
+?.*ERROR: syntax error at or near "unique"
+?.*Position: .*
+create sequence unique start 100 cache 50;
+?.*ERROR: syntax error at or near "unique"
+?.*Position: .*
+drop sequence unique;
+?.*ERROR: syntax error at or near "unique"
+?.*Position: .*
+--关键字带双引号-成功
+drop sequence if exists "unique";
+SQL SUCCESS
+create sequence "unique" start 100 cache 50;
+SQL SUCCESS
+drop sequence "unique";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'unique';
+?.*ERROR: syntax error at or near "'unique'"
+?.*Position: .*
+create sequence 'unique' start 100 cache 50;
+?.*ERROR: syntax error at or near "'unique'"
+?.*Position: .*
+--关键字带反引号-合理报错
+drop sequence if exists `unique`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+create sequence `unique` start 100 cache 50;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*

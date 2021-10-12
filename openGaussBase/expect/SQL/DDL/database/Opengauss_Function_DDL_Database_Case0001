@@ -1,0 +1,25 @@
+-- @testpoint: 创建数据库指定参数owner及template,合理报错
+-- create database with specified owner
+drop database if exists ts_test;
+SQL SUCCESS
+drop user if exists jim;
+SQL SUCCESS
+CREATE USER jim PASSWORD 'Bigdata@123';
+SQL SUCCESS
+CREATE DATABASE ts_test WITH OWNER = jim;
+SQL SUCCESS
+-- create database with template1:fail
+drop database if exists ts_test;
+SQL SUCCESS
+CREATE DATABASE ts_test WITH TEMPLATE=template1;
+?.*ERROR: template1 is not supported for using here, just support template0
+-- create database with template0
+drop database if exists ts_test;
+SQL SUCCESS
+CREATE DATABASE ts_test WITH TEMPLATE=template0;
+SQL SUCCESS
+--tearDown
+drop database if exists ts_test;
+SQL SUCCESS
+drop user if exists jim;
+SQL SUCCESS

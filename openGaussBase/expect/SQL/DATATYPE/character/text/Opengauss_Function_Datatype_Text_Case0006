@@ -1,0 +1,18 @@
+-- @testpoint: 插入汉字和英文
+drop table if exists test_text_06;
+SQL SUCCESS
+create table test_text_06(c_text text);
+SQL SUCCESS
+insert into test_text_06 values('测试数据库abc');
+SQL SUCCESS
+insert into test_text_06 values('abcdfdf测试数据库');
+SQL SUCCESS
+select * from test_text_06;
++--------------+
+| c_text       |
++--------------+
+| 测试数据库abc     |
+| abcdfdf测试数据库 |
++--------------+
+drop table test_text_06;
+SQL SUCCESS

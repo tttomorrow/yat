@@ -1,0 +1,28 @@
+-- @testpoint: 创建视图,添加视图的字段名
+--建表
+drop table if exists table_view_009;
+SQL SUCCESS
+create table table_view_009(id int,name varchar(20));
+SQL SUCCESS
+--插入数据
+insert into table_view_009 values(1,'he&*%&%llo'),(2,'world');
+SQL SUCCESS
+--创建视图
+drop view if exists temp_view_009;
+SQL SUCCESS
+create view temp_view_009(id) as select * from table_view_009;
+SQL SUCCESS
+--替换已有视图，添加字段名
+create or replace view temp_view_009(id,name) as select * from table_view_009;
+SQL SUCCESS
+--查询视图
+select * from temp_view_009;
++----+------------+
+| id | name       |
++----+------------+
+| 1  | he&*%&%llo |
+| 2  | world      |
++----+------------+
+--删表
+drop table table_view_009 cascade;
+SQL SUCCESS

@@ -1,0 +1,18 @@
+-- @testpoint: 使用CALL命令调用已定义的函数
+drop function if exists func_add_sql;
+SQL SUCCESS
+CREATE FUNCTION func_add_sql(num1 integer, num2 integer) RETURN integer
+AS
+BEGIN
+RETURN num1 + num2;
+END;
+/
+SQL SUCCESS
+CALL func_add_sql(1, 3);
++--------------+
+| func_add_sql |
++--------------+
+| 4            |
++--------------+
+drop function if exists func_add_sql;
+SQL SUCCESS

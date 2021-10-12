@@ -1,0 +1,18 @@
+-- @testpoint: 表名和列名同时出现关键字and，与dml结合
+drop table if exists "and" CASCADE;
+SQL SUCCESS
+create table "and" ("and" char(20),stu_age int,sex char(10),score int,address char(10) default 'gauss');
+SQL SUCCESS
+insert into "and"("and",stu_age) values('wangwu',25);
+SQL SUCCESS
+update "and" set "and"='wujun';
+SQL SUCCESS
+delete from "and";
+SQL SUCCESS
+select * from "and";
++-----+---------+-----+-------+---------+
+| and | stu_age | sex | score | address |
++-----+---------+-----+-------+---------+
++-----+---------+-----+-------+---------+
+drop table if exists "and";
+SQL SUCCESS

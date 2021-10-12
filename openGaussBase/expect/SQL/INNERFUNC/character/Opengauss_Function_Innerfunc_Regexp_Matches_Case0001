@@ -1,0 +1,14 @@
+-- @testpoint: 正常值匹配不到
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('foobarbequebaz');
+SQL SUCCESS
+SELECT regexp_matches(string1,'Thom') from type_char;
++----------------+
+| regexp_matches |
++----------------+
++----------------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

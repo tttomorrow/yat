@@ -1,0 +1,39 @@
+--  @testpoint:为枚举类型增加一个新值
+--创建枚举类型
+drop type if exists bugstatus cascade;
+SQL SUCCESS
+CREATE TYPE bugstatus AS ENUM ('create', 'modify', 'closed');
+SQL SUCCESS
+--为枚举类型增加一个新值,在已有标签值之前
+ALTER TYPE bugstatus ADD VALUE 'insert' BEFORE 'create';
+SQL SUCCESS
+--建表
+drop table if exists test_t5 cascade;
+SQL SUCCESS
+create table test_t5 (id int,d bugstatus);
+SQL SUCCESS
+--插入数据
+insert into test_t5 values(1,'modify');
+SQL SUCCESS
+insert into test_t5 values(1,'insert');
+SQL SUCCESS
+--查询表信息
+select * from test_t5;
++----+--------+
+| id | d      |
++----+--------+
+| 1  | modify |
+| 1  | insert |
++----+--------+
+--为枚举类型增加一个新值,在已有标签值之后
+ALTER TYPE bugstatus ADD VALUE 'update' after 'closed';
+SQL SUCCESS
+--插入数据
+insert into test_t5 values(1,'update');
+SQL SUCCESS
+--删表
+drop table if exists test_t5 cascade;
+SQL SUCCESS
+--删除类型
+drop type if exists bugstatus cascade;
+SQL SUCCESS

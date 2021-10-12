@@ -1,0 +1,149 @@
+--  @testpoint: 子查询验证字段名大小写
+select * from false_1 where b in (select b from wms);
++---+------------+
+| a | b          |
++---+------------+
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
++---+------------+
+select * from false_1 where B in (select b from wms);
++---+------------+
+| a | b          |
++---+------------+
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
++---+------------+
+select * from false_1 where b in (select B from wms);
++---+------------+
+| a | b          |
++---+------------+
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
++---+------------+
+select * from false_1 where b in (select B from WMS);
++---+------------+
+| a | b          |
++---+------------+
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
+|   | xx         |
++---+------------+

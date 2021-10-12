@@ -1,0 +1,27 @@
+-- @testpoint: pg_stat_get_xact_blocks_hit(oid)函数的异常校验，合理报错
+select pg_stat_get_xact_blocks_hit(a.oid) from PG_CLASS a where a.relname = 'sales1';
++-----------------------------+
+| pg_stat_get_xact_blocks_hit |
++-----------------------------+
++-----------------------------+
+select pg_stat_get_xact_blocks_hit(a.oid) from PG_CLASS a where a.relname = 'test_index3';
++-----------------------------+
+| pg_stat_get_xact_blocks_hit |
++-----------------------------+
++-----------------------------+
+select pg_stat_get_xact_blocks_hit() from PG_CLASS a where a.relname = 'sales';
+?.*ERROR: function pg_stat_get_xact_blocks_hit\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_stat_get_xact_blocks_hit
+select pg_stat_get_xact_blocks_hit(a.oid,a.oid,a.oid) from PG_CLASS a where a.relname = 'test_index1';
+?.*ERROR: function pg_stat_get_xact_blocks_hit\(oid, oid, oid\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_stat_get_xact_blocks_hit
+?.*ERROR: OID out of range
+  Where: referenced column: pg_stat_get_xact_blocks_hit
+select pg_stat_get_xact_blocks_hit('*&&^*') from PG_CLASS a where a.relname = 'test_index1';
+?.*ERROR: invalid input syntax for type oid: \"\*\&\&\^\*\"
+?.*
+  Where: referenced column: pg_stat_get_xact_blocks_hit

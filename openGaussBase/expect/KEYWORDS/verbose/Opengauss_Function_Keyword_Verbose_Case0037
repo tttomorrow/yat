@@ -1,0 +1,2 @@
+-- @testpoint: 定义verbose是函数名
+Sql parse error: [13:32] expect token, EOF found

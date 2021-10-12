@@ -1,0 +1,54 @@
+-- @testpoint: opengauss关键字explain(非保留)，自定义数据类型名为explain 合理报错
+--关键字explain作为数据类型不带引号，创建成功
+drop type if exists public.explain;
+SQL SUCCESS
+CREATE TYPE public.explain AS (f1 int, f2 text);
+SQL SUCCESS
+select typname from pg_type where typname ='public.explain';
++---------+
+| typname |
++---------+
++---------+
+drop type public.explain;
+SQL SUCCESS
+--关键字explain作为数据类型加双引号，创建成功
+drop type if exists "public.explain";
+SQL SUCCESS
+CREATE TYPE "public.explain" AS (f1 int, f2 text);
+SQL SUCCESS
+select typname from pg_type where typname ='public.explain';
++----------------+
+| typname        |
++----------------+
+| public.explain |
++----------------+
+drop type "public.explain";
+SQL SUCCESS
+--关键字explain作为数据类型加单引号，合理报错
+drop type if exists 'public.explain';
+?.*ERROR: syntax error at or near "'public.explain'"
+?.*
+CREATE TYPE 'public.explain' AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "'public.explain'"
+?.*
+select * from pg_type where typname ='public.explain';
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+----------+-----------+------------+---------+----------+-----------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
+| typname | typnamespace | typowner | typlen | typbyval | typtype | typcategory | typispreferred | typisdefined | typdelim | typrelid | typelem | typarray | typinput | typoutput | typreceive | typsend | typmodin | typmodout | typanalyze | typalign | typstorage | typnotnull | typbasetype | typtypmod | typndims | typcollation | typdefaultbin | typdefault | typacl |
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+----------+-----------+------------+---------+----------+-----------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+----------+-----------+------------+---------+----------+-----------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
+drop type 'public.explain';
+?.*ERROR: syntax error at or near "'public.explain'"
+?.*
+--关键字explain作为数据类型加反引号，合理报错
+drop type if exists `public.explain`;
+?.*ERROR: syntax error at or near "`"
+?.*
+CREATE TYPE `public.explain` AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "`"
+?.*
+select * from pg_type where typname =`public.explain`;
+?.*ERROR: missing FROM-clause entry for table "public"
+?.*
+drop type `public.explain`;
+?.*ERROR: syntax error at or near "`"
+?.*

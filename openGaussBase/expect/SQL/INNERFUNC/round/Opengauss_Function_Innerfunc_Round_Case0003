@@ -1,0 +1,18 @@
+-- @testpoint: round函数入参为无精度数值类型
+drop table if exists tb;
+SQL SUCCESS
+create table tb (num int,dp1 double precision,nem numeric);
+SQL SUCCESS
+insert into tb (nem) values(43.4);
+SQL SUCCESS
+insert into tb (nem) values(43.5);
+SQL SUCCESS
+select round(nem) as result from tb where nem in (43.4,43.5) order by 1;
++--------+
+| result |
++--------+
+| 43     |
+| 44     |
++--------+
+drop table tb;
+SQL SUCCESS

@@ -1,0 +1,55 @@
+--  @testpoint:opengauss关键字initially(保留)，作为存储过程名
+--关键字不带引号-合理报错
+create or replace procedure initially() is
+V1 BLOB;
+begin
+  IF V1 is NULL then
+  raise info 'V1 is NULL';
+  else
+  raise info 'V1 is not NULL';
+  end if;
+end;
+/
+?.*ERROR: syntax error at or near "initially".*
+?.*Position.*
+--关键字带双引号-成功
+create or replace procedure "initially"() is
+V1 BLOB;
+begin
+  IF V1 is NULL then
+  raise info 'V1 is NULL';
+  else
+  raise info 'V1 is not NULL';
+  end if;
+end;
+/
+SQL SUCCESS
+--清理环境
+drop procedure "initially";
+SQL SUCCESS
+--关键字带单引号-合理报错
+create or replace procedure 'initially'() is
+V1 BLOB;
+begin
+  IF V1 is NULL then
+  raise info 'V1 is NULL';
+  else
+  raise info 'V1 is not NULL';
+  end if;
+end;
+/
+?.*ERROR: syntax error at or near "'initially'".*
+?.*Position.*
+--关键字带反引号-合理报错
+create or replace procedure `initially`() is
+V1 BLOB;
+begin
+  IF V1 is NULL then
+  raise info 'V1 is NULL';
+  else
+  raise info 'V1 is not NULL';
+  end if;
+end;
+/
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*

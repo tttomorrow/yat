@@ -1,0 +1,57 @@
+--  @testpoint:文本搜索配置token_type测试
+--创建文本搜索配置，解析器为默认pg_catalog.default
+DROP TEXT SEARCH CONFIGURATION if exists english2 cascade;
+SQL SUCCESS
+CREATE TEXT SEARCH CONFIGURATION english2 (parser=default);
+SQL SUCCESS
+--创建simple字典
+DROP TEXT SEARCH DICTIONARY IF EXISTS pg_dict cascade;
+SQL SUCCESS
+CREATE TEXT SEARCH DICTIONARY pg_dict (TEMPLATE = Simple);
+SQL SUCCESS
+--增加文本搜索配置字串类型映射，token为url_path
+ALTER TEXT SEARCH CONFIGURATION english2 ADD MAPPING FOR url_path WITH pg_dict;
+SQL SUCCESS
+--使用文本检索函数对所创建的词典配置english2进行测试
+SELECT ts_debug('english','/stuff/index.html, in the context of a URL');
++----------------------------------------------------------------------------------+
+| ts_debug                                                                         |
++----------------------------------------------------------------------------------+
+| (file,"File or path name",/stuff/index.html,{simple},simple,{/stuff/index.html}) |
+| (blank,"Space symbols",", ",{},,)                                                |
+| (asciiword,"Word, all ASCII",in,{english_stem},english_stem,{})                  |
+| (blank,"Space symbols"," ",{},,)                                                 |
+| (asciiword,"Word, all ASCII",the,{english_stem},english_stem,{})                 |
+| (blank,"Space symbols"," ",{},,)                                                 |
+| (asciiword,"Word, all ASCII",context,{english_stem},english_stem,{context})      |
+| (blank,"Space symbols"," ",{},,)                                                 |
+| (asciiword,"Word, all ASCII",of,{english_stem},english_stem,{})                  |
+| (blank,"Space symbols"," ",{},,)                                                 |
+| (asciiword,"Word, all ASCII",a,{english_stem},english_stem,{})                   |
+| (blank,"Space symbols"," ",{},,)                                                 |
+| (asciiword,"Word, all ASCII",URL,{english_stem},english_stem,{url})              |
++----------------------------------------------------------------------------------+
+SELECT ts_debug('/stuff/index.html, in the context of a URL');
++----------------------------------------------------------------------------------+
+| ts_debug                                                                         |
++----------------------------------------------------------------------------------+
+| (file,"File or path name",/stuff/index.html,{simple},simple,{/stuff/index.html}) |
+| (blank,"Space symbols",", ",{},,)                                                |
+| (asciiword,"Word, all ASCII",in,{english_stem},english_stem,{})                  |
+| (blank,"Space symbols"," ",{},,)                                                 |
+| (asciiword,"Word, all ASCII",the,{english_stem},english_stem,{})                 |
+| (blank,"Space symbols"," ",{},,)                                                 |
+| (asciiword,"Word, all ASCII",context,{english_stem},english_stem,{context})      |
+| (blank,"Space symbols"," ",{},,)                                                 |
+| (asciiword,"Word, all ASCII",of,{english_stem},english_stem,{})                  |
+| (blank,"Space symbols"," ",{},,)                                                 |
+| (asciiword,"Word, all ASCII",a,{english_stem},english_stem,{})                   |
+| (blank,"Space symbols"," ",{},,)                                                 |
+| (asciiword,"Word, all ASCII",URL,{english_stem},english_stem,{url})              |
++----------------------------------------------------------------------------------+
+--删除文本搜索配置
+DROP TEXT SEARCH CONFIGURATION english2 cascade;
+SQL SUCCESS
+--删除词典
+DROP TEXT SEARCH DICTIONARY pg_dict cascade;
+SQL SUCCESS

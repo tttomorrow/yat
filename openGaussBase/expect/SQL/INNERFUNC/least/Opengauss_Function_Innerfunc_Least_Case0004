@@ -1,0 +1,13 @@
+--@testpoint:视图
+drop table if exists FVT_OBJ_DEFINE_table_least;
+SQL SUCCESS
+CREATE TABLE FVT_OBJ_DEFINE_table_least(COL_1 char(20),COL_2 int);
+SQL SUCCESS
+drop view if exists v_Stu_Cou_least_ZHQ;
+SQL SUCCESS
+create view v_Stu_Cou_least_ZHQ as SELECT COL_1 FROM FVT_OBJ_DEFINE_table_least where COL_1 in (least(125251.123456,100562),least(125251.123456,100563),least(125251.123456,100569),least(125251.123456,100659));
+SQL SUCCESS
+drop view if exists v_Stu_Cou_least_ZHQ;
+SQL SUCCESS
+drop table if exists FVT_OBJ_DEFINE_table_least;
+SQL SUCCESS

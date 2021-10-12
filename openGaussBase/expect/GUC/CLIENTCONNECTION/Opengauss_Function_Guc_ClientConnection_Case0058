@@ -1,0 +1,17 @@
+-- @testpoint: alter system set方法设置参数default_transaction_isolation值，合理报错
+--查看默认
+show default_transaction_isolation;
++-------------------------------+
+| default_transaction_isolation |
++-------------------------------+
+| read committed                |
++-------------------------------+
+--修改，报错
+alter system set default_transaction_isolation to 'repeatable read';
+?.*ERROR: unsupport parameter: default_transaction_isolation
+ALTER SYSTEM SET only support POSTMASTER-level, SIGHUP-level and BACKEND-level guc variable,
+and it must be allowed to set in postgresql.conf.
+alter system set default_transaction_isolation to 'serializable';
+?.*ERROR: unsupport parameter: default_transaction_isolation
+ALTER SYSTEM SET only support POSTMASTER-level, SIGHUP-level and BACKEND-level guc variable,
+and it must be allowed to set in postgresql.conf.

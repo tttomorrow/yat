@@ -1,0 +1,19 @@
+-- @testpoint: 自然对数lnx入参是列
+DROP TABLE IF EXISTS TEST_LN;
+SQL SUCCESS
+CREATE TABLE TEST_LN(A INT,B INT);
+SQL SUCCESS
+INSERT INTO TEST_LN VALUES(0,1);
+SQL SUCCESS
+INSERT INTO TEST_LN VALUES(1,4);
+SQL SUCCESS
+INSERT INTO TEST_LN VALUES(0.5,2);
+SQL SUCCESS
+SELECT LN(B) FROM TEST_LN order by LN(B);
++--------------------+
+| ln                 |
++--------------------+
+| 0.0                |
++--------------------+
+DROP TABLE IF EXISTS TEST_LN;
+SQL SUCCESS

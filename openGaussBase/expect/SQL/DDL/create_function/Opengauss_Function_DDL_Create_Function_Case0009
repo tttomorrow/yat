@@ -1,0 +1,24 @@
+--  @testpoint:创建函数不指定模式名（在当前schema下）
+SELECT CURRENT_SCHEMA;
++----------------+
+| current_schema |
++----------------+
+| public         |
++----------------+
+drop FUNCTION if EXISTS add_two(integer, integer);
+SQL SUCCESS
+CREATE FUNCTION add_two(integer, integer) RETURNS integer
+    AS 'select $1 + $2;'
+    LANGUAGE SQL
+    IMMUTABLE
+    RETURNS NULL ON NULL INPUT;
+ /
+SQL SUCCESS
+select proname from pg_proc where proname='add_two';
++---------+
+| proname |
++---------+
+| add_two |
++---------+
+drop FUNCTION add_two;
+SQL SUCCESS

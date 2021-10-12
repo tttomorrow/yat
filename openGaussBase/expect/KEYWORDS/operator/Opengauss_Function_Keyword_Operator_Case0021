@@ -1,0 +1,58 @@
+-- @testpoint: opengauss关键字operator(非保留)，作为函数名,部分测试点合理报错
+--关键字不带引号-成功
+drop function if exists operator;
+SQL SUCCESS
+create function operator(i integer)
+returns integer
+as $$
+begin
+    return i+1;
+end;
+$$ language plpgsql;
+/
+SQL SUCCESS
+--关键字带双引号-成功
+drop function if exists "operator";
+SQL SUCCESS
+create function "operator"(i integer)
+returns integer
+as $$
+begin
+    return i+1;
+end;
+$$ language plpgsql;
+/
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop function if exists 'operator';
+?.*ERROR: syntax error at or near "'operator'".*
+?.*Position: .*
+create function 'operator'(i integer)
+returns integer
+as $$
+begin
+    return i+1;
+end;
+$$ language plpgsql;
+/
+?.*ERROR: syntax error at or near "'operator'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop function if exists `operator`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create function `operator`(i integer)
+returns integer
+as $$
+begin
+    return i+1;
+end;
+$$ language plpgsql;
+/
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+--清理环境
+drop function if exists operator(integer);
+SQL SUCCESS
+drop function if exists "operator"(integer);
+SQL SUCCESS

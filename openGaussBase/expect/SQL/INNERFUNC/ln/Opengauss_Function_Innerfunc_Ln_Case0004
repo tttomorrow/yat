@@ -1,0 +1,7 @@
+-- @testpoint: 自然对数lnx传入x<=0，合理报错
+SELECT LN(0);
+?.*ERROR: cannot take logarithm of zero
+  Where: referenced column: ln
+SELECT LN(-1);
+?.*ERROR: cannot take logarithm of a negative number
+  Where: referenced column: ln

@@ -1,0 +1,20 @@
+--  @testpoint: numtodsinterval interval_unit为 ’DAY‘
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (clo1 date);
+SQL SUCCESS
+insert into test_date01 values ('2001-02-16');
+SQL SUCCESS
+select to_date(clo1) + numtodsinterval(100, 'DAY') from test_date01;
++-------------------------------+
+| ?column?                      |
++-------------------------------+
++-------------------------------+
+SELECT numtodsinterval(100, 'DAY');
++--------------------------------------------------+
+| numtodsinterval                                  |
++--------------------------------------------------+
+| 0 years 0 mons 100 days 0 hours 0 mins 0.00 secs |
++--------------------------------------------------+
+drop table if exists test_date01;
+SQL SUCCESS

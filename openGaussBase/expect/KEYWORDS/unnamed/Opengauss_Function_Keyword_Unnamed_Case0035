@@ -1,0 +1,40 @@
+-- @testpoint: 关键字unnamed，用作表名创建普通表
+drop table if exists unnamed cascade;
+SQL SUCCESS
+create table if not exists unnamed(id int,name varchar(20));
+SQL SUCCESS
+create or replace procedure unnamed_insert
+as
+begin
+ for i in 1..10 loop
+    insert into unnamed values(i,'unname+'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call unnamed_insert();
++----------------+
+| unnamed_insert |
++----------------+
+|                |
++----------------+
+select * from unnamed;
++----+-----------+
+| id | name      |
++----+-----------+
+| 1  | unname+1  |
+| 2  | unname+2  |
+| 3  | unname+3  |
+| 4  | unname+4  |
+| 5  | unname+5  |
+| 6  | unname+6  |
+| 7  | unname+7  |
+| 8  | unname+8  |
+| 9  | unname+9  |
+| 10 | unname+10 |
++----+-----------+
+--清理环境
+drop table if exists unnamed cascade;
+SQL SUCCESS
+drop procedure unnamed_insert;
+SQL SUCCESS

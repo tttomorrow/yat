@@ -1,0 +1,26 @@
+-- @testpoint: substring函数参数缺少测试，合理报错
+select substring('jjslfhaha') as text1;
+?.*ERROR: function pg_catalog.substring\(unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: text1
+select substring('jjslfhaha' for 4) as text1;
++-------+
+| text1 |
++-------+
+| jjsl  |
++-------+
+select substring('jjslfhaha' from 4) as text1;
++--------+
+| text1  |
++--------+
+| lfhaha |
++--------+
+select substring(from 4 for 4) as text1;
+?.*ERROR: syntax error at or near \"from\"
+?.*
+select substring() as text1;
+?.*ERROR: function pg_catalog.substring\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: text1

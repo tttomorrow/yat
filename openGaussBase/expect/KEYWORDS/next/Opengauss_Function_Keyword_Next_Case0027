@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字next非保留)，作为序列名
+--关键字不带引号-成功
+drop sequence if exists next;
+SQL SUCCESS
+create sequence next start 100 cache 50;
+SQL SUCCESS
+drop sequence next;
+SQL SUCCESS
+--关键字带双引号-成功
+drop sequence if exists "next";
+SQL SUCCESS
+create sequence "next" start 100 cache 50;
+SQL SUCCESS
+drop sequence "next";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'next';
+?.*ERROR: syntax error at or near "'next'".*
+?.*Position: .*
+create sequence 'next' start 100 cache 50;
+?.*ERROR: syntax error at or near "'next'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop sequence if exists `next`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create sequence `next` start 100 cache 50;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

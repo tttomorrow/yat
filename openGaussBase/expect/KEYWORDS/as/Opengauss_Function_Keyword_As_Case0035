@@ -1,0 +1,6 @@
+--  @testpoint:列名出现关键字as；as大小写混合，应该报错
+drop table if exists test_as_001 ;
+SQL SUCCESS
+create table test_as_001 (as int);
+?.*ERROR: syntax error at or near "as"
+?.*Position.*

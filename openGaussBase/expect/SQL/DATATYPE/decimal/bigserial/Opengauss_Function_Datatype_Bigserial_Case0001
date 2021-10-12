@@ -1,0 +1,19 @@
+-- @testpoint: 插入有效正整数
+drop table if exists bigserial_01;
+SQL SUCCESS
+create table bigserial_01 (name bigserial);
+SQL SUCCESS
+insert into bigserial_01 values (120);
+SQL SUCCESS
+insert into bigserial_01 values (0004567);
+SQL SUCCESS
+SQL SUCCESS
+select * from bigserial_01;
++-----------+
+| name      |
++-----------+
+| 120       |
+| 4567      |
++-----------+
+drop table bigserial_01;
+SQL SUCCESS

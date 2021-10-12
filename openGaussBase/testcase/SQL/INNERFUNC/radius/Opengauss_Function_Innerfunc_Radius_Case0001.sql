@@ -1,0 +1,2 @@
+-- @testpoint: radius函数计算圆的半径,整数半径
+SELECT radius(circle '((0,0),2)') AS RESULT;

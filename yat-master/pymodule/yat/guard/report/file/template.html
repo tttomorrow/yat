@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="uk">
+<head>
+    <title>Yat Check Report</title>
+    <style rel="stylesheet">
+       .yat-card {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        h1.center {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="card yat-card">
+                <div class="card-header">
+                    <h1 class="center">Yat Check Report</h1>
+                </div>
+                <table class="card-table table table-striped">
+
+                    <thead>
+                        <tr>
+                            <th>File</th>
+                            <th>Errors</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for error in errors %}
+                        <tr>
+                            <td>{{ error.script }}</td>
+                            <td>{{ error.message }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

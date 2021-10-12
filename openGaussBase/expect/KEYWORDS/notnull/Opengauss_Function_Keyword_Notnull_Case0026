@@ -1,0 +1,30 @@
+--  @testpoint:opengauss关键字notnull(保留)，作为模式名
+--关键字不带引号-合理报错
+drop schema if exists notnull;
+?.*ERROR: syntax error at or near "notnull".*
+?.*Position.*
+create schema notnull;
+?.*ERROR: syntax error at or near "notnull".*
+?.*Position.*
+--关键字带双引号-成功
+drop schema if exists "notnull";
+SQL SUCCESS
+create schema "notnull";
+SQL SUCCESS
+--清理环境
+drop schema "notnull";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop schema if exists 'notnull';
+?.*ERROR: syntax error at or near "'notnull'".*
+?.*Position.*
+create schema 'notnull';
+?.*ERROR: syntax error at or near "'notnull'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop schema if exists `notnull`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create schema `notnull`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*

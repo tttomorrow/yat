@@ -1,0 +1,31 @@
+-- @testpoint: 输入为字符类型（合理报错）
+
+drop table if exists atan2_test_02;
+SQL SUCCESS
+create table atan2_test_02(f1 char(50),f2 nchar(100),f3 varchar(332),f4 nvarchar2(100),f5 nvarchar2(200),f6 int);
+SQL SUCCESS
+insert into atan2_test_02(f1,f2,f3,f4,f5,f6) values ('aa','bb','cc','dd','ee','123');
+SQL SUCCESS
+select atan2(f5,f4) from atan2_test_02;
+?.*ERROR: function atan2\(nvarchar2, nvarchar2\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: atan2
+select atan2(f4,f3) from atan2_test_02;
+?.*ERROR: function atan2\(nvarchar2, character varying\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: atan2
+select atan2(f3,f2) from atan2_test_02;
+?.*ERROR: invalid input syntax for type double precision: \"cc\"
+  Where: referenced column: atan2
+select atan2(f2,f1) from atan2_test_02;
+?.*ERROR: invalid input syntax for type double precision: \"bb                                                                                                  \"
+  Where: referenced column: atan2
+select atan2(f1,f5) from atan2_test_02;
+?.*ERROR: function atan2\(character, nvarchar2\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: atan2
+drop table if exists atan2_test_02;
+SQL SUCCESS

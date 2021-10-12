@@ -1,0 +1,13 @@
+-- @testpoint: 输入无效数值,合理报错
+drop table if exists test_money07;
+SQL SUCCESS
+create table test_money07 (name money);
+SQL SUCCESS
+insert into test_money07 values (12a12);
+?.*ERROR: syntax error at or near "a12"
+?.*
+insert into test_money07 values (abc);
+?.*ERROR: column "abc" does not exist
+?.*
+drop table test_money07;
+SQL SUCCESS

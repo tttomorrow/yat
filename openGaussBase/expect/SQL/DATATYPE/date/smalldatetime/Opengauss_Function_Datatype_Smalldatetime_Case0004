@@ -1,0 +1,12 @@
+-- @testpoint: samlldatetime日期类型相减，合理报错
+DROP TABLE IF EXISTS test_smalldatetime4;
+SQL SUCCESS
+CREATE TABLE test_smalldatetime4 (name smalldatetime);
+SQL SUCCESS
+insert into  test_smalldatetime4 values (smalldatetime '2018-09-17' -  smalldatetime '2018-09-16');
+?.*ERROR: column "name" is of type smalldatetime but expression is of type interval
+  Hint: You will need to rewrite or cast the expression.
+?.*
+  Where: referenced column: name
+DROP TABLE test_smalldatetime4;
+SQL SUCCESS

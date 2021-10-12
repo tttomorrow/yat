@@ -1,0 +1,22 @@
+-- @testpoint: interval时间间隔类型，天数和秒数精度定义不在范围内，提示警告信息
+--创建表
+drop table if exists interval03;
+SQL SUCCESS
+create table interval03 (name interval day(8) to second(9));
+SQL SUCCESS
+--插入数据
+insert into interval03 values ('1234 12:23:48.56745');
+SQL SUCCESS
+insert into interval03 values ('1656 23:45:57.22332322');
+SQL SUCCESS
+--查看数据
+select * from interval03;
++----------------------------------------------------------+
+| name                                                     |
++----------------------------------------------------------+
+| 0 years 0 mons 1234 days 12 hours 23 mins 48.56745 secs  |
+| 0 years 0 mons 1656 days 23 hours 45 mins 57.223323 secs |
++----------------------------------------------------------+
+--清理环境
+drop table interval03;
+SQL SUCCESS

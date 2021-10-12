@@ -1,0 +1,39 @@
+-- @testpoint: 关键字xmlattributes，用作表名创建普通表
+drop table if exists xmlattributes cascade;
+SQL SUCCESS
+create table xmlattributes(id int,name varchar(20));
+SQL SUCCESS
+create or replace procedure xmlattributes_insert
+as
+begin
+ for i in 1..10 loop
+    insert into xmlattributes values(i,'attributes+'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call xmlattributes_insert();
++----------------------+
+| xmlattributes_insert |
++----------------------+
+|                      |
++----------------------+
+select * from xmlattributes;
++----+---------------+
+| id | name          |
++----+---------------+
+| 1  | attributes+1  |
+| 2  | attributes+2  |
+| 3  | attributes+3  |
+| 4  | attributes+4  |
+| 5  | attributes+5  |
+| 6  | attributes+6  |
+| 7  | attributes+7  |
+| 8  | attributes+8  |
+| 9  | attributes+9  |
+| 10 | attributes+10 |
++----+---------------+
+drop table if exists xmlattributes cascade;
+SQL SUCCESS
+drop procedure xmlattributes_insert;
+SQL SUCCESS

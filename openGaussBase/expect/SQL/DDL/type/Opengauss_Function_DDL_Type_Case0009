@@ -1,0 +1,13 @@
+--  @testpoint:创建枚举类型,标签名为空字符串，合理报错
+--标签名为空，合理报错
+drop type if exists bugstatus;
+SQL SUCCESS
+CREATE TYPE bugstatus AS ENUM ('');
+?.*ERROR: invalid enum label ""
+  Detail: Labels must contain 1 to 63 characters.
+--标签名为null，合理报错
+drop type if exists bugstatus1;
+SQL SUCCESS
+CREATE TYPE bugstatus1 AS ENUM (null);
+?.*ERROR: syntax error at or near "null"
+?.*

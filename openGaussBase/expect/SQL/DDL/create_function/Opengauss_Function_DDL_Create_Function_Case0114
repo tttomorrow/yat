@@ -1,0 +1,10 @@
+drop FUNCTION if EXISTS u_testfun1(c_int int);
+SQL SUCCESS
+CREATE FUNCTION u_testfun1 (c_int int) RETURNS int  AS $$
+        BEGIN
+                RETURN (c_int);
+        END;
+$$ LANGUAGE plpgsql
+fenced ;
+/
+?.*ERROR: FENCED mode function is not yet supported in current version.

@@ -1,0 +1,13 @@
+--  @testpoint:设置约束推迟时间
+drop table if exists test_1;
+SQL SUCCESS
+start transaction;
+SQL SUCCESS
+create table test_1(id int  primary key DEFERRABLE INITIALLY DEFERRED ,name char(20));
+SQL SUCCESS
+insert into test_1 values(2,'Maria');
+SQL SUCCESS
+end;
+SQL SUCCESS
+drop table test_1;
+SQL SUCCESS

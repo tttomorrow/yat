@@ -1,0 +1,3 @@
+-- @testpoint: 连接两个tsvector类型的词汇@@，检查词汇类型一致性
+
+select to_tsvector('fat cats ate rats') @@ to_tsquery('cat') as result;

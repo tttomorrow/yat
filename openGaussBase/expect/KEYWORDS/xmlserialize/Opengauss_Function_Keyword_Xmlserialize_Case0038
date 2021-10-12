@@ -1,0 +1,23 @@
+-- @testpoint: 关键字xmlserialize，用作字段类型（合理报错）
+drop table if exists xmlserialize_test cascade;
+SQL SUCCESS
+create table xmlserialize_test(id int,name xmlserialize);
+?.*ERROR.*
+?.*Position: .*
+create or replace procedure xmlserialize_insert
+as
+begin
+ for i in 1..20 loop
+    insert into xmlserialize_test values(i,'a'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call xmlserialize_insert();
+?.*ERROR.*
+  Where: PL/pgSQL function xmlserialize_insert() line 4 at SQL statement
+select * from xmlserialize_test;
+?.*ERROR.*
+?.*Position: .*
+drop procedure xmlserialize_insert;
+SQL SUCCESS

@@ -1,0 +1,16 @@
+-- @testpoint: 存储过程clob数据类型的测试,结合to_date函数
+
+--创建存储过程
+create or replace procedure proc_clob_010(p1 in clob) is
+begin
+    raise info 'result:%',p1;
+    exception
+    when no_data_found then
+        raise info 'no_data_found';
+end;
+/
+--调用存储过程
+call proc_clob_010(to_date('0001-01-01 00:00:00','yyyy-mm-dd hh24:mi:ss'));
+
+--恢复环境
+drop procedure if exists proc_clob_010;

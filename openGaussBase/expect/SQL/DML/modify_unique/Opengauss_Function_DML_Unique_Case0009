@@ -1,0 +1,15 @@
+-- @testpoint: 修改约束之后，添加not null 约束执行成功
+drop table if exists t1;
+SQL SUCCESS
+create table t1(a int);
+SQL SUCCESS
+insert into t1 values(1);
+SQL SUCCESS
+insert into t1 values(11);
+SQL SUCCESS
+alter table t1  add constraint ua unique (a);
+SQL SUCCESS
+alter table t1 modify a not null;
+SQL SUCCESS
+drop table if exists t1;
+SQL SUCCESS

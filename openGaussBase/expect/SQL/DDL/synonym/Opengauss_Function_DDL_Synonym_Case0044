@@ -1,0 +1,57 @@
+-- @testpoint: 创建表后，修改表的检查约束中使用自定义函数的同义词，违反检查约束，合理报错
+-- @modify at: 2020-11-25
+--创建函数
+drop function if exists SYN_FUN_001(a varchar) cascade;
+SQL SUCCESS
+create or replace function SYN_FUN_001 (a varchar) return int
+as
+b int;
+begin
+	b:=length(a);
+	return b;
+end;
+/
+SQL SUCCESS
+--创建同义词
+drop synonym if exists SYN_FUN_SYN_001;
+SQL SUCCESS
+create or replace  synonym  SYN_FUN_SYN_001 for SYN_FUN_001;
+SQL SUCCESS
+--建表
+drop table if exists SYN_TAB_004;
+SQL SUCCESS
+create table SYN_TAB_004
+(
+	a int  check (a <SYN_FUN_SYN_001('uyfuigilhlgig')),
+	b varchar(1024) check (SYN_FUN_SYN_001(b)<SYN_FUN_SYN_001('uyfuigilhlgig'))
+);
+SQL SUCCESS
+--分别删除、增加表的约束
+alter table SYN_TAB_004 drop CONSTRAINT "syn_tab_004_a_check";
+SQL SUCCESS
+alter table SYN_TAB_004 add constraint syn_tab_004_a_check check (a <SYN_FUN_SYN_001('uyfui'));
+SQL SUCCESS
+alter table SYN_TAB_004 drop CONSTRAINT "syn_tab_004_b_check";
+SQL SUCCESS
+alter table SYN_TAB_004 add constraint syn_tab_004_b_check check (SYN_FUN_SYN_001(b)<SYN_FUN_SYN_001('uyfui'));
+SQL SUCCESS
+--插入数据,报错
+insert into SYN_TAB_004 values(14,'a');
+?.*ERROR: new row for relation "syn_tab_004" violates check constraint "syn_tab_004_a_check"
+  Detail: Failing row contains (14, a).
+insert into SYN_TAB_004 values(1,'ahikhbojpgfghpjho9ggio');
+?.*ERROR: new row for relation "syn_tab_004" violates check constraint "syn_tab_004_b_check"
+  Detail: Failing row contains (1, ahikhbojpgfghpjho9ggio).
+--查询
+select * from SYN_TAB_004;
++---+---+
+| a | b |
++---+---+
++---+---+
+--清理环境
+drop function if exists SYN_FUN_001(a varchar) cascade;
+SQL SUCCESS
+drop table if exists SYN_TAB_004 cascade;
+SQL SUCCESS
+drop synonym if exists SYN_FUN_SYN_001;
+SQL SUCCESS

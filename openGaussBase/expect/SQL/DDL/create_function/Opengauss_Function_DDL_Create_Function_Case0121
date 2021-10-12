@@ -1,0 +1,26 @@
+--  @testpoint:创建函数，指定函数的语言的名称是SQL,函数体内使用insert语句
+drop table if EXISTS emp cascade;
+SQL SUCCESS
+CREATE TABLE emp (
+        name        text,
+        salary      numeric,
+        age         integer
+    );
+SQL SUCCESS
+drop function if exists double_salary();
+SQL SUCCESS
+CREATE FUNCTION double_salary() RETURNS void  AS $$
+       insert into emp values('lily',8504.5,25);
+    $$ LANGUAGE SQL;
+    /
+SQL SUCCESS
+select * from emp;
++------+--------+-----+
+| name | salary | age |
++------+--------+-----+
++------+--------+-----+
+drop table emp;
+SQL SUCCESS
+drop FUNCTION double_salary;
+SQL SUCCESS
+

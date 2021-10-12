@@ -1,0 +1,50 @@
+-- @testpoint: where:where+子查询：不支持 合理报错
+DROP TABLE if EXISTS test_index_table_103 CASCADE;
+SQL SUCCESS
+create table test_index_table_103(
+c_float1 float,
+c_int int,
+c_varchar varchar,
+c_text text
+) WITH (ORIENTATION = row) ;
+SQL SUCCESS
+begin
+    for i in 0..1000 loop
+        insert into test_index_table_101 values(i,i);
+    end loop;
+end;
+/
+?.*ERROR: relation "test_index_table_101" does not exist on ?.*
+  Where: PL/pgSQL function inline_code_block line 3 at SQL statement
+DROP TABLE if EXISTS test_index_table_103_02 CASCADE;
+SQL SUCCESS
+create table test_index_table_103_02(
+c_float1 float,
+c_int int,
+c_varchar varchar,
+c_text text
+) WITH (ORIENTATION = row) ;
+SQL SUCCESS
+begin
+    for i in 0..1000 loop
+        insert into test_index_table_101 values(i,i);
+    end loop;
+end;
+/
+?.*ERROR: relation "test_index_table_101" does not exist on ?.*
+  Where: PL/pgSQL function inline_code_block line 3 at SQL statement
+--建索引
+drop index if exists index_103_01;
+SQL SUCCESS
+create index index_103_01 on test_index_table_103(c_float1) where c_int in (select c_int from test_index_table_103_02 where c_int>2) ;
+?.*ERROR: cannot use subquery in index predicate
+select relname from pg_class where relname like 'index_103_%' order by relname;
++---------+
+| relname |
++---------+
++---------+
+--清理环境
+DROP TABLE if EXISTS test_index_table_103 CASCADE;
+SQL SUCCESS
+DROP TABLE if EXISTS test_index_table_103_02 CASCADE;
+SQL SUCCESS

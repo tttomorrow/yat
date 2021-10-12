@@ -1,0 +1,11 @@
+--  @testpoint:删除函数添加RESTRICT 参数且添加函数参数
+drop FUNCTION if EXISTS t_testfun76(c_int int) RESTRICT;
+CREATE FUNCTION t_testfun76 ( INOUT c_int int) RETURNS int  AS $$
+        BEGIN
+                RETURN (c_int);
+        END;
+$$ LANGUAGE plpgsql;
+/
+select proname from pg_proc where proname='t_testfun76';
+--删除已存在的函数并且添加RESTRICT参数
+drop FUNCTION t_testfun76(c_int int) RESTRICT;

@@ -1,0 +1,95 @@
+-- @testpoint: pg_stat_get_db_tuples_deleted(oid)返回数据库中删除的Tuple数。
+alter system set autovacuum to off;
+SQL SUCCESS
+drop table if exists sales;
+SQL SUCCESS
+select pg_stat_reset();
++---------------+
+| pg_stat_reset |
++---------------+
+|               |
++---------------+
+SELECT pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+--创建表sales
+CREATE TABLE sales
+(prod_id NUMBER(6),
+ cust_id NUMBER,
+ time_id DATE,
+ channel_id CHAR(1),
+ promo_id NUMBER(6),
+ quantity_sold NUMBER(3),
+ amount_sold NUMBER(10,2)
+);
+SQL SUCCESS
+select pg_stat_get_db_tuples_deleted(a.oid) from PG_DATABASE a where a.datname = CURRENT_CATALOG;
++-------------------------------+
+| pg_stat_get_db_tuples_deleted |
++-------------------------------+
+| 0                             |
++-------------------------------+
+-- 数据插入
+INSERT INTO sales VALUES(1, 12, '2017-01-10 00:00:00', 'a', 1, 1, 1);
+SQL SUCCESS
+INSERT INTO sales VALUES(1, 12, '2019-05-01 10:00:00', 'b', 1, 1, 1);
+SQL SUCCESS
+INSERT INTO sales VALUES(1, 12, '2019-05-01 10:00:00', 'c', 1, 1, 1);
+SQL SUCCESS
+INSERT INTO sales VALUES(1, 12, '2019-05-01 10:00:00', 'd', 1, 1, 1);
+SQL SUCCESS
+INSERT INTO sales VALUES(1, 12, '2019-05-01 10:00:00', 'e', 1, 1, 1);
+SQL SUCCESS
+INSERT INTO sales VALUES(1, 12, '2019-05-01 10:00:00', 'f', 1, 1, 1);
+SQL SUCCESS
+select pg_stat_get_db_tuples_deleted(a.oid) from PG_DATABASE a where a.datname = CURRENT_CATALOG;
++-------------------------------+
+| pg_stat_get_db_tuples_deleted |
++-------------------------------+
+| 0                             |
++-------------------------------+
+-- 删除一行
+delete from sales where channel_id = 'a';
+SQL SUCCESS
+SELECT pg_sleep(3);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+select pg_stat_get_db_tuples_deleted(a.oid) from PG_DATABASE a where a.datname = CURRENT_CATALOG;
++-------------------------------+
+| pg_stat_get_db_tuples_deleted |
++-------------------------------+
+| 1                             |
++-------------------------------+
+-- 删除多行
+delete from sales where channel_id = 'b';
+SQL SUCCESS
+delete from sales where channel_id = 'c';
+SQL SUCCESS
+delete from sales where channel_id = 'd';
+SQL SUCCESS
+delete from sales where channel_id = 'e';
+SQL SUCCESS
+delete from sales where channel_id = 'f';
+SQL SUCCESS
+SELECT pg_sleep(4);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+select pg_stat_get_db_tuples_deleted(a.oid) from PG_DATABASE a where a.datname = CURRENT_CATALOG;
++-------------------------------+
+| pg_stat_get_db_tuples_deleted |
++-------------------------------+
+| 6                             |
++-------------------------------+
+drop table sales cascade;
+SQL SUCCESS
+alter system set autovacuum to on;
+SQL SUCCESS

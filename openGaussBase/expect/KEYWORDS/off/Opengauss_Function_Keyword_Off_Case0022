@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字off(非保留)，作为用户组名
+--关键字不带引号-成功
+drop group if exists off;
+SQL SUCCESS
+create group off with password 'gauss@123';
+SQL SUCCESS
+drop group off;
+SQL SUCCESS
+--关键字带双引号-成功
+drop group if exists "off";
+SQL SUCCESS
+create group "off" with password 'gauss@123';
+SQL SUCCESS
+drop group "off";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop group if exists 'off';
+?.*ERROR: syntax error at or near "'off'".*
+?.*Position: .*
+create group 'off' with password 'gauss@123';
+?.*ERROR: syntax error at or near "'off'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop group if exists `off`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create group `off` with password 'gauss@123';
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

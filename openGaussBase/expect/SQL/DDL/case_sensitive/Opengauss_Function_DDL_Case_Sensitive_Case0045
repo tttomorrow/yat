@@ -1,0 +1,22 @@
+--  @testpoint: --通过视图查看索引验证索引的大小写
+drop table if exists false_2 cascade;
+SQL SUCCESS
+create table false_2(a int,b int);
+SQL SUCCESS
+create index wms ON false_2(B);
+SQL SUCCESS
+create index wms ON false_2(b);
+?.*ERROR: relation "wms" already exists
+select * from pg_indexes WHERE INDEXNAME='wms';
++------------+-----------+-----------+------------+-------------------------------------------------------------------+
+| schemaname | tablename | indexname | tablespace | indexdef                                                          |
++------------+-----------+-----------+------------+-------------------------------------------------------------------+
+| public     | false_2   | wms       |            | CREATE INDEX wms ON false_2 USING btree (b) TABLESPACE pg_default |
++------------+-----------+-----------+------------+-------------------------------------------------------------------+
+select * from pg_indexes WHERE INDEXNAME='WMS';
++------------+-----------+-----------+------------+----------+
+| schemaname | tablename | indexname | tablespace | indexdef |
++------------+-----------+-----------+------------+----------+
++------------+-----------+-----------+------------+----------+
+drop table if exists false_2 cascade;
+SQL SUCCESS

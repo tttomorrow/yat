@@ -1,0 +1,9 @@
+--  @testpoint:函数参数名无效值测试，以特殊字符@开头，合理报错
+
+
+CREATE FUNCTION test_func8(@_1 integer, @_2 integer) RETURNS integer
+    AS 'select $1 + $2;'
+    LANGUAGE SQL
+    IMMUTABLE
+    RETURNS NULL ON NULL INPUT;
+/

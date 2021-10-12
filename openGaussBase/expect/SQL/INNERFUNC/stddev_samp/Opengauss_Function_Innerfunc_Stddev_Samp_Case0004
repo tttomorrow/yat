@@ -1,0 +1,13 @@
+-- @testpoint: 入参为null或''，分组求标准差
+select STDDEV_SAMP(null);
++-------------+
+| stddev_samp |
++-------------+
+|             |
++-------------+
+select STDDEV_SAMP('');
++-------------+
+| stddev_samp |
++-------------+
+|             |
++-------------+

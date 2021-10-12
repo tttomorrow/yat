@@ -1,0 +1,22 @@
+-- @testpoint: 插入正常值(中、英文字符，数字)
+-- @modify at: 2020-11-05
+DROP TABLE IF EXISTS test_char_01;
+SQL SUCCESS
+CREATE TABLE test_char_01 (stringv char(20));
+SQL SUCCESS
+insert into test_char_01 values ('oh mygod');
+SQL SUCCESS
+insert into test_char_01 values ('测试');
+SQL SUCCESS
+insert into test_char_01 values (123);
+SQL SUCCESS
+select * from test_char_01;
++----------------------+
+| stringv              |
++----------------------+
+| oh mygod             |
+| 测试                   |
+| 123                  |
++----------------------+
+drop table test_char_01;
+SQL SUCCESS

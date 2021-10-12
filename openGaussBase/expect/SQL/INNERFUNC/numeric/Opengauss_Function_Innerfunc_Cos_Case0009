@@ -1,0 +1,14 @@
+-- @testpoint: cos函数入参为正负无穷大,合理报错
+drop table if exists tb1;
+SQL SUCCESS
+create table tb1(col_cos double precision);
+SQL SUCCESS
+insert into tb1 values('infinity');
+SQL SUCCESS
+insert into tb1 values('-infinity');
+SQL SUCCESS
+select cos(col_cos) as result from tb1;
+?.*ERROR: input is out of range
+  Where: referenced column: result
+drop table tb1;
+SQL SUCCESS

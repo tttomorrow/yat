@@ -1,0 +1,30 @@
+-- @testpoint: opengauss关键字constraint_catalog(非保留)，作为角色名，部分测试点合理报错
+--关键字不带引号-成功
+drop role if exists constraint_catalog;
+SQL SUCCESS
+create role constraint_catalog with password 'gauss@123' valid until '2020-12-31';
+SQL SUCCESS
+--关键字带双引号-成功
+drop role if exists "constraint_catalog";
+SQL SUCCESS
+create role "constraint_catalog" with password 'gauss@123' valid until '2020-12-31';
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop role if exists 'constraint_catalog';
+?.*ERROR: syntax error at or near "'constraint_catalog'"
+?.*
+create role 'constraint_catalog' with password 'gauss@123' valid until '2020-12-31';
+?.*ERROR: syntax error at or near "'constraint_catalog'"
+?.*
+--关键字带反引号-合理报错
+drop role if exists `constraint_catalog`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create role `constraint_catalog` with password 'gauss@123' valid until '2020-12-31';
+?.*ERROR: syntax error at or near "`"
+?.*
+--清理环境
+drop role if exists constraint_catalog;
+SQL SUCCESS
+drop role if exists "constraint_catalog";
+SQL SUCCESS

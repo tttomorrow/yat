@@ -1,0 +1,20 @@
+-- @testpoint: sign函数与update结合使用
+drop table if exists tb;
+SQL SUCCESS
+create table tb(a int,b int);
+SQL SUCCESS
+insert into tb values(1,1),(2,-1),(3,-6),(4,0);
+SQL SUCCESS
+update tb set b=888 where sign(b)<=-1;
+SQL SUCCESS
+select a,b from tb order by a;
++---+-----+
+| a | b   |
++---+-----+
+| 1 | 1   |
+| 2 | 888 |
+| 3 | 888 |
+| 4 | 0   |
++---+-----+
+drop table tb;
+SQL SUCCESS

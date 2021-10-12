@@ -1,0 +1,19 @@
+-- @testpoint: having条件
+drop table if exists abs_test_03;
+SQL SUCCESS
+create table abs_test_03(a int,b int);
+SQL SUCCESS
+insert into abs_test_03 values(5,10);
+SQL SUCCESS
+insert into abs_test_03 values(1,9);
+SQL SUCCESS
+insert into abs_test_03 values(2,10);
+SQL SUCCESS
+select sum(a),b from abs_test_03 group by b having abs(b)=10 order by b;
++-----+----+
+| sum | b  |
++-----+----+
+| 7   | 10 |
++-----+----+
+drop table if exists abs_test_03;
+SQL SUCCESS

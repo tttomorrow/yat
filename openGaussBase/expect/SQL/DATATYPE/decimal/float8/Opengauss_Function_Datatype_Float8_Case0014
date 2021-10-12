@@ -1,0 +1,18 @@
+-- @testpoint: 插入空值
+drop table if exists float8_14;
+SQL SUCCESS
+create table float8_14 (id int,name float8);
+SQL SUCCESS
+insert into float8_14 values (1,null);
+SQL SUCCESS
+insert into float8_14 values (2,'');
+SQL SUCCESS
+select * from float8_14;
++----+------+
+| id | name |
++----+------+
+| 1  |      |
+| 2  |      |
++----+------+
+drop table if exists float8_14;
+SQL SUCCESS

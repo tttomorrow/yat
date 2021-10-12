@@ -1,0 +1,30 @@
+-- @testpoint: 创建视图,视图名添加模式修饰
+--创建schema
+drop schema if exists test_schema_006 cascade;
+SQL SUCCESS
+create schema test_schema_006;
+SQL SUCCESS
+--建表
+drop table if exists table_view_006 cascade;
+SQL SUCCESS
+create table table_view_006(id int,name varchar(20));
+SQL SUCCESS
+--创建视图
+drop view if exists test_schema_006.temp_view_006 cascade;
+SQL SUCCESS
+create view test_schema_006.temp_view_006 as select * from table_view_006;
+SQL SUCCESS
+--查询，无数据
+select * from test_schema_006.temp_view_006;
++----+------+
+| id | name |
++----+------+
++----+------+
+--删除视图
+drop view test_schema_006.temp_view_006;
+SQL SUCCESS
+--删表
+drop table table_view_006;
+SQL SUCCESS
+drop schema test_schema_006 cascade;
+SQL SUCCESS

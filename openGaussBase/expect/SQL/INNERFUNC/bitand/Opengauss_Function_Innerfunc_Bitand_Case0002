@@ -1,0 +1,18 @@
+
+
+-- @testpoint: 输入参数为0
+
+drop table if exists bitand_test_02;
+SQL SUCCESS
+create table  bitand_test_02(col_bitand1 integer,col_bitand2 integer,col_bitand3 integer);
+SQL SUCCESS
+insert into bitand_test_02 values(bitand(0,3),bitand(-1,0),bitand(-1,0));
+SQL SUCCESS
+select * from bitand_test_02;
++-------------+-------------+-------------+
+| col_bitand1 | col_bitand2 | col_bitand3 |
++-------------+-------------+-------------+
+| 0           | 0           | 0           |
++-------------+-------------+-------------+
+drop table if exists bitand_test_02;
+SQL SUCCESS

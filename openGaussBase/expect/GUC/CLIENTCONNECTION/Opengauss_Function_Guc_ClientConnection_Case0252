@@ -1,0 +1,35 @@
+-- @testpoint: set方法设置参数update_lockwait_timeout,无效值时，合理报错
+--查看默认
+show update_lockwait_timeout;
++-------------------------+
+| update_lockwait_timeout |
++-------------------------+
+| 2min                    |
++-------------------------+
+--设置，成功
+SQL SUCCESS
+show update_lockwait_timeout;
++-------------------------+
+| update_lockwait_timeout |
++-------------------------+
++-------------------------+
+--设置，报错
+set update_lockwait_timeout to 'test';
+?.*ERROR: invalid value for parameter "update_lockwait_timeout": "test"
+  Hint: Valid units for this parameter are "ms", "s", "min", "h", and "d".
+set update_lockwait_timeout to '-1';
+  Hint: Value exceeds integer range.
+set update_lockwait_timeout to 1582.256;
+?.*ERROR: invalid value for parameter "update_lockwait_timeout": "1582.256"
+  Hint: Valid units for this parameter are "ms", "s", "min", "h", and "d".
+set update_lockwait_timeout to '';
+?.*ERROR: invalid value for parameter "update_lockwait_timeout": ""
+--恢复默认
+set update_lockwait_timeout to 120000;
+SQL SUCCESS
+show update_lockwait_timeout;
++-------------------------+
+| update_lockwait_timeout |
++-------------------------+
+| 2min                    |
++-------------------------+

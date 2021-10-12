@@ -1,0 +1,201 @@
+--  @testpoint: --column_name：列存临时表常用数据类型1列：successs
+DROP TABLE if EXISTS test_index_table_060 CASCADE;
+SQL SUCCESS
+create table test_index_table_060(
+c_int INTEGER,
+c_numeric NUMERIC,
+c_float FLOAT,
+c_money money,
+c_boolean BOOLEAN,
+c_char CHAR,
+c_varchar VARCHAR,
+c_clob CLOB,
+c_text TEXT,
+c_date DATE
+) WITH (ORIENTATION = column);
+SQL SUCCESS
+--建psort索引
+drop index if exists index_060_01;
+SQL SUCCESS
+drop index if exists index_060_02;
+SQL SUCCESS
+drop index if exists index_060_03;
+SQL SUCCESS
+drop index if exists index_060_04;
+SQL SUCCESS
+drop index if exists index_060_05;
+SQL SUCCESS
+drop index if exists index_060_06;
+SQL SUCCESS
+drop index if exists index_060_07;
+SQL SUCCESS
+drop index if exists index_060_08;
+SQL SUCCESS
+drop index if exists index_060_09;
+SQL SUCCESS
+drop index if exists index_060_10;
+SQL SUCCESS
+create index index_060_01 on test_index_table_060(c_int);
+SQL SUCCESS
+create index index_060_02 on test_index_table_060(c_numeric);
+SQL SUCCESS
+create index index_060_03 on test_index_table_060(c_float);
+SQL SUCCESS
+create index index_060_04 on test_index_table_060(c_money);
+SQL SUCCESS
+create index index_060_05 on test_index_table_060(c_boolean);
+SQL SUCCESS
+create index index_060_06 on test_index_table_060(c_char);
+SQL SUCCESS
+create index index_060_07 on test_index_table_060(c_varchar);
+SQL SUCCESS
+create index index_060_08 on test_index_table_060(c_clob);
+SQL SUCCESS
+create index index_060_09 on test_index_table_060(c_text);
+SQL SUCCESS
+create index index_060_10 on test_index_table_060(c_date);
+SQL SUCCESS
+select relname from pg_class where relname like 'index_060_%' order by relname;
++--------------+
+| relname      |
++--------------+
+| index_060_01 |
+| index_060_02 |
+| index_060_03 |
+| index_060_04 |
+| index_060_05 |
+| index_060_06 |
+| index_060_07 |
+| index_060_08 |
+| index_060_09 |
+| index_060_10 |
++--------------+
+--btree
+drop index if exists index_060_01;
+SQL SUCCESS
+drop index if exists index_060_02;
+SQL SUCCESS
+drop index if exists index_060_03;
+SQL SUCCESS
+drop index if exists index_060_04;
+SQL SUCCESS
+drop index if exists index_060_05;
+SQL SUCCESS
+drop index if exists index_060_06;
+SQL SUCCESS
+drop index if exists index_060_07;
+SQL SUCCESS
+drop index if exists index_060_08;
+SQL SUCCESS
+drop index if exists index_060_09;
+SQL SUCCESS
+drop index if exists index_060_10;
+SQL SUCCESS
+create index index_060_01 on test_index_table_060 using btree(c_int);
+SQL SUCCESS
+create index index_060_02 on test_index_table_060 using btree(c_numeric);
+SQL SUCCESS
+create index index_060_03 on test_index_table_060 using btree(c_float);
+SQL SUCCESS
+create index index_060_04 on test_index_table_060 using btree(c_money);
+SQL SUCCESS
+create index index_060_05 on test_index_table_060 using btree(c_boolean);
+SQL SUCCESS
+create index index_060_06 on test_index_table_060 using btree(c_char);
+SQL SUCCESS
+create index index_060_07 on test_index_table_060 using btree(c_varchar);
+SQL SUCCESS
+create index index_060_08 on test_index_table_060 using btree(c_clob);
+SQL SUCCESS
+create index index_060_09 on test_index_table_060 using btree(c_text);
+SQL SUCCESS
+create index index_060_10 on test_index_table_060 using btree(c_date);
+SQL SUCCESS
+select relname from pg_class where relname like 'index_060_%' order by relname;
++--------------+
+| relname      |
++--------------+
+| index_060_01 |
+| index_060_02 |
+| index_060_03 |
+| index_060_04 |
+| index_060_05 |
+| index_060_06 |
+| index_060_07 |
+| index_060_08 |
+| index_060_09 |
+| index_060_10 |
++--------------+
+--gin
+drop index if exists index_060_01;
+SQL SUCCESS
+drop index if exists index_060_02;
+SQL SUCCESS
+drop index if exists index_060_03;
+SQL SUCCESS
+drop index if exists index_060_04;
+SQL SUCCESS
+drop index if exists index_060_05;
+SQL SUCCESS
+drop index if exists index_060_06;
+SQL SUCCESS
+drop index if exists index_060_07;
+SQL SUCCESS
+drop index if exists index_060_08;
+SQL SUCCESS
+drop index if exists index_060_09;
+SQL SUCCESS
+drop index if exists index_060_10;
+SQL SUCCESS
+create index index_060_01 on test_index_table_060 using gin(to_tsvector('english', c_int));
+SQL SUCCESS
+create index index_060_02 on test_index_table_060 using gin(to_tsvector('english', c_numeric));
+SQL SUCCESS
+create index index_060_03 on test_index_table_060 using gin(to_tsvector('english', c_float));
+SQL SUCCESS
+create index index_060_06 on test_index_table_060 using gin(to_tsvector('english', c_char));
+SQL SUCCESS
+create index index_060_07 on test_index_table_060 using gin(to_tsvector('english', c_varchar));
+SQL SUCCESS
+create index index_060_08 on test_index_table_060 using gin(to_tsvector('english', c_clob));
+SQL SUCCESS
+create index index_060_09 on test_index_table_060 using gin(to_tsvector('english', c_text));
+SQL SUCCESS
+create index index_060_10 on test_index_table_060 using gin(to_tsvector('english', c_date));
+SQL SUCCESS
+select relname from pg_class where relname like 'index_060_%' order by relname;
++--------------+
+| relname      |
++--------------+
+| index_060_01 |
+| index_060_02 |
+| index_060_03 |
+| index_060_06 |
+| index_060_07 |
+| index_060_08 |
+| index_060_09 |
+| index_060_10 |
++--------------+
+--清理环境
+drop index if exists index_060_01;
+SQL SUCCESS
+drop index if exists index_060_02;
+SQL SUCCESS
+drop index if exists index_060_03;
+SQL SUCCESS
+drop index if exists index_060_04;
+SQL SUCCESS
+drop index if exists index_060_05;
+SQL SUCCESS
+drop index if exists index_060_06;
+SQL SUCCESS
+drop index if exists index_060_07;
+SQL SUCCESS
+drop index if exists index_060_08;
+SQL SUCCESS
+drop index if exists index_060_09;
+SQL SUCCESS
+drop index if exists index_060_10;
+SQL SUCCESS
+DROP TABLE if EXISTS test_index_table_060 CASCADE;
+SQL SUCCESS

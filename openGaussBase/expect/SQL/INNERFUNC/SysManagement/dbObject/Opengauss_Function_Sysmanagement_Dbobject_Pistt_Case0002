@@ -1,0 +1,41 @@
+-- @testpoint: pg_partition_indexes_size(text,text)函数的异常校验，合理报错
+create table test (a int)
+with(orientation = column)
+partition by range (a)
+(
+        partition test_p1 values less than (88),
+        partition test_p2 values less than (99)
+);
+SQL SUCCESS
+create index test_index on test (a) local;
+SQL SUCCESS
+insert into test values (59);
+SQL SUCCESS
+insert into test values (69);
+SQL SUCCESS
+insert into test values (90);
+SQL SUCCESS
+select pg_partition_indexes_size('test', '');
++---------------------------+
+| pg_partition_indexes_size |
++---------------------------+
+|                           |
++---------------------------+
+select pg_partition_indexes_size('testtest', 'test_p2');
+?.*ERROR: relation \"testtest\" does not exist
+  Where: referenced column: pg_partition_indexes_size
+select pg_partition_indexes_size('test', 'test_p3');
+?.*ERROR: partition \"test_p3\" does not exist
+  Where: referenced column: pg_partition_indexes_size
+select pg_partition_indexes_size();
+?.*ERROR: function pg_partition_indexes_size\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_partition_indexes_size
+select pg_partition_indexes_size('test', 'test_p2','test', 'test_p1');
+?.*ERROR: function pg_partition_indexes_size\(unknown, unknown, unknown, unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_partition_indexes_size
+drop table test;
+SQL SUCCESS

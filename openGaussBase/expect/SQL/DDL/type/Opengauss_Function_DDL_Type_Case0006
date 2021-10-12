@@ -1,0 +1,50 @@
+--  @testpoint:创建复合类型，并且在一个函数定义中使用它
+--创建复合类型
+drop type if exists complex cascade;
+SQL SUCCESS
+create type complex as(r double precision, i double precision);
+SQL SUCCESS
+--创建复合类型
+drop type if exists inventory_item;
+SQL SUCCESS
+create type inventory_item as(name text,number int,price numeric);
+SQL SUCCESS
+--建表
+drop table if exists on_hand;
+SQL SUCCESS
+create table on_hand( item inventory_item, count integer);
+SQL SUCCESS
+--插入数据
+insert into on_hand values (('fuzzy dice',42,1.99),1000);
+SQL SUCCESS
+--创建函数
+drop function if exists price_extension;
+SQL SUCCESS
+create function price_extension(inventory_item,integer) returns numeric as 'select $1.price * $2' language sql;
+/
+SQL SUCCESS
+--调用函数
+select price_extension(item,10) from on_hand;
++-----------------+
+| price_extension |
++-----------------+
+| 19.90           |
++-----------------+
+--删除复合类型complex
+drop type if exists complex;
+SQL SUCCESS
+--删除复合类型inventory_item，不加cascade，合理报错
+drop type if exists inventory_item;
+?.*ERROR: cannot drop type inventory_item because other objects depend on it
+  Detail: table on_hand column item depends on type inventory_item
+function price_extension(inventory_item,integer) depends on type inventory_item
+  Hint: Use DROP ... CASCADE to drop the dependent objects too.
+--删除复合类型inventory_item，添加cascade，删除成功
+drop type if exists inventory_item cascade;
+SQL SUCCESS
+--删除表
+drop table on_hand;
+SQL SUCCESS
+--删除函数
+drop function if exists price_extension;
+SQL SUCCESS

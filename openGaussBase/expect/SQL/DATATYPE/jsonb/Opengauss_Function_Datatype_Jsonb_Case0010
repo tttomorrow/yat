@@ -1,0 +1,27 @@
+-- @testpoint: jsonb格式校验：bool-jsonb（不符合格式合理报错）
+--符合格式
+select 'false'::jsonb;
++-------+
+| jsonb |
++-------+
+| false |
++-------+
+select 'true'::jsonb;
++-------+
+| jsonb |
++-------+
+| true  |
++-------+
+--不符合格式
+select 'FALSE'::jsonb;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "FALSE" is invalid.
+?.*
+  Where: JSON data, line 1: FALSE
+referenced column: jsonb
+select 'TRUE'::jsonb;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "TRUE" is invalid.
+?.*
+  Where: JSON data, line 1: TRUE
+referenced column: jsonb

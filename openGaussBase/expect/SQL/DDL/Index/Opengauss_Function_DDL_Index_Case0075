@@ -1,0 +1,95 @@
+--  @testpoint: column_name：行存普通表常用数据类型33列
+DROP TABLE if EXISTS test_index_table_075 CASCADE;
+SQL SUCCESS
+create  table test_index_table_075(
+c_int1 INTEGER,c_int2 INTEGER,c_int3 INTEGER,c_int4 INTEGER,c_int5 INTEGER,
+c_int6 float,c_int7 char,c_int8 varchar,c_int9 text,c_int10 INTEGER,c_int11 INTEGER,c_int12 INTEGER,
+c_int13 INTEGER,c_int14 INTEGER,c_int15 INTEGER,c_int16 INTEGER,c_int17 INTEGER,c_int18 INTEGER,c_int19 INTEGER,
+c_int20 INTEGER,c_int21 INTEGER,c_int22 INTEGER,c_int23 INTEGER,c_int24 INTEGER,c_int25 INTEGER,c_int26 INTEGER,
+c_int27 INTEGER,c_int28 INTEGER,c_int29 INTEGER,c_int30 INTEGER,c_int31 INTEGER,c_int32 INTEGER,c_int33 INTEGER
+) WITH (ORIENTATION = row);
+SQL SUCCESS
+--建psort索引:合理报错
+drop index if exists index_075_01;
+SQL SUCCESS
+create index index_075_01 on test_index_table_075 using psort(c_int1,
+c_int2,c_int3,c_int4,c_int5,c_int6,c_int7,c_int8,c_int9,c_int10,c_int11,c_int12,
+c_int13,c_int14,c_int15,c_int16,c_int17,c_int18,c_int19,c_int20,c_int21,c_int22,
+c_int23,c_int24,c_int25,c_int26,c_int27,c_int28,c_int29,c_int30,c_int31,c_int32,c_int33);
+?.*ERROR: access method "psort" does not support row store
+select relname from pg_class where relname like 'index_075_%' order by relname;
++---------+
+| relname |
++---------+
++---------+
+--btree:合理报错
+drop index if exists index_075_01;
+SQL SUCCESS
+create index index_075_01 on test_index_table_075 using btree(c_int1,
+c_int2,c_int3,c_int4,c_int5,c_int6,c_int7,c_int8,c_int9,c_int10,c_int11,c_int12,
+c_int13,c_int14,c_int15,c_int16,c_int17,c_int18,c_int19,c_int20,c_int21,c_int22,
+c_int23,c_int24,c_int25,c_int26,c_int27,c_int28,c_int29,c_int30,c_int31,c_int32,c_int33);
+?.*ERROR: cannot use more than 32 columns in an index
+select relname from pg_class where relname like 'index_075_%' order by relname;
++---------+
+| relname |
++---------+
++---------+
+--gist:合理报错
+drop index if exists index_075_01;
+SQL SUCCESS
+create index index_075_01 on test_index_table_075 using gist(c_int1,
+c_int2,c_int3,c_int4,c_int5,c_int6,c_int7,c_int8,c_int9,c_int10,c_int11,c_int12,
+c_int13,c_int14,c_int15,c_int16,c_int17,c_int18,c_int19,c_int20,c_int21,c_int22,
+c_int23,c_int24,c_int25,c_int26,c_int27,c_int28,c_int29,c_int30,c_int31,c_int32,c_int33);
+?.*ERROR: cannot use more than 32 columns in an index
+select relname from pg_class where relname like 'index_075_%' order by relname;
++---------+
+| relname |
++---------+
++---------+
+--gin:合理报错
+drop index if exists index_075_01;
+SQL SUCCESS
+create index index_075_01 on test_index_table_075 using gin(to_tsvector('english', c_int1),
+to_tsvector('english', c_int2),
+to_tsvector('english', c_int3),
+to_tsvector('english', c_int4),
+to_tsvector('english', c_int5),
+to_tsvector('english', c_int6),
+to_tsvector('english', c_int7),
+to_tsvector('english', c_int8),
+to_tsvector('english', c_int9),
+to_tsvector('english', c_int10),
+to_tsvector('english', c_int11),
+to_tsvector('english', c_int12),
+to_tsvector('english', c_int13),
+to_tsvector('english', c_int14),
+to_tsvector('english', c_int15),
+to_tsvector('english', c_int16),
+to_tsvector('english', c_int17),
+to_tsvector('english', c_int18),
+to_tsvector('english', c_int19),
+to_tsvector('english', c_int20),
+to_tsvector('english', c_int21),
+to_tsvector('english', c_int22),
+to_tsvector('english', c_int23),
+to_tsvector('english', c_int24),
+to_tsvector('english', c_int25),
+to_tsvector('english', c_int26),
+to_tsvector('english', c_int27),
+to_tsvector('english', c_int28),
+to_tsvector('english', c_int29),
+to_tsvector('english', c_int30),
+to_tsvector('english', c_int31),
+to_tsvector('english', c_int32),
+to_tsvector('english', c_int33));
+?.*ERROR: cannot use more than 32 columns in an index
+select relname from pg_class where relname like 'index_075_%' order by relname;
++---------+
+| relname |
++---------+
++---------+
+--清理环境
+DROP TABLE if EXISTS test_index_table_075 CASCADE;
+SQL SUCCESS

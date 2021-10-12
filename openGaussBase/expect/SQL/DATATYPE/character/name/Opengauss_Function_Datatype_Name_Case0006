@@ -1,0 +1,15 @@
+-- @testpoint: 插入null值
+drop table if exists name_06;
+SQL SUCCESS
+CREATE TABLE name_06 (id name);
+SQL SUCCESS
+insert into name_06 values (null);
+SQL SUCCESS
+select * from name_06;
++----+
+| id |
++----+
+|    |
++----+
+drop table name_06;
+SQL SUCCESS

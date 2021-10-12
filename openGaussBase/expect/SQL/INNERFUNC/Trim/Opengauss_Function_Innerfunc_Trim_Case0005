@@ -1,0 +1,25 @@
+-- @testpoint: 字符处理函数trim，函数作为group by条件项
+drop table if exists t2;
+SQL SUCCESS
+create table t2 (a int,b char(10));
+SQL SUCCESS
+insert into t2 values(10,'abc');
+SQL SUCCESS
+insert into t2 values(20,'abc');
+SQL SUCCESS
+insert into t2 values(20,'abc');
+SQL SUCCESS
+insert into t2 values(82,'cd');
+SQL SUCCESS
+insert into t2 values(43,'cd');
+SQL SUCCESS
+insert into t2 values(89,'abc');
+SQL SUCCESS
+select sum(a),trim('2' from '2342') from t2 group by trim('2' from '2342');
++-----+-------+
+| sum | btrim |
++-----+-------+
+| 264 | 34    |
++-----+-------+
+drop table if exists t2;
+SQL SUCCESS

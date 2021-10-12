@@ -1,0 +1,18 @@
+-- @testpoint: 插入空值MAC类型
+drop table if exists test_macaddr_03;
+SQL SUCCESS
+create table test_macaddr_03(id int,type macaddr);
+SQL SUCCESS
+insert into test_macaddr_03 values(1,'');
+SQL SUCCESS
+insert into test_macaddr_03 values(2,null);
+SQL SUCCESS
+select * from test_macaddr_03;
++----+------+
+| id | type |
++----+------+
+| 1  |      |
+| 2  |      |
++----+------+
+drop table test_macaddr_03;
+SQL SUCCESS

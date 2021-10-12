@@ -1,0 +1,28 @@
+-- @testpoint: 创建列类型是序列整型-SMALLSERIAL的表，超边界时合理报错
+drop table if exists table_1;
+SQL SUCCESS
+create table table_1(a SMALLSERIAL);
+SQL SUCCESS
+insert into table_1 values(1);
+SQL SUCCESS
+insert into table_1 values(15234);
+SQL SUCCESS
+insert into table_1 values(32767);
+SQL SUCCESS
+--ERROR:  integer out of range
+insert into table_1 values(0);
+SQL SUCCESS
+insert into table_1 values(32768);
+?.*ERROR: smallint out of range.*
+Where: referenced column: a
+select * from table_1;
++-------+
+| a     |
++-------+
+| 1     |
+| 15234 |
+| 32767 |
+| 0     |
++-------+
+drop table if exists table_1;
+SQL SUCCESS

@@ -1,0 +1,19 @@
+--  @testpoint: 删除索引验证索引的大小写
+drop table if exists false_2 cascade;
+SQL SUCCESS
+create table false_2(a int,b int);
+SQL SUCCESS
+create index wms ON false_2(B);
+SQL SUCCESS
+create index yy on FALSE_2(a);
+SQL SUCCESS
+drop index  WMS;
+SQL SUCCESS
+drop index wms;
+?.*ERROR: index "wms" does not exist
+drop index yy;
+SQL SUCCESS
+drop index YY;
+?.*ERROR: index "yy" does not exist
+drop table false_2 cascade;
+SQL SUCCESS

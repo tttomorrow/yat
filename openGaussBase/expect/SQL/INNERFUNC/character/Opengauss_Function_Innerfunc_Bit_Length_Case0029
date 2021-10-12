@@ -1,0 +1,15 @@
+-- @testpoint: 入参为 ''
+DROP TABLE IF EXISTS type_nchar2;
+SQL SUCCESS
+CREATE TABLE type_nchar2 (stringv TEXT);
+SQL SUCCESS
+insert into type_nchar2 values ('');
+SQL SUCCESS
+select bit_length(stringv) from type_nchar2;
++------------+
+| bit_length |
++------------+
+|            |
++------------+
+DROP TABLE IF EXISTS type_nchar2;
+SQL SUCCESS

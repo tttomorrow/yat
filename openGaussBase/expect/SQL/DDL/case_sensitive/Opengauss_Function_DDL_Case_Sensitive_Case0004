@@ -1,0 +1,23 @@
+--  @testpoint: --insert验证字段大小写
+drop table if EXISTS false_1 CASCADE;
+SQL SUCCESS
+create table false_1(A int,b CHAR(10));
+SQL SUCCESS
+insert into false_1(a) values(3);
+SQL SUCCESS
+insert into false_1(A) values(5);
+SQL SUCCESS
+insert into false_1(b) values('xx'),('wms');
+SQL SUCCESS
+insert into false_1(B) values('xx');
+SQL SUCCESS
+select * from false_1;
++---+------------+
+| a | b          |
++---+------------+
+| 3 |            |
+| 5 |            |
+|   | xx         |
+|   | wms        |
+|   | xx         |
++---+------------+

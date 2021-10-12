@@ -1,0 +1,59 @@
+-- @testpoint: 结合游标使用jsonb数据类型
+drop table if exists tab130;
+SQL SUCCESS
+create table tab130(c_id int,c_num int,c_name varchar(10),c_add jsonb);
+SQL SUCCESS
+insert into tab130 values
+(2,368,'Bob','["Shanghai",158,"AAAAACAAAAA"]'),
+(3,59,'Cathy','["false","AAAAADAAAAA"]'),
+(4,96,'David','["Suzhou","true","AAAAAEAAAAA"]'),
+(5,17,'Edrwd','["Fenghuang",null]'),
+(6,253,'Fendi','["Changsha",true,"AAAAAGAAAAA"]');
+SQL SUCCESS
+--以字母开头
+start transaction;
+SQL SUCCESS
+cursor cursor1 for select * from tab130 order by 4;
+SQL SUCCESS
+fetch from cursor1;
++------+-------+--------+---------------------+
+| c_id | c_num | c_name | c_add               |
++------+-------+--------+---------------------+
+| 5    | 17    | Edrwd  | ["Fenghuang", null] |
++------+-------+--------+---------------------+
+close cursor1;
+SQL SUCCESS
+end;
+SQL SUCCESS
+--以下划线开头
+start transaction;
+SQL SUCCESS
+cursor _curs1 for select * from tab130 order by 4;
+SQL SUCCESS
+fetch from _curs1;
++------+-------+--------+---------------------+
+| c_id | c_num | c_name | c_add               |
++------+-------+--------+---------------------+
+| 5    | 17    | Edrwd  | ["Fenghuang", null] |
++------+-------+--------+---------------------+
+close _curs1;
+SQL SUCCESS
+end;
+SQL SUCCESS
+--字母数字符号混合
+start transaction;
+SQL SUCCESS
+cursor cur#1 for select * from tab130 order by 4;
+SQL SUCCESS
+fetch from cur#1;
++------+-------+--------+---------------------+
+| c_id | c_num | c_name | c_add               |
++------+-------+--------+---------------------+
+| 5    | 17    | Edrwd  | ["Fenghuang", null] |
++------+-------+--------+---------------------+
+close cur#1;
+SQL SUCCESS
+end;
+SQL SUCCESS
+drop table tab130;
+SQL SUCCESS

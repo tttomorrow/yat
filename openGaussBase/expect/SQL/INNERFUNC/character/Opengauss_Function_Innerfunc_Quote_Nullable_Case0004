@@ -1,0 +1,15 @@
+-- @testpoint: 参数为二进制
+DROP TABLE IF EXISTS type_binary;
+SQL SUCCESS
+CREATE TABLE type_binary (string1 text);
+SQL SUCCESS
+insert into type_binary values (quote_nullable('DEADBEEF'::raw));
+SQL SUCCESS
+SELECT * from type_binary;
++------------+
+| string1    |
++------------+
+| 'DEADBEEF' |
++------------+
+DROP TABLE IF EXISTS type_binary;
+SQL SUCCESS

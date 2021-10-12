@@ -1,0 +1,21 @@
+--  @testpoint: --查看视图区分大小写
+drop table if exists false_3 cascade;
+SQL SUCCESS
+create table false_3 (A int,f int);
+SQL SUCCESS
+insert into false_3 values(22,33);
+SQL SUCCESS
+create or replace view view_3 as select * from false_3;
+SQL SUCCESS
+select * from VIEW_3;
++----+----+
+| a  | f  |
++----+----+
+| 22 | 33 |
++----+----+
+select * from view_3;
++----+----+
+| a  | f  |
++----+----+
+| 22 | 33 |
++----+----+

@@ -1,0 +1,33 @@
+-- @testpoint:  @> 判断函数是否包某个元素
+--函数包含元素时，结果返回true
+select int4range(1,5) @> 4 as result;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select tsrange('[2013-12-11 pst,2025-03-01 pst)') @> '2014-12-11 pst'::timestamp  as result;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select tsrange('[2021-01-01,2028-03-01)') @> '2026-09-09'::timestamp as result;
++--------+
+| result |
++--------+
+| true   |
++--------+
+--函数不包含元素时，结果返回false
+select int4range(10,12) @> 9 as result;
++--------+
+| result |
++--------+
+| false  |
++--------+
+select numrange(8.1,10.2,'[]') @> 6.1::numeric as result;
++--------+
+| result |
++--------+
+| false  |
++--------+

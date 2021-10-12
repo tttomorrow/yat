@@ -1,0 +1,32 @@
+-- @testpoint: 创建列类型是对象标识符类型的表，给非数值时合理报错
+drop table if exists table_2;
+SQL SUCCESS
+create table table_2(a OID);
+SQL SUCCESS
+insert into table_2 values(782);
+SQL SUCCESS
+insert into table_2 values(122);
+SQL SUCCESS
+select * from table_2;
++-----+
+| a   |
++-----+
+| 782 |
+| 122 |
++-----+
+drop table if exists table_2;
+SQL SUCCESS
+drop table if exists table_3;
+SQL SUCCESS
+create table table_3(a OID);
+SQL SUCCESS
+insert into table_3 values(782),(QEW),(9_S);
+?.*ERROR: syntax error at or near "_S".*
+?.*Position:.*
+select * from table_3;
++---+
+| a |
++---+
++---+
+drop table if exists table_3;
+SQL SUCCESS

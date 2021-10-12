@@ -1,0 +1,25 @@
+-- @testpoint: having条件、group by后使用limit列名
+drop table if exists test_limit_009;
+SQL SUCCESS
+create table test_limit_009 ("LIMIT" int,id int);
+SQL SUCCESS
+insert into test_limit_009 values (-999,1);
+SQL SUCCESS
+insert into test_limit_009 values (-10000,2);
+SQL SUCCESS
+insert into test_limit_009 values (-10000,3);
+SQL SUCCESS
+insert into test_limit_009 values (100,3);
+SQL SUCCESS
+insert into test_limit_009 values (100,2);
+SQL SUCCESS
+select "LIMIT",sum(id) from test_limit_009 group by "LIMIT" having "LIMIT" <> -999 order by 1,2;
++--------+-----+
+| LIMIT  | sum |
++--------+-----+
+| -10000 | 5   |
+| 100    | 5   |
++--------+-----+
+--清理环境
+drop table if exists test_limit_009;
+SQL SUCCESS

@@ -1,0 +1,123 @@
+-- @testpoint: NVL 合理报错
+--如果value1为NULL则返回value2，如果value1非NULL，则返回value1
+--value1为null，返回value2，否则返回value1，覆盖常用数据类型
+SELECT nvl(null,1);
++-----+
+| nvl |
++-----+
+| 1   |
++-----+
+SELECT nvl(null,1::int);
++-----+
+| nvl |
++-----+
+| 1   |
++-----+
+SELECT nvl(null,'test'::varchar);
++------+
+| nvl  |
++------+
+| test |
++------+
+SELECT nvl(null,'test'::clob);
++------+
+| nvl  |
++------+
+| test |
++------+
+SELECT nvl(null,'test'::text);
++------+
+| nvl  |
++------+
+| test |
++------+
+SELECT nvl(null,'3 days'::reltime);
++--------+
+| nvl    |
++--------+
+| 3 days |
++--------+
+SELECT nvl(1,null);
++-----+
+| nvl |
++-----+
+| 1   |
++-----+
+SELECT nvl(1::int,null);
++-----+
+| nvl |
++-----+
+| 1   |
++-----+
+SELECT nvl('test'::varchar,null);
++------+
+| nvl  |
++------+
+| test |
++------+
+SELECT nvl('test'::clob,null);
++------+
+| nvl  |
++------+
+| test |
++------+
+SELECT nvl('test'::text,null);
++------+
+| nvl  |
++------+
+| test |
++------+
+SELECT nvl('3 days'::reltime,null);
++--------+
+| nvl    |
++--------+
+| 3 days |
++--------+
+--不支持的数据类型：合理报错
+SELECT nvl(null,B'10101'::bit(5));
+?.*ERROR: COALESCE could not convert type bit to text
+?.*
+  Where: referenced column: nvl
+SELECT nvl(null,'false'::boolean);
+?.*ERROR: COALESCE could not convert type boolean to text
+?.*
+  Where: referenced column: nvl
+SELECT nvl(null,inet '0.0.5.0/24'::cidr);
+?.*ERROR: COALESCE could not convert type cidr to text
+?.*
+  Where: referenced column: nvl
+SELECT nvl(null,lseg '(1,2),(3,2)');
+?.*ERROR: COALESCE could not convert type lseg to text
+?.*
+  Where: referenced column: nvl
+--value1value2均为null
+SELECT nvl(null,null);
++-----+
+| nvl |
++-----+
+|     |
++-----+
+SELECT nvl('','');
++-----+
+| nvl |
++-----+
+|     |
++-----+
+--多参少参无参
+SELECT nvl(1,2,3,4,5);
+?.*ERROR: syntax error at or near ","
+?.*
+SELECT nvl(1,2,3);
+?.*ERROR: syntax error at or near ","
+?.*
+SELECT nvl(null);
+?.*ERROR: syntax error at or near "\)"
+?.*
+SELECT nvl('test');
+?.*ERROR: syntax error at or near "\)"
+?.*
+SELECT nvl();
+?.*ERROR: syntax error at or near "\)"
+?.*
+--清理环境
+--no need to clean

@@ -1,0 +1,30 @@
+-- @testpoint: set方法设置参数extra_float_digits为负数，建表查询
+--查看默认值
+show extra_float_digits;
++--------------------+
+| extra_float_digits |
++--------------------+
+| 3                  |
++--------------------+
+--设置为负数,表示消除不需要的数据位
+set extra_float_digits to -15;
+SQL SUCCESS
+--建表并插入数据
+drop table if exists float_type_t147;
+SQL SUCCESS
+create table float_type_t147 (FT_COL2 FLOAT4);
+SQL SUCCESS
+insert into float_type_t147 values(10.365456);
+SQL SUCCESS
+--查询
+select * from float_type_t147;
++---------+
+| ft_col2 |
++---------+
+| 10.0    |
++---------+
+--清理环境
+set extra_float_digits to 0;
+SQL SUCCESS
+drop table if exists float_type_t147;
+SQL SUCCESS

@@ -1,0 +1,25 @@
+--  @testpoint:opengauss关键字called非保留)，作为序列名
+--关键字不带引号-成功
+drop sequence if exists called;
+SQL SUCCESS
+create sequence called start 100 cache 50;
+SQL SUCCESS
+--清理环境
+drop sequence called;
+SQL SUCCESS
+--关键字带双引号-成功
+drop sequence if exists "called";
+SQL SUCCESS
+create sequence "called" start 100 cache 50;
+SQL SUCCESS
+--清理环境
+drop sequence "called";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'called';
+?.*ERROR: syntax error at or near "'called'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop sequence if exists `called`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

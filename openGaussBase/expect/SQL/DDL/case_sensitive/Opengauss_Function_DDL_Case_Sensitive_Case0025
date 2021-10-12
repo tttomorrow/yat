@@ -1,0 +1,17 @@
+--  @testpoint: --drop 验证表名大小写敏感
+drop table if exists FALSE_1;
+SQL SUCCESS
+DROP TABLE if exists falsE_1;
+SQL SUCCESS
+select * from falsE_1;
+?.*ERROR: relation "false_1" does not ?.* ?.*
+?.*
+select * from false_1;
+?.*ERROR: relation "false_1" does not ?.* ?.*
+?.*
+drop table false_1;
+?.*ERROR: table "false_1" does not exist
+drop table WMS;
+SQL SUCCESS
+drop table wms;
+?.*ERROR: table "wms" does not exist

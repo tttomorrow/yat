@@ -1,0 +1,30 @@
+-- @testpoint: 插入字符串形式数值
+drop table if exists smallserial_04;
+SQL SUCCESS
+create table smallserial_04 (name smallserial);
+SQL SUCCESS
+insert into smallserial_04 values ('9999');
+SQL SUCCESS
+insert into smallserial_04 values ('1');
+SQL SUCCESS
+insert into smallserial_04 values ('2');
+SQL SUCCESS
+insert into smallserial_04 values ('-9999');
+SQL SUCCESS
+insert into smallserial_04 values ('-1');
+SQL SUCCESS
+insert into smallserial_04 values ('-2');
+SQL SUCCESS
+select * from smallserial_04;
++-------+
+| name  |
++-------+
+| 9999  |
+| 1     |
+| 2     |
+| -9999 |
+| -1    |
+| -2    |
++-------+
+drop table smallserial_04;
+SQL SUCCESS

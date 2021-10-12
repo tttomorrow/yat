@@ -1,0 +1,18 @@
+--  @testpoint:修改词典的TEMPLATE参数值,合理报错
+--创建simple词典
+drop TEXT SEARCH DICTIONARY if exists public.simple_dict cascade;
+SQL SUCCESS
+CREATE TEXT SEARCH DICTIONARY public.simple_dict (
+     TEMPLATE = pg_catalog.simple,
+     STOPWORDS = english,
+     ACCEPT = false
+);
+SQL SUCCESS
+--使用alter语句修改词典模板，合理报错
+ALTER TEXT SEARCH DICTIONARY public.simple_dict (
+     TEMPLATE = pg_catalog.Synonym
+);
+?.*ERROR: Not allowed Template parameter in alter text search dictionary
+--删除词典
+drop TEXT SEARCH DICTIONARY public.simple_dict cascade;
+SQL SUCCESS

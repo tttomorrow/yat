@@ -1,0 +1,26 @@
+-- @testpoint: 与distinct、order by结合使用测试
+drop table if exists cos_test_01;
+SQL SUCCESS
+create table cos_test_01(a int,b int);
+SQL SUCCESS
+insert into cos_test_01 values(0,1);
+SQL SUCCESS
+insert into cos_test_01 values(1,-1);
+SQL SUCCESS
+insert into cos_test_01 values(2,1);
+SQL SUCCESS
+select b from cos_test_01 order by abs(cot(a));
++----+
+| b  |
++----+
+| 1  |
+| -1 |
+| 1  |
++----+
+select distinct cot(b) from cos_test_01 order by cot(b);
++---------------------+
+| cot                 |
++---------------------+
++---------------------+
+drop table if exists cos_test_01;
+SQL SUCCESS

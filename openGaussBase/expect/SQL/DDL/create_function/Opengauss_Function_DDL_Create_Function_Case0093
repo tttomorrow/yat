@@ -1,0 +1,18 @@
+--  @testpoint:创建函数指定参数VOLATILE
+drop FUNCTION if exists func_add_sql007;
+SQL SUCCESS
+CREATE FUNCTION func_add_sql007(integer, integer) RETURNS integer
+    AS 'select $1 + $2;'
+    LANGUAGE SQL
+    VOLATILE
+    RETURNS NULL ON NULL INPUT;
+/
+SQL SUCCESS
+call func_add_sql007(999,1);
++-----------------+
+| func_add_sql007 |
++-----------------+
+| 1000            |
++-----------------+
+drop FUNCTION func_add_sql007;
+SQL SUCCESS

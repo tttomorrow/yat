@@ -1,0 +1,21 @@
+-- @testpoint: 对blob类型的不为null的约束,如果插入的列有null值会合理报错
+DROP TABLE IF EXISTS t_blob;
+SQL SUCCESS
+CREATE TABLE t_blob(ID BLOB NOT NULL);
+SQL SUCCESS
+INSERT INTO t_blob VALUES('35466');
+SQL SUCCESS
+INSERT INTO t_blob VALUES('100000');
+SQL SUCCESS
+INSERT INTO t_blob VALUES('C4711A1097876CC');
+SQL SUCCESS
+INSERT INTO t_blob VALUES('');
+?.*ERROR: null value in column "id" violates not-null constraint
+  Detail: Failing row contains (null).
+INSERT INTO t_blob VALUES(NULL);
+?.*ERROR: null value in column "id" violates not-null constraint
+  Detail: Failing row contains (null).
+COMMIT;
+SQL SUCCESS
+DROP TABLE IF EXISTS t_blob;
+SQL SUCCESS

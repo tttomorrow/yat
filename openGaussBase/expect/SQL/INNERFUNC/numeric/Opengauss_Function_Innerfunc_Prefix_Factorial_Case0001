@@ -1,0 +1,27 @@
+-- @testpoint: 数字操作符!!(前缀阶乘),整数的阶乘
+drop table if exists data_01;
+SQL SUCCESS
+create table data_01 (clo1 int,clo2 SMALLINT);
+SQL SUCCESS
+insert into data_01 values (8, 2);
+SQL SUCCESS
+select  !!clo1 from data_01;
++----------+
+| ?column? |
++----------+
+| 40320    |
++----------+
+select  !!clo2 from data_01;
++----------+
+| ?column? |
++----------+
+| 2        |
++----------+
+SELECT !!5 AS RESULT;
++--------+
+| result |
++--------+
+| 120    |
++--------+
+drop table if exists data_01;
+SQL SUCCESS

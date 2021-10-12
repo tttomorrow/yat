@@ -1,0 +1,14 @@
+-- @testpoint: reltime类型时间间隔相减
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (col1 reltime);
+SQL SUCCESS
+insert into test_date01 values ('60');
+SQL SUCCESS
+select date '2019-1-6' -  col1  from test_date01;
++-------------------------------+
+| ?column?                      |
++-------------------------------+
++-------------------------------+
+drop table if exists test_date01;
+SQL SUCCESS

@@ -1,0 +1,3 @@
+-- @testpoint: 文本比较操作符 < ，比较文本类型的词汇
+
+select to_tsvector('fat cats ate rats ret') <  to_tsvector('fat cats ate rats') as result;

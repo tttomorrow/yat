@@ -1,0 +1,185 @@
+-- @testpoint: NULLIF 合理报错
+--只有当value1和value2相等时，NULLIF才返回NULL。否则它返回value1
+--value1和value2为同一数据类型，覆盖相等和不相等
+DROP TABLE if exists test_expression_08 cascade;
+SQL SUCCESS
+CREATE TABLE test_expression_08 (
+    NI_VALUE1 VARCHAR(10),
+    NI_VALUE2 VARCHAR(10)
+);
+SQL SUCCESS
+INSERT INTO test_expression_08 VALUES('abc', 'abc');
+SQL SUCCESS
+INSERT INTO test_expression_08 VALUES('abc', 'efg');
+SQL SUCCESS
+SELECT NI_VALUE1, NI_VALUE2, NULLIF(NI_VALUE1, NI_VALUE2) FROM test_expression_08 ORDER BY 1, 2, 3;
++-----------+-----------+--------+
+| ni_value1 | ni_value2 | nullif |
++-----------+-----------+--------+
+| abc       | abc       |        |
+| abc       | efg       | abc    |
++-----------+-----------+--------+
+--如果value1等于value2则返回NULL，否则返回value1。
+SELECT NULLIF('Hello','Hello World');
++--------+
+| nullif |
++--------+
+| Hello  |
++--------+
+SELECT NULLIF('Hello','Hello');
++--------+
+| nullif |
++--------+
+|        |
++--------+
+SELECT NULLIF(1::int,2.2::int);
++--------+
+| nullif |
++--------+
+| 1      |
++--------+
+SELECT NULLIF(1::int,1::int);
++--------+
+| nullif |
++--------+
+|        |
++--------+
+SELECT NULLIF('7.7'::money,'7.7'::money);
++--------+
+| nullif |
++--------+
+|        |
++--------+
+SELECT NULLIF('7.7'::money,'7.8'::money);
++--------+
+| nullif |
++--------+
+| 7.7    |
++--------+
+SELECT NULLIF('2020-10-13'::timestamp,'2020-10-13'::timestamp);
++--------+
+| nullif |
++--------+
+|        |
++--------+
+SELECT NULLIF('2020-10-13',current_date);
++------------+
+| nullif     |
++------------+
+| 2020-10-13 |
++------------+
+SELECT NULLIF(lseg '(1,2),(3,2)',lseg '(1,2),(3,2)');
++--------+
+| nullif |
++--------+
+|        |
++--------+
+SELECT NULLIF(lseg '(1,2),(3,2)',lseg '(1,2),(3,2)');
++--------+
+| nullif |
++--------+
+|        |
++--------+
+SELECT NULLIF(inet '0.0.0.0/24',inet '0.0.0.0/24');
++--------+
+| nullif |
++--------+
+|        |
++--------+
+SELECT NULLIF(inet '0.0.0.0/24',inet '0.0.0.8/24');
++------------+
+| nullif     |
++------------+
+| 0.0.0.0/24 |
++------------+
+SELECT NULLIF('The Fat Rats'::tsvector,'The Fat Rats'::tsvector);
++--------+
+| nullif |
++--------+
+|        |
++--------+
+SELECT NULLIF('The Fat Rats'::tsvector,'Fat Rats'::tsvector);
++--------------------+
+| nullif             |
++--------------------+
+| 'Fat' 'Rats' 'The' |
++--------------------+
+--value1和value2为不同数据类型，覆盖相等和不相等
+SELECT NULLIF(1::int,2.2::varchar);
+?.*ERROR: invalid input syntax for type bigint: "2.2"
+  Where: referenced column: nullif
+SELECT NULLIF(1::int,1::varchar);
++--------+
+| nullif |
++--------+
+|        |
++--------+
+SELECT NULLIF('7.7'::money,'7.7'::int);
+?.*ERROR: invalid input syntax for integer: "7.7"
+?.*
+  Where: referenced column: nullif
+SELECT NULLIF('7.7'::money,'7.7'::float);
+?.*ERROR: operator does not exist: money = double precision
+  Hint: No operator matches the given name and argument type(s). You might need to add explicit type casts.
+?.*
+  Where: referenced column: nullif
+SELECT NULLIF('2020-10-13'::timestamp,'The Fat Rats'::tsvector);
+?.*ERROR: operator does not exist: timestamp without time zone = tsvector
+  Hint: No operator matches the given name and argument type(s). You might need to add explicit type casts.
+?.*
+  Where: referenced column: nullif
+SELECT NULLIF(lseg '(1,2),(3,2)',inet '0.0.0.0/24');
+?.*ERROR: operator does not exist: lseg = inet
+  Hint: No operator matches the given name and argument type(s). You might need to add explicit type casts.
+?.*
+  Where: referenced column: nullif
+--value和null值
+SELECT NULLIF('Hello',' ');
++--------+
+| nullif |
++--------+
+| Hello  |
++--------+
+SELECT NULLIF('Hello','');
++--------+
+| nullif |
++--------+
+| Hello  |
++--------+
+SELECT NULLIF('Hello',NULL);
++--------+
+| nullif |
++--------+
+| Hello  |
++--------+
+SELECT NULLIF(' ','Hello');
++--------+
+| nullif |
++--------+
+|        |
++--------+
+SELECT NULLIF('','Hello');
++--------+
+| nullif |
++--------+
+|        |
++--------+
+SELECT NULLIF(NULL,'Hello');
++--------+
+| nullif |
++--------+
+|        |
++--------+
+--多参少参无参
+SELECT NULLIF('Hello','Hello World','Hello');
+?.*ERROR: syntax error at or near ","
+?.*
+SELECT NULLIF('Hello');
+?.*ERROR: syntax error at or near "\)"
+?.*
+SELECT NULLIF();
+?.*ERROR: syntax error at or near "\)"
+?.*
+--清理环境
+DROP TABLE if exists test_expression_08 cascade;
+SQL SUCCESS

@@ -1,0 +1,30 @@
+--  @testpoint:opengauss关键字Analyze(保留)，作为模式名
+--关键字不带引号-合理报错
+drop schema if exists Analyze;
+?.*ERROR: syntax error at or near "Analyze".*
+?.*Position.*
+create schema Analyze;
+?.*ERROR: syntax error at or near "Analyze".*
+?.*Position.*
+--关键字带双引号-成功
+drop schema if exists "Analyze";
+SQL SUCCESS
+create schema "Analyze";
+SQL SUCCESS
+--清理环境
+drop schema "Analyze";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop schema if exists 'Analyze';
+?.*ERROR: syntax error at or near "'Analyze'".*
+?.*Position.*
+create schema 'Analyze';
+?.*ERROR: syntax error at or near "'Analyze'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop schema if exists `Analyze`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create schema `Analyze`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*

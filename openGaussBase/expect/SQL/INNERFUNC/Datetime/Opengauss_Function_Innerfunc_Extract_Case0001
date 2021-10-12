@@ -1,0 +1,21 @@
+-- @testpoint: EXTRACT函数从TIMESTAMP类型中获取最小世纪
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (clo1 TIMESTAMP);
+SQL SUCCESS
+insert into test_date01 values ('0001-01-01 00:00:00 AD');
+SQL SUCCESS
+select EXTRACT(CENTURY FROM clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| 1.0       |
++-----------+
+SELECT EXTRACT(CENTURY FROM TIMESTAMP '0001-01-01 00:00:00 AD');
++-----------+
+| date_part |
++-----------+
+| 1.0       |
++-----------+
+drop table if exists test_date01;
+SQL SUCCESS

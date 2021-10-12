@@ -1,0 +1,33 @@
+-- @testpoint: 给表赋予所有权限当权限参数privilege正确的时候查询
+DROP USER IF EXISTS joe CASCADE;
+SQL SUCCESS
+CREATE USER joe PASSWORD 'Bigdata@123';
+SQL SUCCESS
+DROP table IF EXISTS table_test001;
+SQL SUCCESS
+create table table_test001(c int,d int);
+SQL SUCCESS
+GRANT ALL PRIVILEGES ON table_test001 TO joe;
+SQL SUCCESS
+SELECT has_table_privilege('joe', 'table_test001','select');
++---------------------+
+| has_table_privilege |
++---------------------+
+| true                |
++---------------------+
+SELECT has_table_privilege('joe', 'table_test001','insert');
++---------------------+
+| has_table_privilege |
++---------------------+
+| true                |
++---------------------+
+SELECT has_table_privilege('joe', 'table_test001','update');
++---------------------+
+| has_table_privilege |
++---------------------+
+| true                |
++---------------------+
+DROP USER IF EXISTS joe CASCADE;
+SQL SUCCESS
+DROP table IF EXISTS table_test001;
+SQL SUCCESS

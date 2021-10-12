@@ -1,0 +1,7 @@
+-- @testpoint: 描述：获取小时的值。等效于extract(field from timestamp)。返回值类型：double precision
+SELECT date_part('hour', timestamp '2001-02-16 20:38:40') from sys_dummy;
++-----------+
+| date_part |
++-----------+
+| 20.0      |
++-----------+

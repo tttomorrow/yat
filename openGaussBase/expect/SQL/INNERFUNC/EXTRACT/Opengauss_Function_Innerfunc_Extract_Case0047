@@ -1,0 +1,8 @@
+-- @testpoint: extract(field from timestamp)从给定的时间戳里获取星期几的值
+--（field的取值范围：dow每周的星期几，星期天（0）到星期六（6））
+select extract(dow from timestamp '2001-02-16 20:38:40') from sys_dummy;
++-----------+
+| date_part |
++-----------+
+| 5.0       |
++-----------+

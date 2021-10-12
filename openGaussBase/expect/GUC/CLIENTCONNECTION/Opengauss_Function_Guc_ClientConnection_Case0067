@@ -1,0 +1,33 @@
+-- @testpoint: 参数default_transaction_read_only保持默认，执行DMl操作，成功
+--查看默认值
+show default_transaction_read_only;
++-------------------------------+
+| default_transaction_read_only |
++-------------------------------+
+| off                           |
++-------------------------------+
+--建表
+drop table if exists test_isolation067;
+SQL SUCCESS
+create table test_isolation067(id int,name varchar(20));
+SQL SUCCESS
+--插入数据
+insert into test_isolation067 values(1,'tom'),(2,'lily');
+SQL SUCCESS
+--修改
+update test_isolation067 set id = id+1;
+SQL SUCCESS
+--查询
+select * from test_isolation067;
++----+------+
+| id | name |
++----+------+
+| 2  | tom  |
+| 3  | lily |
++----+------+
+--删除
+delete from test_isolation067;
+SQL SUCCESS
+--删表
+drop table test_isolation067;
+SQL SUCCESS

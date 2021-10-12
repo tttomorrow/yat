@@ -1,0 +1,21 @@
+--  @testpoint:openGauss保留关键字nlssort作为 用户名，
+--不带引号，合理报错
+CREATE USER nlssort PASSWORD 'Bigdata@123';
+?.*ERROR: syntax error at or near "nlssort".*
+?.*Position.*
+--加双引号，创建成功
+drop user if exists "nlssort";
+SQL SUCCESS
+CREATE USER "nlssort" PASSWORD 'Bigdata@123';
+SQL SUCCESS
+--清理环境
+drop user "nlssort";
+SQL SUCCESS
+--加单引号，合理报错
+CREATE USER 'nlssort' PASSWORD 'Bigdata@123';
+?.*ERROR: syntax error at or near "'nlssort'".*
+?.*Position.*
+--加反引号，合理报错
+CREATE USER `nlssort` PASSWORD 'Bigdata@123';
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*

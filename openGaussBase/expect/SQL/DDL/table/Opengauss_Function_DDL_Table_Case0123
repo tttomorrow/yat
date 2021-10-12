@@ -1,0 +1,53 @@
+-- @testpoint: 创建列为浮点类型decimal的表，精度p超过1000或s非正整数时合理报错
+drop table if exists table_1;
+SQL SUCCESS
+drop table if exists table_2;
+SQL SUCCESS
+drop table if exists table_3;
+SQL SUCCESS
+drop table if exists table_4;
+SQL SUCCESS
+drop table if exists table_5;
+SQL SUCCESS
+drop table if exists table_6;
+SQL SUCCESS
+drop table if exists table_7;
+SQL SUCCESS
+drop table if exists table_8;
+SQL SUCCESS
+create table table_2(a DEC(1,1));
+SQL SUCCESS
+create table table_3(a DEC(1,0));
+SQL SUCCESS
+create table table_4(a DEC(500,200));
+SQL SUCCESS
+create table table_5(a DEC(1000,0));
+SQL SUCCESS
+create table table_6(a DEC(1000,100));
+SQL SUCCESS
+create table table_7(a DEC(1000,1000));
+SQL SUCCESS
+--ERROR:  NUMERIC precision 1001 must be between 1 and 1000
+create table table_8(a DEC(1001,1000));
+?.*ERROR: NUMERIC precision 1001 must be between 1 and 1000.*
+?.*Position:.*
+--ERROR:  invalid input syntax for integer: "0.5"
+create table table_1(a DEC(1,0.5));
+?.*ERROR: invalid input syntax for integer: "0.5".*
+?.*Position:.*
+drop table if exists table_2;
+SQL SUCCESS
+drop table if exists table_1;
+SQL SUCCESS
+drop table if exists table_3;
+SQL SUCCESS
+drop table if exists table_4;
+SQL SUCCESS
+drop table if exists table_5;
+SQL SUCCESS
+drop table if exists table_6;
+SQL SUCCESS
+drop table if exists table_7;
+SQL SUCCESS
+drop table if exists table_8;
+SQL SUCCESS

@@ -1,0 +1,24 @@
+-- @testpoint: 插入bool类型
+drop table if exists bigint11;
+SQL SUCCESS
+create table bigint11 (name bigint);
+SQL SUCCESS
+insert into bigint11 values ('1');
+SQL SUCCESS
+insert into bigint11 values ('0');
+SQL SUCCESS
+insert into bigint11 values (true);
+SQL SUCCESS
+insert into bigint11 values (false);
+SQL SUCCESS
+select * from bigint11;
++------+
+| name |
++------+
+| 1    |
+| 0    |
+| 1    |
+| 0    |
++------+
+drop table bigint11;
+SQL SUCCESS

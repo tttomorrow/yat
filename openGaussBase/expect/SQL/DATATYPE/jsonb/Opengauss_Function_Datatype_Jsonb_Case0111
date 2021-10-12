@@ -1,0 +1,80 @@
+-- @testpoint: json类型的临时表上创建索引:不支持，合理报错
+--建本地临时表
+drop table if exists tab111 cascade;
+SQL SUCCESS
+create local temporary table tab111(id int,name varchar,message json);
+SQL SUCCESS
+--插入数据
+insert into tab111 values(001,'Jane','{"age":18,"city":"xianyang"}');
+SQL SUCCESS
+insert into tab111 values(012,'Joy','{"age":19,"city":"qingdao"}');
+SQL SUCCESS
+insert into tab111 values(023,'Jack','{"age":20,"city":"xiamen"}');
+SQL SUCCESS
+insert into tab111 values(004,'Json','{"age":23,"city":"shenzhen"}');
+SQL SUCCESS
+insert into tab111 values(005,'Jim','{"age":21,"city":"shanghai"}');
+SQL SUCCESS
+--创建索引，不支持，合理报错
+drop index if exists index1111;
+SQL SUCCESS
+drop index if exists index1112;
+SQL SUCCESS
+drop index if exists index1113;
+SQL SUCCESS
+drop index if exists index1114;
+SQL SUCCESS
+create index index1111 on tab111(message);
+?.*ERROR: data type json has no default operator class for access method "btree.*
+  Hint: You must specify an operator class for the index or define a default operator class for the data type.
+create index index1112 on tab111 using gist(message);
+?.*ERROR: data type json has no default operator class for access method "gist.*
+  Hint: You must specify an operator class for the index or define a default operator class for the data type.
+create index index1113 on tab111 using gin(message);
+?.*ERROR: data type json has no default operator class for access method "gin.*
+  Hint: You must specify an operator class for the index or define a default operator class for the data type.
+create unique index index1114 on tab111 using btree(message asc);
+?.*ERROR: data type json has no default operator class for access method "btree.*
+  Hint: You must specify an operator class for the index or define a default operator class for the data type.
+--建全局临时表
+drop table if exists tab1112 cascade;
+SQL SUCCESS
+create global temporary table tab1112(id int,name varchar,message json);
+SQL SUCCESS
+--插入数据
+insert into tab1112 values(001,'Jane','{"age":18,"city":"xianyang"}');
+SQL SUCCESS
+insert into tab1112 values(012,'Joy','{"age":19,"city":"qingdao"}');
+SQL SUCCESS
+insert into tab1112 values(023,'Jack','{"age":20,"city":"xiamen"}');
+SQL SUCCESS
+insert into tab1112 values(004,'Json','{"age":23,"city":"shenzhen"}');
+SQL SUCCESS
+insert into tab1112 values(005,'Jim','{"age":21,"city":"shanghai"}');
+SQL SUCCESS
+--创建索引，不支持，合理报错
+drop index if exists index11121;
+SQL SUCCESS
+drop index if exists index11122;
+SQL SUCCESS
+drop index if exists index11123;
+SQL SUCCESS
+drop index if exists index11124;
+SQL SUCCESS
+create index index11121 on tab1112(message);
+?.*ERROR: data type json has no default operator class for access method "btree.*
+  Hint: You must specify an operator class for the index or define a default operator class for the data type.
+create index index11122 on tab1112 using gist(message);
+?.*ERROR: data type json has no default operator class for access method "gist.*
+  Hint: You must specify an operator class for the index or define a default operator class for the data type.
+create index index11123 on tab1112 using gin(message);
+?.*ERROR: data type json has no default operator class for access method "gin.*
+  Hint: You must specify an operator class for the index or define a default operator class for the data type.
+create unique index index11124 on tab1112 using btree(message asc);
+?.*ERROR: data type json has no default operator class for access method "btree.*
+  Hint: You must specify an operator class for the index or define a default operator class for the data type.
+--清理数据
+drop table if exists tab111 cascade;
+SQL SUCCESS
+drop table if exists tab1112 cascade;
+SQL SUCCESS

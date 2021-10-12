@@ -1,0 +1,15 @@
+-- @testpoint: 在有unique约束的前提下，创建主键约束
+drop table if exists t1;
+SQL SUCCESS
+create table t1(a int);
+SQL SUCCESS
+insert into t1 values(1);
+SQL SUCCESS
+insert into t1 values(11);
+SQL SUCCESS
+alter table t1  add constraint ua unique (a);
+SQL SUCCESS
+alter table t1 add constraint studentkey primary key(a);
+SQL SUCCESS
+drop table if exists t1;
+SQL SUCCESS

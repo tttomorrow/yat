@@ -1,0 +1,13 @@
+-- @testpoint: ALTER SYSTEM SET方法设置deadlock_timeout参数，合理报错
+--查看默认
+show deadlock_timeout;
++------------------+
+| deadlock_timeout |
++------------------+
+| 1s               |
++------------------+
+--设置，报错
+ALTER SYSTEM SET deadlock_timeout to 5;
+?.*ERROR: unsupport parameter: deadlock_timeout
+ALTER SYSTEM SET only support POSTMASTER-level, SIGHUP-level and BACKEND-level guc variable,
+and it must be allowed to set in postgresql.conf.

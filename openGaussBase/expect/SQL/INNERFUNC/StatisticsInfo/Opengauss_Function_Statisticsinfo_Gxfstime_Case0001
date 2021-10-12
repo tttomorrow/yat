@@ -1,0 +1,137 @@
+-- @testpoint: pg_stat_get_xact_function_self_time(oid)在当前事务中仅花费在此功能上的时间，不包括花费在调用函数上的时间。
+alter system set autovacuum to off;
+SQL SUCCESS
+set track_functions to 'all';
+SQL SUCCESS
+set track_io_timing to 'on';
+SQL SUCCESS
+-- 未调用其它函数的结果和pg_stat_get_xact_function_total_time一样
+begin;
+/
+SQL SUCCESS
+drop function if exists func_add_sql;
+SQL SUCCESS
+CREATE FUNCTION func_add_sql(integer, integer) RETURNS integer
+AS 'select $1 + $2;'
+LANGUAGE SQL
+IMMUTABLE
+RETURNS NULL ON NULL INPUT;
+/
+SQL SUCCESS
+select func_add_sql(3,7);
++--------------+
+| func_add_sql |
++--------------+
+| 10           |
++--------------+
+SELECT pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+select pg_stat_get_xact_function_self_time(a.oid)=pg_stat_get_xact_function_total_time(a.oid) from PG_PROC a where a.proname = 'func_add_sql';
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select pg_stat_reset();
++---------------+
+| pg_stat_reset |
++---------------+
+|               |
++---------------+
+select func_add_sql(3,7);
++--------------+
+| func_add_sql |
++--------------+
+| 10           |
++--------------+
+SELECT pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+select pg_stat_get_xact_function_self_time(a.oid)<2,pg_stat_get_xact_function_total_time(a.oid)<2 from PG_PROC a where a.proname = 'func_add_sql';
++----------+----------+
+| ?column? | ?column? |
++----------+----------+
+| true     | true     |
++----------+----------+
+select pg_stat_get_xact_function_self_time(a.oid)=2,pg_stat_get_xact_function_total_time(a.oid)<2 from PG_PROC a where a.proname = 'func_add_sql';
+?.*
+?.*
+?.*
+?.*
+?.*
+drop FUNCTION func_add_sql;
+SQL SUCCESS
+end;
+SQL SUCCESS
+-- 函数内调用了其它函数
+begin;
+/
+SQL SUCCESS
+drop function if exists func01;
+SQL SUCCESS
+drop function if exists func02;
+SQL SUCCESS
+create or replace function func01()returns void as $$
+begin
+    raise notice ' from func01(): hello PG';
+end ;
+$$language plpgsql;
+/
+SQL SUCCESS
+create or replace function func02() returns void as $$
+begin
+    perform  func01();
+end;
+$$language plpgsql;
+/
+SQL SUCCESS
+select  func02();
++--------+
+| func02 |
++--------+
+|        |
++--------+
+SELECT pg_sleep(3);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+select pg_stat_get_xact_function_self_time(a.oid)<pg_stat_get_xact_function_total_time(a.oid) from PG_PROC a where a.proname = 'func02';
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select pg_stat_get_xact_function_self_time(a.oid)<2 from PG_PROC a where a.proname = 'func02';
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select pg_stat_get_xact_function_self_time(a.oid)=2 from PG_PROC a where a.proname = 'func02';
+?.*
+?.*
+?.*
+?.*
+?.*
+drop function func01;
+SQL SUCCESS
+drop function func02;
+SQL SUCCESS
+end;
+SQL SUCCESS
+-- 恢复环境
+set track_functions to 'none';
+SQL SUCCESS
+set track_io_timing to 'off';
+SQL SUCCESS
+alter system set autovacuum to on;
+SQL SUCCESS

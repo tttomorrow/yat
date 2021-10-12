@@ -1,0 +1,17 @@
+-- @testpoint: sin函数输入参数为特殊字符，'Infinity'、'-Infinity',合理报错
+drop table if exists TEST_SIN_04;
+SQL SUCCESS
+create table TEST_SIN_04(COL_SIN double precision);
+SQL SUCCESS
+insert into TEST_SIN_04 values('infinity');
+SQL SUCCESS
+insert into TEST_SIN_04 values('-infinity');
+SQL SUCCESS
+select SIN(COL_SIN) as RESULT from TEST_SIN_04;
+?.*ERROR: input is out of range
+  Where: referenced column: result
+select SIN(COL_SIN) as RESULT from TEST_SIN_04;
+?.*ERROR: input is out of range
+  Where: referenced column: result
+drop table TEST_SIN_04;
+SQL SUCCESS

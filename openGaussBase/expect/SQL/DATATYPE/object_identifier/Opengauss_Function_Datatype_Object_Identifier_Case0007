@@ -1,0 +1,267 @@
+-- @testpoint:插入其他类型，合理报错；
+drop table if exists object_identifier_007;
+SQL SUCCESS
+CREATE  TABLE object_identifier_007(
+	c1 OID,
+	c2 CID,
+	c3 XID,
+	c4 TID,
+	c5 REGCONFIG,
+	c6 REGDICTIONARY,
+	c7 REGOPER,
+	c8 REGOPERATOR,
+	c9 REGPROC,
+	c10 REGPROCEDURE,
+	c11 REGCLASS,
+	c12 REGTYPE
+);
+SQL SUCCESS
+insert into object_identifier_007 values (date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02');
+?.*ERROR: column "c1" is of type oid but expression is of type timestamp without time zone.*
+  Hint: You will need to rewrite or cast the expression.
+?.*Position:.*
+  Where: referenced column: c1
+drop table if exists object_identifier_007;
+SQL SUCCESS
+CREATE  TABLE object_identifier_007(
+	c1 OID,
+	c2 CID,
+	c3 XID,
+	c4 TID,
+	c5 REGCONFIG,
+	c6 REGDICTIONARY,
+	c7 REGOPER,
+	c8 REGOPERATOR,
+	c9 REGPROC,
+	c10 REGPROCEDURE,
+	c11 REGCLASS,
+	c12 REGTYPE
+);
+SQL SUCCESS
+insert into object_identifier_007 values (null,date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02');
+?.*ERROR: column "c2" is of type cid but expression is of type timestamp without time zone.*
+  Hint: You will need to rewrite or cast the expression.
+?.*Position:.*
+  Where: referenced column: c2
+drop table if exists object_identifier_007;
+SQL SUCCESS
+CREATE  TABLE object_identifier_007(
+    c1 OID,
+	c2 CID,
+	c3 XID,
+	c4 TID,
+	c5 REGCONFIG,
+	c6 REGDICTIONARY,
+	c7 REGOPER,
+	c8 REGOPERATOR,
+	c9 REGPROC,
+	c10 REGPROCEDURE,
+	c11 REGCLASS,
+	c12 REGTYPE
+);
+SQL SUCCESS
+insert into object_identifier_007 values (null,null,date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02');
+?.*ERROR: column "c3" is of type xid but expression is of type timestamp without time zone.*
+  Hint: You will need to rewrite or cast the expression.
+?.*Position:.*
+  Where: referenced column: c3
+drop table if exists object_identifier_007;
+SQL SUCCESS
+CREATE  TABLE object_identifier_007(
+	c1 OID,
+	c2 CID,
+	c3 XID,
+	c4 TID,
+	c5 REGCONFIG,
+	c6 REGDICTIONARY,
+	c7 REGOPER,
+	c8 REGOPERATOR,
+	c9 REGPROC,
+	c10 REGPROCEDURE,
+	c11 REGCLASS,
+	c12 REGTYPE
+);
+SQL SUCCESS
+insert into object_identifier_007 values (null,null,null,date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02');
+?.*ERROR: column "c4" is of type tid but expression is of type timestamp without time zone.*
+  Hint: You will need to rewrite or cast the expression.
+?.*Position:.*
+  Where: referenced column: c4
+drop table if exists object_identifier_007;
+SQL SUCCESS
+CREATE  TABLE object_identifier_007(
+	c1 OID,
+	c2 CID,
+	c3 XID,
+	c4 TID,
+	c5 REGCONFIG,
+	c6 REGDICTIONARY,
+	c7 REGOPER,
+	c8 REGOPERATOR,
+	c9 REGPROC,
+	c10 REGPROCEDURE,
+	c11 REGCLASS,
+	c12 REGTYPE
+);
+SQL SUCCESS
+insert into object_identifier_007 values (null,null,null,null,date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02');
+?.*ERROR: column "c5" is of type regconfig but expression is of type timestamp without time zone.*
+  Hint: You will need to rewrite or cast the expression.
+?.*Position:.*
+  Where: referenced column: c5
+drop table if exists object_identifier_007;
+SQL SUCCESS
+CREATE  TABLE object_identifier_007(
+	c1 OID,
+	c2 CID,
+	c3 XID,
+	c4 TID,
+	c5 REGCONFIG,
+	c6 REGDICTIONARY,
+	c7 REGOPER,
+	c8 REGOPERATOR,
+	c9 REGPROC,
+	c10 REGPROCEDURE,
+	c11 REGCLASS,
+	c12 REGTYPE
+);
+SQL SUCCESS
+insert into object_identifier_007 values (null,null,null,null,null,date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02');
+?.*ERROR: column "c6" is of type regdictionary but expression is of type timestamp without time zone.*
+  Hint: You will need to rewrite or cast the expression.
+?.*Position:.*
+  Where: referenced column: c6
+drop table if exists object_identifier_007;
+SQL SUCCESS
+CREATE  TABLE object_identifier_007(
+	c1 OID,
+	c2 CID,
+	c3 XID,
+	c4 TID,
+	c5 REGCONFIG,
+	c6 REGDICTIONARY,
+	c7 REGOPER,
+	c8 REGOPERATOR,
+	c9 REGPROC,
+	c10 REGPROCEDURE,
+	c11 REGCLASS,
+	c12 REGTYPE
+);
+SQL SUCCESS
+insert into object_identifier_007 values (null,null,null,null,null,null,date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02');
+?.*ERROR: column "c7" is of type regoper but expression is of type timestamp without time zone.*
+  Hint: You will need to rewrite or cast the expression.
+?.*Position:.*
+  Where: referenced column: c7
+drop table if exists object_identifier_007;
+SQL SUCCESS
+CREATE  TABLE object_identifier_007(
+	c1 OID,
+	c2 CID,
+	c3 XID,
+	c4 TID,
+	c5 REGCONFIG,
+	c6 REGDICTIONARY,
+	c7 REGOPER,
+	c8 REGOPERATOR,
+	c9 REGPROC,
+	c10 REGPROCEDURE,
+	c11 REGCLASS,
+	c12 REGTYPE
+);
+SQL SUCCESS
+insert into object_identifier_007 values (null,null,null,null,null,null,null,date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02');
+?.*ERROR: column "c8" is of type regoperator but expression is of type timestamp without time zone.*
+  Hint: You will need to rewrite or cast the expression.
+?.*Position:.*
+  Where: referenced column: c8
+drop table if exists object_identifier_007;
+SQL SUCCESS
+CREATE  TABLE object_identifier_007(
+	c1 OID,
+	c2 CID,
+	c3 XID,
+	c4 TID,
+	c5 REGCONFIG,
+	c6 REGDICTIONARY,
+	c7 REGOPER,
+	c8 REGOPERATOR,
+	c9 REGPROC,
+	c10 REGPROCEDURE,
+	c11 REGCLASS,
+	c12 REGTYPE
+);
+SQL SUCCESS
+insert into object_identifier_007 values (null,null,null,null,null,null,null,null,date'2020-02-02',date'2020-02-02',date'2020-02-02',date'2020-02-02');
+?.*ERROR: column "c9" is of type regproc but expression is of type timestamp without time zone.*
+  Hint: You will need to rewrite or cast the expression.
+?.*Position:.*
+  Where: referenced column: c9
+drop table if exists object_identifier_007;
+SQL SUCCESS
+CREATE  TABLE object_identifier_007(
+	c1 OID,
+	c2 CID,
+	c3 XID,
+	c4 TID,
+	c5 REGCONFIG,
+	c6 REGDICTIONARY,
+	c7 REGOPER,
+	c8 REGOPERATOR,
+	c9 REGPROC,
+	c10 REGPROCEDURE,
+	c11 REGCLASS,
+	c12 REGTYPE
+);
+SQL SUCCESS
+insert into object_identifier_007 values (null,null,null,null,null,null,null,null,null,date'2020-02-02',date'2020-02-02',date'2020-02-02');
+?.*ERROR: column "c10" is of type regprocedure but expression is of type timestamp without time zone.*
+  Hint: You will need to rewrite or cast the expression.
+?.*Position:.*
+  Where: referenced column: c10
+drop table if exists object_identifier_007;
+SQL SUCCESS
+CREATE  TABLE object_identifier_007(
+	c1 OID,
+	c2 CID,
+	c3 XID,
+	c4 TID,
+	c5 REGCONFIG,
+	c6 REGDICTIONARY,
+	c7 REGOPER,
+	c8 REGOPERATOR,
+	c9 REGPROC,
+	c10 REGPROCEDURE,
+	c11 REGCLASS,
+	c12 REGTYPE
+);
+SQL SUCCESS
+insert into object_identifier_007 values (null,null,null,null,null,null,null,null,null,null,date'2020-02-02',date'2020-02-02');
+?.*ERROR: column "c11" is of type regclass but expression is of type timestamp without time zone.*
+  Hint: You will need to rewrite or cast the expression.
+?.*Position:.*
+  Where: referenced column: c11
+drop table if exists object_identifier_007;
+SQL SUCCESS
+CREATE  TABLE object_identifier_007(
+	c1 OID,
+	c2 CID,
+	c3 XID,
+	c4 TID,
+	c5 REGCONFIG,
+	c6 REGDICTIONARY,
+	c7 REGOPER,
+	c8 REGOPERATOR,
+	c9 REGPROC,
+	c10 REGPROCEDURE,
+	c11 REGCLASS,
+	c12 REGTYPE
+);
+SQL SUCCESS
+insert into object_identifier_007 values (null,null,null,null,null,null,null,null,null,null,null,date'2020-02-02');
+?.*ERROR: column "c12" is of type regtype but expression is of type timestamp without time zone.*
+  Hint: You will need to rewrite or cast the expression.
+?.*Position:.*
+  Where: referenced column: c12
+drop table if exists object_identifier_007;
+SQL SUCCESS

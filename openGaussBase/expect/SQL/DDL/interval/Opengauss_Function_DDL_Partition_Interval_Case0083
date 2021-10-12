@@ -1,0 +1,25 @@
+-- @testpoint: interval分区,带模式名删除表指定CASCADE | RESTRICT,存在依赖对象时RESTRICT合理报错
+drop table if exists test9;
+SQL SUCCESS
+drop schema if exists xhy;
+SQL SUCCESS
+drop view if exists winners;
+SQL SUCCESS
+create schema xhy;
+SQL SUCCESS
+create table xhy.test9(col_4 date not null)
+partition by range (col_4) interval ('1 month')
+(partition test9_p1 values less than ('2020-01-01'));
+SQL SUCCESS
+create index on xhy.test9(col_4);
+SQL SUCCESS
+create view winners as select col_4 from xhy.test9;
+SQL SUCCESS
+drop table xhy.test9 restrict;
+?.*ERROR: cannot drop table xhy.test9 because other objects depend on it
+  Detail: view winners depends on table xhy.test9
+  Hint: Use DROP ... CASCADE to drop the dependent objects too.
+drop table xhy.test9 cascade;
+SQL SUCCESS
+drop schema xhy;
+SQL SUCCESS

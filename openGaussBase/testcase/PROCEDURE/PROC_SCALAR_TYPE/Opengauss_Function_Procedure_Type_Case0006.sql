@@ -1,0 +1,77 @@
+-- @testpoint: 标量类型%type的测试———列属性改变
+
+--test procedure
+--标量类型%type的测试———列属性改变
+
+drop table if exists FVT_PROC_SCALAR_TYPE_table_006;
+CREATE TABLE FVT_PROC_SCALAR_TYPE_table_006(
+  T1 INT,
+  T2 INTEGER,
+  T3 BIGINT,
+  T4 NUMBER DEFAULT 0.2332,
+  T5 NUMBER(12,2),
+  T6 NUMBER(12,6),
+  T7 BINARY_DOUBLE,
+  T8 DECIMAL,
+  T9 DECIMAL(8,2),
+  T10 DECIMAL(8,4),
+  T11 REAL,
+  T12 CHAR(4000),
+  T13 VARCHAR(1000),
+  T14 VARCHAR(4000),
+  T15 VARCHAR(100),
+  T16 VARCHAR2(4000),
+  T17 NUMERIC,
+
+  T19 DATE,
+  T20 TIMESTAMP,
+  T21 TIMESTAMP(6),
+  T22 BOOL
+) ;
+
+create unique index  FVT_PROC_SCALAR_TYPE_table_index_006 on FVT_PROC_SCALAR_TYPE_table_006(T1);
+create index FVT_PROC_SCALAR_TYPE_table_index1_006 on FVT_PROC_SCALAR_TYPE_table_006(T2,T19,T20);
+
+
+--创建存储过程
+CREATE OR REPLACE PROCEDURE FVT_PROC_SCALAR_TYPE_006(P1 FVT_PROC_SCALAR_TYPE_table_006.T19%type)  AS
+BEGIN
+raise info 'P1=:%',P1;
+EXCEPTION
+WHEN NO_DATA_FOUND THEN raise info 'NO_DATA_FOUND';
+END;
+/
+
+--调用存储过程
+DECLARE
+x1 FVT_PROC_SCALAR_TYPE_table_006.T19%type :=(to_date('2017-05-12 10:15:52','YYYY-MM-DD HH24:MI:SS'));
+BEGIN
+FVT_PROC_SCALAR_TYPE_006(x1);
+END;
+/
+
+--修改列属性
+alter table FVT_PROC_SCALAR_TYPE_table_006 modify T19 VARCHAR(100);--修改字段类型
+
+
+--重新编译存储过程
+CREATE OR REPLACE PROCEDURE FVT_PROC_SCALAR_TYPE_006_CS6(P1 FVT_PROC_SCALAR_TYPE_table_006.T19%type)  AS
+BEGIN
+raise info 'P1=:%',P1;
+EXCEPTION
+WHEN NO_DATA_FOUND THEN raise info 'NO_DATA_FOUND';
+END;
+/
+
+--调用存储过程
+DECLARE
+x2 FVT_PROC_SCALAR_TYPE_table_006.T19%type :='2017-05-12 10:15:52';
+BEGIN
+FVT_PROC_SCALAR_TYPE_006_CS6(x2);
+END;
+/
+
+--恢复环境
+drop table if exists FVT_PROC_SCALAR_TYPE_table_006;
+drop procedure if exists FVT_PROC_SCALAR_TYPE_006;
+drop procedure if exists FVT_PROC_SCALAR_TYPE_006_CS6;

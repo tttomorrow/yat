@@ -1,0 +1,39 @@
+-- @testpoint: 关键字workload，用作字符串
+drop table if exists workload_test cascade;
+SQL SUCCESS
+create table workload_test(id int,name varchar(20));
+SQL SUCCESS
+create or replace procedure workload_insert
+as
+begin
+ for i in 1..10 loop
+    insert into workload_test values(i,'workload'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call workload_insert();
++-----------------+
+| workload_insert |
++-----------------+
+|                 |
++-----------------+
+select * from workload_test;
++----+------------+
+| id | name       |
++----+------------+
+| 1  | workload1  |
+| 2  | workload2  |
+| 3  | workload3  |
+| 4  | workload4  |
+| 5  | workload5  |
+| 6  | workload6  |
+| 7  | workload7  |
+| 8  | workload8  |
+| 9  | workload9  |
+| 10 | workload10 |
++----+------------+
+drop table if exists workload_test cascade;
+SQL SUCCESS
+drop procedure workload_insert;
+SQL SUCCESS

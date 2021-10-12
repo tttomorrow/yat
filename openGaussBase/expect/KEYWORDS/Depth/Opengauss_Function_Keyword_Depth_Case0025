@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字depth(非保留)，作为角色名
+--关键字不带引号-成功
+drop role if exists depth;
+SQL SUCCESS
+create role depth with password 'gauss@123' valid until '2020-12-31';
+SQL SUCCESS
+drop role depth;
+SQL SUCCESS
+--关键字带双引号-成功
+drop role if exists "depth";
+SQL SUCCESS
+create role "depth" with password 'gauss@123' valid until '2020-12-31';
+SQL SUCCESS
+drop role "depth";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop role if exists 'depth';
+?.*ERROR: syntax error at or near "'depth'"
+?.*
+create role 'depth' with password 'gauss@123' valid until '2020-12-31';
+?.*ERROR: syntax error at or near "'depth'"
+?.*
+--关键字带反引号-合理报错
+drop role if exists `depth`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create role `depth` with password 'gauss@123' valid until '2020-12-31';
+?.*ERROR: syntax error at or near "`"
+?.*

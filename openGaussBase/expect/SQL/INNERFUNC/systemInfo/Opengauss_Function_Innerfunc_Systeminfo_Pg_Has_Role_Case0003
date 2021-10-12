@@ -1,0 +1,27 @@
+-- @testpoint: role参数为role oid时有角色权限和没有角色权限返回值校验
+DROP USER IF EXISTS senior_manager CASCADE;
+SQL SUCCESS
+DROP ROLE IF EXISTS manager;
+SQL SUCCESS
+CREATE ROLE manager IDENTIFIED BY 'Bigdata@123';
+SQL SUCCESS
+CREATE USER senior_manager PASSWORD 'Bigdata@123';
+SQL SUCCESS
+select pg_has_role('senior_manager', oid, 'USAGE') from PG_AUTHID where rolname = 'manager';
++-------------+
+| pg_has_role |
++-------------+
+| false       |
++-------------+
+GRANT manager TO senior_manager WITH ADMIN OPTION;
+SQL SUCCESS
+select pg_has_role('senior_manager', oid, 'USAGE') from PG_AUTHID where rolname = 'manager';
++-------------+
+| pg_has_role |
++-------------+
+| true        |
++-------------+
+DROP ROLE IF EXISTS manager;
+SQL SUCCESS
+DROP USER IF EXISTS senior_manager CASCADE;
+SQL SUCCESS

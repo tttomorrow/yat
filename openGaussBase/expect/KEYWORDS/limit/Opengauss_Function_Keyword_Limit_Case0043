@@ -1,0 +1,24 @@
+--  @testpoint:关键字limit作为临时表的列名在update语句的使用
+drop table if exists test_temporary_limit_004;
+SQL SUCCESS
+create temporary table test_temporary_limit_004("limit" int);
+SQL SUCCESS
+insert into test_temporary_limit_004 values (1);
+SQL SUCCESS
+commit;
+SQL SUCCESS
+select "limit" from test_temporary_limit_004 order by "limit";
++-------+
+| limit |
++-------+
+| 1     |
++-------+
+update test_temporary_limit_004 set "LIMIT" = 2;
+?.*ERROR: column "LIMIT" of relation "test_temporary_limit_004" does not exist
+?.*Position: .*
+commit;
+SQL SUCCESS
+select "LIMIT" from test_temporary_limit_004 order by "LIMIT";
+?.*ERROR: column "LIMIT" does not exist
+?.*Position: .*
+  Where: referenced column: LIMIT

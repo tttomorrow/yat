@@ -1,0 +1,15 @@
+-- @testpoint: 函数notlike(x bytea name text, y bytea text)，比较x和y是否不一致，入参为无效值时，合理报错
+--参数是英文
+select notlike(a,b);
+?.*ERROR: column "a" does not exis.*
+?.*
+  Where: referenced column: notlike
+--参数是中文，不带引号
+select notlike(哈,哈);
+?.*ERROR: column "哈" does not exis.*
+?.*
+  Where: referenced column: notlike
+--少参
+select notlike(1, );
+?.*ERROR: syntax error at or near "\).*
+?.*

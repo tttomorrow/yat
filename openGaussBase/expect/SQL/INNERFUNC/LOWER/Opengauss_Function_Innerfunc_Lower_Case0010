@@ -1,0 +1,15 @@
+-- @testpoint: lower函数用于查询语句
+drop table if exists TEST_LOWER_001;
+SQL SUCCESS
+create table TEST_LOWER_001(STR varchar(10));
+SQL SUCCESS
+insert into TEST_LOWER_001 values('TGHJ');
+SQL SUCCESS
+select lower(STR) from TEST_LOWER_001;
++-------+
+| lower |
++-------+
+| tghj  |
++-------+
+drop table if exists TEST_LOWER_001;
+SQL SUCCESS

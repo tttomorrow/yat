@@ -1,0 +1,15 @@
+-- @testpoint: floor函数入参个数及类型的校验，合理报错
+select floor(1.3,-9.9);
+?.*ERROR: function floor\(numeric, numeric\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: floor
+select floor();
+?.*ERROR: function floor\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: floor
+select floor('life');
+?.*ERROR: invalid input syntax for type double precision: "life"
+?.*
+  Where: referenced column: floor

@@ -1,0 +1,65 @@
+-- @testpoint: opengauss关键字defaults(非保留)，作为同义词对象名，部分测试点合理报错
+--前置条件
+drop table if exists defaults_test;
+SQL SUCCESS
+create table defaults_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists defaults;
+SQL SUCCESS
+create synonym defaults for defaults_test;
+SQL SUCCESS
+insert into defaults values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update defaults set defaults.name='cici' where defaults.id=2;
+SQL SUCCESS
+select * from defaults;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+drop synonym if exists defaults;
+SQL SUCCESS
+--关键字带双引号-成功
+drop synonym if exists "defaults";
+SQL SUCCESS
+create synonym "defaults" for defaults_test;
+SQL SUCCESS
+drop synonym if exists "defaults";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'defaults';
+?.*ERROR: syntax error at or near "'defaults'"
+?.*
+create synonym 'defaults' for defaults_test;
+?.*ERROR: syntax error at or near "'defaults'"
+?.*
+insert into 'defaults' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'defaults'"
+?.*
+update 'defaults' set 'defaults'.name='cici' where 'defaults'.id=2;
+?.*ERROR: syntax error at or near "'defaults'"
+?.*
+select * from 'defaults';
+?.*ERROR: syntax error at or near "'defaults'"
+?.*
+--关键字带反引号-合理报错
+drop synonym if exists `defaults`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create synonym `defaults` for defaults_test;
+?.*ERROR: syntax error at or near "`"
+?.*
+insert into `defaults` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`"
+?.*
+update `defaults` set `defaults`.name='cici' where `defaults`.id=2;
+?.*ERROR: syntax error at or near "`"
+?.*
+select * from `defaults`;
+?.*ERROR: syntax error at or near "`"
+?.*
+drop table if exists defaults_test;
+SQL SUCCESS

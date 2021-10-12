@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字routine_catalog(非保留)，作为外部数据源名
+--关键字不带引号-成功
+drop data source if exists routine_catalog;
+SQL SUCCESS
+create data source routine_catalog;
+SQL SUCCESS
+drop data source routine_catalog;
+SQL SUCCESS
+--关键字带双引号-成功
+drop data source if exists "routine_catalog";
+SQL SUCCESS
+create data source "routine_catalog";
+SQL SUCCESS
+drop data source "routine_catalog";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop data source if exists 'routine_catalog';
+?.*ERROR: syntax error at or near "'routine_catalog'".*
+?.*Position: .*
+create data source 'routine_catalog';
+?.*ERROR: syntax error at or near "'routine_catalog'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop data source if exists `routine_catalog`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create data source `routine_catalog`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

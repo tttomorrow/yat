@@ -1,0 +1,15 @@
+-- @testpoint: 定义和使用authid列带双引号
+drop table if exists test_authid_002;
+SQL SUCCESS
+create table test_authid_002 ("authid" char(20),stu_age int,sex char(10),score int,address char(10));
+SQL SUCCESS
+insert into  test_authid_002 ("authid")values('zhangsan');
+SQL SUCCESS
+select * from  test_authid_002;
++----------------------+---------+-----+-------+---------+
+| authid               | stu_age | sex | score | address |
++----------------------+---------+-----+-------+---------+
+| zhangsan             |         |     |       |         |
++----------------------+---------+-----+-------+---------+
+drop table if exists test_authid_002;
+SQL SUCCESS

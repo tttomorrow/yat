@@ -1,0 +1,25 @@
+-- @testpoint: 存储过程中，查询临时表语句与游标结合
+-- @modify at: 2020-11-24
+--建表并插入数据
+drop table if exists temp_table_067;
+create temporary table temp_table_067(empno int,ename varchar(10),job varchar(10) ,sal integer);
+insert into temp_table_067 values(1,'zhangsan','doctor1',10000),(2,'zhangsan2','doctor2',10000),(123,'zhangsan3','doctor3',10000);
+--创建存储过程
+CREATE OR REPLACE PROCEDURE p_emp_001(str boolean)
+AS
+declare
+a temp_table_067%rowtype;
+cursor mycursor is  select * from temp_table_067 where empno=1 order by ename;
+begin
+open mycursor;
+fetch  mycursor into a;
+raise info 'a is emp:%',a;
+close mycursor;
+end;
+/
+--调用存储过程
+call p_emp_001(true);
+--删除存储过程
+drop procedure p_emp_001;
+--删除表
+drop table temp_table_067;

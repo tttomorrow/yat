@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字nologging(非保留)，作为外部数据源名
+--关键字不带引号-成功
+drop data source if exists nologging;
+SQL SUCCESS
+create data source nologging;
+SQL SUCCESS
+drop data source nologging;
+SQL SUCCESS
+--关键字带双引号-成功
+drop data source if exists "nologging";
+SQL SUCCESS
+create data source "nologging";
+SQL SUCCESS
+drop data source "nologging";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop data source if exists 'nologging';
+?.*ERROR: syntax error at or near "'nologging'".*
+?.*Position: .*
+create data source 'nologging';
+?.*ERROR: syntax error at or near "'nologging'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop data source if exists `nologging`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create data source `nologging`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

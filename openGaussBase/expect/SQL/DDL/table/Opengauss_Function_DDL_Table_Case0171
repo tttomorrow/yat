@@ -1,0 +1,46 @@
+-- @testpoint: 表在存储过程中使用中调用
+drop procedure if exists proc_001;
+SQL SUCCESS
+drop table if exists table_001;
+SQL SUCCESS
+create table table_001(id int);
+SQL SUCCESS
+select * from table_001;
++----+
+| id |
++----+
++----+
+CREATE OR REPLACE PROCEDURE proc_001()
+AS
+BEGIN
+    FOR id IN 1..10 loop
+        INSERT INTO table_001 VALUES(id);
+    END loop;
+END;
+/
+SQL SUCCESS
+call proc_001();
++----------+
+| proc_001 |
++----------+
+|          |
++----------+
+select * from table_001;
++----+
+| id |
++----+
+| 1  |
+| 2  |
+| 3  |
+| 4  |
+| 5  |
+| 6  |
+| 7  |
+| 8  |
+| 9  |
+| 10 |
++----+
+drop procedure if exists proc_001;
+SQL SUCCESS
+drop table if exists table_001;
+SQL SUCCESS

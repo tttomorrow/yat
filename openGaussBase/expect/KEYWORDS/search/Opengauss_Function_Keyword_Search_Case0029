@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字search(非保留)，作为表空间名
+--关键字不带引号，创建成功
+drop tablespace if exists search;
+SQL SUCCESS
+CREATE TABLESPACE search RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+SQL SUCCESS
+drop tablespace search;
+SQL SUCCESS
+--关键字带双引号，创建成功
+drop tablespace if exists "search";
+SQL SUCCESS
+CREATE TABLESPACE "search" RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+SQL SUCCESS
+drop tablespace "search";
+SQL SUCCESS
+--关键字带单引号，合理报错
+drop tablespace if exists 'search';
+?.*ERROR: syntax error at or near "'search'".*
+?.*Position: .*
+CREATE TABLESPACE 'search' RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+?.*ERROR: syntax error at or near "'search'".*
+?.*Position: .*
+--关键字带反引号，合理报错
+drop tablespace if exists `search`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+CREATE TABLESPACE `search` RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

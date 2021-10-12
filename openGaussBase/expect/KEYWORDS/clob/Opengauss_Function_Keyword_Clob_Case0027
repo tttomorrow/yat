@@ -1,0 +1,25 @@
+--  @testpoint:opengauss关键字clob非保留)，作为序列名
+--关键字不带引号-成功
+drop sequence if exists clob;
+SQL SUCCESS
+create sequence clob start 100 cache 50;
+SQL SUCCESS
+--清理环境
+drop sequence clob;
+SQL SUCCESS
+--关键字带双引号-成功
+drop sequence if exists "clob";
+SQL SUCCESS
+create sequence "clob" start 100 cache 50;
+SQL SUCCESS
+--清理环境
+drop sequence "clob";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'clob';
+?.*ERROR: syntax error at or near "'clob'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop sequence if exists `clob`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

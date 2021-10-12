@@ -1,0 +1,8 @@
+
+
+-- @testpoint: 非法字符，大写字母
+
+select ASCII(A);
+?.*ERROR: column "a" does not exist
+?.*
+  Where: referenced column: ascii

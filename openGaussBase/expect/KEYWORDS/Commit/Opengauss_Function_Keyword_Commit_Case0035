@@ -1,0 +1,17 @@
+-- @testpoint: 修改某一列字段值后，执行commit成功，再使用rollback
+drop table if exists t_student;
+SQL SUCCESS
+create table t_student (stu_name char(20),stu_age int,sex char(10));
+SQL SUCCESS
+insert into t_student values('zhangsan',18,'boy'),('lisi',25,'boy'),('wangwu',28,'girl');
+SQL SUCCESS
+start transaction;
+SQL SUCCESS
+update t_student set stu_age=20 where stu_name='zhangsan';
+SQL SUCCESS
+commit;
+SQL SUCCESS
+rollback;
+SQL SUCCESS
+drop table if exists t_student;
+SQL SUCCESS

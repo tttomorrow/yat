@@ -1,0 +1,21 @@
+-- @testpoint: 删除表空间
+--表空间里面没有任何数据库对象
+DROP TABLESPACE IF EXISTS re_location1;
+SQL SUCCESS
+CREATE TABLESPACE ds_location1 RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+SQL SUCCESS
+DROP TABLESPACE IF EXISTS ds_location1;
+SQL SUCCESS
+--表空间里面有数据库对象
+drop table if exists ts_test;
+SQL SUCCESS
+DROP TABLESPACE IF EXISTS re_location1;
+SQL SUCCESS
+CREATE TABLESPACE ds_location1 RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+SQL SUCCESS
+CREATE table  ts_test(a int)   tablespace  ds_location1;
+SQL SUCCESS
+DROP TABLE IF EXISTS ts_test;
+SQL SUCCESS
+DROP TABLESPACE IF EXISTS ds_location1;
+SQL SUCCESS

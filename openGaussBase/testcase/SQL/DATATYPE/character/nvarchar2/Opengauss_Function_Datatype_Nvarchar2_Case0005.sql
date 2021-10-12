@@ -1,0 +1,14 @@
+-- @testpoint: 插入超出正常范围值，设定字节长度为10000，合理报错
+-- @modified at: 2020-11-16
+
+DECLARE
+  V_C nvarchar2(10001);
+BEGIN
+  drop table if exists test_nvarchar2_05;
+  create table test_nvarchar2_05 (name nvarchar2(10000));
+  FOR I IN 1 .. 10001 LOOP
+    V_C := V_C || 'q';
+  END LOOP;
+  insert into test_nvarchar2_05 values (V_C);
+END;
+/

@@ -1,0 +1,23 @@
+-- @testpoint: char_length函数入参异常校验，合理报错
+select char_length(null);
++-------------+
+| char_length |
++-------------+
+|             |
++-------------+
+select char_length('');
++-------------+
+| char_length |
++-------------+
+|             |
++-------------+
+select char_length();
+?.*ERROR: function char_length\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: char_length
+select char_length('jjslf','jdflsjf');
+?.*ERROR: function char_length\(unknown, unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: char_length

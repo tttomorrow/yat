@@ -1,0 +1,27 @@
+-- @testpoint: 表达式做为参数的存储过程测试--复合表达式-算数运算表达式
+
+--创建存储过程
+CREATE OR REPLACE PROCEDURE PROC_EXPR_PARAM_003(P1 REAL)  AS
+BEGIN
+raise info 'P1=:%',P1;
+EXCEPTION
+WHEN NO_DATA_FOUND THEN raise info 'NO_DATA_FOUND';
+END;
+/
+--调用存储过程
+-- +
+CALL PROC_EXPR_PARAM_003(1+2+3);
+-- -
+CALL PROC_EXPR_PARAM_003(1024-4+0.1);
+-- *
+CALL PROC_EXPR_PARAM_003(2*1024*1.5/6);
+-- /
+CALL PROC_EXPR_PARAM_003(9/4);
+-- ||（字符串拼接）
+CALL PROC_EXPR_PARAM_003('10010'||'0010'||'111');
+-- |（按位或）&（按位与）
+CALL PROC_EXPR_PARAM_003((12|3)&11);
+-- &（按位与）位运算符中的位异或
+CALL PROC_EXPR_PARAM_003((17&13)^9);
+--清理环境
+drop PROCEDURE PROC_EXPR_PARAM_003;

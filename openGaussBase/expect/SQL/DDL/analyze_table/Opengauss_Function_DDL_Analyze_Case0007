@@ -1,0 +1,38 @@
+-- @testpoint: 使用ANALYZE VERBOSE语句收集分区表的统计信息并输出表的相关信息
+drop table if exists customer_par;
+SQL SUCCESS
+create table customer_par
+(
+wr_returned_date_sk       integer                       ,
+wr_returned_time_sk       integer                       ,
+wr_item_sk                integer               not null,
+wr_refunded_customer_sk   integer
+)
+partition by range(wr_returned_date_sk)
+(
+partition p1 values less than(2452275),
+partition p2 values less than(2452640),
+partition p3 values less than(2453000),
+partition p4 values less than(maxvalue)
+)
+enable row movement;
+SQL SUCCESS
+insert into customer_par values(2452260,11,111,1111);
+SQL SUCCESS
+insert into customer_par values(2452530,22,222,2222);
+SQL SUCCESS
+insert into customer_par values(2452700,33,333,3333);
+SQL SUCCESS
+analyze VERBOSE customer_par;
+SQL SUCCESS
+select staattnum, stanullfrac, stadistinct, stavalues2 from pg_statistic where starelid = (select oid from pg_class where relname = 'customer_par');
++-----------+-------------+-------------+------------+
+| staattnum | stanullfrac | stadistinct | stavalues2 |
++-----------+-------------+-------------+------------+
+| 1         | 0.0         | -1.0        |            |
+| 2         | 0.0         | -1.0        |            |
+| 3         | 0.0         | -1.0        |            |
+| 4         | 0.0         | -1.0        |            |
++-----------+-------------+-------------+------------+
+drop table if exists customer_par;
+SQL SUCCESS

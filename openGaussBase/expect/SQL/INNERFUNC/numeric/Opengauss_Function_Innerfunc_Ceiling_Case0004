@@ -1,0 +1,13 @@
+-- @testpoint: ceiling函数入参为空值
+select ceiling('');
++---------+
+| ceiling |
++---------+
+|         |
++---------+
+select ceiling(null);
++---------+
+| ceiling |
++---------+
+|         |
++---------+

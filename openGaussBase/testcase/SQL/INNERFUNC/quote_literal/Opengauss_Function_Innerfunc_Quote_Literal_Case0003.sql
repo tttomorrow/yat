@@ -1,0 +1,2 @@
+-- @testpoint: quote_literal函数入参给字符类型
+SELECT quote_literal('hello');

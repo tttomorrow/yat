@@ -1,0 +1,41 @@
+-- @testpoint: pg_relation_size(relation regclass, fork text)函数的异常校验，合理报错
+CREATE TABLE test
+(
+    c_customer_sk             integer,
+    c_customer_id             char(5)
+);
+SQL SUCCESS
+CREATE UNIQUE INDEX test_index ON test(c_customer_sk);
+SQL SUCCESS
+insert into test values(9,'hhh');
+SQL SUCCESS
+insert into test values(8,'ooo');
+SQL SUCCESS
+select pg_relation_size(a.oid,'main','main') from pg_class a where a.relname='test';
+?.*ERROR: function pg_relation_size\(oid, unknown, unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_relation_size
+select pg_relation_size() from pg_class a where a.relname='test';
+?.*ERROR: function pg_relation_size\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_relation_size
+select pg_relation_size(b.oid,'*&^%$') from pg_class b where b.relname='test_index';
+?.*ERROR: invalid fork name
+  Hint: Valid fork names are "main", "fsm", "bcm", and "vm".
+  Where: referenced column: pg_relation_size
+select pg_relation_size('','') from pg_class b where b.relname='test_index';
++------------------+
+| pg_relation_size |
++------------------+
+|                  |
++------------------+
+select pg_relation_size('') from pg_class a where a.relname='test';
++------------------+
+| pg_relation_size |
++------------------+
+|                  |
++------------------+
+drop table test;
+SQL SUCCESS

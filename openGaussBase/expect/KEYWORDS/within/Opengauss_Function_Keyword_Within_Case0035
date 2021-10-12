@@ -1,0 +1,39 @@
+-- @testpoint: 关键字within，用作表名创建普通表，部分测试点合理报错
+drop table if exists within cascade;
+SQL SUCCESS
+create table within(id int,name varchar(20));
+SQL SUCCESS
+create or replace procedure within_insert
+as
+begin
+ for i in 1..10 loop
+    insert into within values(i,'wit+'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call within_insert();
++---------------+
+| within_insert |
++---------------+
+|               |
++---------------+
+select * from within;
++----+--------+
+| id | name   |
++----+--------+
+| 1  | wit+1  |
+| 2  | wit+2  |
+| 3  | wit+3  |
+| 4  | wit+4  |
+| 5  | wit+5  |
+| 6  | wit+6  |
+| 7  | wit+7  |
+| 8  | wit+8  |
+| 9  | wit+9  |
+| 10 | wit+10 |
++----+--------+
+drop table if exists within cascade;
+SQL SUCCESS
+drop procedure within_insert;
+SQL SUCCESS

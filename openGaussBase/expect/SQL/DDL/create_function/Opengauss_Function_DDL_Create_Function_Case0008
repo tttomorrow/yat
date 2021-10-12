@@ -1,0 +1,24 @@
+-- @testpoint: 创建函数指定模式名（模式名已存在）
+drop schema if exists self cascade;
+SQL SUCCESS
+CREATE schema self;
+SQL SUCCESS
+drop FUNCTION if exists self.sum_two(integer, integer);
+SQL SUCCESS
+CREATE FUNCTION self.sum_two(integer, integer) RETURNS integer
+    AS 'select $1 + $2;'
+    LANGUAGE SQL
+    IMMUTABLE
+    RETURNS NULL ON NULL INPUT;
+/
+SQL SUCCESS
+select proname from pg_proc where proname='sum_two';
++---------+
+| proname |
++---------+
+| sum_two |
++---------+
+drop FUNCTION self.sum_two(integer, integer);
+SQL SUCCESS
+drop schema self cascade;
+SQL SUCCESS

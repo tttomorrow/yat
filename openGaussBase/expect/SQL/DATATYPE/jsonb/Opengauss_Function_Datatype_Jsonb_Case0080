@@ -1,0 +1,84 @@
+-- @testpoint: 通用函数：json(b)_typeof（返回json的数据类型，当入参不合理时，合理报错）
+--jsonb_typeof函数，入参合理
+select value, jsonb_typeof(value)  from (values (jsonb '123.4'), (jsonb '"foo"'), (jsonb 'true'), (jsonb 'null'), (jsonb '[1, 2, 3]'), (jsonb '{"x":"foo", "y":123}'), (NULL::jsonb))  as data(value);
++------------------------+--------------+
+| value                  | jsonb_typeof |
++------------------------+--------------+
+| 123.4                  | number       |
+| "foo"                  | string       |
+| true                   | boolean      |
+| null                   | null         |
+| [1, 2, 3]              | array        |
+| {"x": "foo", "y": 123} | object       |
+|                        |              |
++------------------------+--------------+
+select jsonb_typeof('{"f2":{"f3":1},"f4":{"f5":99,"f6":"stringy"}}');
++--------------+
+| jsonb_typeof |
++--------------+
+| object       |
++--------------+
+select jsonb_typeof ('[{"a":"foo"},"b",true,null,138]');
++--------------+
+| jsonb_typeof |
++--------------+
+| array        |
++--------------+
+select jsonb_typeof ('[{"a":"foo"},{"b":"bar"},{"c":"baz"}]');
++--------------+
+| jsonb_typeof |
++--------------+
+| array        |
++--------------+
+select jsonb_typeof('true');
++--------------+
+| jsonb_typeof |
++--------------+
+| boolean      |
++--------------+
+select jsonb_typeof('138158');
++--------------+
+| jsonb_typeof |
++--------------+
+| number       |
++--------------+
+select jsonb_typeof('null');
++--------------+
+| jsonb_typeof |
++--------------+
+| null         |
++--------------+
+--jsonb_typeof函数，入参不合理
+select jsonb_typeof ('[{"a":"foo"},{"b":"bar"},{"c":"baz"}]','[2,1]');
+?.*ERROR: function jsonb_typeof\(unknown, unknown\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: jsonb_typeof
+select jsonb_typeof ('["a","foo","b","bar","c":"baz"]','{"b","c"}');
+?.*ERROR: function jsonb_typeof\(unknown, unknown\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: jsonb_typeof
+select jsonb_typeof('true,false');
+?.*ERROR: invalid input syntax for type jso.*
+  Detail: Expected end of input, but found ",".
+?.*
+  Where: JSON data, line 1: true,...
+referenced column: jsonb_typeof
+select jsonb_typeof('138,158,369');
+?.*ERROR: invalid input syntax for type jso.*
+  Detail: Expected end of input, but found ",".
+?.*
+  Where: JSON data, line 1: 138,...
+referenced column: jsonb_typeof
+select jsonb_typeof("null");
+?.*ERROR: column "null" does not exis.*
+?.*
+  Where: referenced column: jsonb_typeof
+--返回结果类型校验：text
+select pg_typeof(jsonb_typeof ('{"f2":{"f3":1},"f4":{"f5":99,"f6":"stringy"}}'));
++-----------+
+| pg_typeof |
++-----------+
+| text      |
++-----------+

@@ -1,0 +1,47 @@
+-- @testpoint: 列存表支持删除字段DROP COLUMN，删除后添加数据合理报错
+drop table if exists table_alter_034;
+SQL SUCCESS
+create table table_alter_034
+(id int ,name char(20),class char(10),course char(20)default '数学',score float(1)
+)with(ORIENTATION=COLUMN);
+SQL SUCCESS
+insert into table_alter_034 values(4,'小明',1,'数学',87.5);
+SQL SUCCESS
+insert into table_alter_034 values(2,'小红',2,'数学',62);
+SQL SUCCESS
+insert into table_alter_034 (id,name,class,score) values(3,'小黄',2,88);
+SQL SUCCESS
+insert into table_alter_034 (id,name,class,score) values(5,'小紫',1,57);
+SQL SUCCESS
+insert into table_alter_034 (id,name,class,score) values(7,'小白',1,100);
+SQL SUCCESS
+select * from table_alter_034;
++----+------------------+------------+------------------+-------+
+| id | name             | class      | course           | score |
++----+------------------+------------+------------------+-------+
+| 4  | 小明               | 1          | 数学               | 87.5  |
+| 2  | 小红               | 2          | 数学               | 62.0  |
+| 3  | 小黄               | 2          | 数学               | 88.0  |
+| 5  | 小紫               | 1          | 数学               | 57.0  |
+| 7  | 小白               | 1          | 数学               | 100.0 |
++----+------------------+------------+------------------+-------+
+drop index if exists table_alter_034_index;
+SQL SUCCESS
+create index table_alter_034_index on table_alter_034(id);
+SQL SUCCESS
+insert into table_alter_034 values(4,'小明',1,'数学',87.5);
+SQL SUCCESS
+insert into table_alter_034 values(2,'小红',2,'数学',62);
+SQL SUCCESS
+alter table  table_alter_034 DROP column IF EXISTS id  CASCADE ;
+SQL SUCCESS
+insert into table_alter_034 values(4,'小明',1,'数学',87.5);
+?.*ERROR: INSERT has more expressions than target columns.*
+?.*Position:.*
+insert into table_alter_034 values(2,'小红',2,'数学',62);
+?.*ERROR: INSERT has more expressions than target columns.*
+?.*Position:.*
+drop index if exists table_alter_034_index;
+SQL SUCCESS
+drop table if exists table_alter_034;
+SQL SUCCESS

@@ -1,0 +1,22 @@
+-- @testpoint: 插入中文
+-- @modify at: 2020-11-17
+drop table if exists test_varchar2_09;
+SQL SUCCESS
+create table test_varchar2_09 (name varchar2(20));
+SQL SUCCESS
+insert into test_varchar2_09 values ('gkb中国');
+SQL SUCCESS
+insert into test_varchar2_09 values ('中国gkb');
+SQL SUCCESS
+insert into test_varchar2_09 values ('开源数据库');
+SQL SUCCESS
+select * from test_varchar2_09;
++-------+
+| name  |
++-------+
+| gkb中国 |
+| 中国gkb |
+| 开源数据库 |
++-------+
+drop table test_varchar2_09;
+SQL SUCCESS

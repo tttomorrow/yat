@@ -1,0 +1,15 @@
+-- @testpoint: 在全局临时表关键字limit作为列名的字段上创建索引
+drop table if exists t_global_temporary_limit_007;
+SQL SUCCESS
+create global temporary table t_global_temporary_limit_007("limit" int);
+SQL SUCCESS
+create index index_limit_003 on t_global_temporary_limit_007("limit");
+SQL SUCCESS
+select "limit" from t_global_temporary_limit_007;
++-------+
+| limit |
++-------+
++-------+
+--清理环境
+drop table if exists t_global_temporary_limit_007;
+SQL SUCCESS

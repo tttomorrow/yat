@@ -1,0 +1,17 @@
+-- @testpoint: 插入精度小数点前边界范围长度值
+-- @modified at: 2020-11-23
+
+declare
+  V_C text;
+begin
+  drop table if exists test_number_05;
+  create table test_number_05 (name number);
+  for i in 1 .. 131072 loop
+    V_C := V_C || '9';
+  end loop;
+  V_C := V_C || '.1';
+  insert into test_number_05 values (V_C);
+END;
+/
+select char_length(name) from test_number_05;
+drop table test_number_05;

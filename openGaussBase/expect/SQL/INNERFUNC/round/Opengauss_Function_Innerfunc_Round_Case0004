@@ -1,0 +1,21 @@
+-- @testpoint: round函数入参为空或者负数
+drop table if exists tb;
+SQL SUCCESS
+create table tb (nem numeric);
+SQL SUCCESS
+insert into tb values ('');
+SQL SUCCESS
+insert into tb values (null);
+SQL SUCCESS
+insert into tb values (-9.56);
+SQL SUCCESS
+select round(nem) from tb;
++-------+
+| round |
++-------+
+|       |
+|       |
+| -10   |
++-------+
+drop table tb;
+SQL SUCCESS

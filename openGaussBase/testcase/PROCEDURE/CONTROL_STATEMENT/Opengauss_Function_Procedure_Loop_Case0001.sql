@@ -1,0 +1,21 @@
+-- @testpoint: 简单loop语句
+
+create or replace procedure proc_loop_001(i in integer, count out integer)
+as
+    begin
+        count:=0;
+        loop
+        if count > i
+        then
+            raise info 'count is %. ', count;
+            exit;
+        else
+            count:=count+1;
+        end if;
+        end loop;
+    end;
+/
+
+call proc_loop_001(10,5);
+drop procedure proc_loop_001;
+

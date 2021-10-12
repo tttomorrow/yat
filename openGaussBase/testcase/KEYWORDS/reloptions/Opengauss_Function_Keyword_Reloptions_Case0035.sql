@@ -1,0 +1,5 @@
+--  @testpoint:opengauss关键字reloptions(非保留)，查询系统表PG_PARTITION、PG_CLASS字段名reloptions
+
+select relname from PG_PARTITION where relname='reloptions';
+select relname from PG_class where relname='reloptions';
+

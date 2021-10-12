@@ -1,0 +1,21 @@
+-- @testpoint: 列存表使用update..returning子句，合理报错
+--建表
+drop table if exists all_datatype_tbl;
+SQL SUCCESS
+create table all_datatype_tbl(c_integer integer, c_varchar varchar(50)) with(orientation = column);
+SQL SUCCESS
+--插入数据
+insert into all_datatype_tbl values(1,'aaaaa');
+SQL SUCCESS
+insert into all_datatype_tbl values(2,'bbbbb');
+SQL SUCCESS
+--修改数据，报错
+update all_datatype_tbl set c_varchar = 'new_a' where c_integer = 1 returning *;
+?.*ERROR: Un-support feature
+  Detail: column stored relation doesn't support UPDATE returning
+update all_datatype_tbl set c_varchar = 'new_a' where c_integer = 1 returning c_integer;
+?.*ERROR: Un-support feature
+  Detail: column stored relation doesn't support UPDATE returning
+--删表
+drop table all_datatype_tbl;
+SQL SUCCESS

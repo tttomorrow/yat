@@ -1,0 +1,17 @@
+-- @testpoint: 删除指定的表
+DROP TABLE if exists warehouse_t1;
+SQL SUCCESS
+DROP TABLE if exists re_warehouse;
+SQL SUCCESS
+DROP TABLE if exists warehouse_t3;
+SQL SUCCESS
+DROP TABLE if exists warehouse_t4;
+SQL SUCCESS
+DROP TABLE if exists warehouse_t5;
+SQL SUCCESS
+DROP TABLE if exists warehouse_t6;
+SQL SUCCESS
+DROP TABLE if exists warehouse_t12;
+SQL SUCCESS
+DROP TABLE if exists reason_t2;
+SQL SUCCESS

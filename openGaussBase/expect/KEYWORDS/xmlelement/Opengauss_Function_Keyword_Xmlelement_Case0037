@@ -1,0 +1,39 @@
+-- @testpoint: 关键字xmlelement，用作字段名
+drop table if exists xmlelement_test cascade;
+SQL SUCCESS
+create table xmlelement_test(id int,xmlelement varchar(20));
+SQL SUCCESS
+create or replace procedure xmlelement_insert
+as
+begin
+ for i in 1..10 loop
+    insert into xmlelement_test values(i,'val+'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call xmlelement_insert();
++-------------------+
+| xmlelement_insert |
++-------------------+
+|                   |
++-------------------+
+select * from xmlelement_test;
++----+------------+
+| id | xmlelement |
++----+------------+
+| 1  | val+1      |
+| 2  | val+2      |
+| 3  | val+3      |
+| 4  | val+4      |
+| 5  | val+5      |
+| 6  | val+6      |
+| 7  | val+7      |
+| 8  | val+8      |
+| 9  | val+9      |
+| 10 | val+10     |
++----+------------+
+drop table if exists xmlelement_test cascade;
+SQL SUCCESS
+drop procedure xmlelement_insert;
+SQL SUCCESS

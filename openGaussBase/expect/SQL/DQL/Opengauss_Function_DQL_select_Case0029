@@ -1,0 +1,47 @@
+-- @testpoint: DQL语法，结合SELECT...having
+drop table if exists select_test_tab;
+SQL SUCCESS
+create table select_test_tab(id number,name varchar2(30),age number);
+SQL SUCCESS
+insert into select_test_tab values(1,'aaa',10);
+SQL SUCCESS
+insert into select_test_tab values(2,'bbb',12);
+SQL SUCCESS
+insert into select_test_tab values(3,'ccc',14);
+SQL SUCCESS
+insert into select_test_tab values(4,'ddd',16);
+SQL SUCCESS
+insert into select_test_tab values(1,'eee',18);
+SQL SUCCESS
+insert into select_test_tab values(1,'adc',20);
+SQL SUCCESS
+insert into select_test_tab values(1,'abc',21);
+SQL SUCCESS
+insert into select_test_tab values(2,'eea',22);
+SQL SUCCESS
+insert into select_test_tab values(2,'eae',24);
+SQL SUCCESS
+insert into select_test_tab values(3,'ede',26);
+SQL SUCCESS
+insert into select_test_tab values(3,'aee',28);
+SQL SUCCESS
+insert into select_test_tab values(4,'cee',25);
+SQL SUCCESS
+insert into select_test_tab values(4,'gee',22);
+SQL SUCCESS
+insert into select_test_tab values(5,'fee',21);
+SQL SUCCESS
+insert into select_test_tab values(5,'iee',28);
+SQL SUCCESS
+select id,count(id) from select_test_tab where age>18 group by id having count(id)>1 order by 1,2;
++----+-------+
+| id | count |
++----+-------+
+| 1  | 2     |
+| 2  | 2     |
+| 3  | 2     |
+| 4  | 2     |
+| 5  | 2     |
++----+-------+
+drop table if exists select_test_tab;
+SQL SUCCESS

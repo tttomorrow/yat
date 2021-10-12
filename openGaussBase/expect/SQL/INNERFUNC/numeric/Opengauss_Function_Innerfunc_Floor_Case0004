@@ -1,0 +1,13 @@
+-- @testpoint: floor函数入参给空值
+select floor(null);
++-------+
+| floor |
++-------+
+|       |
++-------+
+select floor('');
++-------+
+| floor |
++-------+
+|       |
++-------+

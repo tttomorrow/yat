@@ -1,0 +1,7 @@
+-- @testpoint: 对blob类型的唯一约束
+DROP TABLE IF EXISTS t_blob;
+SQL SUCCESS
+CREATE TABLE t_blob(ID BLOB UNIQUE);
+SQL SUCCESS
+drop table if exists t_blob;
+SQL SUCCESS

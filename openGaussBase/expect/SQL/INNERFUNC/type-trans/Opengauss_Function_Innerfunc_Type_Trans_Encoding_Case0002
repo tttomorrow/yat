@@ -1,0 +1,22 @@
+-- @testpoint: convert_to_nocase(text, text)将字符串转换为指定的编码类型，入参为无效值时合理报错
+select convert_to_nocase('aaa', 'ascii');
+?.*ERROR: invalid destination encoding name "ascii".*
+  Where: referenced column: convert_to_nocase
+select convert_to_nocase('你好$%^*', 'unicode1');
+?.*ERROR: invalid destination encoding name "unicode1".*
+  Where: referenced column: convert_to_nocase
+select convert_to_nocase('你好', 'utf-8','999');
+?.*ERROR: function convert_to_nocase\(unknown, unknown, unknown\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: convert_to_nocase
+select convert_to_nocase('你好');
+?.*ERROR: function convert_to_nocase\(unknown\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: convert_to_nocase
+select convert_to_nocase(false, 'latin1');
+?.*ERROR: function convert_to_nocase\(boolean, unknown\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: convert_to_nocase

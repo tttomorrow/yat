@@ -1,0 +1,54 @@
+-- @testpoint: opengauss关键字excluding(非保留)，自定义数据类型名为excluding 合理报错
+--关键字excluding作为数据类型不带引号，创建成功
+drop type if exists public.excluding;
+SQL SUCCESS
+CREATE TYPE public.excluding AS (f1 int, f2 text);
+SQL SUCCESS
+select typname from pg_type where typname ='public.excluding';
++---------+
+| typname |
++---------+
++---------+
+drop type public.excluding;
+SQL SUCCESS
+--关键字excluding作为数据类型加双引号，创建成功
+drop type if exists "public.excluding";
+SQL SUCCESS
+CREATE TYPE "public.excluding" AS (f1 int, f2 text);
+SQL SUCCESS
+select typname from pg_type where typname ='public.excluding';
++------------------+
+| typname          |
++------------------+
+| public.excluding |
++------------------+
+drop type "public.excluding";
+SQL SUCCESS
+--关键字excluding作为数据类型加单引号，合理报错
+drop type if exists 'public.excluding';
+?.*ERROR: syntax error at or near "'public.excluding'"
+?.*
+CREATE TYPE 'public.excluding' AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "'public.excluding'"
+?.*
+select * from pg_type where typname ='public.excluding';
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+----------+-----------+------------+---------+----------+-----------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
+| typname | typnamespace | typowner | typlen | typbyval | typtype | typcategory | typispreferred | typisdefined | typdelim | typrelid | typelem | typarray | typinput | typoutput | typreceive | typsend | typmodin | typmodout | typanalyze | typalign | typstorage | typnotnull | typbasetype | typtypmod | typndims | typcollation | typdefaultbin | typdefault | typacl |
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+----------+-----------+------------+---------+----------+-----------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+----------+-----------+------------+---------+----------+-----------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
+drop type 'public.excluding';
+?.*ERROR: syntax error at or near "'public.excluding'"
+?.*
+--关键字excluding作为数据类型加反引号，合理报错
+drop type if exists `public.excluding`;
+?.*ERROR: syntax error at or near "`"
+?.*
+CREATE TYPE `public.excluding` AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "`"
+?.*
+select * from pg_type where typname =`public.excluding`;
+?.*ERROR: missing FROM-clause entry for table "public"
+?.*
+drop type `public.excluding`;
+?.*ERROR: syntax error at or near "`"
+?.*

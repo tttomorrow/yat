@@ -1,0 +1,55 @@
+--  @testpoint:opengauss关键字delete(非保留)，自定义数据类型名为delete
+--关键字delete作为数据类型不带引号，创建成功
+drop type if exists delete;
+SQL SUCCESS
+CREATE TYPE delete AS (f1 int, f2 text);
+SQL SUCCESS
+select typname from pg_type where typname ='delete';
++---------+
+| typname |
++---------+
+| delete  |
++---------+
+drop type delete;
+SQL SUCCESS
+--关键字delete作为用户名加双引号，创建成功
+drop type if exists "delete";
+SQL SUCCESS
+CREATE TYPE "delete" AS (f1 int, f2 text);
+SQL SUCCESS
+select typname from pg_type where typname ='delete';
++---------+
+| typname |
++---------+
+| delete  |
++---------+
+drop type "delete";
+SQL SUCCESS
+--关键字delete作为用户名加单引号，合理报错
+drop type if exists 'delete';
+?.*ERROR: syntax error at or near "'delete'"
+?.*
+CREATE TYPE 'delete' AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "'delete'"
+?.*
+select typname from pg_type where typname ='delete';
++---------+
+| typname |
++---------+
++---------+
+drop type 'delete';
+?.*ERROR: syntax error at or near "'delete'"
+?.*
+--关键字delete作为用户名加反引号，合理报错
+drop type if exists `delete`;
+?.*ERROR: syntax error at or near "`"
+?.*
+CREATE TYPE `delete` AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "`"
+?.*
+select typname from pg_type where typname =`delete`;
+?.*ERROR: column "delete" does not exist
+?.*
+drop type `delete`;
+?.*ERROR: syntax error at or near "`"
+?.*

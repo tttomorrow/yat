@@ -1,0 +1,41 @@
+-- @testpoint: BINARY类型的测试———RAW类型最大支持8000字节
+drop table if exists FVT_FUNC_BINARY_TABLE_017;
+SQL SUCCESS
+create table FVT_FUNC_BINARY_TABLE_017(T1 INT,T2 RAW(8000));
+SQL SUCCESS
+--创建自定义函数
+create or replace function FVT_FUNC_BINARY_017(P1 RAW) return int
+is
+  V_LANG RAW(8000);
+  V_length int;
+BEGIN
+    V_LANG:=P1;
+    For I IN 1 .. 1599 LOOP
+        V_LANG := V_LANG || 'FFFFFFFFFF';
+    END LOOP;
+    V_length:=char_length(V_LANG);
+    insert into FVT_FUNC_BINARY_TABLE_017 values(V_length,V_LANG);
+    return V_length;
+    EXCEPTION
+WHEN NO_DATA_FOUND THEN  raise info 'NO_DATA_FOUND';
+END;
+/
+SQL SUCCESS
+--调用自定义函数
+select FVT_FUNC_BINARY_017('FFFFFFFFFF');
++---------------------+
+| fvt_func_binary_017 |
++---------------------+
+| 16000               |
++---------------------+
+select T1 from FVT_FUNC_BINARY_TABLE_017 ;
++-------+
+| t1    |
++-------+
+| 16000 |
++-------+
+--清理环境
+drop function if exists FVT_FUNC_BINARY_017;
+SQL SUCCESS
+drop table if exists FVT_FUNC_BINARY_TABLE_017;
+SQL SUCCESS

@@ -1,0 +1,11 @@
+-- @testpoint: 修改参数值为无效值,合理报错
+--set命令设置参数值，报错
+set synchronous_commit to 'remote_apply*&^%';
+?.*ERROR: invalid value for parameter "synchronous_commit": "remote_apply\*\&\^\%"
+  Hint: Available values: local, remote_receive, remote_write, remote_apply, on, off.
+set synchronous_commit to '2*&^^';
+?.*ERROR: invalid value for parameter "synchronous_commit": "2\*\&\^\^"
+  Hint: Available values: local, remote_receive, remote_write, remote_apply, on, off.
+set synchronous_commit to 1234;
+?.*ERROR: invalid value for parameter "synchronous_commit": "1234"
+  Hint: Available values: local, remote_receive, remote_write, remote_apply, on, off.

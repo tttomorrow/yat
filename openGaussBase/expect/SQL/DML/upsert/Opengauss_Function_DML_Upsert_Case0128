@@ -1,0 +1,1116 @@
+-- @testpoint: upsert子查询excluded引用语法覆盖，不符合语法要求，合理报错
+--创建upeset及子查询表，插入数据
+drop table if exists t_dml_upsert_sub0128;
+SQL SUCCESS
+create table t_dml_upsert_sub0128 (a int,b int primary key,c text);
+SQL SUCCESS
+insert into t_dml_upsert_sub0128 values(generate_series(1,10),generate_series(1,10),'c-'||generate_series(1,10));
+SQL SUCCESS
+insert into t_dml_upsert_sub0128 values(generate_series(1,10),generate_series(11,20),'c-'||generate_series(1,10));
+SQL SUCCESS
+insert into t_dml_upsert_sub0128 values('',generate_series(21,30),'c-'||generate_series(1,10));
+SQL SUCCESS
+drop table if exists t_dml_upsert0128;
+SQL SUCCESS
+--创建upsert表，组合主键场景
+create table t_dml_upsert0128 (a int , b text, c int not null, d text,primary key (a,b));
+SQL SUCCESS
+insert into t_dml_upsert0128 values (1,1,1),(2,2,2),(3,3,3),(4,4,4);
+SQL SUCCESS
+select * from t_dml_upsert0128;
++---+---+---+---+
+| a | b | c | d |
++---+---+---+---+
+| 1 | 1 | 1 |   |
+| 2 | 2 | 2 |   |
+| 3 | 3 | 3 |   |
+| 4 | 4 | 4 |   |
++---+---+---+---+
+analyze t_dml_upsert_sub0128;
+SQL SUCCESS
+analyze t_dml_upsert0128;
+SQL SUCCESS
+--distinct， muilt-set/single-set均支持
+explain (costs off, verbose) select distinct(c),a from t_dml_upsert_sub0128 where a=4;
++-----------------------------------------------------+
+| QUERY PLAN                                          |
++-----------------------------------------------------+
+| Unique                                              |
+|   Output: c, a                                      |
+|   ->  Sort                                          |
+|         Output: c, a                                |
+|         Sort Key: t_dml_upsert_sub0128.c            |
+|         ->  Seq Scan on public.t_dml_upsert_sub0128 |
+|               Output: c, a                          |
+|               Filter: (t_dml_upsert_sub0128.a = 4)  |
++-----------------------------------------------------+
+explain (costs off, verbose) insert into t_dml_upsert0128 values(1,1,3) on duplicate key update (d,c)= (select distinct(c),a from t_dml_upsert_sub0128 where a=4);
++--------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                       |
++--------------------------------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0128                                                                |
+|   Conflict Resolution: UPDATE                                                                    |
+|   Conflict Arbiter Indexes: t_dml_upsert0128_pkey                                                |
+|   InitPlan 1 (returns $0)                                                                        |
+|     ->  Subquery Scan on "S"                                                                     |
+|           Output: "S".s2                                                                         |
+|           ->  Unique                                                                             |
+|                 Output: public.t_dml_upsert_sub0128.c, public.t_dml_upsert_sub0128.a             |
+|                 ->  Sort                                                                         |
+|                       Output: public.t_dml_upsert_sub0128.c, public.t_dml_upsert_sub0128.a       |
+|                       Sort Key: public.t_dml_upsert_sub0128.c                                    |
+|                       ->  Seq Scan on public.t_dml_upsert_sub0128                                |
+|                             Output: public.t_dml_upsert_sub0128.c, public.t_dml_upsert_sub0128.a |
+|                             Filter: (public.t_dml_upsert_sub0128.a = 4)                          |
+|   InitPlan 2 (returns $1)                                                                        |
+|     ->  Subquery Scan on "S"                                                                     |
+|           Output: "S".s1                                                                         |
+|           ->  Unique                                                                             |
+|                 Output: public.t_dml_upsert_sub0128.c, public.t_dml_upsert_sub0128.a             |
+|                 ->  Sort                                                                         |
+|                       Output: public.t_dml_upsert_sub0128.c, public.t_dml_upsert_sub0128.a       |
+|                       Sort Key: public.t_dml_upsert_sub0128.c                                    |
+|                       ->  Seq Scan on public.t_dml_upsert_sub0128                                |
+|                             Output: public.t_dml_upsert_sub0128.c, public.t_dml_upsert_sub0128.a |
+|                             Filter: (public.t_dml_upsert_sub0128.a = 4)                          |
+|   ->  Result                                                                                     |
+|         Output: 1, '1'::text, 3, NULL::text                                                      |
++--------------------------------------------------------------------------------------------------+
+insert into t_dml_upsert0128 values(1,1,3) on duplicate key update (d,c)= (select distinct(c),a from t_dml_upsert_sub0128 where a= excluded.a *4);
+SQL SUCCESS
+select * from t_dml_upsert0128;
++---+---+---+-----+
+| a | b | c | d   |
++---+---+---+-----+
+| 2 | 2 | 2 |     |
+| 3 | 3 | 3 |     |
+| 4 | 4 | 4 |     |
+| 1 | 1 | 4 | c-4 |
++---+---+---+-----+
+explain (costs off, verbose) select distinct(c) from t_dml_upsert_sub0128 where a=5;
++-----------------------------------------------+
+| QUERY PLAN                                    |
++-----------------------------------------------+
+| HashAggregate                                 |
+|   Output: c                                   |
+|   Group By Key: t_dml_upsert_sub0128.c        |
+|   ->  Seq Scan on public.t_dml_upsert_sub0128 |
+|         Output: c                             |
+|         Filter: (t_dml_upsert_sub0128.a = 5)  |
++-----------------------------------------------+
+explain (costs off, verbose) insert into t_dml_upsert0128 values(1,1,3) on duplicate key update d = (select distinct(c) from t_dml_upsert_sub0128 where a=excluded.b*5);
++---------------------------------------------------------------------------------+
+| QUERY PLAN                                                                      |
++---------------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0128                                               |
+|   Conflict Resolution: UPDATE                                                   |
+|   Conflict Arbiter Indexes: t_dml_upsert0128_pkey                               |
+|   ->  Result                                                                    |
+|         Output: 1, '1'::text, 3, NULL::text                                     |
+|   SubPlan 1                                                                     |
+|     ->  HashAggregate                                                           |
+|           Output: t_dml_upsert_sub0128.c                                        |
+|           Group By Key: t_dml_upsert_sub0128.c                                  |
+|           ->  Seq Scan on public.t_dml_upsert_sub0128                           |
+|                 Output: t_dml_upsert_sub0128.c                                  |
+|                 Filter: (t_dml_upsert_sub0128.a = (("excluded".b)::bigint * 5)) |
++---------------------------------------------------------------------------------+
+insert into t_dml_upsert0128 values(1,1,3) on duplicate key update d = (select distinct(c) from t_dml_upsert_sub0128 where a=5);
+SQL SUCCESS
+select * from t_dml_upsert0128;
++---+---+---+-----+
+| a | b | c | d   |
++---+---+---+-----+
+| 2 | 2 | 2 |     |
+| 3 | 3 | 3 |     |
+| 4 | 4 | 4 |     |
+| 1 | 1 | 4 | c-5 |
++---+---+---+-----+
+--plain hint ，目前存在问题，待开发核实
+--indexscan 方式的hint
+explain (costs off, verbose) select /*+ indexscan(t_dml_upsert_sub0128)*/ c,a from t_dml_upsert_sub0128 where b>1 and a=1;
++---------------------------------------------------------------------------+
+| QUERY PLAN                                                                |
++---------------------------------------------------------------------------+
+| Index Scan using t_dml_upsert_sub0128_pkey on public.t_dml_upsert_sub0128 |
+|   Output: c, a                                                            |
+|   Index Cond: (t_dml_upsert_sub0128.b > 1)                                |
+|   Filter: (t_dml_upsert_sub0128.a = 1)                                    |
++---------------------------------------------------------------------------+
+insert into t_dml_upsert0128 values(1,1,3) on duplicate key update (d,c)= ( select /*+ indexscan(t_dml_upsert_sub0128)*/ c,a from t_dml_upsert_sub0128 where b>excluded.b and a=excluded.a);
+SQL SUCCESS
+explain (costs off, verbose) insert into t_dml_upsert0128 values(1,1,3) on duplicate key update (d,c)= ( select /*+ indexscan(t_dml_upsert_sub0128)*/ c,a from t_dml_upsert_sub0128 where b>excluded.b and a=excluded.a);
++---------------------------------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                                                      |
++---------------------------------------------------------------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0128                                                                                               |
+|   Conflict Resolution: UPDATE                                                                                                   |
+|   Conflict Arbiter Indexes: t_dml_upsert0128_pkey                                                                               |
+|   ->  Result                                                                                                                    |
+|         Output: 1, '1'::text, 3, NULL::text                                                                                     |
+|   SubPlan 1                                                                                                                     |
+|     ->  Seq Scan on public.t_dml_upsert_sub0128                                                                                 |
+|           Output: public.t_dml_upsert_sub0128.a                                                                                 |
+|           Filter: ((public.t_dml_upsert_sub0128.a = "excluded".a) AND (public.t_dml_upsert_sub0128.b > ("excluded".b)::bigint)) |
+|   SubPlan 2                                                                                                                     |
+|     ->  Seq Scan on public.t_dml_upsert_sub0128                                                                                 |
+|           Output: public.t_dml_upsert_sub0128.c                                                                                 |
+|           Filter: ((public.t_dml_upsert_sub0128.a = "excluded".a) AND (public.t_dml_upsert_sub0128.b > ("excluded".b)::bigint)) |
++---------------------------------------------------------------------------------------------------------------------------------+
+select * from t_dml_upsert0128;
++---+---+---+-----+
+| a | b | c | d   |
++---+---+---+-----+
+| 2 | 2 | 2 |     |
+| 3 | 3 | 3 |     |
+| 4 | 4 | 4 |     |
+| 1 | 1 | 1 | c-1 |
++---+---+---+-----+
+--tablescan 方式的hint
+explain (costs off, verbose) select /*+ tablescan(t_dml_upsert_sub0128)*/ c,a from t_dml_upsert_sub0128 where b>1 and a=1;
++---------------------------------------------------------------------------+
+| QUERY PLAN                                                                |
++---------------------------------------------------------------------------+
+| Seq Scan on public.t_dml_upsert_sub0128                                   |
+|   Output: c, a                                                            |
+|   Filter: ((t_dml_upsert_sub0128.b > 1) AND (t_dml_upsert_sub0128.a = 1)) |
++---------------------------------------------------------------------------+
+insert into t_dml_upsert0128 values(1,1,3) on duplicate key update (d,c)= ( select /*+ tablescan(t_dml_upsert_sub0128)*/ c,a from t_dml_upsert_sub0128 where b>1 and a=1);
+SQL SUCCESS
+explain (costs off, verbose) insert into t_dml_upsert0128 values(1,1,3) on duplicate key update (d,c)= ( select /*+ tablescan(t_dml_upsert_sub0128)*/ c,a from t_dml_upsert_sub0128 where b>excluded.b and a=excluded.a);
++---------------------------------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                                                      |
++---------------------------------------------------------------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0128                                                                                               |
+|   Conflict Resolution: UPDATE                                                                                                   |
+|   Conflict Arbiter Indexes: t_dml_upsert0128_pkey                                                                               |
+|   ->  Result                                                                                                                    |
+|         Output: 1, '1'::text, 3, NULL::text                                                                                     |
+|   SubPlan 1                                                                                                                     |
+|     ->  Seq Scan on public.t_dml_upsert_sub0128                                                                                 |
+|           Output: public.t_dml_upsert_sub0128.a                                                                                 |
+|           Filter: ((public.t_dml_upsert_sub0128.a = "excluded".a) AND (public.t_dml_upsert_sub0128.b > ("excluded".b)::bigint)) |
+|   SubPlan 2                                                                                                                     |
+|     ->  Seq Scan on public.t_dml_upsert_sub0128                                                                                 |
+|           Output: public.t_dml_upsert_sub0128.c                                                                                 |
+|           Filter: ((public.t_dml_upsert_sub0128.a = "excluded".a) AND (public.t_dml_upsert_sub0128.b > ("excluded".b)::bigint)) |
++---------------------------------------------------------------------------------------------------------------------------------+
+select * from t_dml_upsert0128;
++---+---+---+-----+
+| a | b | c | d   |
++---+---+---+-----+
+| 2 | 2 | 2 |     |
+| 3 | 3 | 3 |     |
+| 4 | 4 | 4 |     |
+| 1 | 1 | 1 | c-1 |
++---+---+---+-----+
+--limit,muilt-set不支持，报错；single-set支持
+insert into t_dml_upsert0128 values(1,1,3) on duplicate key update (c,d) = (select c,b from t_dml_upsert_sub0128 where a> (excluded.c+1) limit 1);
+?.* ERROR: syntax error at or near "limit"
+?.*
+explain (costs off, verbose) select c from t_dml_upsert_sub0128 where a>4 limit 1;
++-----------------------------------------------+
+| QUERY PLAN                                    |
++-----------------------------------------------+
+| Limit                                         |
+|   Output: c                                   |
+|   ->  Seq Scan on public.t_dml_upsert_sub0128 |
+|         Output: c                             |
+|         Filter: (t_dml_upsert_sub0128.a > 4)  |
++-----------------------------------------------+
+insert into t_dml_upsert0128 values(1,1,3) on duplicate key update d = (select c from t_dml_upsert_sub0128 where a>(excluded.c+1) limit 1);
+SQL SUCCESS
+select * from t_dml_upsert0128;
++---+---+---+-----+
+| a | b | c | d   |
++---+---+---+-----+
+| 2 | 2 | 2 |     |
+| 3 | 3 | 3 |     |
+| 4 | 4 | 4 |     |
+| 1 | 1 | 1 | c-5 |
++---+---+---+-----+
+explain (costs off, verbose) insert into t_dml_upsert0128 values(1,1,3) on duplicate key update d = (select c from t_dml_upsert_sub0128 where a>(excluded.c+1) limit 1);
++-----------------------------------------------------------------------+
+| QUERY PLAN                                                            |
++-----------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0128                                     |
+|   Conflict Resolution: UPDATE                                         |
+|   Conflict Arbiter Indexes: t_dml_upsert0128_pkey                     |
+|   ->  Result                                                          |
+|         Output: 1, '1'::text, 3, NULL::text                           |
+|   SubPlan 1                                                           |
+|     ->  Limit                                                         |
+|           Output: t_dml_upsert_sub0128.c                              |
+|           ->  Seq Scan on public.t_dml_upsert_sub0128                 |
+|                 Output: t_dml_upsert_sub0128.c                        |
+|                 Filter: (t_dml_upsert_sub0128.a > ("excluded".c + 1)) |
++-----------------------------------------------------------------------+
+--limit offset，muilt-set不支持，报错；single-set支持
+insert into t_dml_upsert0128 values(1,1,3) on duplicate key update (c,d)= (select c,b from t_dml_upsert_sub0128 where a>(excluded.c+1) limit 1 offset 5);
+?.* ERROR: syntax error at or near "limit"
+?.*
+explain (costs off, verbose) select c from t_dml_upsert_sub0128 where a>4 limit 1 offset 5;
++-----------------------------------------------+
+| QUERY PLAN                                    |
++-----------------------------------------------+
+| Limit                                         |
+|   Output: c                                   |
+|   ->  Seq Scan on public.t_dml_upsert_sub0128 |
+|         Output: c                             |
+|         Filter: (t_dml_upsert_sub0128.a > 4)  |
++-----------------------------------------------+
+insert into t_dml_upsert0128 values(1,1,3) on duplicate key update d = (select c from t_dml_upsert_sub0128 where a>(excluded.c+1) limit 1 offset 5);
+SQL SUCCESS
+select * from t_dml_upsert0128;
++---+---+---+------+
+| a | b | c | d    |
++---+---+---+------+
+| 2 | 2 | 2 |      |
+| 3 | 3 | 3 |      |
+| 4 | 4 | 4 |      |
+| 1 | 1 | 1 | c-10 |
++---+---+---+------+
+explain (costs off, verbose) insert into t_dml_upsert0128 values(1,1,3) on duplicate key update d = (select c from t_dml_upsert_sub0128 where a>(excluded.c+1) limit 1 offset 5);
++-----------------------------------------------------------------------+
+| QUERY PLAN                                                            |
++-----------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0128                                     |
+|   Conflict Resolution: UPDATE                                         |
+|   Conflict Arbiter Indexes: t_dml_upsert0128_pkey                     |
+|   ->  Result                                                          |
+|         Output: 1, '1'::text, 3, NULL::text                           |
+|   SubPlan 1                                                           |
+|     ->  Limit                                                         |
+|           Output: t_dml_upsert_sub0128.c                              |
+|           ->  Seq Scan on public.t_dml_upsert_sub0128                 |
+|                 Output: t_dml_upsert_sub0128.c                        |
+|                 Filter: (t_dml_upsert_sub0128.a > ("excluded".c + 1)) |
++-----------------------------------------------------------------------+
+--offset，muilt-set不支持，报错；single-set支持
+insert into t_dml_upsert0128 values(1,1,3) on duplicate key update (c,d)= (select c,b from t_dml_upsert_sub0128 where a>(excluded.c+1) offset 5);
+?.* ERROR: syntax error at or near "offset"
+?.*
+explain (costs off, verbose) select b from t_dml_upsert_sub0128 where b>4 and a =10 order by b asc offset 1;
++----------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                             |
++----------------------------------------------------------------------------------------+
+| Limit                                                                                  |
+|   Output: b                                                                            |
+|   ->  Sort                                                                             |
+|         Output: b                                                                      |
+|         Sort Key: t_dml_upsert_sub0128.b                                               |
+|         ->  Seq Scan on public.t_dml_upsert_sub0128                                    |
+|               Output: b                                                                |
+|               Filter: ((t_dml_upsert_sub0128.b > 4) AND (t_dml_upsert_sub0128.a = 10)) |
++----------------------------------------------------------------------------------------+
+insert into t_dml_upsert0128 values(1,1,3) on duplicate key update d = (select b from t_dml_upsert_sub0128 where b>(excluded.c+1) and a =excluded.a*10 order by b asc offset 1);
+SQL SUCCESS
+explain (costs off, verbose) insert into t_dml_upsert0128 values(1,1,3) on duplicate key update d = (select b from t_dml_upsert_sub0128 where b>(excluded.c+1) and a =excluded.a*10 order by b asc offset 1);
++----------------------------------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                                                       |
++----------------------------------------------------------------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0128                                                                                                |
+|   Conflict Resolution: UPDATE                                                                                                    |
+|   Conflict Arbiter Indexes: t_dml_upsert0128_pkey                                                                                |
+|   ->  Result                                                                                                                     |
+|         Output: 1, '1'::text, 3, NULL::text                                                                                      |
+|   SubPlan 1                                                                                                                      |
+|     ->  Limit                                                                                                                    |
+|           Output: t_dml_upsert_sub0128.b                                                                                         |
+|           ->  Sort                                                                                                               |
+|                 Output: t_dml_upsert_sub0128.b                                                                                   |
+|                 Sort Key: t_dml_upsert_sub0128.b                                                                                 |
+|                 ->  Seq Scan on public.t_dml_upsert_sub0128                                                                      |
+|                       Output: t_dml_upsert_sub0128.b                                                                             |
+|                       Filter: ((t_dml_upsert_sub0128.b > ("excluded".c + 1)) AND (t_dml_upsert_sub0128.a = ("excluded".a * 10))) |
++----------------------------------------------------------------------------------------------------------------------------------+
+select * from t_dml_upsert0128;
++---+---+---+----+
+| a | b | c | d  |
++---+---+---+----+
+| 2 | 2 | 2 |    |
+| 3 | 3 | 3 |    |
+| 4 | 4 | 4 |    |
+| 1 | 1 | 1 | 20 |
++---+---+---+----+
+--FETCH，muilt-set不支持，报错；single-set支持
+insert into t_dml_upsert0128 values(1,1,3) on duplicate key update (c,d)= (select c,b from t_dml_upsert_sub0128 where b>4 offset (excluded.c-1) fetch next 1 row only);
+?.* ERROR: syntax error at or near "offset"
+?.*
+explain (costs off, verbose) select b from t_dml_upsert_sub0128 where b>4 offset 2 fetch next 1 row only;
++-----------------------------------------------+
+| QUERY PLAN                                    |
++-----------------------------------------------+
+| Limit                                         |
+|   Output: b                                   |
+|   ->  Seq Scan on public.t_dml_upsert_sub0128 |
+|         Output: b                             |
+|         Filter: (t_dml_upsert_sub0128.b > 4)  |
++-----------------------------------------------+
+insert into t_dml_upsert0128 values(1,1,3) on duplicate key update d= (select b from t_dml_upsert_sub0128 where b>4 offset (excluded.c-1) fetch next 1 row only);
+SQL SUCCESS
+select * from t_dml_upsert0128;
++---+---+---+---+
+| a | b | c | d |
++---+---+---+---+
+| 2 | 2 | 2 |   |
+| 3 | 3 | 3 |   |
+| 4 | 4 | 4 |   |
+| 1 | 1 | 1 | 7 |
++---+---+---+---+
+explain (costs off, verbose) insert into t_dml_upsert0128 values(1,1,3) on duplicate key update d= (select b from t_dml_upsert_sub0128 where b>4 offset (excluded.c-1) fetch next 1 row only);
++-------------------------------------------------------+
+| QUERY PLAN                                            |
++-------------------------------------------------------+
+| Insert on public.t_dml_upsert0128                     |
+|   Conflict Resolution: UPDATE                         |
+|   Conflict Arbiter Indexes: t_dml_upsert0128_pkey     |
+|   ->  Result                                          |
+|         Output: 1, '1'::text, 3, NULL::text           |
+|   SubPlan 1                                           |
+|     ->  Limit                                         |
+|           Output: t_dml_upsert_sub0128.b              |
+|           ->  Seq Scan on public.t_dml_upsert_sub0128 |
+|                 Output: t_dml_upsert_sub0128.b        |
+|                 Filter: (t_dml_upsert_sub0128.b > 4)  |
++-------------------------------------------------------+
+--order by ，muilt-set不支持，报错；single-set支持
+insert into t_dml_upsert0128 values(2,2,3) on duplicate key update (c,d) = (select c,b from t_dml_upsert_sub0128 where b=(excluded.b*2) order by b ASC);
+?.* ERROR: syntax error at or near "order"
+?.*
+explain (costs off, verbose) select a from t_dml_upsert_sub0128 where b=4 order by b ASC;
++-----------------------------------------+
+| QUERY PLAN                              |
++-----------------------------------------+
+| Seq Scan on public.t_dml_upsert_sub0128 |
+|   Output: a, b                          |
+|   Filter: (t_dml_upsert_sub0128.b = 4)  |
++-----------------------------------------+
+insert into t_dml_upsert0128 values(2,2,3) on duplicate key update c= (select a from t_dml_upsert_sub0128 where b=(excluded.b*2) order by b ASC);
+SQL SUCCESS
+select * from t_dml_upsert0128;
++---+---+---+---+
+| a | b | c | d |
++---+---+---+---+
+| 3 | 3 | 3 |   |
+| 4 | 4 | 4 |   |
+| 1 | 1 | 1 | 7 |
+| 2 | 2 | 4 |   |
++---+---+---+---+
+explain (costs off, verbose) insert into t_dml_upsert0128 values(2,2,3) on duplicate key update d= (select c from t_dml_upsert_sub0128 where b=(excluded.b*2) order by b ASC);
++---------------------------------------------------------------------------+
+| QUERY PLAN                                                                |
++---------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0128                                         |
+|   Conflict Resolution: UPDATE                                             |
+|   Conflict Arbiter Indexes: t_dml_upsert0128_pkey                         |
+|   ->  Result                                                              |
+|         Output: 2, '2'::text, 3, NULL::text                               |
+|   SubPlan 1                                                               |
+|     ->  Seq Scan on public.t_dml_upsert_sub0128                           |
+|           Output: t_dml_upsert_sub0128.c, t_dml_upsert_sub0128.b          |
+|           Filter: (t_dml_upsert_sub0128.b = (("excluded".b)::bigint * 2)) |
++---------------------------------------------------------------------------+
+--CTE with子句，muilt-set不支持，报错；single-set支持
+insert into t_dml_upsert0128 values(3,3,4) on duplicate key update (c,d)= (with temp_tb(i,j,k) as(select a,c,b from t_dml_upsert_sub0128) select i,j from temp_tb where k = (excluded.b+excluded.c));
+?.* ERROR: syntax error at or near "with temp_tb"
+?.*
+explain (costs off, verbose) with temp_tb(i,j,k) as(select a,c,b from t_dml_upsert_sub0128) select i from temp_tb where k = '7';
++------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                               |
++------------------------------------------------------------------------------------------+
+| CTE Scan on temp_tb                                                                      |
+|   Output: temp_tb.i                                                                      |
+|   Filter: (temp_tb.k = 7)                                                                |
+|   CTE temp_tb                                                                            |
+|     ->  Seq Scan on public.t_dml_upsert_sub0128                                          |
+|           Output: t_dml_upsert_sub0128.a, t_dml_upsert_sub0128.c, t_dml_upsert_sub0128.b |
++------------------------------------------------------------------------------------------+
+insert into t_dml_upsert0128 values(3,3,4) on duplicate key update c = (with temp_tb(i,j,k) as(select a,c,b from t_dml_upsert_sub0128) select i from temp_tb where k = (excluded.b+excluded.c));
+SQL SUCCESS
+select * from t_dml_upsert0128;
++---+---+---+---+
+| a | b | c | d |
++---+---+---+---+
+| 4 | 4 | 4 |   |
+| 1 | 1 | 1 | 7 |
+| 2 | 2 | 4 |   |
+| 3 | 3 | 7 |   |
++---+---+---+---+
+explain (costs off, verbose) insert into t_dml_upsert0128 values(3,3,4) on duplicate key update c = (with temp_tb(i,j,k) as(select a,c,b from t_dml_upsert_sub0128) select i from temp_tb where k = (excluded.b+excluded.c));
++--------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                       |
++--------------------------------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0128                                                                |
+|   Conflict Resolution: UPDATE                                                                    |
+|   Conflict Arbiter Indexes: t_dml_upsert0128_pkey                                                |
+|   ->  Result                                                                                     |
+|         Output: 3, '3'::text, 4, NULL::text                                                      |
+|   SubPlan 2                                                                                      |
+|     ->  CTE Scan on temp_tb                                                                      |
+|           Output: temp_tb.i                                                                      |
+|           Filter: (temp_tb.k = (("excluded".b)::bigint + "excluded".c))                          |
+|           CTE temp_tb                                                                            |
+|             ->  Seq Scan on public.t_dml_upsert_sub0128                                          |
+|                   Output: t_dml_upsert_sub0128.a, t_dml_upsert_sub0128.c, t_dml_upsert_sub0128.b |
++--------------------------------------------------------------------------------------------------+
+--order by nulls ;muilt-set不支持，报错；single-set支持
+insert into t_dml_upsert0128 values(2,2,3) on duplicate key update (c,d) =(select a, avg(b) from t_dml_upsert_sub0128 group by a having avg(b)>(excluded.b+excluded.c)*2 order by a nulls last);
+?.* ERROR: syntax error at or near "order"
+?.*
+explain (costs off, verbose) select avg(b) from t_dml_upsert_sub0128 group by a having avg(b)>13 order by a nulls last limit 1;
++-------------------------------------------------------------------+
+| QUERY PLAN                                                        |
++-------------------------------------------------------------------+
+| Limit                                                             |
+|   Output: (avg(b)), a                                             |
+|   ->  Sort                                                        |
+|         Output: (avg(b)), a                                       |
+|         Sort Key: t_dml_upsert_sub0128.a                          |
+|         ->  HashAggregate                                         |
+|               Output: avg(b), a                                   |
+|               Group By Key: t_dml_upsert_sub0128.a                |
+|               Filter: (avg(t_dml_upsert_sub0128.b) > 13::numeric) |
+|               ->  Seq Scan on public.t_dml_upsert_sub0128         |
+|                     Output: a, b                                  |
++-------------------------------------------------------------------+
+insert into t_dml_upsert0128 values(2,2,3) on duplicate key update d =(select avg(b) from t_dml_upsert_sub0128 group by a having avg(b)>((excluded.b+excluded.c)*2 + excluded.c)order by a nulls last limit 1);
+SQL SUCCESS
+explain (costs off, verbose) insert into t_dml_upsert0128 values(2,2,3) on duplicate key update d =(select avg(b) from t_dml_upsert_sub0128 group by a having avg(b)>((excluded.b+excluded.c)*2 + excluded.c) order by a nulls last limit 1);
++-----------------------------------------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                                                              |
++-----------------------------------------------------------------------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0128                                                                                                       |
+|   Conflict Resolution: UPDATE                                                                                                           |
+|   Conflict Arbiter Indexes: t_dml_upsert0128_pkey                                                                                       |
+|   ->  Result                                                                                                                            |
+|         Output: 2, '2'::text, 3, NULL::text                                                                                             |
+|   SubPlan 1                                                                                                                             |
+|     ->  Limit                                                                                                                           |
+|           Output: (avg(t_dml_upsert_sub0128.b)), t_dml_upsert_sub0128.a                                                                 |
+|           ->  Sort                                                                                                                      |
+|                 Output: (avg(t_dml_upsert_sub0128.b)), t_dml_upsert_sub0128.a                                                           |
+|                 Sort Key: t_dml_upsert_sub0128.a                                                                                        |
+|                 ->  HashAggregate                                                                                                       |
+|                       Output: avg(t_dml_upsert_sub0128.b), t_dml_upsert_sub0128.a                                                       |
+|                       Group By Key: t_dml_upsert_sub0128.a                                                                              |
+|                       Filter: (avg(t_dml_upsert_sub0128.b) > ((((("excluded".b)::bigint + "excluded".c) * 2) + "excluded".c))::numeric) |
+|                       ->  Seq Scan on public.t_dml_upsert_sub0128                                                                       |
+|                             Output: t_dml_upsert_sub0128.a, t_dml_upsert_sub0128.b                                                      |
++-----------------------------------------------------------------------------------------------------------------------------------------+
+select * from t_dml_upsert0128;
++---+---+---+---------------------+
+| a | b | c | d                   |
++---+---+---+---------------------+
+| 4 | 4 | 4 |                     |
+| 1 | 1 | 1 | 7                   |
+| 3 | 3 | 7 |                     |
++---+---+---+---------------------+
+explain (costs off, verbose) select avg(b) from t_dml_upsert_sub0128 group by a having avg(b)>13 order by a nulls first limit 1;
++-------------------------------------------------------------------+
+| QUERY PLAN                                                        |
++-------------------------------------------------------------------+
+| Limit                                                             |
+|   Output: (avg(b)), a                                             |
+|   ->  Sort                                                        |
+|         Output: (avg(b)), a                                       |
+|         Sort Key: t_dml_upsert_sub0128.a NULLS FIRST              |
+|         ->  HashAggregate                                         |
+|               Output: avg(b), a                                   |
+|               Group By Key: t_dml_upsert_sub0128.a                |
+|               Filter: (avg(t_dml_upsert_sub0128.b) > 13::numeric) |
+|               ->  Seq Scan on public.t_dml_upsert_sub0128         |
+|                     Output: a, b                                  |
++-------------------------------------------------------------------+
+insert into t_dml_upsert0128 values(2,2,3) on duplicate key update d =(select avg(b) from t_dml_upsert_sub0128 group by a having avg(b)>((excluded.b+excluded.c)*2 + excluded.c) order by a nulls first limit 1);
+SQL SUCCESS
+select * from t_dml_upsert0128;
++---+---+---+---------------------+
+| a | b | c | d                   |
++---+---+---+---------------------+
+| 4 | 4 | 4 |                     |
+| 1 | 1 | 1 | 7                   |
+| 3 | 3 | 7 |                     |
++---+---+---+---------------------+
+explain (costs off, verbose) insert into t_dml_upsert0128 values(2,2,3) on duplicate key update d =(select avg(b) from t_dml_upsert_sub0128 group by a having avg(b)>((excluded.b+excluded.c)*2 + excluded.c) order by a nulls first limit 1);
++-----------------------------------------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                                                              |
++-----------------------------------------------------------------------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0128                                                                                                       |
+|   Conflict Resolution: UPDATE                                                                                                           |
+|   Conflict Arbiter Indexes: t_dml_upsert0128_pkey                                                                                       |
+|   ->  Result                                                                                                                            |
+|         Output: 2, '2'::text, 3, NULL::text                                                                                             |
+|   SubPlan 1                                                                                                                             |
+|     ->  Limit                                                                                                                           |
+|           Output: (avg(t_dml_upsert_sub0128.b)), t_dml_upsert_sub0128.a                                                                 |
+|           ->  Sort                                                                                                                      |
+|                 Output: (avg(t_dml_upsert_sub0128.b)), t_dml_upsert_sub0128.a                                                           |
+|                 Sort Key: t_dml_upsert_sub0128.a NULLS FIRST                                                                            |
+|                 ->  HashAggregate                                                                                                       |
+|                       Output: avg(t_dml_upsert_sub0128.b), t_dml_upsert_sub0128.a                                                       |
+|                       Group By Key: t_dml_upsert_sub0128.a                                                                              |
+|                       Filter: (avg(t_dml_upsert_sub0128.b) > ((((("excluded".b)::bigint + "excluded".c) * 2) + "excluded".c))::numeric) |
+|                       ->  Seq Scan on public.t_dml_upsert_sub0128                                                                       |
+|                             Output: t_dml_upsert_sub0128.a, t_dml_upsert_sub0128.b                                                      |
++-----------------------------------------------------------------------------------------------------------------------------------------+
+--group by having; muilt-set/single-set均支持
+explain (costs off, verbose) select a,avg(b) from t_dml_upsert_sub0128 group by a having avg(b)=15;
++-------------------------------------------------------+
+| QUERY PLAN                                            |
++-------------------------------------------------------+
+| HashAggregate                                         |
+|   Output: a, avg(b)                                   |
+|   Group By Key: t_dml_upsert_sub0128.a                |
+|   Filter: (avg(t_dml_upsert_sub0128.b) = 15::numeric) |
+|   ->  Seq Scan on public.t_dml_upsert_sub0128         |
+|         Output: a, b                                  |
++-------------------------------------------------------+
+insert into t_dml_upsert0128 values(2,2,3) on duplicate key update (c,d) = (select a,avg(b) from t_dml_upsert_sub0128 group by a having avg(b)=(excluded.b+excluded.c)*3);
+SQL SUCCESS
+select * from t_dml_upsert0128;
++---+---+----+---------------------+
+| a | b | c  | d                   |
++---+---+----+---------------------+
+| 4 | 4 | 4  |                     |
+| 1 | 1 | 1  | 7                   |
+| 3 | 3 | 7  |                     |
++---+---+----+---------------------+
+explain (costs off, verbose) insert into t_dml_upsert0128 values(2,2,3) on duplicate key update (c,d) = (select a,avg(b) from t_dml_upsert_sub0128 group by a having avg(b)=(excluded.b+excluded.c)*3);
++-------------------------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                                              |
++-------------------------------------------------------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0128                                                                                       |
+|   Conflict Resolution: UPDATE                                                                                           |
+|   Conflict Arbiter Indexes: t_dml_upsert0128_pkey                                                                       |
+|   ->  Result                                                                                                            |
+|         Output: 2, '2'::text, 3, NULL::text                                                                             |
+|   SubPlan 1                                                                                                             |
+|     ->  Subquery Scan on "S"                                                                                            |
+|           Output: "S".s1                                                                                                |
+|           ->  HashAggregate                                                                                             |
+|                 Output: public.t_dml_upsert_sub0128.a, avg(public.t_dml_upsert_sub0128.b)                               |
+|                 Group By Key: public.t_dml_upsert_sub0128.a                                                             |
+|                 Filter: (avg(public.t_dml_upsert_sub0128.b) = (((("excluded".b)::bigint + "excluded".c) * 3))::numeric) |
+|                 ->  Seq Scan on public.t_dml_upsert_sub0128                                                             |
+|                       Output: public.t_dml_upsert_sub0128.a, public.t_dml_upsert_sub0128.b                              |
+|   SubPlan 2                                                                                                             |
+|     ->  Subquery Scan on "S"                                                                                            |
+|           Output: "S".s2                                                                                                |
+|           ->  HashAggregate                                                                                             |
+|                 Output: public.t_dml_upsert_sub0128.a, avg(public.t_dml_upsert_sub0128.b)                               |
+|                 Group By Key: public.t_dml_upsert_sub0128.a                                                             |
+|                 Filter: (avg(public.t_dml_upsert_sub0128.b) = (((("excluded".b)::bigint + "excluded".c) * 3))::numeric) |
+|                 ->  Seq Scan on public.t_dml_upsert_sub0128                                                             |
+|                       Output: public.t_dml_upsert_sub0128.a, public.t_dml_upsert_sub0128.b                              |
++-------------------------------------------------------------------------------------------------------------------------+
+explain (costs off, verbose) select avg(b) from t_dml_upsert_sub0128 group by a having avg(b)>10 order by a asc limit 1;
++-------------------------------------------------------------------+
+| QUERY PLAN                                                        |
++-------------------------------------------------------------------+
+| Limit                                                             |
+|   Output: (avg(b)), a                                             |
+|   ->  Sort                                                        |
+|         Output: (avg(b)), a                                       |
+|         Sort Key: t_dml_upsert_sub0128.a                          |
+|         ->  HashAggregate                                         |
+|               Output: avg(b), a                                   |
+|               Group By Key: t_dml_upsert_sub0128.a                |
+|               Filter: (avg(t_dml_upsert_sub0128.b) > 10::numeric) |
+|               ->  Seq Scan on public.t_dml_upsert_sub0128         |
+|                     Output: a, b                                  |
++-------------------------------------------------------------------+
+insert into t_dml_upsert0128 values(2,2,3) on duplicate key update d = (select avg(b) from t_dml_upsert_sub0128 group by a having avg(b)>(excluded.b+excluded.c)*2 order by a asc limit 1);
+SQL SUCCESS
+select * from t_dml_upsert0128;
++---+---+----+---------------------+
+| a | b | c  | d                   |
++---+---+----+---------------------+
+| 4 | 4 | 4  |                     |
+| 1 | 1 | 1  | 7                   |
+| 3 | 3 | 7  |                     |
++---+---+----+---------------------+
+explain (costs off, verbose) insert into t_dml_upsert0128 values(2,2,3) on duplicate key update d = (select avg(b) from t_dml_upsert_sub0128 group by a having avg(b)>(excluded.b+excluded.c)*2 order by a asc limit 1);
++------------------------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                                             |
++------------------------------------------------------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0128                                                                                      |
+|   Conflict Resolution: UPDATE                                                                                          |
+|   Conflict Arbiter Indexes: t_dml_upsert0128_pkey                                                                      |
+|   ->  Result                                                                                                           |
+|         Output: 2, '2'::text, 3, NULL::text                                                                            |
+|   SubPlan 1                                                                                                            |
+|     ->  Limit                                                                                                          |
+|           Output: (avg(t_dml_upsert_sub0128.b)), t_dml_upsert_sub0128.a                                                |
+|           ->  Sort                                                                                                     |
+|                 Output: (avg(t_dml_upsert_sub0128.b)), t_dml_upsert_sub0128.a                                          |
+|                 Sort Key: t_dml_upsert_sub0128.a                                                                       |
+|                 ->  HashAggregate                                                                                      |
+|                       Output: avg(t_dml_upsert_sub0128.b), t_dml_upsert_sub0128.a                                      |
+|                       Group By Key: t_dml_upsert_sub0128.a                                                             |
+|                       Filter: (avg(t_dml_upsert_sub0128.b) > (((("excluded".b)::bigint + "excluded".c) * 2))::numeric) |
+|                       ->  Seq Scan on public.t_dml_upsert_sub0128                                                      |
+|                             Output: t_dml_upsert_sub0128.a, t_dml_upsert_sub0128.b                                     |
++------------------------------------------------------------------------------------------------------------------------+
+--group by cube; muilt-set/single-set均支持
+explain (costs off, verbose) select a,avg(b) from t_dml_upsert_sub0128 group by CUBE(a) having avg(b)= 10;
++-------------------------------------------------------+
+| QUERY PLAN                                            |
++-------------------------------------------------------+
+| GroupAggregate                                        |
+|   Output: a, avg(b)                                   |
+|   Group By Key: t_dml_upsert_sub0128.a                |
+|   Group By Key: ()                                    |
+|   Filter: (avg(t_dml_upsert_sub0128.b) = 10::numeric) |
+|   ->  Sort                                            |
+|         Output: a, b                                  |
+|         Sort Key: t_dml_upsert_sub0128.a              |
+|         ->  Seq Scan on public.t_dml_upsert_sub0128   |
+|               Output: a, b                            |
++-------------------------------------------------------+
+insert into t_dml_upsert0128 values(2,2,3) on duplicate key update (c,d) = (select a,avg(b) from t_dml_upsert_sub0128 group by CUBE(a) having avg(b)= (excluded.b+excluded.c)*2);
+SQL SUCCESS
+select * from t_dml_upsert0128;
++---+---+---+---------------------+
+| a | b | c | d                   |
++---+---+---+---------------------+
+| 4 | 4 | 4 |                     |
+| 1 | 1 | 1 | 7                   |
+| 3 | 3 | 7 |                     |
++---+---+---+---------------------+
+explain (costs off, verbose) insert into t_dml_upsert0128 values(2,2,3) on duplicate key update (c,d) = (select a,avg(b) from t_dml_upsert_sub0128 group by CUBE(a) having avg(b)= (excluded.b+excluded.c)*2);
++-------------------------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                                              |
++-------------------------------------------------------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0128                                                                                       |
+|   Conflict Resolution: UPDATE                                                                                           |
+|   Conflict Arbiter Indexes: t_dml_upsert0128_pkey                                                                       |
+|   ->  Result                                                                                                            |
+|         Output: 2, '2'::text, 3, NULL::text                                                                             |
+|   SubPlan 1                                                                                                             |
+|     ->  Subquery Scan on "S"                                                                                            |
+|           Output: "S".s1                                                                                                |
+|           ->  GroupAggregate                                                                                            |
+|                 Output: public.t_dml_upsert_sub0128.a, avg(public.t_dml_upsert_sub0128.b)                               |
+|                 Group By Key: public.t_dml_upsert_sub0128.a                                                             |
+|                 Group By Key: ()                                                                                        |
+|                 Filter: (avg(public.t_dml_upsert_sub0128.b) = (((("excluded".b)::bigint + "excluded".c) * 2))::numeric) |
+|                 ->  Sort                                                                                                |
+|                       Output: public.t_dml_upsert_sub0128.a, public.t_dml_upsert_sub0128.b                              |
+|                       Sort Key: public.t_dml_upsert_sub0128.a                                                           |
+|                       ->  Seq Scan on public.t_dml_upsert_sub0128                                                       |
+|                             Output: public.t_dml_upsert_sub0128.a, public.t_dml_upsert_sub0128.b                        |
+|   SubPlan 2                                                                                                             |
+|     ->  Subquery Scan on "S"                                                                                            |
+|           Output: "S".s2                                                                                                |
+|           ->  GroupAggregate                                                                                            |
+|                 Output: public.t_dml_upsert_sub0128.a, avg(public.t_dml_upsert_sub0128.b)                               |
+|                 Group By Key: public.t_dml_upsert_sub0128.a                                                             |
+|                 Group By Key: ()                                                                                        |
+|                 Filter: (avg(public.t_dml_upsert_sub0128.b) = (((("excluded".b)::bigint + "excluded".c) * 2))::numeric) |
+|                 ->  Sort                                                                                                |
+|                       Output: public.t_dml_upsert_sub0128.a, public.t_dml_upsert_sub0128.b                              |
+|                       Sort Key: public.t_dml_upsert_sub0128.a                                                           |
+|                       ->  Seq Scan on public.t_dml_upsert_sub0128                                                       |
+|                             Output: public.t_dml_upsert_sub0128.a, public.t_dml_upsert_sub0128.b                        |
++-------------------------------------------------------------------------------------------------------------------------+
+explain (costs off, verbose) select a from t_dml_upsert_sub0128 group by CUBE(a) having avg(b)= 11;
++-------------------------------------------------------+
+| QUERY PLAN                                            |
++-------------------------------------------------------+
+| GroupAggregate                                        |
+|   Output: a                                           |
+|   Group By Key: t_dml_upsert_sub0128.a                |
+|   Group By Key: ()                                    |
+|   Filter: (avg(t_dml_upsert_sub0128.b) = 11::numeric) |
+|   ->  Sort                                            |
+|         Output: a, b                                  |
+|         Sort Key: t_dml_upsert_sub0128.a              |
+|         ->  Seq Scan on public.t_dml_upsert_sub0128   |
+|               Output: a, b                            |
++-------------------------------------------------------+
+insert into t_dml_upsert0128 values(2,2,3) on duplicate key update d = (select a from t_dml_upsert_sub0128 group by CUBE(a) having avg(b)= (excluded.b+excluded.c)*2+1);
+SQL SUCCESS
+select * from t_dml_upsert0128;
++---+---+---+---+
+| a | b | c | d |
++---+---+---+---+
+| 4 | 4 | 4 |   |
+| 1 | 1 | 1 | 7 |
+| 3 | 3 | 7 |   |
+| 2 | 2 | 5 | 6 |
++---+---+---+---+
+explain (costs off, verbose) insert into t_dml_upsert0128 values(2,2,3) on duplicate key update d = (select a from t_dml_upsert_sub0128 group by CUBE(a) having avg(b)= (excluded.b+excluded.c)*2+1);
++------------------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                                       |
++------------------------------------------------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0128                                                                                |
+|   Conflict Resolution: UPDATE                                                                                    |
+|   Conflict Arbiter Indexes: t_dml_upsert0128_pkey                                                                |
+|   ->  Result                                                                                                     |
+|         Output: 2, '2'::text, 3, NULL::text                                                                      |
+|   SubPlan 1                                                                                                      |
+|     ->  GroupAggregate                                                                                           |
+|           Output: t_dml_upsert_sub0128.a                                                                         |
+|           Group By Key: t_dml_upsert_sub0128.a                                                                   |
+|           Group By Key: ()                                                                                       |
+|           Filter: (avg(t_dml_upsert_sub0128.b) = ((((("excluded".b)::bigint + "excluded".c) * 2) + 1))::numeric) |
+|           ->  Sort                                                                                               |
+|                 Output: t_dml_upsert_sub0128.a, t_dml_upsert_sub0128.b                                           |
+|                 Sort Key: t_dml_upsert_sub0128.a                                                                 |
+|                 ->  Seq Scan on public.t_dml_upsert_sub0128                                                      |
+|                       Output: t_dml_upsert_sub0128.a, t_dml_upsert_sub0128.b                                     |
++------------------------------------------------------------------------------------------------------------------+
+--window ;muilt-set不支持/single-set支持
+insert into t_dml_upsert0128 values(2,2,3) on duplicate key update (c,d) = (select b,count(c) over window1 typecount from t_dml_upsert_sub0128 where b =(excluded.b+excluded.c)*2+1 window window1 as (partition by a));
+?.* ERROR: syntax error at or near "window"
+?.*
+explain (costs off, verbose) select count(c) over window1 typecount from t_dml_upsert_sub0128 where b =11 window window1 as (partition by a);
++-----------------------------------------------------+
+| QUERY PLAN                                          |
++-----------------------------------------------------+
+| WindowAgg                                           |
+|   Output: count(c) OVER (PARTITION BY a), a         |
+|   ->  Sort                                          |
+|         Output: a, c                                |
+|         Sort Key: t_dml_upsert_sub0128.a            |
+|         ->  Seq Scan on public.t_dml_upsert_sub0128 |
+|               Output: a, c                          |
+|               Filter: (t_dml_upsert_sub0128.b = 11) |
++-----------------------------------------------------+
+insert into t_dml_upsert0128 values(2,2,3) on duplicate key update c = (select count(c) over window1 typecount from t_dml_upsert_sub0128 where b =(excluded.b+excluded.c)*2+1 window window1 as (partition by a));
+SQL SUCCESS
+select * from t_dml_upsert0128;
++---+---+---+---+
+| a | b | c | d |
++---+---+---+---+
+| 4 | 4 | 4 |   |
+| 1 | 1 | 1 | 7 |
+| 3 | 3 | 7 |   |
+| 2 | 2 | 1 | 6 |
++---+---+---+---+
+explain (costs off, verbose) insert into t_dml_upsert0128 values(2,2,3) on duplicate key update c = (select count(c) over window1 typecount from t_dml_upsert_sub0128 where b =(excluded.b+excluded.c)*2+1 window window1 as (partition by a));
++--------------------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                                         |
++--------------------------------------------------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0128                                                                                  |
+|   Conflict Resolution: UPDATE                                                                                      |
+|   Conflict Arbiter Indexes: t_dml_upsert0128_pkey                                                                  |
+|   ->  Result                                                                                                       |
+|         Output: 2, '2'::text, 3, NULL::text                                                                        |
+|   SubPlan 1                                                                                                        |
+|     ->  WindowAgg                                                                                                  |
+|           Output: count(t_dml_upsert_sub0128.c) OVER (PARTITION BY t_dml_upsert_sub0128.a), t_dml_upsert_sub0128.a |
+|           ->  Sort                                                                                                 |
+|                 Output: t_dml_upsert_sub0128.a, t_dml_upsert_sub0128.c                                             |
+|                 Sort Key: t_dml_upsert_sub0128.a                                                                   |
+|                 ->  Seq Scan on public.t_dml_upsert_sub0128                                                        |
+|                       Output: t_dml_upsert_sub0128.a, t_dml_upsert_sub0128.c                                       |
+|                       Filter: (t_dml_upsert_sub0128.b = (((("excluded".b)::bigint + "excluded".c) * 2) + 1))       |
++--------------------------------------------------------------------------------------------------------------------+
+--union ;muilt-set不支持/single-set支持
+insert into t_dml_upsert0128 values(2,2,3) on duplicate key update (c,d) = (select a,b from t_dml_upsert_sub0128 where a =excluded.c/3 union select a,b from t_dml_upsert_sub0128 where a = excluded.a);
+?.* ERROR: syntax error at or near "union"
+?.*
+explain (costs off, verbose) select b from t_dml_upsert_sub0128 where a =1 union select b from t_dml_upsert_sub0128 where a = 2 order by b desc limit 1;
++-----------------------------------------------------------------------+
+| QUERY PLAN                                                            |
++-----------------------------------------------------------------------+
+| Limit                                                                 |
+|   Output: public.t_dml_upsert_sub0128.b                               |
+|   ->  Sort                                                            |
+|         Output: public.t_dml_upsert_sub0128.b                         |
+|         Sort Key: public.t_dml_upsert_sub0128.b DESC                  |
+|         ->  HashAggregate                                             |
+|               Output: public.t_dml_upsert_sub0128.b                   |
+|               Group By Key: public.t_dml_upsert_sub0128.b             |
+|               ->  Append                                              |
+|                     ->  Seq Scan on public.t_dml_upsert_sub0128       |
+|                           Output: public.t_dml_upsert_sub0128.b       |
+|                           Filter: (public.t_dml_upsert_sub0128.a = 1) |
+|                     ->  Seq Scan on public.t_dml_upsert_sub0128       |
+|                           Output: public.t_dml_upsert_sub0128.b       |
+|                           Filter: (public.t_dml_upsert_sub0128.a = 2) |
++-----------------------------------------------------------------------+
+insert into t_dml_upsert0128 values(2,2,3) on duplicate key update d = (select b from t_dml_upsert_sub0128 where a =excluded.c/3 union select b from t_dml_upsert_sub0128 where a = excluded.a order by b desc limit 1);
+SQL SUCCESS
+select * from t_dml_upsert0128;
++---+---+---+----+
+| a | b | c | d  |
++---+---+---+----+
+| 4 | 4 | 4 |    |
+| 1 | 1 | 1 | 7  |
+| 3 | 3 | 7 |    |
+| 2 | 2 | 1 | 12 |
++---+---+---+----+
+explain (costs off, verbose) insert into t_dml_upsert0128 values(2,2,3) on duplicate key update d = (select b from t_dml_upsert_sub0128 where a =excluded.c/3 union select b from t_dml_upsert_sub0128 where a = excluded.a order by b desc limit 1);
++--------------------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                                         |
++--------------------------------------------------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0128                                                                                  |
+|   Conflict Resolution: UPDATE                                                                                      |
+|   Conflict Arbiter Indexes: t_dml_upsert0128_pkey                                                                  |
+|   ->  Result                                                                                                       |
+|         Output: 2, '2'::text, 3, NULL::text                                                                        |
+|   SubPlan 1                                                                                                        |
+|     ->  Limit                                                                                                      |
+|           Output: public.t_dml_upsert_sub0128.b                                                                    |
+|           ->  Sort                                                                                                 |
+|                 Output: public.t_dml_upsert_sub0128.b                                                              |
+|                 Sort Key: public.t_dml_upsert_sub0128.b DESC                                                       |
+|                 ->  HashAggregate                                                                                  |
+|                       Output: public.t_dml_upsert_sub0128.b                                                        |
+|                       Group By Key: public.t_dml_upsert_sub0128.b                                                  |
+|                       ->  Append                                                                                   |
+|                             ->  Seq Scan on public.t_dml_upsert_sub0128                                            |
+|                                   Output: public.t_dml_upsert_sub0128.b                                            |
+|                                   Filter: ((public.t_dml_upsert_sub0128.a)::double precision = ("excluded".c / 3)) |
+|                             ->  Seq Scan on public.t_dml_upsert_sub0128                                            |
+|                                   Output: public.t_dml_upsert_sub0128.b                                            |
+|                                   Filter: (public.t_dml_upsert_sub0128.a = "excluded".a)                           |
++--------------------------------------------------------------------------------------------------------------------+
+--except ;muilt-set不支持/single-set支持
+insert into t_dml_upsert0128 values(2,2,3) on duplicate key update (c,d) = (select a,c from t_dml_upsert_sub0128 where b>excluded.c except select a,c from t_dml_upsert_sub0128 where b>excluded.a*2);
+?.* ERROR: syntax error at or near "except"
+?.*
+explain (costs off, verbose) select c from t_dml_upsert_sub0128 where b>3 except select c from t_dml_upsert_sub0128 where a = 4 order by c desc limit 1;
++-----------------------------------------------------------------------------+
+| QUERY PLAN                                                                  |
++-----------------------------------------------------------------------------+
+| Limit                                                                       |
+|   Output: "*SELECT* 1".c, (0)                                               |
+|   ->  Sort                                                                  |
+|         Output: "*SELECT* 1".c, (0)                                         |
+|         Sort Key: "*SELECT* 1".c DESC                                       |
+|         ->  HashSetOp Except                                                |
+|               Output: "*SELECT* 1".c, (0)                                   |
+|               ->  Append                                                    |
+|                     ->  Subquery Scan on "*SELECT* 1"                       |
+|                           Output: "*SELECT* 1".c, 0                         |
+|                           ->  Seq Scan on public.t_dml_upsert_sub0128       |
+|                                 Output: public.t_dml_upsert_sub0128.c       |
+|                                 Filter: (public.t_dml_upsert_sub0128.b > 3) |
+|                     ->  Subquery Scan on "*SELECT* 2"                       |
+|                           Output: "*SELECT* 2".c, 1                         |
+|                           ->  Seq Scan on public.t_dml_upsert_sub0128       |
+|                                 Output: public.t_dml_upsert_sub0128.c       |
+|                                 Filter: (public.t_dml_upsert_sub0128.a = 4) |
++-----------------------------------------------------------------------------+
+insert into t_dml_upsert0128 values(2,2,3) on duplicate key update d = (select c from t_dml_upsert_sub0128 where b>excluded.c except select c from t_dml_upsert_sub0128 where a = excluded.a*2 order by c desc limit 1);
+SQL SUCCESS
+select * from t_dml_upsert0128;
++---+---+---+-----+
+| a | b | c | d   |
++---+---+---+-----+
+| 4 | 4 | 4 |     |
+| 1 | 1 | 1 | 7   |
+| 3 | 3 | 7 |     |
+| 2 | 2 | 1 | c-9 |
++---+---+---+-----+
+explain (costs off, verbose) insert into t_dml_upsert0128 values(2,2,3) on duplicate key update d = (select c from t_dml_upsert_sub0128 where b>excluded.c except select c from t_dml_upsert_sub0128 where a = excluded.a*2 order by c desc limit 1);
++------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                           |
++------------------------------------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0128                                                                    |
+|   Conflict Resolution: UPDATE                                                                        |
+|   Conflict Arbiter Indexes: t_dml_upsert0128_pkey                                                    |
+|   ->  Result                                                                                         |
+|         Output: 2, '2'::text, 3, NULL::text                                                          |
+|   SubPlan 1                                                                                          |
+|     ->  Limit                                                                                        |
+|           Output: "*SELECT* 1".c, (0)                                                                |
+|           ->  Sort                                                                                   |
+|                 Output: "*SELECT* 1".c, (0)                                                          |
+|                 Sort Key: "*SELECT* 1".c DESC                                                        |
+|                 ->  HashSetOp Except                                                                 |
+|                       Output: "*SELECT* 1".c, (0)                                                    |
+|                       ->  Append                                                                     |
+|                             ->  Subquery Scan on "*SELECT* 1"                                        |
+|                                   Output: "*SELECT* 1".c, 0                                          |
+|                                   ->  Seq Scan on public.t_dml_upsert_sub0128                        |
+|                                         Output: public.t_dml_upsert_sub0128.c                        |
+|                                         Filter: (public.t_dml_upsert_sub0128.b > "excluded".c)       |
+|                             ->  Subquery Scan on "*SELECT* 2"                                        |
+|                                   Output: "*SELECT* 2".c, 1                                          |
+|                                   ->  Seq Scan on public.t_dml_upsert_sub0128                        |
+|                                         Output: public.t_dml_upsert_sub0128.c                        |
+|                                         Filter: (public.t_dml_upsert_sub0128.a = ("excluded".a * 2)) |
++------------------------------------------------------------------------------------------------------+
+--intersect ;muilt-set不支持/single-set支持
+insert into t_dml_upsert0128 values(2,2,3) on duplicate key update (c,d) = (select a,c from t_dml_upsert_sub0128 where b>3 intersect select a,c from t_dml_upsert_sub0128 where b>4);
+?.* ERROR: syntax error at or near "intersect"
+?.*
+explain (costs off, verbose) select c from t_dml_upsert_sub0128 where b>3 intersect select c from t_dml_upsert_sub0128 where a < 4 order by c desc limit 1;
++-----------------------------------------------------------------------------+
+| QUERY PLAN                                                                  |
++-----------------------------------------------------------------------------+
+| Limit                                                                       |
+|   Output: "*SELECT* 2".c, (1)                                               |
+|   ->  Sort                                                                  |
+|         Output: "*SELECT* 2".c, (1)                                         |
+|         Sort Key: "*SELECT* 2".c DESC                                       |
+|         ->  HashSetOp Intersect                                             |
+|               Output: "*SELECT* 2".c, (1)                                   |
+|               ->  Append                                                    |
+|                     ->  Subquery Scan on "*SELECT* 2"                       |
+|                           Output: "*SELECT* 2".c, 1                         |
+|                           ->  Seq Scan on public.t_dml_upsert_sub0128       |
+|                                 Output: public.t_dml_upsert_sub0128.c       |
+|                                 Filter: (public.t_dml_upsert_sub0128.a < 4) |
+|                     ->  Subquery Scan on "*SELECT* 1"                       |
+|                           Output: "*SELECT* 1".c, 0                         |
+|                           ->  Seq Scan on public.t_dml_upsert_sub0128       |
+|                                 Output: public.t_dml_upsert_sub0128.c       |
+|                                 Filter: (public.t_dml_upsert_sub0128.b > 3) |
++-----------------------------------------------------------------------------+
+insert into t_dml_upsert0128 values(2,2,3) on duplicate key update d = (select c from t_dml_upsert_sub0128 where b>excluded.c intersect select c from t_dml_upsert_sub0128 where a <excluded.a*2 order by c desc limit 1);
+SQL SUCCESS
+select * from t_dml_upsert0128;
++---+---+---+-----+
+| a | b | c | d   |
++---+---+---+-----+
+| 4 | 4 | 4 |     |
+| 1 | 1 | 1 | 7   |
+| 3 | 3 | 7 |     |
+| 2 | 2 | 1 | c-3 |
++---+---+---+-----+
+explain (costs off, verbose) insert into t_dml_upsert0128 values(2,2,3) on duplicate key update d = (select c from t_dml_upsert_sub0128 where b>excluded.c intersect select c from t_dml_upsert_sub0128 where a <excluded.a*2 order by c desc limit 1);
++------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                           |
++------------------------------------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0128                                                                    |
+|   Conflict Resolution: UPDATE                                                                        |
+|   Conflict Arbiter Indexes: t_dml_upsert0128_pkey                                                    |
+|   ->  Result                                                                                         |
+|         Output: 2, '2'::text, 3, NULL::text                                                          |
+|   SubPlan 1                                                                                          |
+|     ->  Limit                                                                                        |
+|           Output: "*SELECT* 1".c, (0)                                                                |
+|           ->  Sort                                                                                   |
+|                 Output: "*SELECT* 1".c, (0)                                                          |
+|                 Sort Key: "*SELECT* 1".c DESC                                                        |
+|                 ->  HashSetOp Intersect                                                              |
+|                       Output: "*SELECT* 1".c, (0)                                                    |
+|                       ->  Append                                                                     |
+|                             ->  Subquery Scan on "*SELECT* 1"                                        |
+|                                   Output: "*SELECT* 1".c, 0                                          |
+|                                   ->  Seq Scan on public.t_dml_upsert_sub0128                        |
+|                                         Output: public.t_dml_upsert_sub0128.c                        |
+|                                         Filter: (public.t_dml_upsert_sub0128.b > "excluded".c)       |
+|                             ->  Subquery Scan on "*SELECT* 2"                                        |
+|                                   Output: "*SELECT* 2".c, 1                                          |
+|                                   ->  Seq Scan on public.t_dml_upsert_sub0128                        |
+|                                         Output: public.t_dml_upsert_sub0128.c                        |
+|                                         Filter: (public.t_dml_upsert_sub0128.a < ("excluded".a * 2)) |
++------------------------------------------------------------------------------------------------------+
+--order by NLS_SORT ;single-set支持
+insert into t_dml_upsert_sub0128 values(generate_series(1,10),generate_series(31,40),'C-'||generate_series(1,10));
+SQL SUCCESS
+explain (costs off, verbose) select b from t_dml_upsert_sub0128 where a= 9 order by NLSSORT( c, 'NLS_SORT = generic_m_ci') limit 1;
++----------------------------------------------------------------------------+
+| QUERY PLAN                                                                 |
++----------------------------------------------------------------------------+
+| Limit                                                                      |
+|   Output: b, (convert_to_nocase(c, 'gbk'::name))                           |
+|   ->  Sort                                                                 |
+|         Output: b, (convert_to_nocase(c, 'gbk'::name))                     |
+|         Sort Key: (convert_to_nocase(t_dml_upsert_sub0128.c, 'gbk'::name)) |
+|         ->  Seq Scan on public.t_dml_upsert_sub0128                        |
+|               Output: b, convert_to_nocase(c, 'gbk'::name)                 |
+|               Filter: (t_dml_upsert_sub0128.a = 9)                         |
++----------------------------------------------------------------------------+
+insert into t_dml_upsert0128 values(2,2,3) on duplicate key update d= (select b from t_dml_upsert_sub0128 where a= excluded.c*3 order by NLSSORT( c, 'NLS_SORT = generic_m_ci') limit 1);
+SQL SUCCESS
+explain (costs off, verbose) insert into t_dml_upsert0128 values(2,2,3) on duplicate key update d= (select b from t_dml_upsert_sub0128 where a= excluded.c*3 order by NLSSORT( c, 'NLS_SORT = generic_m_ci') limit 1);
++--------------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                                   |
++--------------------------------------------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0128                                                                            |
+|   Conflict Resolution: UPDATE                                                                                |
+|   Conflict Arbiter Indexes: t_dml_upsert0128_pkey                                                            |
+|   ->  Result                                                                                                 |
+|         Output: 2, '2'::text, 3, NULL::text                                                                  |
+|   SubPlan 1                                                                                                  |
+|     ->  Limit                                                                                                |
+|           Output: t_dml_upsert_sub0128.b, (convert_to_nocase(t_dml_upsert_sub0128.c, 'gbk'::name))           |
+|           ->  Sort                                                                                           |
+|                 Output: t_dml_upsert_sub0128.b, (convert_to_nocase(t_dml_upsert_sub0128.c, 'gbk'::name))     |
+|                 Sort Key: (convert_to_nocase(t_dml_upsert_sub0128.c, 'gbk'::name))                           |
+|                 ->  Seq Scan on public.t_dml_upsert_sub0128                                                  |
+|                       Output: t_dml_upsert_sub0128.b, convert_to_nocase(t_dml_upsert_sub0128.c, 'gbk'::name) |
+|                       Filter: (t_dml_upsert_sub0128.a = ("excluded".c * 3))                                  |
++--------------------------------------------------------------------------------------------------------------+
+select * from t_dml_upsert0128;
++---+---+---+---+
+| a | b | c | d |
++---+---+---+---+
+| 4 | 4 | 4 |   |
+| 1 | 1 | 1 | 7 |
+| 3 | 3 | 7 |   |
+| 2 | 2 | 1 | 9 |
++---+---+---+---+
+explain (costs off, verbose) select b from t_dml_upsert_sub0128 where a= 9 order by c limit 1;
++-----------------------------------------------------+
+| QUERY PLAN                                          |
++-----------------------------------------------------+
+| Limit                                               |
+|   Output: b, c                                      |
+|   ->  Sort                                          |
+|         Output: b, c                                |
+|         Sort Key: t_dml_upsert_sub0128.c            |
+|         ->  Seq Scan on public.t_dml_upsert_sub0128 |
+|               Output: b, c                          |
+|               Filter: (t_dml_upsert_sub0128.a = 9)  |
++-----------------------------------------------------+
+insert into t_dml_upsert0128 values(2,2,3) on duplicate key update d= (select b from t_dml_upsert_sub0128 where a= excluded.c*3 order by c limit 1);
+SQL SUCCESS
+explain (costs off, verbose) insert into t_dml_upsert0128 values(2,2,3) on duplicate key update d= (select b from t_dml_upsert_sub0128 where a= excluded.c*3 order by c limit 1);
++------------------------------------------------------------------------------+
+| QUERY PLAN                                                                   |
++------------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0128                                            |
+|   Conflict Resolution: UPDATE                                                |
+|   Conflict Arbiter Indexes: t_dml_upsert0128_pkey                            |
+|   ->  Result                                                                 |
+|         Output: 2, '2'::text, 3, NULL::text                                  |
+|   SubPlan 1                                                                  |
+|     ->  Limit                                                                |
+|           Output: t_dml_upsert_sub0128.b, t_dml_upsert_sub0128.c             |
+|           ->  Sort                                                           |
+|                 Output: t_dml_upsert_sub0128.b, t_dml_upsert_sub0128.c       |
+|                 Sort Key: t_dml_upsert_sub0128.c                             |
+|                 ->  Seq Scan on public.t_dml_upsert_sub0128                  |
+|                       Output: t_dml_upsert_sub0128.b, t_dml_upsert_sub0128.c |
+|                       Filter: (t_dml_upsert_sub0128.a = ("excluded".c * 3))  |
++------------------------------------------------------------------------------+
+select * from t_dml_upsert0128;
++---+---+---+----+
+| a | b | c | d  |
++---+---+---+----+
+| 4 | 4 | 4 |    |
+| 1 | 1 | 1 | 7  |
+| 3 | 3 | 7 |    |
+| 2 | 2 | 1 | 39 |
++---+---+---+----+
+--批量插入多条数据，部分数据重复场景
+insert into t_dml_upsert0128 (a,b,c) select a,b,substring(c,3,1) from t_dml_upsert_sub0128 where b<10 on duplicate key update d = (select c from t_dml_upsert_sub0128 where a = excluded.a and b= excluded.b);
+SQL SUCCESS
+select * from t_dml_upsert0128;
++---+---+---+-----+
+| a | b | c | d   |
++---+---+---+-----+
+| 1 | 1 | 1 | c-1 |
+| 2 | 2 | 1 | c-2 |
+| 3 | 3 | 7 | c-3 |
+| 4 | 4 | 4 | c-4 |
+| 5 | 5 | 5 |     |
+| 6 | 6 | 6 |     |
+| 7 | 7 | 7 |     |
+| 8 | 8 | 8 |     |
+| 9 | 9 | 9 |     |
++---+---+---+-----+
+--数据处理
+drop table if exists t_dml_upsert0128;
+SQL SUCCESS
+drop table if exists t_dml_upsert_sub0128;
+SQL SUCCESS

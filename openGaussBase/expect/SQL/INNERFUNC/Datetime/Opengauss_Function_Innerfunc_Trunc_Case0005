@@ -1,0 +1,21 @@
+-- @testpoint: trunc函数入参给小数的年月日
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (clo1 interval);
+SQL SUCCESS
+insert into test_date01 values ('2.1 years 3.7 months 3 days 1.5 hours 1.5 minute 1.5 s');
+SQL SUCCESS
+select trunc(clo1) from test_date01;
++-------+
+| trunc |
++-------+
+| 864   |
++-------+
+SELECT trunc(interval '2.9 years 3 months 3.4 days 1.5 hours 1.5 minute 1.5 s');
++-------+
+| trunc |
++-------+
+| 1113  |
++-------+
+drop table if exists test_date01;
+SQL SUCCESS

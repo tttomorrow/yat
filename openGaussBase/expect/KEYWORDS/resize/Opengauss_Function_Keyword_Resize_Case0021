@@ -1,0 +1,57 @@
+--  @testpoint:opengauss关键字resize(非保留)，作为函数名
+--关键字不带引号-成功
+drop function if exists resize;
+SQL SUCCESS
+create function resize(i integer)
+returns integer
+as $$
+begin
+    return i+1;
+end;
+$$ language plpgsql;
+/
+SQL SUCCESS
+drop function resize;
+SQL SUCCESS
+--关键字带双引号-成功
+drop function if exists "resize";
+SQL SUCCESS
+create function "resize"(i integer)
+returns integer
+as $$
+begin
+    return i+1;
+end;
+$$ language plpgsql;
+/
+SQL SUCCESS
+drop function "resize";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop function if exists 'resize';
+?.*ERROR: syntax error at or near "'resize'".*
+?.*Position: .*
+create function 'resize'(i integer)
+returns integer
+as $$
+begin
+    return i+1;
+end;
+$$ language plpgsql;
+/
+?.*ERROR: syntax error at or near "'resize'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop function if exists `resize`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create function `resize`(i integer)
+returns integer
+as $$
+begin
+    return i+1;
+end;
+$$ language plpgsql;
+/
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

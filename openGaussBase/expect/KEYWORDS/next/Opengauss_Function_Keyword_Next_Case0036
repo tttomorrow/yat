@@ -1,0 +1,31 @@
+--  @testpoint:opengauss关键字NEXT(非保留)，使用RETURN NEXT向结果集中追加结果
+drop table if exists t1;
+SQL SUCCESS
+CREATE TABLE t1(a int);
+SQL SUCCESS
+INSERT INTO t1 VALUES(1),(10);
+SQL SUCCESS
+CREATE OR REPLACE FUNCTION fun_for_return_next() RETURNS SETOF t1 AS $$
+DECLARE
+   r t1%ROWTYPE;
+BEGIN
+   FOR r IN select * from t1
+   LOOP
+      RETURN NEXT r;
+   END LOOP;
+   RETURN;
+END;
+$$ LANGUAGE PLPGSQL;
+/
+SQL SUCCESS
+call fun_for_return_next();
++----+
+| a  |
++----+
+| 1  |
+| 10 |
++----+
+drop FUNCTION fun_for_return_next;
+SQL SUCCESS
+drop table t1;
+SQL SUCCESS

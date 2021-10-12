@@ -1,0 +1,18 @@
+-- @testpoint: insert into插入结合使用
+drop table if exists ABS_TEST_01;
+SQL SUCCESS
+create table ABS_TEST_01(COL_ABS int);
+SQL SUCCESS
+insert into ABS_TEST_01 values (cast(abs(-1)as int));
+SQL SUCCESS
+insert into ABS_TEST_01 values (cast(abs(99.9999)as int));
+SQL SUCCESS
+select COL_ABS AS RESULT from ABS_TEST_01;
++--------+
+| result |
++--------+
+| 1      |
+| 100    |
++--------+
+drop table if exists ABS_TEST_01;
+SQL SUCCESS

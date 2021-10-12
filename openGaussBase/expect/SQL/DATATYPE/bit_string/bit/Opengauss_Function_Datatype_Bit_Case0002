@@ -1,0 +1,25 @@
+-- @testpoint: 插入不符合设定范围值，合理报错
+-- @modify at: 2020-11-04
+--创建表
+DROP TABLE IF EXISTS type_bit02;
+SQL SUCCESS
+CREATE TABLE type_bit02 (name bit(3));
+SQL SUCCESS
+--插入数据
+--超出字段设定长度
+insert into type_bit02 values (B'1011');
+?.*ERROR: bit string length 4 does not match type bit\(3\)
+  Where: referenced column: name
+--不足字段设定长度
+insert into type_bit02 values (B'10');
+?.*ERROR: bit string length 2 does not match type bit\(3\)
+  Where: referenced column: name
+--插入失败，查看数据
+select * from type_bit02;
++------+
+| name |
++------+
++------+
+--清理环境
+drop table type_bit02;
+SQL SUCCESS

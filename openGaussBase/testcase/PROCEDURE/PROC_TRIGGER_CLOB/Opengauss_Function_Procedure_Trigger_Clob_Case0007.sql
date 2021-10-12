@@ -1,0 +1,30 @@
+-- @testpoint: 验证存储过程是否支持clob类型查询
+
+--创建测试表
+drop table if exists temp;
+create table temp
+(
+  name      varchar2(200),
+  age       number,
+  temp_clob clob
+);
+
+
+--创建存储过程
+create or replace procedure proc_clob_002
+is
+  v_name temp.name%type;
+  v_temp_clob temp.temp_clob%type;
+begin
+  insert into temp values ('grand.jon', 22,  '待插入的海量字符串');
+  select name,temp_clob into v_name,v_temp_clob from temp where age=22;
+  raise info '查询的人名:%',v_name;
+  end;
+  /
+ --调用存储过程
+call proc_clob_002();
+
+--清理环境
+drop procedure proc_clob_002;
+drop table temp;
+

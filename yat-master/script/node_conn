@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+NODE_NAME=${1}
+
+if [[ -z "${NODE_NAME}" ]]; then
+  NODE_NAME=DEFAULT
+else
+  NODE_NAME=${NODE_NAME^^}
+fi
+
+echo `eval echo '$'${NODE_NAME}_DB_USER/'$'${NODE_NAME}_DB_PASSWD@'$'${NODE_NAME}_DB_HOST:'$'${NODE_NAME}_DB_PORT`

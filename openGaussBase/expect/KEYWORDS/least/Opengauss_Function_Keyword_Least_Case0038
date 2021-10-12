@@ -1,0 +1,6 @@
+--  @testpoint:定义列的数据类型是least，应该报错
+drop table if exists test;
+SQL SUCCESS
+create table test (id least);
+?.*ERROR: syntax error at or near "least"
+?.*Position: .*

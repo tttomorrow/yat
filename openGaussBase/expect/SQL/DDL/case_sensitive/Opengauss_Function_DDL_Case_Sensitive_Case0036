@@ -1,0 +1,19 @@
+--  @testpoint: 删除同名词，区分同名词的大小写
+drop synonym if exists VI ;
+SQL SUCCESS
+drop synonym if exists vi;
+SQL SUCCESS
+DROP SYNONYM if exists AD;
+SQL SUCCESS
+SELECT * FROM pg_synonym WHERE synname='ad';
++---------+--------------+----------+--------------+------------+
+| synname | synnamespace | synowner | synobjschema | synobjname |
++---------+--------------+----------+--------------+------------+
++---------+--------------+----------+--------------+------------+
+SELECT * FROM pg_synonym WHERE synname='AD';
++---------+--------------+----------+--------------+------------+
+| synname | synnamespace | synowner | synobjschema | synobjname |
++---------+--------------+----------+--------------+------------+
++---------+--------------+----------+--------------+------------+
+drop synonym if exists ad;
+SQL SUCCESS

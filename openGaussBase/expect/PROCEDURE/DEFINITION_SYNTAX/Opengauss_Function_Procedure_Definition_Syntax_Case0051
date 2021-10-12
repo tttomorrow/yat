@@ -1,0 +1,67 @@
+-- @testpoint:删除过程中的select原表
+DROP table if exists Proc_Syntax_051;
+SQL SUCCESS
+drop table if exists  Proc_Syntax_051_mid;
+SQL SUCCESS
+create table Proc_Syntax_051(id int,name varchar2(20));
+SQL SUCCESS
+create table Proc_Syntax_051_mid(id int,name varchar2(20));
+SQL SUCCESS
+begin
+ for v_i in 1..9 loop
+  insert into Proc_Syntax_051_mid values(v_i,'Xiaxia');
+ end loop;
+end;
+/
+SQL SUCCESS
+select count(1) from Proc_Syntax_051_mid;
++-------+
+| count |
++-------+
+| 9     |
++-------+
+create or replace procedure TEST_PROC_Proc_Syntax_051(
+  v_id    IN  int,
+  v_name  IN  varchar2
+  ) AS
+  v_sql VARCHAR2(2000);
+BEGIN
+  insert into Proc_Syntax_051
+  select * from Proc_Syntax_051_mid;
+
+END;
+/
+SQL SUCCESS
+select count(1) from Proc_Syntax_051;
++-------+
+| count |
++-------+
+| 0     |
++-------+
+call TEST_PROC_Proc_Syntax_051(1,'Xiaxia1');
++---------------------------+
+| test_proc_proc_syntax_051 |
++---------------------------+
+|                           |
++---------------------------+
+select count(1) from Proc_Syntax_051;
++-------+
+| count |
++-------+
+| 9     |
++-------+
+drop table  Proc_Syntax_051_mid;
+SQL SUCCESS
+call TEST_PROC_Proc_Syntax_051(4,'Xiaxia4');
+?.*ERROR: relation "proc_syntax_051_mid" does not exist.*
+  Where: PL/pgSQL function test_proc_proc_syntax_051(integer,character varying) line 3 at SQL statement
+select count(1) from Proc_Syntax_051;
++-------+
+| count |
++-------+
+| 9     |
++-------+
+drop procedure TEST_PROC_Proc_Syntax_051;
+SQL SUCCESS
+drop table Proc_Syntax_051;
+SQL SUCCESS

@@ -1,0 +1,29 @@
+-- @testpoint: alter table 添加check约束，在有违背数据时合理报错
+drop table if exists alter_table_tb003;
+SQL SUCCESS
+create table alter_table_tb003(c1 int,c2 bigint,c3 varchar(20));
+SQL SUCCESS
+insert into alter_table_tb003 values('11',null,'sss');
+SQL SUCCESS
+insert into alter_table_tb003 values('21','','sss');
+SQL SUCCESS
+insert into alter_table_tb003 values('31',66,'');
+SQL SUCCESS
+insert into alter_table_tb003 values('41',66,null);
+SQL SUCCESS
+alter table alter_table_tb003 add constraint con_al_table_3_3  check(c3!= '');
+SQL SUCCESS
+alter table alter_table_tb003 add constraint con_al_table_3_1  check(c1!= '');
+SQL SUCCESS
+insert into alter_table_tb003 values('',66,'');
+SQL SUCCESS
+alter table alter_table_tb003 add constraint con_al_table_3_31  check(c3!= 'sss');
+?.*ERROR: check constraint "con_al_table_3_31" is violated by some row.*
+alter table alter_table_tb003 add constraint con_al_table_3_11  check(c1!= '21');
+?.*ERROR: check constraint "con_al_table_3_11" is violated by some row.*
+insert into alter_table_tb003 values('',66,'sss');
+SQL SUCCESS
+insert into alter_table_tb003 values('21',66,'');
+SQL SUCCESS
+drop table if exists alter_table_tb003;
+SQL SUCCESS

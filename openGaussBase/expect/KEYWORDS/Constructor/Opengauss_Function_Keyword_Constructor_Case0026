@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字constructor(非保留)，作为模式名
+--关键字不带引号-成功
+drop schema if exists constructor;
+SQL SUCCESS
+create schema constructor;
+SQL SUCCESS
+drop schema constructor;
+SQL SUCCESS
+--关键字带双引号-成功
+drop schema if exists "constructor";
+SQL SUCCESS
+create schema "constructor";
+SQL SUCCESS
+drop schema "constructor";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop schema if exists 'constructor';
+?.*ERROR: syntax error at or near "'constructor'"
+?.*
+create schema 'constructor';
+?.*ERROR: syntax error at or near "'constructor'"
+?.*
+--关键字带反引号-合理报错
+drop schema if exists `constructor`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create schema `constructor`;
+?.*ERROR: syntax error at or near "`"
+?.*

@@ -1,0 +1,27 @@
+-- @testpoint: 插入正整数
+drop table if exists real_01;
+SQL SUCCESS
+create table real_01 (name real);
+SQL SUCCESS
+insert into real_01 values (120);
+SQL SUCCESS
+insert into real_01 values (99999);
+SQL SUCCESS
+insert into real_01 values (1);
+SQL SUCCESS
+insert into real_01 values (2);
+SQL SUCCESS
+insert into real_01 values (3);
+SQL SUCCESS
+select * from real_01;
++---------+
+| name    |
++---------+
+| 120.0   |
+| 99999.0 |
+| 1.0     |
+| 2.0     |
+| 3.0     |
++---------+
+drop table real_01;
+SQL SUCCESS

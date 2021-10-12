@@ -1,0 +1,33 @@
+-- @testpoint: EXTRACT函数传入TIMESTAMP WITH TIME ZONE类型，source为EPOCH边界值不带时区，获取自1970-01-01 00:00:00-00 UTC以来的秒数
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (clo1 TIMESTAMP WITH TIME ZONE );
+SQL SUCCESS
+insert into test_date01 values ('1970-01-01 00:00:00 ');
+SQL SUCCESS
+select EXTRACT(EPOCH FROM clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| -28800.0  |
++-----------+
+SELECT EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE  '1970-01-01 00:00:00 ');
++-----------+
+| date_part |
++-----------+
+| -28800.0  |
++-----------+
+SELECT EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE  '1970-01-01 00:00:00 ');
++-----------+
+| date_part |
++-----------+
+| -28800.0  |
++-----------+
+SELECT EXTRACT(EPOCH FROM date '1970-01-01 00:00:00');
++-----------+
+| date_part |
++-----------+
+| 0.0       |
++-----------+
+drop table if exists test_date01;
+SQL SUCCESS

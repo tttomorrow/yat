@@ -1,0 +1,11 @@
+-- @testpoint: 输入时间相加，合理报错
+DROP TABLE IF EXISTS test_time03;
+SQL SUCCESS
+CREATE TABLE test_time03 (name time);
+SQL SUCCESS
+insert into  test_time03 values (time '11:21:17' + time '09:21:17');
+?.*ERROR: operator is not unique: time without time zone \+ time without time zone
+  Hint: Could not choose a best candidate operator. You might need to add explicit type casts.
+?.*
+DROP TABLE test_time03;
+SQL SUCCESS

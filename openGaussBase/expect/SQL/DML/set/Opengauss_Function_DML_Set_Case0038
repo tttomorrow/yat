@@ -1,0 +1,11 @@
+-- @testpoint: set session命令设置配置参数allocate_mem_cost值超范围，合理报错（user类型）
+--set session to 命令设置配置参数
+set session allocate_mem_cost to 1E+309;
+?.*ERROR: parameter "allocate_mem_cost" requires a numeric value
+set session allocate_mem_cost to -1;
+?.*ERROR: -1 is outside the valid range for parameter "allocate_mem_cost".*
+--set session =命令设置配置参数
+set session allocate_mem_cost = -1E+308;
+?.*ERROR: .*
+set session allocate_mem_cost = -1;
+?.*ERROR: -1 is outside the valid range for parameter "allocate_mem_cost".*

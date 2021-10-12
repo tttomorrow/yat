@@ -1,0 +1,26 @@
+-- @testpoint: opengauss比较操作符<>，入参为函数
+-- 入参为函数
+SELECT bit_length('world') <> bit_length(right('helloworld',5));
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+SELECT bit_length(right('helloworld',5)) <> bit_length(btrim('sring' , 'ing'));
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+SELECT char_length('hello') <> instr( 'abcdabcdabcd', 'bcd', 2, 2 );
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+SELECT lpad('hi', 5000, 'xyza') <> lpad('hi', 5000, 'xyza');
++----------+
+| ?column? |
++----------+
+| false    |
++----------+

@@ -1,0 +1,18 @@
+--  @testpoint:opengauss关键字user(保留)，修改用户信息
+--前置条件
+drop user if exists user_test;
+SQL SUCCESS
+create user user_test password 'gauss@123';
+SQL SUCCESS
+--修改用户名
+alter user user_test rename to new_user_test;
+SQL SUCCESS
+--修改用户登录密码
+alter user new_user_test identified by 'Gauss@123' replace 'gauss@123';
+SQL SUCCESS
+--为用户追加createrole权限
+alter user new_user_test createrole;
+SQL SUCCESS
+--清空
+drop user new_user_test cascade;
+SQL SUCCESS

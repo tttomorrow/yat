@@ -1,0 +1,20 @@
+-- @testpoint: 插入指数形式值
+drop table if exists float8_11;
+SQL SUCCESS
+create table float8_11 (name float8);
+SQL SUCCESS
+insert into float8_11 values (exp(33));
+SQL SUCCESS
+insert into float8_11 values (exp(12.34));
+SQL SUCCESS
+insert into float8_11 values (exp(-15));
+SQL SUCCESS
+insert into float8_11 values (exp(-12.34));
+SQL SUCCESS
+select * from float8_11;
++-----------------------+
+| name                  |
++-----------------------+
++-----------------------+
+drop table float8_11;
+SQL SUCCESS

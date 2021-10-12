@@ -1,0 +1,15 @@
+-- @testpoint: 删除主键之后，再次更新unique约束
+drop table if exists t1;
+SQL SUCCESS
+create table t1(a int);
+SQL SUCCESS
+alter table t1 add constraint studentkey primary key(a);
+SQL SUCCESS
+alter table t1 add constraint unkey  unique (a);
+SQL SUCCESS
+alter table t1 drop constraint studentkey;
+SQL SUCCESS
+alter table t1 add constraint unkey1  unique (a);
+SQL SUCCESS
+drop table if exists t1;
+SQL SUCCESS

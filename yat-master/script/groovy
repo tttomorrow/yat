@@ -1,0 +1,47 @@
+#!/usr/bin/env python
+# encoding=utf-8
+import os
+import sys
+from subprocess import Popen
+
+
+YAT_HOME = os.environ['YAT_HOME']
+LIB_DIR = os.path.join(YAT_HOME, 'lib')
+DRIVER_DIR = os.path.join(YAT_HOME, 'driver')
+
+
+def class_path_from_argv(argv):
+    class_path_arg = ''
+
+    pos = 0
+    for arg in argv:
+        if arg == '-cp' or arg == '--classpath' or arg == '-classpath':
+            class_path_arg = class_path_arg + ':' + argv[pos + 1]
+        elif arg.startswith('--classpath='):
+            class_path_arg = class_path_arg + ':' + arg[12:]
+        pos += 1
+
+    return class_path_arg
+
+
+def class_path_default():
+    libs = [os.path.abspath(os.path.join(LIB_DIR, jar)) for jar in os.listdir(LIB_DIR) if jar.endswith('.jar')]
+    drivers = [os.path.abspath(os.path.join(DRIVER_DIR, jar)) for jar in os.listdir(DRIVER_DIR) if jar.endswith('.jar')]
+    libs.extend(drivers)
+    return ':'.join(libs)
+
+
+def class_path(argv):
+    return class_path_default() + ':' + class_path_from_argv(argv)
+
+
+def main():
+    class_path_argv = class_path(sys.argv[1:])
+    cmd = ['java', '-cp', class_path_argv, 'groovy.ui.GroovyMain']
+    cmd.extend(sys.argv[1:])
+
+    Popen(cmd).wait()
+
+
+if __name__ == '__main__':
+    main()

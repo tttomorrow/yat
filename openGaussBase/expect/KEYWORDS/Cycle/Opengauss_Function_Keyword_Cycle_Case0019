@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字cycle(非保留)，作为外部数据源名
+--关键字不带引号-成功
+drop data source if exists cycle;
+SQL SUCCESS
+create data source cycle;
+SQL SUCCESS
+drop data source cycle;
+SQL SUCCESS
+--关键字带双引号-成功
+drop data source if exists "cycle";
+SQL SUCCESS
+create data source "cycle";
+SQL SUCCESS
+drop data source "cycle";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop data source if exists 'cycle';
+?.*ERROR: syntax error at or near "'cycle'"
+?.*
+create data source 'cycle';
+?.*ERROR: syntax error at or near "'cycle'"
+?.*
+--关键字带反引号-合理报错
+drop data source if exists `cycle`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create data source `cycle`;
+?.*ERROR: syntax error at or near "`"
+?.*

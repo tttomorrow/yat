@@ -1,0 +1,43 @@
+--  @testpoint:开启事务提取数据，参数为prior，从当前关联位置开始抓取上一行；
+--前置条件
+drop table if exists cur_test_74;
+SQL SUCCESS
+create table cur_test_74(c_id int,c_num int,c_name varchar(10),c_city varchar(10),c_add varchar(20));
+SQL SUCCESS
+insert into cur_test_74 values(1,18,'Allen','Beijing','AAAAABAAAAA'),(2,368,'Bob','Shanghai','AAAAACAAAAA'),
+                           (3,59,'Cathy','Shenzhen','AAAAADAAAAA'),(4,96,'David','Suzhou','AAAAAEAAAAA'),
+                           (5,17,'Edrwd','Fenghuang','AAAAAFAAAAA'),(6,253,'Fendi','Changsha','AAAAAGAAAAA');
+SQL SUCCESS
+--默认初始位置为起始，提取数据为空
+start transaction;
+SQL SUCCESS
+cursor cursor74_1 for select * from cur_test_74 order by 1;
+SQL SUCCESS
+fetch prior from cursor74_1;
++------+-------+--------+--------+-------+
+| c_id | c_num | c_name | c_city | c_add |
++------+-------+--------+--------+-------+
++------+-------+--------+--------+-------+
+close cursor74_1;
+SQL SUCCESS
+end;
+SQL SUCCESS
+--移动游标位置，提取上行数据
+start transaction;
+SQL SUCCESS
+cursor cursor74_2 for select * from cur_test_74 order by 1;
+SQL SUCCESS
+move 3 from cursor74_2;
+SQL SUCCESS
+fetch prior from cursor74_2;
++------+-------+--------+----------+-------------+
+| c_id | c_num | c_name | c_city   | c_add       |
++------+-------+--------+----------+-------------+
+| 2    | 368   | Bob    | Shanghai | AAAAACAAAAA |
++------+-------+--------+----------+-------------+
+close cursor74_2;
+SQL SUCCESS
+end;
+SQL SUCCESS
+drop table cur_test_74;
+SQL SUCCESS

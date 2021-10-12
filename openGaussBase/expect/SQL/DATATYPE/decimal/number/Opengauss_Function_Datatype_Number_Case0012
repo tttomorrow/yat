@@ -1,0 +1,11 @@
+-- @testpoint: 插入非法空值，合理报错
+drop table if exists number_12;
+SQL SUCCESS
+create table number_12 (id int,name number);
+SQL SUCCESS
+insert into number_12 values (1,' ');
+?.*ERROR: invalid input syntax for type numeric: " "
+?.*
+  Where: referenced column: name
+drop table number_12;
+SQL SUCCESS

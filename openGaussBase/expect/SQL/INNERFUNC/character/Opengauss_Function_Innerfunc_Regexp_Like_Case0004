@@ -1,0 +1,15 @@
+-- @testpoint: 参数i定义时大小写匹配
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('ABC');
+SQL SUCCESS
+SELECT regexp_like(string1,'[A-Z]','i') from type_char;
++-------------+
+| regexp_like |
++-------------+
+| true        |
++-------------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

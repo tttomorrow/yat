@@ -1,0 +1,23 @@
+-- @testpoint: pg_stat_get_db_xact_rollback(oid)函数的异常校验，合理报错
+select pg_stat_get_db_xact_rollback('') from PG_DATABASE a where a.datname = CURRENT_CATALOG;
++------------------------------+
+| pg_stat_get_db_xact_rollback |
++------------------------------+
+|                              |
++------------------------------+
+select pg_stat_get_db_xact_rollback() from PG_DATABASE a where a.datname = CURRENT_CATALOG;
+?.*ERROR: function pg_stat_get_db_xact_rollback\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_stat_get_db_xact_rollback
+select pg_stat_get_db_xact_rollback(a.oid,a.oid,a.oid) from PG_DATABASE a where a.datname = CURRENT_CATALOG;
+?.*ERROR: function pg_stat_get_db_xact_rollback\(oid, oid, oid\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_stat_get_db_xact_rollback
+?.*ERROR: OID out of range
+  Where: referenced column: pg_stat_get_db_xact_rollback
+select pg_stat_get_db_xact_rollback('*&^%$') from PG_DATABASE a where a.datname = CURRENT_CATALOG;
+?.*ERROR: invalid input syntax for type oid: \"\*\&\^\%\$"
+?.*
+  Where: referenced column: pg_stat_get_db_xact_rollback

@@ -1,0 +1,10 @@
+-- @testpoint: 插入特殊字符,合理报错
+drop table if exists binary_double05;
+SQL SUCCESS
+create table binary_double05 (name binary_double);
+SQL SUCCESS
+insert into binary_double05 values (!@#$%^&*);
+?.*ERROR: syntax error at or near "\$"
+?.*
+drop table binary_double05;
+SQL SUCCESS

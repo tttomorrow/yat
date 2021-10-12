@@ -1,0 +1,11 @@
+-- @testpoint: 插入非法空值,合理报错
+drop table if exists dec_05;
+SQL SUCCESS
+CREATE  TABLE dec_05 (id1 int,id2 DEC(4,2));
+SQL SUCCESS
+insert into dec_05 values (1,' ');
+?.*ERROR: invalid input syntax for type numeric: " "
+?.*
+  Where: referenced column: id2
+drop table dec_05;
+SQL SUCCESS

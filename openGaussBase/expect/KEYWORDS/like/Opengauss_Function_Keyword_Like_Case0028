@@ -1,0 +1,67 @@
+-- @testpoint: opengauss关键字like(保留)，作为同义词对象名 合理报错
+--前置条件
+drop table if exists like_test;
+SQL SUCCESS
+create table like_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-失败
+drop synonym if exists like;
+?.*ERROR: syntax error at or near "like"
+?.*Position: .*
+create synonym like for like_test;
+?.*ERROR: syntax error at or near "like"
+?.*Position: .*
+--关键字带双引号-成功
+drop synonym if exists "like";
+SQL SUCCESS
+create synonym "like" for like_test;
+SQL SUCCESS
+insert into "like" values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update "like" set "like".name='cici' where "like".id=2;
+SQL SUCCESS
+select * from "like";
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--清理环境
+drop synonym "like";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'like';
+?.*ERROR: syntax error at or near "'like'"
+?.*Position: .*
+create synonym 'like' for like_test;
+?.*ERROR: syntax error at or near "'like'"
+?.*Position: .*
+insert into 'like' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'like'"
+?.*Position: .*
+update 'like' set 'like'.name='cici' where 'like'.id=2;
+?.*ERROR: syntax error at or near "'like'"
+?.*Position: .*
+select * from 'like';
+?.*ERROR: syntax error at or near "'like'"
+?.*Position: .*
+--关键字带反引号-合理报错
+drop synonym if exists `like`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+create synonym `like` for like_test;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+insert into `like` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+update `like` set `like`.name='cici' where `like`.id=2;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+select * from `like`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+--清理环境
+drop table if exists like_test cascade;
+SQL SUCCESS

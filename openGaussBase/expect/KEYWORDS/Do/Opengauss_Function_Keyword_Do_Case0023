@@ -1,0 +1,36 @@
+-- @testpoint: opengauss关键字do(保留)，作为索引名，部分测试点合理报错
+--前置条件，创建一个表
+drop table if exists do_test;
+SQL SUCCESS
+create table do_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-失败
+drop index if exists do;
+?.*ERROR: syntax error at or near "do"
+?.*Position: .*
+create index do on do_test(id);
+?.*ERROR: syntax error at or near "do"
+?.*Position: .*
+--关键字带双引号-成功
+drop index if exists "do";
+SQL SUCCESS
+create index "do" on do_test(id);
+SQL SUCCESS
+drop index "do";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop index if exists 'do';
+?.*ERROR: syntax error at or near "'do'"
+?.*Position: .*
+create index 'do' on do_test(id);
+?.*ERROR: syntax error at or near "'do'"
+?.*Position: .*
+--关键字带反引号-合理报错
+drop index if exists `do`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+create index `do` on do_test(id);
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+drop table if exists do_test;
+SQL SUCCESS

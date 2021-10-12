@@ -1,0 +1,22 @@
+-- @testpoint: BLOB数据类型当表中为空时,修改字段类型为int，合理报错
+DROP TABLE IF EXISTS t_blob;
+SQL SUCCESS
+CREATE TABLE t_blob(ID BLOB);
+SQL SUCCESS
+INSERT INTO t_blob VALUES('35466');
+SQL SUCCESS
+INSERT INTO t_blob VALUES('100000');
+SQL SUCCESS
+INSERT INTO t_blob VALUES('C4711A1097876CC');
+SQL SUCCESS
+INSERT INTO t_blob VALUES('');
+SQL SUCCESS
+INSERT INTO t_blob VALUES(NULL);
+SQL SUCCESS
+COMMIT;
+SQL SUCCESS
+ALTER TABLE T_BLOB MODIFY (ID INT);
+?.*ERROR: column "id" cannot be cast automatically to type integer
+  Hint: Specify a USING expression to perform the conversion.
+drop table if exists t_blob;
+SQL SUCCESS

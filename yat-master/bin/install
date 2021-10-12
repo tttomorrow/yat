@@ -1,0 +1,166 @@
+#!/usr/bin/env python3
+
+import logging
+import os
+import sys
+from optparse import OptionParser
+from subprocess import Popen, PIPE
+
+YAT_NAME = 'yat'
+DEFAULT_INSTALL_PATH = '/usr/local'
+DEPS = (
+    ('xlrd', 'xlrd'),
+    ('requests', 'requests'),
+    ('pyyaml', 'yaml'),
+    ('click', 'click'),
+    ('openpyxl', 'openpyxl'),
+    ('paramiko', 'paramiko'),
+    ('scp', 'scp'),
+    ('jinja2', 'jinja2'),
+    ('paramunittest', 'paramunittest')
+)
+
+
+def check_miss_deps():
+    miss_deps = []
+    for name, pkg in DEPS:
+        try:
+            __import__(pkg)
+        except ImportError as e:
+            miss_deps.append((name, e))
+    return miss_deps
+
+
+def parse_command(argv):
+    """
+    Parse the system command
+    :param argv: the argument values
+    :return: ((options, other command), OptionParser instance)
+    """
+    parser = OptionParser()
+    parser.add_option('-a', '--app', dest='app_path', help='set the yat install path', type='str',
+                      default=DEFAULT_INSTALL_PATH)
+    parser.add_option('-F', '--force', dest='force', action="store_true",
+                      help='If the zbench is already installed on the system, then force overwrite')
+    parser.add_option("--pip-opt", dest="pip_opt", help="set the pip options", type='str', default="")
+    return parser.parse_args(argv), parser
+
+
+def cmd(cmd):
+    """
+    Run a command with shell mode
+    :param cmd:
+    :return:
+    """
+    if 0 != Popen(cmd, shell=True).wait():
+        raise RuntimeError('run shell command error: %s' % cmd)
+    logging.info('run cmd: %s' % cmd)
+
+
+def cmd_output_assert(cmd, _assert=False):
+    opts = dict(shell=True, stdout=PIPE, stderr=PIPE, encoding='utf-8')
+
+    process = Popen(cmd, **opts)
+    stdout, stderr = process.communicate()
+    if _assert and process.returncode != 0:
+        raise RuntimeError('run command error: %s\n%s%s' % (cmd, stdout, stderr))
+
+    logging.info('run cmd: %s' % cmd)
+    return stdout, stderr
+
+
+def cmd_output(cmd):
+    """
+    Run a command with shell mode and get the output
+    :param cmd:
+    :return:
+    """
+    return cmd_output_assert(cmd, True)
+
+
+def cmd_no_output(cmd):
+    return cmd_output_assert(cmd)
+
+
+def dos2unix(src, dest):
+    with open(src, 'rb') as infile:
+        content = infile.read()
+
+    with open(dest, 'wb') as outfile:
+        for line in content.splitlines():
+            outfile.write(line + b'\n')
+
+
+def _is_reinstall(yat_install_path):
+    yat_app_path = os.path.join(yat_install_path, YAT_NAME)
+    if os.path.exists(yat_app_path) and len(os.listdir(yat_app_path)) > 0:
+        return True
+    return False
+
+
+def _compile_all_modules(mode_path):
+    cmd_no_output('python -m compileall -q -f %s' % mode_path)
+
+
+def install_yat(path, pip_opt):
+    """
+    Install the core simulator to the specific path
+    :param path: the path to install core simulator
+    """
+    yat_path = os.path.realpath(os.path.join(path, YAT_NAME))
+    if not os.path.exists(yat_path):
+        os.makedirs(yat_path, 0o755)  # means 0o755
+    else:
+        os.chmod(yat_path, 0o755)
+        cmd_output("rm -rf %s" % yat_path)
+        os.makedirs(yat_path, 0o755)
+
+    cmd_output('cp -r app bin script python template %s' % yat_path)
+    yat_bin_real_path = os.path.realpath(os.path.join(yat_path, 'bin', YAT_NAME))
+    cmd_output("ln -f -s '%s' '/usr/local/bin/%s'" % (yat_bin_real_path, YAT_NAME))
+    dos2unix(yat_bin_real_path, yat_bin_real_path)
+    _compile_all_modules(os.path.join(yat_path, 'python'))
+    cmd_output("find '%s' -type d -exec chmod 755 {} \\+" % yat_path)
+    cmd_output("find '%s' -type f -exec chmod a+r {} \\+" % yat_path)
+    cmd_output("chmod 755 '%s'" % yat_bin_real_path)
+    cmd_output("chmod 755 %s/script/*" % yat_path)
+    for dep in check_miss_deps():
+        print("install python module {}".format(dep[0]))
+        cmd_output('python3 -m pip install --trusted-host plugins.gradle.org/m2 {} {}'.format(pip_opt, dep[0]))
+
+    missing = check_miss_deps()
+    if len(missing) > 0:
+        print("depended python modules is installed, but not work:")
+        for mod in missing:
+            print("    {}\n{}".format(mod[0], mod[1]))
+        return False
+    return True
+
+
+def main():
+    """
+    The main process to install the zbench
+    """
+    major, minor = sys.version_info[:2]
+
+    if major < 3 or (major == 3 and minor < 6):
+        print('*** Error: Python 3.6+ is required')
+        exit(1)
+
+    (opts, _), parser = parse_command(sys.argv)
+
+    if _is_reinstall(opts.app_path) and not opts.force:
+        raise RuntimeError('the yat has installed, please uninstall first or use -F/--force option to override it')
+
+    if install_yat(opts.app_path, opts.pip_opt):
+        print("Install success")
+    else:
+        print("Install failed")
+
+
+if __name__ == '__main__':
+    try:
+        os.umask(0o022)
+        main()
+    except Exception as e:
+        print(e)

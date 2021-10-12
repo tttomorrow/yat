@@ -1,0 +1,29 @@
+-- @testpoint: 中文
+drop database if exists logdb;
+SQL SUCCESS
+create database logdb encoding='UTF8';
+SQL SUCCESS
+select col1 from wdr_xdb_query('dbname=logdb',
+'CREATE TABLE type_char (string1 char(100));
+insert into type_char values (''我是一个'');') as dd(col1 varchar);
++------------+
+| col1       |
++------------+
+| INSERT 0 1 |
++------------+
+select col1 from wdr_xdb_query('dbname=logdb',
+'SELECT substrb(string1,2,6) from type_char;') as dd(col1 varchar);
++------+
+| col1 |
++------+
+|   是  |
++------+
+select col1 from wdr_xdb_query('dbname=logdb',
+'SELECT substrb(string1,4,9) from type_char;') as dd(col1 varchar);
++------+
+| col1 |
++------+
+| 是一个  |
++------+
+drop database if exists logdb;
+SQL SUCCESS

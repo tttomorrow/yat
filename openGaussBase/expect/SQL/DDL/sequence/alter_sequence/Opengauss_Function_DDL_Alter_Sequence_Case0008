@@ -1,0 +1,103 @@
+-- @testpoint: 创建时设置cache 插值和插入值后执行alter sequence cache 修改cache为正确和错误值等 合理报错
+--创建序列
+drop sequence if exists test_seq_008;
+SQL SUCCESS
+CREATE sequence test_seq_008 cache 10;
+SQL SUCCESS
+drop table if exists table_seq_008 cascade;
+SQL SUCCESS
+create table table_seq_008(id int);
+SQL SUCCESS
+--查询cache值
+select last_value,cache_value from test_seq_008;
++------------+-------------+
+| last_value | cache_value |
++------------+-------------+
+| 1          | 10          |
++------------+-------------+
+--未调用时修改cache值
+alter sequence test_seq_008 cache 20;
+SQL SUCCESS
+--查询cache值
+select last_value,cache_value from test_seq_008;
++------------+-------------+
+| last_value | cache_value |
++------------+-------------+
+| 1          | 20          |
++------------+-------------+
+alter sequence test_seq_008 maxvalue 50;
+SQL SUCCESS
+select last_value,cache_value from test_seq_008;
++------------+-------------+
+| last_value | cache_value |
++------------+-------------+
+| 1          | 20          |
++------------+-------------+
+alter sequence test_seq_008 cache 5;
+SQL SUCCESS
+select last_value,cache_value from test_seq_008;
++------------+-------------+
+| last_value | cache_value |
++------------+-------------+
+| 1          | 5           |
++------------+-------------+
+--调用后修改cache
+select nextval('test_seq_008');
++---------+
+| nextval |
++---------+
+| 1       |
++---------+
+insert into table_seq_008 values(nextval('test_seq_008'));
+SQL SUCCESS
+alter sequence test_seq_008 cache 20;
+SQL SUCCESS
+--查询cache值
+select last_value,cache_value from test_seq_008;
++------------+-------------+
+| last_value | cache_value |
++------------+-------------+
+| 5          | 20          |
++------------+-------------+
+alter sequence test_seq_008 maxvalue 50;
+SQL SUCCESS
+select last_value,cache_value from test_seq_008;
++------------+-------------+
+| last_value | cache_value |
++------------+-------------+
+| 5          | 20          |
++------------+-------------+
+alter sequence test_seq_008 cache 5;
+SQL SUCCESS
+select last_value,cache_value from test_seq_008;
++------------+-------------+
+| last_value | cache_value |
++------------+-------------+
+| 5          | 5           |
++------------+-------------+
+--alter为-1，0，字母 浮点数空格等无效值 合理报错
+alter sequence test_seq_008 cache -1.1;
+?.*ERROR: invalid input syntax for type bigint: "-1.1"?.*
+alter sequence test_seq_008 cache 0;
+?.*ERROR: CACHE \(0\) must be greater than zero?.*
+alter sequence test_seq_008 cache 'aa';
+?.*ERROR: syntax error at or near "'aa'"?.*
+?.*
+alter sequence test_seq_008 cache '';
+?.*ERROR: syntax error at or near "''"?.*
+?.*
+alter sequence test_seq_008 cache '!==()*';
+?.*ERROR: syntax error at or near "'\!==\(\)\*'"?.*
+?.*
+--查询cache值
+select last_value,cache_value from test_seq_008;
++------------+-------------+
+| last_value | cache_value |
++------------+-------------+
+| 5          | 5           |
++------------+-------------+
+--清理环境
+drop table if exists table_seq_008 cascade;
+SQL SUCCESS
+drop sequence if exists test_seq_008;
+SQL SUCCESS

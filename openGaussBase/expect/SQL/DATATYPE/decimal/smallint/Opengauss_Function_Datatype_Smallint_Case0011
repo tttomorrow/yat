@@ -1,0 +1,18 @@
+-- @testpoint: 插入bool类型
+drop table if exists smallint11;
+SQL SUCCESS
+create table smallint11 (name smallint);
+SQL SUCCESS
+insert into smallint11 values (false);
+SQL SUCCESS
+insert into smallint11 values (true);
+SQL SUCCESS
+select * from smallint11;
++------+
+| name |
++------+
+| 0    |
+| 1    |
++------+
+drop table smallint11;
+SQL SUCCESS

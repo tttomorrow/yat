@@ -1,0 +1,11 @@
+-- @testpoint: 函数hll_hash_smallint(smallint)，入参为非smallint类型时，合理报错
+select hll_hash_smallint(-32769);
+?.*ERROR: smallint out of range.*
+  Where: referenced column: hll_hash_smallint
+select hll_hash_smallint(32768);
+?.*ERROR: smallint out of range.*
+  Where: referenced column: hll_hash_smallint
+select hll_hash_smallint('nihao');
+?.*ERROR: invalid input syntax for integer: "nihao".*
+?.*
+  Where: referenced column: hll_hash_smallint

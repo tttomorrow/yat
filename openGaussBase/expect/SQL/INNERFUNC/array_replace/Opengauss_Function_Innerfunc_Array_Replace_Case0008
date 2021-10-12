@@ -1,0 +1,66 @@
+-- @testpoint: 替换数组array中所有的指定元素，element用select查询结果代替，部分合理报错
+--创建数据
+drop table if exists rep08;
+SQL SUCCESS
+create table rep08(id int,name varchar);
+SQL SUCCESS
+insert into rep08 values(1,'Joe');
+SQL SUCCESS
+insert into rep08 values(2,'Jim');
+SQL SUCCESS
+insert into rep08 values(3,'Jay');
+SQL SUCCESS
+insert into rep08 values(4,'Janne');
+SQL SUCCESS
+insert into rep08 values(5,'Bob');
+SQL SUCCESS
+insert into rep08 values(6,'Cherrs');
+SQL SUCCESS
+insert into rep08 values(7,'Alexs');
+SQL SUCCESS
+insert into rep08 values(8,'Lily');
+SQL SUCCESS
+--查询结果类型和数组中元素数据类型一致
+select array_replace(array[1,2,2,3],(select id from rep08 where name = 'Jim'),(select id from rep08 where name = 'Cherrs'));
++---------------+
+| array_replace |
++---------------+
+| {1,6,6,3}     |
++---------------+
+select array_replace(array[4,5,6,7,8,9],(select id from rep08 where name = 'Jay'),(select id from rep08 where name = 'Cherrs'));
++---------------+
+| array_replace |
++---------------+
+| {4,5,6,7,8,9} |
++---------------+
+select array_replace(array['Joe','Jim','Cherrs','Lily'],((select name from rep08 where id = 2)::text),((select name from rep08 where id = 5)::text));
++-----------------------+
+| array_replace         |
++-----------------------+
+| {Joe,Bob,Cherrs,Lily} |
++-----------------------+
+select array_replace(array['Joe','Jim','Cherrs','Lily'],((select name from rep08 where id = 4)::text),((select name from rep08 where id = 5)::text));
++-----------------------+
+| array_replace         |
++-----------------------+
+| {Joe,Jim,Cherrs,Lily} |
++-----------------------+
+--查询结果类型和数组中元素数据类型不一致：合理报错
+select array_replace(array[1,2,2,3],(select name from rep08 where id = 6),6);
+?.*ERROR: function array_replace\(integer\[\], character varying, integer\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: array_replace
+select array_replace(array[1,2,3,4,5,6,7,8,9],(select id from rep08),((select name from rep08 where id = 4)::text));
+?.*ERROR: function array_replace\(integer\[\], integer, text\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: array_replace
+select array_replace(array['Joe','Jim','Cherrs','Lily'],(select name from rep08 where id = 7),10);
+?.*ERROR: function array_replace\(text\[\], character varying, integer\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: array_replace
+--清理环境
+drop table if exists rep08 cascade;
+SQL SUCCESS

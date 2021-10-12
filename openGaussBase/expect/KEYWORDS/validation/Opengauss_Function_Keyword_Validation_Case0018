@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字validation(非保留)，作为数据库名
+--关键字不带引号-成功
+drop database if exists validation;
+SQL SUCCESS
+create database validation;
+SQL SUCCESS
+drop database validation;
+SQL SUCCESS
+--关键字带双引号-成功
+drop database if exists "validation";
+SQL SUCCESS
+create database "validation";
+SQL SUCCESS
+drop database "validation";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop database if exists 'validation';
+?.*ERROR: syntax error at or near "'validation'".*
+?.*Position: .*
+create database 'validation';
+?.*ERROR: syntax error at or near "'validation'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop database if exists `validation`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create database `validation`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

@@ -1,0 +1,22 @@
+-- @testpoint: 插入正常字符、中文、混合字符
+-- @modified at: 2020-11-13
+drop table if exists test_clob_047;
+SQL SUCCESS
+create table test_clob_047(id int,c_clob clob);
+SQL SUCCESS
+insert into test_clob_047 values(2,'abc');
+SQL SUCCESS
+insert into test_clob_047 values(3,'中国');
+SQL SUCCESS
+insert into test_clob_047 values(4,'123Gauss测试');
+SQL SUCCESS
+select * from test_clob_047;
++----+------------+
+| id | c_clob     |
++----+------------+
+| 2  | abc        |
+| 3  | 中国         |
+| 4  | 123Gauss测试 |
++----+------------+
+drop table test_clob_047;
+SQL SUCCESS

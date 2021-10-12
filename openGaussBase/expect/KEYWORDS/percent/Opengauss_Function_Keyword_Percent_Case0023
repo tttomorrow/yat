@@ -1,0 +1,37 @@
+-- @testpoint: opengauss关键字percent非保留)，作为索引名,部分测试点合理报错
+--前置条件，创建一个表
+drop table if exists percent_test;
+SQL SUCCESS
+create table percent_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop index if exists percent;
+SQL SUCCESS
+create index percent on percent_test(id);
+SQL SUCCESS
+drop index percent;
+SQL SUCCESS
+--关键字带双引号-成功
+drop index if exists "percent";
+SQL SUCCESS
+create index "percent" on percent_test(id);
+SQL SUCCESS
+drop index "percent";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop index if exists 'percent';
+?.*ERROR: syntax error at or near "'percent'".*
+?.*Position: .*
+create index 'percent' on percent_test(id);
+?.*ERROR: syntax error at or near "'percent'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop index if exists `percent`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create index `percent` on percent_test(id);
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+--清理环境
+drop table if exists percent_test cascade;
+SQL SUCCESS

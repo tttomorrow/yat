@@ -1,0 +1,15 @@
+-- @testpoint: 创建列类型为二进制类型blob的表
+drop table if exists table_2;
+SQL SUCCESS
+create table table_2(a BLOB);
+SQL SUCCESS
+insert into table_2 values(empty_blob());
+SQL SUCCESS
+select * from table_2;
++---+
+| a |
++---+
+|   |
++---+
+drop table if exists table_2;
+SQL SUCCESS

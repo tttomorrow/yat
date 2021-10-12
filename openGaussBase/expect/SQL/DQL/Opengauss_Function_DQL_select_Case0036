@@ -1,0 +1,50 @@
+-- @testpoint: DQL语法，结合for循环语句及内建函数char_length
+drop table if exists t_agg_join_004;
+SQL SUCCESS
+create table t_agg_join_004 (id int,c1 varchar(8000),c2 varchar(8000),c3 varchar(8000));
+SQL SUCCESS
+declare
+begin 
+    for i in 1..2000 loop
+        insert into t_agg_join_004 values (i,rpad('12',20,2),rpad('12',20,i),rpad('23',20,i));
+    end loop;
+    for i in 2001..4000 loop
+        insert into t_agg_join_004 values (i,rpad('23',21,2),rpad('23',21,2),rpad('12',21,i));
+    end loop;
+    for i in 4001..8000 loop
+        insert into t_agg_join_004 values (i,rpad('12',22,2),rpad('45',22,2),rpad('12',22,2));
+    end loop;
+end; 
+/
+SQL SUCCESS
+select char_length(c1) from t_agg_join_004 where id < 10;
++-------------+
+| char_length |
++-------------+
+| 20          |
+| 20          |
+| 20          |
+| 20          |
+| 20          |
+| 20          |
+| 20          |
+| 20          |
+| 20          |
++-------------+
+select char_length(c2) from t_agg_join_004 where id > 2000 limit 10;
++-------------+
+| char_length |
++-------------+
+| 21          |
+| 21          |
+| 21          |
+| 21          |
+| 21          |
+| 21          |
+| 21          |
+| 21          |
+| 21          |
+| 21          |
++-------------+
+drop table t_agg_join_004;
+SQL SUCCESS

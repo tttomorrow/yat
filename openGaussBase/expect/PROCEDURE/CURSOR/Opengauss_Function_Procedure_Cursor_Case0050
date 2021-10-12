@@ -1,0 +1,64 @@
+-- @testpoint: 游标变量作为函数返回值
+drop table if exists emp_test;
+SQL SUCCESS
+create table emp_test(empno int,ename varchar(10),job varchar(10) ,sal integer);
+SQL SUCCESS
+insert into emp_test values(1,'zhangsan','doctor1',10000);
+SQL SUCCESS
+insert into emp_test values(2,'zhangsan2','doctor2',10000);
+SQL SUCCESS
+insert into emp_test values(123,'zhangsan3','doctor3',10000);
+SQL SUCCESS
+insert into emp_test values(1,'zhansi','doctor1',12000);
+SQL SUCCESS
+insert into emp_test values(2,'lisiabc','doctor2',13000);
+SQL SUCCESS
+insert into emp_test values(123,'zhangwu123','doctor3',14000);
+SQL SUCCESS
+create or replace function syscur_050(v_num int) return sys_refcursor
+is
+    cv1 SYS_REFCURSOR;
+    v_empno NUMBER(10,0);
+begin
+    select count(*) into v_empno from emp_test;
+    if v_empno <> v_num then
+        open cv1 for select 1 from sys_dummy;
+    else
+        open cv1 for select 0 from sys_dummy;
+    end if;
+    RETURN cv1;
+end;
+/
+SQL SUCCESS
+declare
+    cv sys_refcursor;
+    v_empno emp_test.empno%type;
+begin
+cv :=syscur_050(10);
+    loop
+        fetch cv into v_empno;
+        exit when cv%notfound;
+        raise info 'v_empno is% ', v_empno;
+    end loop;
+    close cv;
+end;
+/
+SQL SUCCESS
+declare
+    cv sys_refcursor;
+    v_empno emp_test.empno%type;
+begin
+    cv :=syscur_050(6);
+    loop
+        fetch cv into v_empno;
+        exit when cv%notfound;
+        raise info 'v_empno is% ', v_empno;
+    end loop;
+    close cv;
+end;
+/
+SQL SUCCESS
+drop table emp_test;
+SQL SUCCESS
+drop procedure syscur_050;
+SQL SUCCESS

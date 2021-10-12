@@ -1,0 +1,42 @@
+--  @testpoint:两张表使用CROSS JOIN查询，使用on条件连接，合理报错
+--建表1
+drop table if exists person;
+SQL SUCCESS
+create table person(personcode int,personname varchar(20),addresscode int);
+SQL SUCCESS
+--插入数据
+insert into person values(1,'小赵',1);
+SQL SUCCESS
+insert into person values(2,'小钱',2);
+SQL SUCCESS
+insert into person values(3,'赵四',3);
+SQL SUCCESS
+insert into person values(4,'孙晔',4);
+SQL SUCCESS
+insert into person values(5,'周瑜',6);
+SQL SUCCESS
+--建表2
+drop table if exists address;
+SQL SUCCESS
+create table address(addresscode int,addressname varchar(20));
+SQL SUCCESS
+--插入数据
+insert into address values(1,'北京');
+SQL SUCCESS
+insert into address values(2,'上海');
+SQL SUCCESS
+insert into address values(3,'广州');
+SQL SUCCESS
+insert into address values(4,'深圳');
+SQL SUCCESS
+insert into address values(5,'上海');
+SQL SUCCESS
+--表1和表2使用CROSS JOIN查询,有条件连接，合理报错
+select * from person per cross join address ad on per.addresscode = ad.addresscode order by personcode;
+?.*ERROR: syntax error at or near "on"
+?.*
+--删表
+drop table if exists person;
+SQL SUCCESS
+drop table if exists address;
+SQL SUCCESS

@@ -1,0 +1,27 @@
+-- @testpoint: 给表的某一列赋予权限查询该列是否另外类型权限
+DROP USER IF EXISTS joe CASCADE;
+SQL SUCCESS
+CREATE USER joe PASSWORD 'Bigdata@123';
+SQL SUCCESS
+DROP table IF EXISTS table_test001;
+SQL SUCCESS
+create table table_test001(c int,d int);
+SQL SUCCESS
+GRANT select (c),update (d) ON table_test001 TO joe;
+SQL SUCCESS
+SELECT has_column_privilege('joe', 'table_test001','c' ,'insert');
++----------------------+
+| has_column_privilege |
++----------------------+
+| false                |
++----------------------+
+SELECT has_column_privilege('joe', 'table_test001',1:: smallint ,'update');
++----------------------+
+| has_column_privilege |
++----------------------+
+| false                |
++----------------------+
+DROP USER IF EXISTS joe CASCADE;
+SQL SUCCESS
+DROP table IF EXISTS table_test001;
+SQL SUCCESS

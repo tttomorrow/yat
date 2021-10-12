@@ -1,0 +1,27 @@
+-- @testpoint: 插入负整数
+drop table if exists smallint02;
+SQL SUCCESS
+create table smallint02 (name smallint);
+SQL SUCCESS
+insert into smallint02 values (-1220);
+SQL SUCCESS
+insert into smallint02 values (-11111);
+SQL SUCCESS
+insert into smallint02 values (-1);
+SQL SUCCESS
+insert into smallint02 values (-2);
+SQL SUCCESS
+insert into smallint02 values (-3);
+SQL SUCCESS
+select * from smallint02;
++--------+
+| name   |
++--------+
+| -1220  |
+| -11111 |
+| -1     |
+| -2     |
+| -3     |
++--------+
+drop table smallint02;
+SQL SUCCESS

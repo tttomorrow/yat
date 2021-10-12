@@ -1,0 +1,16 @@
+-- @testpoint: 文本检索函数strip()处理含有位置常量的tsvector类型
+drop table if exists ts_zhparser;
+SQL SUCCESS
+create table ts_zhparser(id int, body text);
+SQL SUCCESS
+insert into ts_zhparser values(2, 'a:1 fat:2');
+SQL SUCCESS
+select strip(body :: tsvector) from ts_zhparser;
++-----------+
+| strip     |
++-----------+
+| 'a' 'fat' |
++-----------+
+--清理环境
+drop table if exists ts_zhparser;
+SQL SUCCESS

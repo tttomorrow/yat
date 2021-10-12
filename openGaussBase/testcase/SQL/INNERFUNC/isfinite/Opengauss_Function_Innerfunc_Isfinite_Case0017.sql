@@ -1,0 +1,6 @@
+-- @testpoint: isfinite有效值测试，参数为timestamp类型
+--测试判断是否为有效时间
+SELECT isfinite(timestamp '2001-02-16 21:28:30') from sys_dummy;
+SELECT isfinite(timestamp '2020-02-28 21:28:30') from sys_dummy;
+
+

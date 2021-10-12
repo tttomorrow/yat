@@ -1,0 +1,26 @@
+-- @testpoint: 关键字unnamed，用作字段类型（合理报错）
+drop table if exists unnamed_test cascade;
+SQL SUCCESS
+create table if not exists unnamed_test(id int,unnamed unnamed(20));
+?.*ERROR.*
+?.*Position: .*
+create or replace procedure unnamed_insert
+as
+begin
+ for i in 1..10 loop
+    insert into unnamed_test values(i,'unnamed'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call unnamed_insert();
+?.*ERROR.*
+  Where: PL/pgSQL function unnamed_insert() line 4 at SQL statement
+select * from unnamed_test;
+?.*ERROR.*
+?.*Position: .*
+--清理环境
+drop table if exists unnamed_test cascade;
+SQL SUCCESS
+drop procedure unnamed_insert;
+SQL SUCCESS

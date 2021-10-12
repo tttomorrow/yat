@@ -1,0 +1,13 @@
+-- @testpoint: 创建列存表以及列存表GIN索引
+drop table if exists table_t3;
+SQL SUCCESS
+create table table_t3(a int, b text) with (orientation = column);
+SQL SUCCESS
+DROP INDEX if exists gin_test;
+SQL SUCCESS
+create index gin_test on table_t3 using gin(to_tsvector('ngram', b));
+SQL SUCCESS
+DROP INDEX if exists gin_test;
+SQL SUCCESS
+drop table if exists table_t3;
+SQL SUCCESS

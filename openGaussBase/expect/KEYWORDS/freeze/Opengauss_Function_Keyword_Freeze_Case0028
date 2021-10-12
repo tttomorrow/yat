@@ -1,0 +1,67 @@
+-- @testpoint: opengauss关键字freeze(保留)，作为同义词对象名，部分测试点合理报错
+--前置条件
+drop table if exists freeze_test;
+SQL SUCCESS
+create table freeze_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-失败
+drop synonym if exists freeze;
+?.*ERROR: syntax error at or near "freeze".*
+?.*Position.*
+create synonym freeze for freeze_test;
+?.*ERROR: syntax error at or near "freeze".*
+?.*Position.*
+--关键字带双引号-成功
+drop synonym if exists "freeze";
+SQL SUCCESS
+create synonym "freeze" for freeze_test;
+SQL SUCCESS
+insert into "freeze" values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update "freeze" set "freeze".name='cici' where "freeze".id=2;
+SQL SUCCESS
+select * from "freeze";
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--清理环境
+drop synonym "freeze";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'freeze';
+?.*ERROR: syntax error at or near "'freeze'".*
+?.*Position.*
+create synonym 'freeze' for freeze_test;
+?.*ERROR: syntax error at or near "'freeze'".*
+?.*Position.*
+insert into 'freeze' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'freeze'".*
+?.*Position.*
+update 'freeze' set 'freeze'.name='cici' where 'freeze'.id=2;
+?.*ERROR: syntax error at or near "'freeze'".*
+?.*Position.*
+select * from 'freeze';
+?.*ERROR: syntax error at or near "'freeze'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop synonym if exists `freeze`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create synonym `freeze` for freeze_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+insert into `freeze` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+update `freeze` set `freeze`.name='cici' where `freeze`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+select * from `freeze`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+--清理环境
+drop table if exists freeze_test;
+SQL SUCCESS

@@ -1,0 +1,25 @@
+-- @testpoint: alter table对有空值的列设置not nul约束时合理报错
+drop table if exists alter_table_tb001;
+SQL SUCCESS
+create table alter_table_tb001
+(
+c1 int,
+c2 bigint,
+c3 varchar(20)
+);
+SQL SUCCESS
+insert into alter_table_tb001 values('11',null,'sss');
+SQL SUCCESS
+insert into alter_table_tb001 values('21','','sss');
+SQL SUCCESS
+insert into alter_table_tb001 values('31',66,'');
+SQL SUCCESS
+insert into alter_table_tb001 values('41',66,null);
+SQL SUCCESS
+alter table alter_table_tb001 modify c3 varchar(50);
+SQL SUCCESS
+alter table alter_table_tb001 modify c3  not null;
+?.*ERROR: column "c3" contains null values
+--error
+drop table if exists alter_table_tb001;
+SQL SUCCESS

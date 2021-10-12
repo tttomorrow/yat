@@ -1,0 +1,30 @@
+--  @testpoint:修改函数的模式
+drop FUNCTION if EXISTS u_testfun55(c_int int);
+SQL SUCCESS
+CREATE FUNCTION u_testfun55 ( INOUT c_int int) RETURNS int  AS $$
+        BEGIN
+                RETURN (c_int);
+        END;
+$$ LANGUAGE plpgsql;
+/
+SQL SUCCESS
+--创建hs模式
+drop schema if EXISTS hs cascade;
+SQL SUCCESS
+create schema hs;
+SQL SUCCESS
+--修改函数模式
+ALTER FUNCTION u_testfun55(c_int int) SET SCHEMA hs;
+SQL SUCCESS
+--查询函数信息
+select proargnames,proname from pg_proc where proname='u_testfun55';
++-------------+-------------+
+| proargnames | proname     |
++-------------+-------------+
+| {c_int}     | u_testfun55 |
++-------------+-------------+
+--清理环境
+drop FUNCTION hs.u_testfun55;
+SQL SUCCESS
+drop schema hs;
+SQL SUCCESS

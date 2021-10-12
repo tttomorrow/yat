@@ -1,0 +1,32 @@
+--  @testpoint:opengauss关键字user(保留)，作为序列名
+--关键字不带引号-失败
+drop sequence if exists user;
+?.*ERROR: syntax error at or near "user"
+?.*Position: .*
+create sequence user start 100 cache 50;
+?.*ERROR: syntax error at or near "user"
+?.*Position: .*
+drop sequence user;
+?.*ERROR: syntax error at or near "user"
+?.*Position: .*
+--关键字带双引号-成功
+drop sequence if exists "user";
+SQL SUCCESS
+create sequence "user" start 100 cache 50;
+SQL SUCCESS
+drop sequence "user";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'user';
+?.*ERROR: syntax error at or near "'user'"
+?.*Position: .*
+create sequence 'user' start 100 cache 50;
+?.*ERROR: syntax error at or near "'user'"
+?.*Position: .*
+--关键字带反引号-合理报错
+drop sequence if exists `user`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+create sequence `user` start 100 cache 50;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*

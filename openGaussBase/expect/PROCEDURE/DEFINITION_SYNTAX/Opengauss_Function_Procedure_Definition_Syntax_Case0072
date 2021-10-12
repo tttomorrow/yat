@@ -1,0 +1,2 @@
+-- @testpoint: 定义匿名块，不加/结尾，合理报错
+?.*Sql parse error.*

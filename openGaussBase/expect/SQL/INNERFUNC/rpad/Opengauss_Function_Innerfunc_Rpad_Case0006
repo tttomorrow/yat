@@ -1,0 +1,17 @@
+-- @testpoint: rpad函数与order by联用
+drop table if exists tb;
+SQL SUCCESS
+create table tb(id text,name char(30));
+SQL SUCCESS
+insert into tb values('00001123','Curry'),('00001125','Selenia'),('00001128','hebe');
+SQL SUCCESS
+select id from tb order by rpad(name,15,'3');
++----------+
+| id       |
++----------+
+| 00001123 |
+| 00001125 |
+| 00001128 |
++----------+
+drop table tb;
+SQL SUCCESS

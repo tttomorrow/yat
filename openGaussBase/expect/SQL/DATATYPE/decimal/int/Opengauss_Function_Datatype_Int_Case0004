@@ -1,0 +1,13 @@
+-- @testpoint: 插入右边界范围值
+drop table if exists int04;
+SQL SUCCESS
+create table int04 (name int);
+SQL SUCCESS
+SQL SUCCESS
+select * from int04;
++------------+
+| name       |
++------------+
++------------+
+drop table int04;
+SQL SUCCESS

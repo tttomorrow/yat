@@ -1,0 +1,32 @@
+--  @testpoint:opengauss关键字distinct(保留)，作为序列名
+--关键字不带引号-失败
+drop sequence if exists distinct;
+?.*ERROR: syntax error at or near "distinct"
+?.*Position: .*
+create sequence distinct start 100 cache 50;
+?.*ERROR: syntax error at or near "distinct"
+?.*Position: .*
+drop sequence distinct;
+?.*ERROR: syntax error at or near "distinct"
+?.*Position: .*
+--关键字带双引号-成功
+drop sequence if exists "distinct";
+SQL SUCCESS
+create sequence "distinct" start 100 cache 50;
+SQL SUCCESS
+drop sequence "distinct";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'distinct';
+?.*ERROR: syntax error at or near "'distinct'"
+?.*Position: .*
+create sequence 'distinct' start 100 cache 50;
+?.*ERROR: syntax error at or near "'distinct'"
+?.*Position: .*
+--关键字带反引号-合理报错
+drop sequence if exists `distinct`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+create sequence `distinct` start 100 cache 50;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*

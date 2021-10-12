@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字Instantiable(非保留)，作为模式名
+--关键字不带引号-成功
+drop schema if exists Instantiable;
+SQL SUCCESS
+create schema Instantiable;
+SQL SUCCESS
+drop schema Instantiable;
+SQL SUCCESS
+--关键字带双引号-成功
+drop schema if exists "Instantiable";
+SQL SUCCESS
+create schema "Instantiable";
+SQL SUCCESS
+drop schema "Instantiable";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop schema if exists 'Instantiable';
+?.*ERROR: syntax error at or near "'Instantiable'".*
+?.*Position: .*
+create schema 'Instantiable';
+?.*ERROR: syntax error at or near "'Instantiable'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop schema if exists `Instantiable`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create schema `Instantiable`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

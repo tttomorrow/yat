@@ -1,0 +1,9 @@
+-- @testpoint: 数组操作符>=，判断一个数组是否大于或等于另一个数组
+
+--当前面数组大于等于后面数组时返回true
+select array[1,4,3] >= array[1,4,3] as result;
+select array[1,4,5] >= array[1,4,3] as result;
+
+--当前面数组不大于等于后面数组时返回false
+select array[1,2,3] >= array[1,2,5] as result;
+

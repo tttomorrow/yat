@@ -1,0 +1,31 @@
+--  @testpoint:opengauss关键字binary_integer(非保留)，作为角色名
+--关键字不带引号-成功
+drop role if exists binary_integer;
+SQL SUCCESS
+create role binary_integer with password 'gauss@123' valid until '2020-12-31';
+SQL SUCCESS
+--清理环境
+drop role binary_integer;
+SQL SUCCESS
+--关键字带双引号-成功
+drop role if exists "binary_integer";
+SQL SUCCESS
+create role "binary_integer" with password 'gauss@123' valid until '2020-12-31';
+SQL SUCCESS
+--清理环境
+drop role "binary_integer";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop role if exists 'binary_integer';
+?.*ERROR: syntax error at or near "'binary_integer'".*
+?.*Position: .*
+create role 'binary_integer' with password 'gauss@123' valid until '2020-12-31';
+?.*ERROR: syntax error at or near "'binary_integer'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop role if exists `binary_integer`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create role `binary_integer` with password 'gauss@123' valid until '2020-12-31';
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

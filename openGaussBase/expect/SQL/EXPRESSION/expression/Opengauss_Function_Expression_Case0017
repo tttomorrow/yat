@@ -1,0 +1,96 @@
+--  @testpoint: NOT IN
+--右侧括号中的是一个表达式列表。
+--左侧表达式的结果与表达式列表的内容进行比较。
+--如果在列表中的内容没有符合左侧表达式结果的内容，则NOT IN的结果为true。
+--如果有符合的内容，则NOT IN的结果为false
+--一般常用的数值，日期，和字符表达式，与函数结合
+SELECT 8000+500 NOT IN (10000, 9000) AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+SELECT NOT (8000+500  IN (10000, 9000)) AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+SELECT 'hello'::TEXT || ' world'::TEXT NOT IN ('hello world', 'hello','world') AS RESULT;
++--------+
+| result |
++--------+
+| false  |
++--------+
+SELECT NOT ('hello'::TEXT || ' world'::TEXT  IN ('hello world', 'hello','world')) AS RESULT;
++--------+
+| result |
++--------+
+| false  |
++--------+
+SELECT ADD_MONTHS('2020-10-13',1) NOT IN ('2020-11-01'::timestamp,'2020-11-13 00:00:05'::timestamp,'2020-11-04'::timestamp) AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+SELECT NOT (ADD_MONTHS('2020-10-13',1) IN ('2020-11-01'::timestamp,'2020-11-13 00:00:05'::timestamp,'2020-11-04'::timestamp)) AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+--表达式结果为null，NOT IN返回NULL
+SELECT null NOT IN (10000, 9000) AS RESULT;
++--------+
+| result |
++--------+
+|        |
++--------+
+SELECT NOT (null  IN (10000, 9000)) AS RESULT;
++--------+
+| result |
++--------+
+|        |
++--------+
+--表达式列表不符合表达式的条件且右侧表达式列表返回结果至少一处为空，NOT IN返回NULL
+SELECT  8000+500 NOT IN (10000, 9000, null) AS RESULT;
++--------+
+| result |
++--------+
+|        |
++--------+
+SELECT  NOT (8000+500  IN (10000, 9000, null)) AS RESULT;
++--------+
+| result |
++--------+
+|        |
++--------+
+--表达式列表符合表达式的条件且右侧表达式列表返回结果至少一处为空，NOT IN返回FALSE
+SELECT  8000+2000 NOT IN (10000, 9000, null) AS RESULT;
++--------+
+| result |
++--------+
+| false  |
++--------+
+SELECT NOT (8000+2000 IN (10000, 9000, null)) AS RESULT;
++--------+
+| result |
++--------+
+| false  |
++--------+
+--表达式列表不符合表达式的条件且右侧表达式列表返回结果均不为空，NOT IN返回TRUE
+SELECT  8000+200 NOT IN (10000, 9000) AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+SELECT NOT ( 8000+200  IN (10000, 9000)) AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+--环境清理
+--no need to clean

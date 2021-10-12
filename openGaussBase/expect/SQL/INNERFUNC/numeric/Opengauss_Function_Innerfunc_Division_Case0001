@@ -1,0 +1,20 @@
+-- @testpoint: 数字操作符/(除)，正整数之间相除
+drop table if exists data_01;
+SQL SUCCESS
+create table data_01 (clo1 int,clo2 SMALLINT);
+SQL SUCCESS
+insert into data_01 values (255, 25);
+SQL SUCCESS
+select clo1 / clo2 from data_01;
++----------+
+| ?column? |
++----------+
+| 10.2     |
++----------+
+SELECT 124/45 AS RESULT;
++--------------------+
+| result             |
++--------------------+
++--------------------+
+drop table if exists data_01;
+SQL SUCCESS

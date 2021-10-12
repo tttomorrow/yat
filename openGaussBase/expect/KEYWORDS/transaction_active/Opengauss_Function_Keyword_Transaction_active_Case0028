@@ -1,0 +1,66 @@
+-- @testpoint: opengauss关键字transaction_active(非保留)，作为同义词对象名,部分测试点合理报错
+--前置条件
+drop table if exists explain_test;
+SQL SUCCESS
+create table explain_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists transaction_active;
+SQL SUCCESS
+create synonym transaction_active for explain_test;
+SQL SUCCESS
+insert into transaction_active values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update transaction_active set transaction_active.name='cici' where transaction_active.id=2;
+SQL SUCCESS
+select * from transaction_active;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+drop synonym if exists transaction_active;
+SQL SUCCESS
+--关键字带双引号-成功
+drop synonym if exists "transaction_active";
+SQL SUCCESS
+create synonym "transaction_active" for explain_test;
+SQL SUCCESS
+drop synonym if exists "transaction_active";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'transaction_active';
+?.*ERROR: syntax error at or near "'transaction_active'".*
+?.*Position: .*
+create synonym 'transaction_active' for explain_test;
+?.*ERROR: syntax error at or near "'transaction_active'".*
+?.*Position: .*
+insert into 'transaction_active' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'transaction_active'".*
+?.*Position: .*
+update 'transaction_active' set 'transaction_active'.name='cici' where 'transaction_active'.id=2;
+?.*ERROR: syntax error at or near "'transaction_active'".*
+?.*Position: .*
+select * from 'transaction_active';
+?.*ERROR: syntax error at or near "'transaction_active'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop synonym if exists `transaction_active`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create synonym `transaction_active` for explain_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+insert into `transaction_active` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+update `transaction_active` set `transaction_active`.name='cici' where `transaction_active`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+select * from `transaction_active`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+--清理环境
+drop table if exists explain_test;
+SQL SUCCESS

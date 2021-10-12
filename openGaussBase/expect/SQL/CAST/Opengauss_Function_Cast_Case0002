@@ -1,0 +1,109 @@
+-- @testpoint: varchar类型转换
+--查询源数据类型和目标数据类型间的转化方式：
+--'e'：表示只能进行显式转化（使用CAST或::语法）。
+--'i'：表示只能进行隐式转化。
+--'a'：表示类型间同时支持隐式和显式转化。
+--转化方法：
+--'f'：使用castfunc字段中指定的函数进行转化。
+--'b'：类型间是二进制强制转化，不使用castfunc。
+select typname,proname,castcontext,castmethod from pg_cast c
+join pg_type t on t.oid=c.casttarget
+left join pg_proc p on p.oid=c.castfunc
+where c.oid in (select oid from pg_cast
+where castsource= (select oid from pg_type where typname='varchar'));
++---------------+--------------------------+-------------+------------+
+| typname       | proname                  | castcontext | castmethod |
++---------------+--------------------------+-------------+------------+
+| regclass      | regclass                 | i           | f          |
+| text          |                          | i           | b          |
+| clob          |                          | i           | b          |
+| bpchar        |                          | i           | b          |
+| nvarchar2     |                          | i           | b          |
+| char          | char                     | a           | f          |
+| name          | name                     | i           | f          |
+| xml           | xml                      | e           | f          |
+| varchar       | varchar                  | i           | f          |
+| date          | varchar_date             | i           | f          |
+| numeric       | varchar_numeric          | i           | f          |
+| int4          | varchar_int4             | i           | f          |
+| int8          | varchar_int8             | i           | f          |
+| timestamp     | varchar_timestamp        | i           | f          |
+| raw           | hextoraw                 | i           | f          |
+| interval      | to_interval              | i           | f          |
+| smalldatetime | varchar2_to_smlldatetime | i           | f          |
+| float4        | varchar_float4           | i           | f          |
+| float8        | varchar_float8           | i           | f          |
++---------------+--------------------------+-------------+------------+
+--建表
+drop table if exists test_cast_0002 cascade;
+SQL SUCCESS
+create table test_cast_0002(
+c_char char,
+c_name name,
+c_int8 int8,
+c_int4 int4,
+c_text text,
+c_float4 float4,
+c_float8 float8,
+c_bpchar bpchar,
+c_varchar varchar,
+c_nvarchar2 nvarchar2,
+c_date date,
+c_timestamp timestamp,
+c_interval interval,
+c_numeric numeric,
+c_regclass regclass,
+c_smalldatetime smalldatetime,
+c_raw raw,
+c_clob clob
+);
+SQL SUCCESS
+--查询转换计划
+--test point：隐式转换
+explain performance insert into test_cast_0002 values(
+'t'::varchar,
+'test_cast_0002'::varchar,
+'0002'::varchar,
+'0002'::varchar,
+'test_cast_0002'::varchar,
+'0.0002'::varchar,
+'0.0002'::varchar,
+'test_cast_0002'::varchar,
+'test_cast_0002'::varchar,
+'test_cast_0002'::varchar,
+'2020-09-28'::varchar,
+'2020-09-28'::varchar,
+'10'::varchar,
+'1.0002'::varchar,
+'test_cast_0002'::varchar,
+'2020-09-28'::varchar,
+HEXTORAW('DEADBEEF')::varchar,
+'test_cast_0002'::varchar
+);
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*
+?.*
+?.*
+?.*
+?.*
+--test point：显式转换
+explain performance insert into test_cast_0002(c_char) values(cast('t'::varchar as char));
+?.*
+?.*QUERY PLAN.*
+?.*
+?..*
+?.*
+?.*
+?.*
+?.*
+?.*Output: 't'::character\(1\), NULL::name, NULL::bigint, NULL::integer, NULL::text, NULL::real, NULL::double precision, NULL::bpchar, NULL::character varying, NULL::nvarchar2, NULL::timestamp without time zone, NULL::timestamp without time zone, NULL::interval, NULL::numeric, NULL::regclass, NULL::smalldatetime, NULL::raw, NULL::clob.*
+?.*
+?.*
+?.*
+--清理数据
+drop table if exists test_cast_0002 cascade;
+SQL SUCCESS

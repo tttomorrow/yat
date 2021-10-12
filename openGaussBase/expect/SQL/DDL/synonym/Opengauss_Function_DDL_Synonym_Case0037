@@ -1,0 +1,69 @@
+-- @testpoint: with语句查询中，使用同义词
+-- @modify at: 2020-11-25
+--建表
+drop table if exists syn_table_0037 cascade;
+SQL SUCCESS
+create table syn_table_0037(id int, pid int,name varchar(10));
+SQL SUCCESS
+--插入数据
+insert into syn_table_0037 values(2 , 0 , 'a');
+SQL SUCCESS
+insert into syn_table_0037 values(1 , 0 , 'b');
+SQL SUCCESS
+insert into syn_table_0037 values(3 , 2 , 'c');
+SQL SUCCESS
+insert into syn_table_0037 values(4 , 2 , 'd') ;
+SQL SUCCESS
+insert into syn_table_0037 values(5 , 2 , 'e');
+SQL SUCCESS
+insert into syn_table_0037 values(6 , 2 , 'f') ;
+SQL SUCCESS
+insert into syn_table_0037 values(7 , 3 , 'g');
+SQL SUCCESS
+insert into syn_table_0037 values(8 , 3 , 'h') ;
+SQL SUCCESS
+insert into syn_table_0037 values(9 , 4 , 'i');
+SQL SUCCESS
+insert into syn_table_0037 values(10 , 5 , 'j') ;
+SQL SUCCESS
+insert into syn_table_0037 values(11 , 7 , 'k');
+SQL SUCCESS
+insert into syn_table_0037 values(12 , 2 , 'l') ;
+SQL SUCCESS
+insert into syn_table_0037 values(13 , 9 , 'm');
+SQL SUCCESS
+insert into syn_table_0037 values(14 , 9 , 'n') ;
+SQL SUCCESS
+insert into syn_table_0037 values(15 , 4 , 'o');
+SQL SUCCESS
+--创建表的同义词
+drop synonym if exists syn_table_0037_bak;
+SQL SUCCESS
+create synonym syn_table_0037_bak  for syn_table_0037;
+SQL SUCCESS
+--with recursive语句使用临时表
+with recursive temp_syn_table_0037(t_pid,t_name) as(select distinct pid,name from syn_table_0037_bak)select * from temp_syn_table_0037;
++-------+--------+
+| t_pid | t_name |
++-------+--------+
+| 3     | h      |
+| 7     | k      |
+| 9     | m      |
+| 2     | f      |
+| 2     | e      |
+| 5     | j      |
+| 0     | a      |
+| 2     | d      |
+| 3     | g      |
+| 0     | b      |
+| 9     | n      |
+| 4     | o      |
+| 4     | i      |
+| 2     | l      |
+| 2     | c      |
++-------+--------+
+--清理数据
+drop table if exists syn_table_0037 cascade;
+SQL SUCCESS
+drop synonym if exists syn_table_0037_bak;
+SQL SUCCESS

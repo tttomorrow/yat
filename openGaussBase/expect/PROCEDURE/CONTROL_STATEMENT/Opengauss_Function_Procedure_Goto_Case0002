@@ -1,0 +1,24 @@
+-- @testpoint: 存储过程中goto语句使用  目标lable不一致，合理报错
+create or replace procedure goto_test()
+as
+declare
+    v1  int;
+begin
+    v1  := 0;
+        loop
+        exit when v1 > 100;
+                v1 := v1 + 2;
+                if v1 > 25 then
+                        goto v1;
+                end if;
+        end loop;
+	<<v1>>
+	v1 := v1 + 10;
+	raise info 'v1 is %. ', v1;
+end;
+/
+?.*ERROR: syntax error at or near "v1".*
+call goto_test();
+?.*ERROR: function "goto_test" doesn't exist.*
+drop procedure goto_test;
+?.*ERROR: function goto_test does not exist

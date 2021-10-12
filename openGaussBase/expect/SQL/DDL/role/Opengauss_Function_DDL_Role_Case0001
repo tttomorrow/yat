@@ -1,0 +1,7 @@
+-- @testpoint: 创建角色
+drop ROLE if exists sys_role;
+SQL SUCCESS
+CREATE  ROLE  sys_role with  createdb IDENTIFIED BY 'Bigdata@123' ;
+SQL SUCCESS
+drop ROLE if exists sys_role;
+SQL SUCCESS

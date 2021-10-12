@@ -1,0 +1,27 @@
+-- @testpoint: 创建列类型为整数类型INT2,插入数据超过边界时合理报错
+drop table if exists table_1;
+SQL SUCCESS
+create table table_1(a INT2);
+SQL SUCCESS
+insert into table_1 values(-32768);
+SQL SUCCESS
+insert into table_1 values(12553);
+SQL SUCCESS
+insert into table_1 values(32767);
+SQL SUCCESS
+insert into table_1 values(-32769);
+?.*ERROR: smallint out of range
+  Where: referenced column: a
+insert into table_1 values(32768);
+?.*ERROR: smallint out of range
+  Where: referenced column: a
+select * from table_1;
++--------+
+| a      |
++--------+
+| -32768 |
+| 12553  |
+| 32767  |
++--------+
+drop table if exists table_1;
+SQL SUCCESS

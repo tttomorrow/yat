@@ -1,0 +1,19 @@
+-- @testpoint: 需要创建触发器的表名称不存在（检查报错的合理性检查），合理报错
+
+
+--创建触发器函数
+CREATE OR REPLACE FUNCTION tri_insert_func01() RETURNS TRIGGER AS
+$$
+DECLARE
+BEGIN
+	INSERT INTO test_trigger_des_tbl0 VALUES(NEW.id1, NEW.id2, NEW.id3);
+	TRUNCATE TABLE test_trigger_des_tbl0;
+	RETURN NEW;
+END
+$$ LANGUAGE PLPGSQL;
+/
+--创建触发器
+CREATE TRIGGER insert_trigger01 BEFORE INSERT or DELETE ON test_trigger_src_tbl0 FOR EACH ROW EXECUTE PROCEDURE tri_insert_func01();
+/
+--清理资源
+DROP FUNCTION tri_insert_func01();

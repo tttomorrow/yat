@@ -1,0 +1,21 @@
+-- @testpoint: 插入有效正整数
+drop table if exists binary_integer10;
+SQL SUCCESS
+create table binary_integer10 (name binary_integer);
+SQL SUCCESS
+insert into binary_integer10 values (123);
+SQL SUCCESS
+insert into binary_integer10 values (122340);
+SQL SUCCESS
+insert into binary_integer10 values (99999999);
+SQL SUCCESS
+select * from binary_integer10;
++----------+
+| name     |
++----------+
+| 123      |
+| 122340   |
+| 99999999 |
++----------+
+drop table binary_integer10;
+SQL SUCCESS

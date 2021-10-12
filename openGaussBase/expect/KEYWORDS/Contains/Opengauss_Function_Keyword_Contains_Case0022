@@ -1,0 +1,29 @@
+-- @testpoint: opengauss关键字contains(非保留)，作为用户组名，部分测试点合理报错
+--关键字不带引号-成功
+drop group if exists contains;
+SQL SUCCESS
+create group contains with password 'gauss@123';
+SQL SUCCESS
+drop group if exists contains;
+SQL SUCCESS
+--关键字带双引号-成功
+drop group if exists "contains";
+SQL SUCCESS
+create group "contains" with password 'gauss@123';
+SQL SUCCESS
+drop group if exists "contains";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop group if exists 'contains';
+?.*ERROR: syntax error at or near "'contains'"
+?.*
+create group 'contains' with password 'gauss@123';
+?.*ERROR: syntax error at or near "'contains'"
+?.*
+--关键字带反引号-合理报错
+drop group if exists `contains`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create group `contains` with password 'gauss@123';
+?.*ERROR: syntax error at or near "`"
+?.*

@@ -1,0 +1,37 @@
+-- @testpoint: substring函数合法值及空值测试
+select substring('jjslfhaha' from 6 for 4);
++-----------+
+| substring |
++-----------+
+| haha      |
++-----------+
+select substring('jjslfhaha' from null for 4);
++-----------+
+| substring |
++-----------+
+|           |
++-----------+
+select substring('jjslfhaha' from 6 for null);
++-----------+
+| substring |
++-----------+
+|           |
++-----------+
+select substring('jjslfhaha' from null for null);
++-----------+
+| substring |
++-----------+
+|           |
++-----------+
+select substring('jjslfhaha' from 0 for 6);
++-----------+
+| substring |
++-----------+
+| jjslf     |
++-----------+
+select substring('jjslfhaha' from -1 for 6);
++-----------+
+| substring |
++-----------+
+| jjsl      |
++-----------+

@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字yes非保留)，作为序列名
+--关键字不带引号-成功
+drop sequence if exists yes;
+SQL SUCCESS
+create sequence yes start 100 cache 50;
+SQL SUCCESS
+drop sequence yes;
+SQL SUCCESS
+--关键字带双引号-成功
+drop sequence if exists "yes";
+SQL SUCCESS
+create sequence "yes" start 100 cache 50;
+SQL SUCCESS
+drop sequence "yes";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'yes';
+?.*ERROR: syntax error at or near "'yes'".*
+?.*Position: .*
+create sequence 'yes' start 100 cache 50;
+?.*ERROR: syntax error at or near "'yes'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop sequence if exists `yes`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create sequence `yes` start 100 cache 50;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

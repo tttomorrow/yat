@@ -1,0 +1,15 @@
+-- @testpoint: opengauss比较操作符<,比较类型:BOOLEAN
+drop table if exists ts_zhparser;
+SQL SUCCESS
+CREATE TABLE ts_zhparser(mon BOOLEAN, mon1 BOOLEAN);
+SQL SUCCESS
+INSERT INTO ts_zhparser VALUES(false, true);
+SQL SUCCESS
+select * from ts_zhparser where mon < mon1;
++-------+------+
+| mon   | mon1 |
++-------+------+
+| false | true |
++-------+------+
+drop table if exists ts_zhparser;
+SQL SUCCESS

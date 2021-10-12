@@ -1,0 +1,36 @@
+-- @testpoint: covar_samp函数返回结果用于create table as select
+drop table if exists T_VAR_POP_SAMP_VARIANCE01;
+SQL SUCCESS
+CREATE TABLE  T_VAR_POP_SAMP_VARIANCE01(
+     COL_1 integer,
+     COL_2 number(19,0), 
+     COL_3 number(10,6));
+SQL SUCCESS
+insert into T_VAR_POP_SAMP_VARIANCE01 values(7,312.245,7+445.255);
+SQL SUCCESS
+insert into T_VAR_POP_SAMP_VARIANCE01 values(5,112.245,7+443.255);
+SQL SUCCESS
+DROP TABLE IF EXISTS T_VAR_SAMP_DEFALUT03;
+SQL SUCCESS
+CREATE TABLE T_VAR_SAMP_DEFALUT03 as SELECT covar_samp(COL_2,COL_2) as a FROM T_VAR_POP_SAMP_VARIANCE01 group by COL_1,COL_2,COL_3;
+SQL SUCCESS
+select * from T_VAR_SAMP_DEFALUT03 order by 1;
++---+
+| a |
++---+
+|   |
+|   |
++---+
+DROP TABLE IF EXISTS T_VAR_SAMP_DEFALUT03;
+SQL SUCCESS
+CREATE TABLE T_VAR_SAMP_DEFALUT03 as SELECT covar_samp(COL_2-COL_3,COL_2-COL_3) as a FROM T_VAR_POP_SAMP_VARIANCE01;
+SQL SUCCESS
+select * from T_VAR_SAMP_DEFALUT03 order by 1;
++--------------------+
+| a                  |
++--------------------+
++--------------------+
+DROP TABLE IF EXISTS T_VAR_SAMP_DEFALUT03;
+SQL SUCCESS
+drop table if exists T_VAR_POP_SAMP_VARIANCE01;
+SQL SUCCESS

@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字type(非保留)，作为角色名
+--关键字不带引号-成功
+drop role if exists type;
+SQL SUCCESS
+create role type with password 'gauss@123' valid until '2020-12-31';
+SQL SUCCESS
+drop role type;
+SQL SUCCESS
+--关键字带双引号-成功
+drop role if exists "type";
+SQL SUCCESS
+create role "type" with password 'gauss@123' valid until '2020-12-31';
+SQL SUCCESS
+drop role "type";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop role if exists 'type';
+?.*ERROR: syntax error at or near "'type'".*
+?.*Position: .*
+create role 'type' with password 'gauss@123' valid until '2020-12-31';
+?.*ERROR: syntax error at or near "'type'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop role if exists `type`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create role `type` with password 'gauss@123' valid until '2020-12-31';
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

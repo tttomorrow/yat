@@ -1,0 +1,7 @@
+-- @testpoint: 文本检索操作符&&，@@，结合使用，先将两个tsquery类型的词汇进行“与”操作，词汇类型一致时返回结果为true
+select 'fat cats ate fat rats'::tsvector @@ ('fat'::tsquery  && 'ate'::tsquery)  as result;
++--------+
+| result |
++--------+
+| true   |
++--------+

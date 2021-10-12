@@ -1,0 +1,21 @@
+-- @testpoint: 创建表，将“char”数据类型转换至boolean、date，合理报错
+drop table if exists special_char_04;
+SQL SUCCESS
+CREATE  TABLE special_char_04 (id "char");
+SQL SUCCESS
+insert into special_char_04 values ('a');
+SQL SUCCESS
+alter table special_char_04 alter column id TYPE BOOLEAN;
+?.*ERROR: column "id" cannot be cast automatically to type boolean
+  Hint: Specify a USING expression to perform the conversion.
+drop table if exists special_char_04;
+SQL SUCCESS
+CREATE  TABLE special_char_04 (id "char");
+SQL SUCCESS
+insert into special_char_04 values ('a');
+SQL SUCCESS
+alter table special_char_04 alter column id TYPE date;
+?.*ERROR: column "id" cannot be cast automatically to type timestamp without time zone
+  Hint: Specify a USING expression to perform the conversion.
+drop table if exists special_char_04;
+SQL SUCCESS

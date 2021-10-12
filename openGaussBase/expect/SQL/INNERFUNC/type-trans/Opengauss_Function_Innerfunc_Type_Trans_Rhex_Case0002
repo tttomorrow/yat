@@ -1,0 +1,19 @@
+-- @testpoint: 类型转换函数，rawtohex(string)将一个二进制构成的字符串转换为十六进制的字符串，入参为无效值时合理报错
+-- 多参，少参、空值
+SELECT rawtohex();
+?.*ERROR: function rawtohex\(\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: rawtohex
+SELECT rawtohex('A','999');
+?.*ERROR: function rawtohex\(unknown, unknown\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: rawtohex
+SELECT rawtohex(汉字);
+?.*ERROR: column "汉字" does not exist.*
+?.*
+  Where: referenced column: rawtohex
+SELECT rawtohex(0x12L);
+?.*ERROR: syntax error at or near "x12L".*
+?.*

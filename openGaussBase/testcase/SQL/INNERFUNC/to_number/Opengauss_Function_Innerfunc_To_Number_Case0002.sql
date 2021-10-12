@@ -1,0 +1,3 @@
+-- @testpoint: 类型转换函数to_number，参数为小数
+
+select to_number('12.3', '99G999D9S');

@@ -1,0 +1,8 @@
+--  @testpoint:创建数据源对象,添加type选项
+--创建数据源对象,type为空
+DROP DATA SOURCE if exists ds_test3;
+CREATE DATA SOURCE ds_test3 type '';
+--查询创建的数据源对象信息
+select srcname,srctype,srcversion,srcacl,srcoptions from PG_EXTENSION_DATA_SOURCE where srcname = 'ds_test3';
+--删除数据源对象
+DROP DATA SOURCE ds_test3;

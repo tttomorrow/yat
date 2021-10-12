@@ -1,0 +1,13 @@
+-- @testpoint: 插入右边界范围值
+drop table if exists bigserial_08;
+SQL SUCCESS
+create table bigserial_08 (name bigserial);
+SQL SUCCESS
+SQL SUCCESS
+select * from bigserial_08;
++---------------------+
+| name                |
++---------------------+
++---------------------+
+drop table bigserial_08;
+SQL SUCCESS

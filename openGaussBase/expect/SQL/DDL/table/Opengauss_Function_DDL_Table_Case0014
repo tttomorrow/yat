@@ -1,0 +1,29 @@
+-- @testpoint: alter table为列添加check约束，插入数据违背该约束时合理报错
+drop table if exists table_alter_014;
+SQL SUCCESS
+create table table_alter_014 (c1 int,ad VARCHAR(4000) NULL,ad1 VARCHAR(4000) NULL);
+SQL SUCCESS
+alter table table_alter_014 add constraint table_alter_014_check check(ad in ('confirmed','unconfirmed'));
+SQL SUCCESS
+alter table table_alter_014 modify ad not null;
+SQL SUCCESS
+--error
+insert into table_alter_014(ad) values (3);
+?.*ERROR: new row for relation "table_alter_014" violates check constraint "table_alter_014_check".*
+  Detail: Failing row contains (null, 3, null).
+alter table table_alter_014 drop constraint table_alter_014_check;
+SQL SUCCESS
+insert into table_alter_014(ad) values(1);
+SQL SUCCESS
+SELECT col_description(a.attrelid,a.attnum) as comment,format_type(a.atttypid,a.atttypmod) as type,a.attname as name, a.attnotnull as notnull
+FROM pg_class as c,pg_attribute as a
+where c.relname = 'table_alter_014' and a.attrelid = c.oid and a.attnum>0;
++---------+-------------------------+------+---------+
+| comment | type                    | name | notnull |
++---------+-------------------------+------+---------+
+|         | integer                 | c1   | false   |
+|         | character varying(4000) | ad   | true    |
+|         | character varying(4000) | ad1  | false   |
++---------+-------------------------+------+---------+
+drop table if exists table_alter_014;
+SQL SUCCESS

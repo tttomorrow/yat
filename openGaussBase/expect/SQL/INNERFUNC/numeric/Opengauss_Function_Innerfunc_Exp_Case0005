@@ -1,0 +1,15 @@
+-- @testpoint: exp函数入参个数及类型校验，合理报错
+select exp(1,7);
+?.*ERROR: function exp\(integer, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: exp
+select exp();
+?.*ERROR: function exp\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: exp
+select exp('far');
+?.*ERROR: invalid input syntax for type double precision: "far"
+?.*
+  Where: referenced column: exp

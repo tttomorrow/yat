@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字condition(非保留)，作为模式名
+--关键字不带引号-成功
+drop schema if exists condition;
+SQL SUCCESS
+create schema condition;
+SQL SUCCESS
+drop schema condition;
+SQL SUCCESS
+--关键字带双引号-成功
+drop schema if exists "condition";
+SQL SUCCESS
+create schema "condition";
+SQL SUCCESS
+drop schema "condition";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop schema if exists 'condition';
+?.*ERROR: syntax error at or near "'condition'"
+?.*
+create schema 'condition';
+?.*ERROR: syntax error at or near "'condition'"
+?.*
+--关键字带反引号-合理报错
+drop schema if exists `condition`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create schema `condition`;
+?.*ERROR: syntax error at or near "`"
+?.*

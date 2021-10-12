@@ -1,0 +1,26 @@
+-- @testpoint: 存储过程中goto语句使用  不支持goto语句从一个if子句跳转到另一个if子句 合理报错
+
+create or replace procedure proc_if_else_004
+as
+  v_int int;
+begin
+	begin
+		v_int:=10;
+		if((v_int*10+100-90)/10>11)
+		then
+		goto pos1;
+			raise info '10*10+100-90)/10>11';
+		elsif
+		<<pos1>>
+		(v_int<(100/10-10+9))
+		then
+			raise info '10<(100/10-10+9)';
+		elsif(v_int<11)
+		then
+		    raise info '10<11';
+		end if;
+	end;
+end ;
+/
+call proc_if_else_004();
+drop procedure proc_if_else_004;

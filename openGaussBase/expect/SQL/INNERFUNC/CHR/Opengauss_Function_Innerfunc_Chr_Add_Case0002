@@ -1,0 +1,18 @@
+
+
+-- @testpoint: 有效值
+
+drop table if exists TEST_CHR12;
+SQL SUCCESS
+create table TEST_CHR12(COL integer);
+SQL SUCCESS
+insert into TEST_CHR12 values(127);
+SQL SUCCESS
+select chr(COL) as RESULT from TEST_CHR12;
++--------+
+| result |
++--------+
+|       |
++--------+
+drop table TEST_CHR12;
+SQL SUCCESS

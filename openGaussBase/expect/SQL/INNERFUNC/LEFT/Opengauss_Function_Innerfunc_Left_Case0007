@@ -1,0 +1,11 @@
+-- @testpoint: left函数入参个数超过固定值，合理报错
+select left('xiexiaoyu','gaoxin',5);
+?.*ERROR: function left\(unknown, unknown, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: left
+select left('xiexiaoyu','gaoxin',4,5);
+?.*ERROR: function left\(unknown, unknown, integer, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: left

@@ -1,0 +1,57 @@
+-- @testpoint: json格式校验：Str-json（不符合格式合理报错）
+--符合规范(使用反斜杠转义后，数据库显示包含反斜杠)
+select '"abcdefg"'::json;
++-----------+
+| json      |
++-----------+
+| "abcdefg" |
++-----------+
+select '"1"'::json;
++------+
+| json |
++------+
+| "1"  |
++------+
+select '"$$"'::json;
++------+
+| json |
++------+
+| "$$" |
++------+
+select '"\"$$\""'::json;
++----------+
+| json     |
++----------+
+| "\"$$\"" |
++----------+
+select '"[\"www@13^\", 1, {\"name\": \"john\"}, \"2\"]"'::json;
++-------------------------------------------------+
+| json                                            |
++-------------------------------------------------+
+| "[\"www@13^\", 1, {\"name\": \"john\"}, \"2\"]" |
++-------------------------------------------------+
+--不符合规范
+select 'abcdefg'::json;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "abcdefg" is invalid.
+?.*
+  Where: JSON data, line 1: abcdefg
+referenced column: json
+select '''abcdefg'''::json;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "'" is invalid.
+?.*
+  Where: JSON data, line 1: '...
+referenced column: json
+select '\"$$\"'::json;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "\" is invalid.
+?.*
+  Where: JSON data, line 1: \...
+referenced column: json
+select '"["www@13^", 1, {"name": "john"}, "2"]"'::json;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "www" is invalid.
+?.*
+  Where: JSON data, line 1: "["www...
+referenced column: json

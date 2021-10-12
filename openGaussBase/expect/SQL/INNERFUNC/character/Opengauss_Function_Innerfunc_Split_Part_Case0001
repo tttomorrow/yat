@@ -1,0 +1,14 @@
+-- @testpoint: 缺少指定个数，合理报错
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('abc~@~def~@~ghi');
+SQL SUCCESS
+SELECT split_part(string1,'~@~') from type_char;
+?.*ERROR: function split_part\(character, unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: split_part
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

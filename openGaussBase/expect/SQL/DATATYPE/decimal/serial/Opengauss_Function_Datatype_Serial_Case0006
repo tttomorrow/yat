@@ -1,0 +1,15 @@
+-- @testpoint: 插入超出左边界范围值，隐式转换integer
+drop table if exists serial_06;
+SQL SUCCESS
+create table serial_06 (name serial);
+SQL SUCCESS
+insert into serial_06 values (0);
+SQL SUCCESS
+select * from serial_06;
++------+
+| name |
++------+
+| 0    |
++------+
+drop table serial_06;
+SQL SUCCESS

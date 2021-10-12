@@ -1,0 +1,23 @@
+-- @testpoint: 关键字validate,用作字段类型（合理报错）
+drop table if exists validate_test cascade;
+SQL SUCCESS
+create table validate_test(id int,name validate(20));
+?.*ERROR.*
+?.*Position: .*
+create or replace procedure validate_insert
+as
+begin
+ for i in 1..10 loop
+    insert into validate_test values(i,'vali'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call validate_insert();
+?.*ERROR.*
+  Where: PL/pgSQL function validate_insert() line 4 at SQL statement
+select * from validate_test;
+?.*ERROR.*
+?.*Position: .*
+drop procedure validate_insert;
+SQL SUCCESS

@@ -1,0 +1,41 @@
+-- @testpoint: 测试在物化视图中执行DDL（insert、update、delete），合理报错
+--物化视图执行DDL（insert、update、delete）
+drop table if exists student cascade;
+SQL SUCCESS
+create table student
+(
+    id int primary key,
+    name varchar(10) not null
+);
+SQL SUCCESS
+insert into student values (1, 'aaa');
+SQL SUCCESS
+insert into student values (2, 'bbb');
+SQL SUCCESS
+insert into student values (3, 'ccc');
+SQL SUCCESS
+insert into student values (4, 'ddd');
+SQL SUCCESS
+insert into student values (5, 'eee');
+SQL SUCCESS
+insert into student values (6, 'fff');
+SQL SUCCESS
+create materialized view student_mv (id, name) as select * from student;
+SQL SUCCESS
+--insert
+insert into student_mv values (7. 'ggg');
+?.*ERROR: syntax error at or near "'ggg'"
+?.*Position:?.*
+--error
+--update
+update student_mv set name = 'fff_new' where id = 1;
+?.*ERROR: Unsupported feature
+?.*Detail: Materialized view doesn't allow UPDATE
+--error
+--delete
+delete from student_mv where id = 1;
+?.*ERROR: Unsupported feature
+?.*Detail: Materialized view doesn't allow DELETE
+--error
+drop table student cascade;
+SQL SUCCESS

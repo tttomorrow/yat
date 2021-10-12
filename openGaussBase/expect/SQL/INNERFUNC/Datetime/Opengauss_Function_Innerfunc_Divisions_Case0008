@@ -1,0 +1,21 @@
+-- @testpoint: reltime负的时间间隔字符串与整数、浮点数相除
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (col1 reltime);
+SQL SUCCESS
+insert into test_date01 values ('-13 months -10 hours');
+SQL SUCCESS
+select col1 / double precision '1.5' from test_date01;
++--------------------------------------------------------+
+| ?column?                                               |
++--------------------------------------------------------+
+| 0 years -8 mons -16 days -18 hours -40 mins -0.00 secs |
++--------------------------------------------------------+
+select col1/2  from test_date01;
++------------------------------------------------------+
+| ?column?                                             |
++------------------------------------------------------+
+| 0 years -6 mons -12 days -14 hours 0 mins -0.00 secs |
++------------------------------------------------------+
+drop table if exists test_date01;
+SQL SUCCESS

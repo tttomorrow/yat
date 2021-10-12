@@ -1,0 +1,24 @@
+-- @testpoint: 使用bigint别名int8
+drop table if exists bigint16;
+SQL SUCCESS
+create table bigint16 (name int8);
+SQL SUCCESS
+insert into bigint16 values (123);
+SQL SUCCESS
+insert into bigint16 values (9999.8888);
+SQL SUCCESS
+insert into bigint16 values (-23668);
+SQL SUCCESS
+insert into bigint16 values (-0.000012);
+SQL SUCCESS
+select * from bigint16;
++--------+
+| name   |
++--------+
+| 123    |
+| 10000  |
+| -23668 |
+| 0      |
++--------+
+drop table bigint16;
+SQL SUCCESS

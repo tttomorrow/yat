@@ -1,0 +1,21 @@
+--  @testpoint: 删除视图，区分视图的大小写
+drop view VIEW_3;
+SQL SUCCESS
+DROP VIEW view_2;
+SQL SUCCESS
+select * from view_2;
+?.*ERROR: relation "view_2" does not ?.* ?.*
+?.*
+SELECT * FROM VIEW_2 order by 1;
+?.*ERROR: relation "view_2" does not ?.* ?.*
+?.*
+drop view VIEW_2;
+?.*ERROR: view "view_2" does not exist
+DROP VIEW view_3;
+?.*ERROR: view "view_3" does not exist
+SELECT * FROM view_3;
+?.*ERROR: relation "view_3" does not ?.* ?.*
+?.*
+select * from VIEW_2;
+?.*ERROR: relation "view_2" does not ?.* ?.*
+?.*

@@ -1,0 +1,25 @@
+--  @testpoint:opengauss关键字by(非保留)，作为表空间名
+--关键字不带引号，创建成功
+drop tablespace if exists by;
+SQL SUCCESS
+CREATE TABLESPACE by RELATIVE LOCATION 'tablespace/tablespace_1';
+SQL SUCCESS
+--清理环境
+drop tablespace by;
+SQL SUCCESS
+--关键字带双引号，创建成功
+drop tablespace if exists "by";
+SQL SUCCESS
+CREATE TABLESPACE "by" RELATIVE LOCATION 'tablespace/tablespace_1';
+SQL SUCCESS
+--清理环境
+drop tablespace "by";
+SQL SUCCESS
+--关键字带单引号，合理报错
+drop tablespace if exists 'by';
+?.*ERROR: syntax error at or near "'by'".*
+?.*Position.*
+--关键字带反引号，合理报错
+drop tablespace if exists `by`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*

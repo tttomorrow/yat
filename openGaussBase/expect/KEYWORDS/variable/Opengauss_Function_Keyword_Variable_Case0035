@@ -1,0 +1,39 @@
+-- @testpoint: 关键字variable，用作表名创建普通表
+drop table if exists variable cascade;
+SQL SUCCESS
+create table variable(id int,name varchar(20));
+SQL SUCCESS
+create or replace procedure variable_insert
+as
+begin
+ for i in 1..10 loop
+    insert into variable values(i,'vari+'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call variable_insert();
++-----------------+
+| variable_insert |
++-----------------+
+|                 |
++-----------------+
+select * from variable;
++----+---------+
+| id | name    |
++----+---------+
+| 1  | vari+1  |
+| 2  | vari+2  |
+| 3  | vari+3  |
+| 4  | vari+4  |
+| 5  | vari+5  |
+| 6  | vari+6  |
+| 7  | vari+7  |
+| 8  | vari+8  |
+| 9  | vari+9  |
+| 10 | vari+10 |
++----+---------+
+drop table if exists variable cascade;
+SQL SUCCESS
+drop procedure variable_insert;
+SQL SUCCESS

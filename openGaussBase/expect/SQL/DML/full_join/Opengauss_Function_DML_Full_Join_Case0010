@@ -1,0 +1,60 @@
+-- @testpoint: 使用join...on语句，on条件为整数和real类型比较，查询成功
+-- @modify at: 2020-11-13
+--建表
+drop table if exists zsharding_tbl;
+SQL SUCCESS
+create table zsharding_tbl(
+c_id int, c_int int, c_integer integer, c_bool int, c_boolean int, c_bigint integer,
+c_real real, c_double real,
+c_decimal decimal(38), c_number number(38), c_numeric numeric(38),
+c_char char(50) default null, c_varchar varchar(20), c_varchar2 varchar2(4000),
+c_date date, c_datetime date
+)
+PARTITION BY RANGE (c_integer)
+(
+partition P_max values less than (maxvalue)
+);
+SQL SUCCESS
+--插入数据
+SQL SUCCESS
+SQL SUCCESS
+INSERT INTO zsharding_tbl VALUES ( 22, 12, 20000, 1, 1, 0, 1, 10, 3000, 13, 0, 'ekb', 'eekbvumxm', 'd', TO_DATE('1995-08-08', 'YYYY-MM-DD'), TO_DATE('2009-11-25', 'YYYY-MM-DD') );
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+--查询
+select t1.c_integer,t1.c_real,t2.c_integer c1 ,t2.c_real c2 from zsharding_tbl t1 full join zsharding_tbl t2 on t1.c_integer=t2.c_real order by 1,2,3,4;
++-------------+---------------+-------------+---------------+
+| c_integer   | c_real        | c1          | c2            |
++-------------+---------------+-------------+---------------+
+| 0           | 20000.0       |             |               |
+| 20000       | 1.0           | 0           | 20000.0       |
+| 20000       | 1.0           | 500000      | 20000.0       |
+| 20000       | 1.0           | 500000      | 20000.0       |
+| 20000       | 1.0           | 500000      | 20000.0       |
+| 20000       | 2.94453248E8  | 0           | 20000.0       |
+| 20000       | 2.94453248E8  | 500000      | 20000.0       |
+| 20000       | 2.94453248E8  | 500000      | 20000.0       |
+| 20000       | 2.94453248E8  | 500000      | 20000.0       |
+| 30000       | 500000.0      |             |               |
+| 500000      | 20000.0       | 10          | 500000.0      |
+| 500000      | 20000.0       | 10          | 500000.0      |
+| 500000      | 20000.0       | 10          | 500000.0      |
+| 500000      | 20000.0       | 30000       | 500000.0      |
+| 500000      | 20000.0       | 30000       | 500000.0      |
+| 500000      | 20000.0       | 30000       | 500000.0      |
+|             |               | 10          | -1.06391142E9 |
+|             |               | 10          | 11.0          |
+|             |               | 20000       | 1.0           |
+|             |               | 20000       | 2.94453248E8  |
++-------------+---------------+-------------+---------------+
+--删表
+drop table if exists zsharding_tbl;
+SQL SUCCESS

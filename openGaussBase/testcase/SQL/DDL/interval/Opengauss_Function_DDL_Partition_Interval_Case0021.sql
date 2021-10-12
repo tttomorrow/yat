@@ -1,0 +1,13 @@
+-- @testpoint: interval分区,创建时声明like子句,源表不存在,合理报错
+drop table if exists table2;
+create table table2(
+like table1 including indexes
+)
+partition by range (col_4)
+interval ('1 month') 
+(
+	partition table2_p1 values less than ('2020-03-01'),
+	partition table2_p2 values less than ('2020-04-01'),
+	partition table2_p3 values less than ('2020-05-01')
+);
+drop table if exists table2;

@@ -1,0 +1,27 @@
+
+
+--  @testpoint:不同参数个数及类型测试（合理报错）
+
+select asin() as result;
+?.*ERROR: function asin\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: result
+select asin(2  2) as result;
+?.*ERROR: syntax error at or near \"2\"
+?.*
+select asin(2,2) as result;
+?.*ERROR: function asin\(integer, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: result
+select asin(2)(2) as result;
+?.*ERROR: syntax error at or near \"\(\"
+?.*
+select asin('abcd') as result;
+?.*ERROR: invalid input syntax for type double precision: \"abcd\"
+?.*
+  Where: referenced column: result
+select asin 1 as result;
+?.*ERROR: syntax error at or near \"1\"
+?.*

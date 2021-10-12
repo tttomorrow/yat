@@ -1,0 +1,66 @@
+-- @testpoint: opengauss关键字Check(保留)，作为同义词对象名，部分测试点合理报错
+--前置条件
+drop table if exists Check_test;
+SQL SUCCESS
+create table Check_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-失败
+drop synonym if exists Check;
+?.*ERROR: syntax error at or near "Check".*
+?.*Position.*
+create synonym Check for Check_test;
+?.*ERROR: syntax error at or near "Check".*
+?.*Position.*
+--关键字带双引号-成功
+drop synonym if exists "Check";
+SQL SUCCESS
+create synonym "Check" for Check_test;
+SQL SUCCESS
+insert into "Check" values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update "Check" set "Check".name='cici' where "Check".id=2;
+SQL SUCCESS
+select * from "Check";
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--清理环境
+drop synonym "Check";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'Check';
+?.*ERROR: syntax error at or near "'Check'".*
+?.*Position.*
+create synonym 'Check' for Check_test;
+?.*ERROR: syntax error at or near "'Check'".*
+?.*Position.*
+insert into 'Check' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'Check'".*
+?.*Position.*
+update 'Check' set 'Check'.name='cici' where 'Check'.id=2;
+?.*ERROR: syntax error at or near "'Check'".*
+?.*Position.*
+select * from 'Check';
+?.*ERROR: syntax error at or near "'Check'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop synonym if exists `Check`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create synonym `Check` for Check_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+insert into `Check` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+update `Check` set `Check`.name='cici' where `Check`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+select * from `Check`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+drop table if exists Check_test;
+SQL SUCCESS

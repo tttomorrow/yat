@@ -1,0 +1,57 @@
+-- @testpoint: date_part函数入参给interval类型的时间段
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (clo1 interval);
+SQL SUCCESS
+insert into test_date01 values ('-2 YEARS +5 MONTHS 10 DAYS');
+SQL SUCCESS
+select date_part('month', clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| -7.0      |
++-----------+
+SELECT date_part('month', interval '-2 YEARS +5 MONTHS 10 DAYS');
++-----------+
+| date_part |
++-----------+
+| -7.0      |
++-----------+
+select date_part('day', clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| 10.0      |
++-----------+
+SELECT date_part('day', interval '-2 YEARS +5 MONTHS 10 DAYS');
++-----------+
+| date_part |
++-----------+
+| 10.0      |
++-----------+
+select date_part('year', clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| -1.0      |
++-----------+
+SELECT date_part('year', interval '-2 YEARS +5 MONTHS 10 DAYS');
++-----------+
+| date_part |
++-----------+
+| -1.0      |
++-----------+
+select date_part('hour', clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| 0.0       |
++-----------+
+SELECT date_part('hour', interval '-2 YEARS +5 MONTHS 10 DAYS');
++-----------+
+| date_part |
++-----------+
+| 0.0       |
++-----------+
+drop table if exists test_date01;
+SQL SUCCESS

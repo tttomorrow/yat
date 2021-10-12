@@ -1,0 +1,15 @@
+-- @testpoint: 数据类型不是字符
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 int);
+SQL SUCCESS
+insert into type_char values (111);
+SQL SUCCESS
+SELECT lower(string1) from type_char;
++-------+
+| lower |
++-------+
+| 111   |
++-------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

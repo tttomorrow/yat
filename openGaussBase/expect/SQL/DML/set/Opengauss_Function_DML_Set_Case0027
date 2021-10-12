@@ -1,0 +1,26 @@
+--查询是否存在模式名为myschema1
+select * from information_schema.schemata where schema_name='myschema1';
++--------------+-------------+--------------+-------------------------------+------------------------------+----------------------------+----------+
+| catalog_name | schema_name | schema_owner | default_character_set_catalog | default_character_set_schema | default_character_set_name | sql_path |
++--------------+-------------+--------------+-------------------------------+------------------------------+----------------------------+----------+
++--------------+-------------+--------------+-------------------------------+------------------------------+----------------------------+----------+
+--set local to命令设置schema为不存在myschema1，合理报错（实际未报错）
+set local current_schema to myschema1;
+SQL SUCCESS
+--查询当前schema，还是public
+select current_schema;
++----------------+
+| current_schema |
++----------------+
+| public         |
++----------------+
+--set local =命令设置schema为不存在myschema1，合理报错（实际未报错）
+set local current_schema to myschema1;
+SQL SUCCESS
+--查询当前schema，还是public
+select current_schema;
++----------------+
+| current_schema |
++----------------+
+| public         |
++----------------+

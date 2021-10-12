@@ -1,0 +1,18 @@
+-- @testpoint: 指定网络地址输入为空
+drop table if exists test_inet_03;
+SQL SUCCESS
+create table test_inet_03(id int,type inet);
+SQL SUCCESS
+insert into test_inet_03 values(1,null);
+SQL SUCCESS
+insert into test_inet_03 values(2,'');
+SQL SUCCESS
+select * from test_inet_03;
++----+------+
+| id | type |
++----+------+
+| 1  |      |
+| 2  |      |
++----+------+
+drop table test_inet_03;
+SQL SUCCESS

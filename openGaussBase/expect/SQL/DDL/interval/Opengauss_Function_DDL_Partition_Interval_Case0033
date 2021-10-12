@@ -1,0 +1,100 @@
+-- @testpoint: interval分区,创建时声明like子句,指定including partition，则原表的分区定义会复制到新表中
+drop table if exists partiton_table_001;
+SQL SUCCESS
+drop table if exists partiton_table_002;
+SQL SUCCESS
+create table partiton_table_001(
+col_1 smallint,
+col_2 char(30),
+col_3 int,
+col_4 date,
+col_5 boolean,
+col_6 nchar(30),
+col_7 float
+)
+partition by range (col_4)
+interval ('1 month')
+(
+	partition partiton_table_001_p1 values less than ('2020-03-01'),
+	partition partiton_table_001_p2 values less than ('2020-04-01'),
+	partition partiton_table_001_p3 values less than ('2020-05-01')
+);
+SQL SUCCESS
+create table partiton_table_002(
+like partiton_table_001 including partition);
+SQL SUCCESS
+-- 查看分区信息
+select relname, parttype, partstrategy, boundaries,reltablespace from pg_partition
+where parentid = (select oid from pg_class where relname = 'partiton_table_002')
+order by relname;
++-----------------------+----------+--------------+-----------------------+---------------+
+| relname               | parttype | partstrategy | boundaries            | reltablespace |
++-----------------------+----------+--------------+-----------------------+---------------+
+| partiton_table_001_p1 | p        | r            | {2020-03-01 00:00:00} | 0             |
+| partiton_table_001_p2 | p        | r            | {2020-04-01 00:00:00} | 0             |
+| partiton_table_001_p3 | p        | r            | {2020-05-01 00:00:00} | 0             |
+| partiton_table_002    | r        | i            |                       | 0             |
++-----------------------+----------+--------------+-----------------------+---------------+
+-- 插入数据
+insert into partiton_table_002 values (1,'aaa',1,'2020-02-23',true,'aaa',1.1);
+SQL SUCCESS
+insert into partiton_table_002 values (2,'bbb',2,'2020-03-23',false,'bbb',2.2);
+SQL SUCCESS
+insert into partiton_table_002 values (3,'ccc',3,'2020-04-23',true,'ccc',3.3);
+SQL SUCCESS
+insert into partiton_table_002 values (4,'ddd',4,'2020-05-23',false,'ddd',4.4);
+SQL SUCCESS
+insert into partiton_table_002 values (5,'eee',5,'2020-06-23',true,'eee',5.5);
+SQL SUCCESS
+insert into partiton_table_002 values (6,'fff',6,'2020-07-23',false,'fff',6.6);
+SQL SUCCESS
+-- 查看分区信息
+select relname, parttype, partstrategy, boundaries,reltablespace from pg_partition
+where parentid = (select oid from pg_class where relname = 'partiton_table_002')
+order by relname;
++-----------------------+----------+--------------+-----------------------+---------------+
+| relname               | parttype | partstrategy | boundaries            | reltablespace |
++-----------------------+----------+--------------+-----------------------+---------------+
+| partiton_table_001_p1 | p        | r            | {2020-03-01 00:00:00} | 0             |
+| partiton_table_001_p2 | p        | r            | {2020-04-01 00:00:00} | 0             |
+| partiton_table_001_p3 | p        | r            | {2020-05-01 00:00:00} | 0             |
+| partiton_table_002    | r        | i            |                       | 0             |
+| sys_p1                | p        | i            | {2020-06-01 00:00:00} | 0             |
+| sys_p2                | p        | i            | {2020-07-01 00:00:00} | 0             |
+| sys_p3                | p        | i            | {2020-08-01 00:00:00} | 0             |
++-----------------------+----------+--------------+-----------------------+---------------+
+-- 查看各分区中数据
+select * from partiton_table_002 partition (partiton_table_001_p1)order by col_4;
++-------+--------------------------------+-------+-------------------------------+-------+--------------------------------+-------+
+| col_1 | col_2                          | col_3 | col_4                         | col_5 | col_6                          | col_7 |
++-------+--------------------------------+-------+-------------------------------+-------+--------------------------------+-------+
++-------+--------------------------------+-------+-------------------------------+-------+--------------------------------+-------+
+select * from partiton_table_002 partition (partiton_table_001_p2)order by col_4;
++-------+--------------------------------+-------+-------------------------------+-------+--------------------------------+-------+
+| col_1 | col_2                          | col_3 | col_4                         | col_5 | col_6                          | col_7 |
++-------+--------------------------------+-------+-------------------------------+-------+--------------------------------+-------+
++-------+--------------------------------+-------+-------------------------------+-------+--------------------------------+-------+
+select * from partiton_table_002 partition (partiton_table_001_p3)order by col_4;
++-------+--------------------------------+-------+-------------------------------+-------+--------------------------------+-------+
+| col_1 | col_2                          | col_3 | col_4                         | col_5 | col_6                          | col_7 |
++-------+--------------------------------+-------+-------------------------------+-------+--------------------------------+-------+
++-------+--------------------------------+-------+-------------------------------+-------+--------------------------------+-------+
+select * from partiton_table_002 partition (sys_p1)order by col_4;
++-------+--------------------------------+-------+-------------------------------+-------+--------------------------------+-------+
+| col_1 | col_2                          | col_3 | col_4                         | col_5 | col_6                          | col_7 |
++-------+--------------------------------+-------+-------------------------------+-------+--------------------------------+-------+
++-------+--------------------------------+-------+-------------------------------+-------+--------------------------------+-------+
+select * from partiton_table_002 partition (sys_p2)order by col_4;
++-------+--------------------------------+-------+-------------------------------+-------+--------------------------------+-------+
+| col_1 | col_2                          | col_3 | col_4                         | col_5 | col_6                          | col_7 |
++-------+--------------------------------+-------+-------------------------------+-------+--------------------------------+-------+
++-------+--------------------------------+-------+-------------------------------+-------+--------------------------------+-------+
+select * from partiton_table_002 partition (sys_p3)order by col_4;
++-------+--------------------------------+-------+-------------------------------+-------+--------------------------------+-------+
+| col_1 | col_2                          | col_3 | col_4                         | col_5 | col_6                          | col_7 |
++-------+--------------------------------+-------+-------------------------------+-------+--------------------------------+-------+
++-------+--------------------------------+-------+-------------------------------+-------+--------------------------------+-------+
+drop table if exists partiton_table_001;
+SQL SUCCESS
+drop table if exists partiton_table_002;
+SQL SUCCESS

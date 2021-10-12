@@ -1,0 +1,63 @@
+-- @testpoint: opengauss关键字concurrently(非保留)，作为同义词对象名，部分测试点合理报错
+--前置条件
+drop table if exists concurrently_test;
+SQL SUCCESS
+create table concurrently_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-合理报错
+drop synonym if exists concurrently;
+?.*ERROR: syntax error at or near "concurrently"
+?.*
+create synonym concurrently for concurrently_test;
+?.*ERROR: syntax error at or near "concurrently"
+?.*
+insert into concurrently values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "concurrently"
+?.*
+update concurrently set concurrently.name='cici' where concurrently.id=2;
+?.*ERROR: syntax error at or near "concurrently"
+?.*
+select * from concurrently;
+?.*ERROR: syntax error at end of input
+?.*
+--关键字带双引号-成功
+drop synonym if exists "concurrently";
+SQL SUCCESS
+create synonym "concurrently" for concurrently_test;
+SQL SUCCESS
+drop synonym if exists "concurrently";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'concurrently';
+?.*ERROR: syntax error at or near "'concurrently'"
+?.*
+create synonym 'concurrently' for concurrently_test;
+?.*ERROR: syntax error at or near "'concurrently'"
+?.*
+insert into 'concurrently' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'concurrently'"
+?.*
+update 'concurrently' set 'concurrently'.name='cici' where 'concurrently'.id=2;
+?.*ERROR: syntax error at or near "'concurrently'"
+?.*
+select * from 'concurrently';
+?.*ERROR: syntax error at or near "'concurrently'"
+?.*
+--关键字带反引号-合理报错
+drop synonym if exists `concurrently`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create synonym `concurrently` for concurrently_test;
+?.*ERROR: syntax error at or near "`"
+?.*
+insert into `concurrently` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`"
+?.*
+update `concurrently` set `concurrently`.name='cici' where `concurrently`.id=2;
+?.*ERROR: syntax error at or near "`"
+?.*
+select * from `concurrently`;
+?.*ERROR: syntax error at or near "`"
+?.*
+drop table if exists concurrently_test;
+SQL SUCCESS

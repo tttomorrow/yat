@@ -1,0 +1,20 @@
+-- @testpoint: 插入字符串形式小数
+drop table if exists binary_double04;
+SQL SUCCESS
+create table binary_double04 (name binary_double);
+SQL SUCCESS
+SQL SUCCESS
+insert into binary_double04 values ('0.0000023');
+SQL SUCCESS
+insert into binary_double04 values ('-99999999.3653');
+SQL SUCCESS
+SQL SUCCESS
+select * from binary_double04;
++----------------------+
+| name                 |
++----------------------+
+| 2.3E-6               |
+| -2.32222E-6          |
++----------------------+
+drop table binary_double04;
+SQL SUCCESS

@@ -1,0 +1,39 @@
+-- @testpoint: 关键字xmlconcat，用作字段名
+drop table if exists xmlconcat_test cascade;
+SQL SUCCESS
+create table xmlconcat_test(id int,xmlconcat varchar(20));
+SQL SUCCESS
+create or replace procedure xmlconcat_insert
+as
+begin
+ for i in 1..10 loop
+    insert into xmlconcat_test values(i,'val+'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call xmlconcat_insert();
++------------------+
+| xmlconcat_insert |
++------------------+
+|                  |
++------------------+
+select * from xmlconcat_test;
++----+-----------+
+| id | xmlconcat |
++----+-----------+
+| 1  | val+1     |
+| 2  | val+2     |
+| 3  | val+3     |
+| 4  | val+4     |
+| 5  | val+5     |
+| 6  | val+6     |
+| 7  | val+7     |
+| 8  | val+8     |
+| 9  | val+9     |
+| 10 | val+10    |
++----+-----------+
+drop table if exists xmlconcat_test cascade;
+SQL SUCCESS
+drop procedure xmlconcat_insert;
+SQL SUCCESS

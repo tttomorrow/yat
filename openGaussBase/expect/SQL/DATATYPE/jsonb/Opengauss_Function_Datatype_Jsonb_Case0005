@@ -1,0 +1,53 @@
+-- @testpoint: json格式校验：Null-json（不符合格式合理报错）
+--json格式校验：Null-json
+--符合格式
+--1.Null-json格式
+select 'null'::json;
++------+
+| json |
++------+
+| null |
++------+
+--2.空值
+select ''::json;
++------+
+| json |
++------+
+|      |
++------+
+select null::json;
++------+
+| json |
++------+
+|      |
++------+
+--3.字符串null
+select '"null"'::json;
++--------+
+| json   |
++--------+
+| "null" |
++--------+
+--4.空字符串""
+select '""'::json;
++------+
+| json |
++------+
+| ""   |
++------+
+--不符合格式
+select 'NULL'::json;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "NULL" is invalid.
+?.*
+  Where: JSON data, line 1: NULL
+referenced column: json
+select ''null''::json;
+?.*ERROR: syntax error at or near "null.*
+?.*
+select '''null'''::json;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "'" is invalid.
+?.*
+  Where: JSON data, line 1: '...
+referenced column: json

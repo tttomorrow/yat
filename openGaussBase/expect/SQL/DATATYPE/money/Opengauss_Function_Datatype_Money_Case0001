@@ -1,0 +1,24 @@
+-- @testpoint: 插入正整数
+drop table if exists type_money01;
+SQL SUCCESS
+create table type_money01 (mon money);
+SQL SUCCESS
+insert into type_money01 values (132);
+SQL SUCCESS
+insert into type_money01 values (1);
+SQL SUCCESS
+insert into type_money01 values (2);
+SQL SUCCESS
+insert into type_money01 values (3);
+SQL SUCCESS
+select * from type_money01;
++-------+
+| mon   |
++-------+
+| 132.0 |
+| 1.0   |
+| 2.0   |
+| 3.0   |
++-------+
+drop table type_money01;
+SQL SUCCESS

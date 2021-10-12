@@ -1,0 +1,21 @@
+-- @testpoint: 指定正常网络地址类型输入值
+drop table if exists test_inet_01;
+SQL SUCCESS
+create table test_inet_01(type inet);
+SQL SUCCESS
+insert into test_inet_01 values('192.168.31.32/24');
+SQL SUCCESS
+insert into test_inet_01 values('192.168.31/24');
+SQL SUCCESS
+insert into test_inet_01 values('0.0.0.0/24');
+SQL SUCCESS
+select * from test_inet_01;
++------------------+
+| type             |
++------------------+
+| 192.168.31.32/24 |
+| 192.168.31.0/24  |
+| 0.0.0.0/24       |
++------------------+
+drop table test_inet_01;
+SQL SUCCESS

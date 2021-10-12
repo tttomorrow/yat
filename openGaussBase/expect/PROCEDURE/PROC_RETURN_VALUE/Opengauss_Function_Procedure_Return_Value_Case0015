@@ -1,0 +1,37 @@
+-- @testpoint: 测试存储过程返回值类型——char/varchar 合理报错
+drop table if exists emp;
+SQL SUCCESS
+create table emp(empno int,ename varchar(10),job varchar(10) ,sal integer);
+SQL SUCCESS
+insert into emp values(1,'zhangsan','doctor1',10000),(2,'zhangsan2','doctor2',10000),(123,'zhangsan3','doctor3',10000);
+SQL SUCCESS
+--创建存储过程
+create or replace procedure proc_return_value_015(p1 varchar)  as
+v_char char(20);
+begin
+    v_char:=p1;
+    raise info 'v_char=:%',v_char;
+    exception
+    when no_data_found
+    then
+    select * from emp;
+    raise info 'no_data_found';
+end;
+/
+SQL SUCCESS
+--调用存储过程
+declare
+v1 varchar(200):='qwerttttyuioppppasdfg';
+begin
+proc_return_value_015(v1);
+end;
+/
+?.*ERROR: value too long for type character\(20\).*
+  Where: PL/pgSQL function proc_return_value_015(character varying) line 4 at assignment
+SQL statement "CALL proc_return_value_015(v1)"
+PL/pgSQL function inline_code_block line 4 at PERFORM
+--清理环境
+drop procedure proc_return_value_015;
+SQL SUCCESS
+drop table emp;
+SQL SUCCESS

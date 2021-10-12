@@ -1,0 +1,33 @@
+-- @testpoint: 创建有唯一约束的临时表，违反约束，合理报错
+-- @modify at: 2020-11-24
+--建表
+drop table if exists temp_table_051;
+SQL SUCCESS
+create  temporary table temp_table_051(a int,b char(10) UNIQUE);
+SQL SUCCESS
+--插入数据
+insert into temp_table_051 values(4,'a');
+SQL SUCCESS
+insert into temp_table_051 values(2,'cd');
+SQL SUCCESS
+insert into temp_table_051 values (2,'aw');
+SQL SUCCESS
+insert into temp_table_051 values (2,'');
+SQL SUCCESS
+--插入数据，报错
+insert into temp_table_051 values (3,'a');
+?.*ERROR: duplicate key value violates unique constraint "temp_table_051_b_key"
+  Detail: Key (b)=(a         ) already exists.
+--查询
+select * from temp_table_051;
++---+------------+
+| a | b          |
++---+------------+
+| 4 | a          |
+| 2 | cd         |
+| 2 | aw         |
+| 2 |            |
++---+------------+
+--删表
+drop table temp_table_051;
+SQL SUCCESS

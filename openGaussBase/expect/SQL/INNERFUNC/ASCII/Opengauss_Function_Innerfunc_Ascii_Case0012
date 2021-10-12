@@ -1,0 +1,7 @@
+
+
+-- @testpoint: 转换=
+
+select ASCII(=);
+?.*ERROR: syntax error at or near "="
+?.*

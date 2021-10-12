@@ -1,0 +1,54 @@
+--  @testpoint:opengauss关键字Label(非保留)，自定义数据类型名为explain
+--关键字explain作为数据类型不带引号，创建成功
+drop type if exists Label;
+SQL SUCCESS
+CREATE TYPE Label AS (f1 int, f2 text);
+SQL SUCCESS
+select typname from pg_type where typname ='Label';
++---------+
+| typname |
++---------+
++---------+
+drop type Label;
+SQL SUCCESS
+--关键字explain作为数据类型加双引号，创建成功
+drop type if exists "Label";
+SQL SUCCESS
+CREATE TYPE "Label" AS (f1 int, f2 text);
+SQL SUCCESS
+select typname from pg_type where typname ='Label';
++---------+
+| typname |
++---------+
+| Label   |
++---------+
+drop type "Label";
+SQL SUCCESS
+--关键字explain作为数据类型加单引号，合理报错
+drop type if exists 'Label';
+?.*ERROR: syntax error at or near "'Label'"
+?.*Position: .*
+CREATE TYPE 'Label' AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "'Label'"
+?.*Position: .*
+select * from pg_type where typname ='Label';
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+----------+-----------+------------+---------+----------+-----------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
+| typname | typnamespace | typowner | typlen | typbyval | typtype | typcategory | typispreferred | typisdefined | typdelim | typrelid | typelem | typarray | typinput | typoutput | typreceive | typsend | typmodin | typmodout | typanalyze | typalign | typstorage | typnotnull | typbasetype | typtypmod | typndims | typcollation | typdefaultbin | typdefault | typacl |
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+----------+-----------+------------+---------+----------+-----------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+----------+-----------+------------+---------+----------+-----------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
+drop type 'Label';
+?.*ERROR: syntax error at or near "'Label'"
+?.*Position: .*
+--关键字explain作为数据类型加反引号，合理报错
+drop type if exists `Label`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+CREATE TYPE `Label` AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+select * from pg_type where typname =`Label`;
+?.*ERROR: column "label" does not exist
+?.*Position: .*
+drop type `Label`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*

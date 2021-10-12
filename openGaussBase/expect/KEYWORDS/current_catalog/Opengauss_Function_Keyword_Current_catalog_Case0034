@@ -1,0 +1,51 @@
+--  @testpoint:opengauss关键字current_catalog(保留)，作为游标名
+--前置条件
+drop table if exists current_catalog_test cascade;
+SQL SUCCESS
+create table current_catalog_test(cid int,fid int);
+SQL SUCCESS
+--关键字不带引号-失败
+start transaction;
+SQL SUCCESS
+cursor current_catalog for select * from current_catalog_test order by 1;
+?.*ERROR: syntax error at or near "current_catalog".*
+?.*Position.*
+close current_catalog;
+?.*ERROR: syntax error at or near "current_catalog".*
+?.*Position.*
+end;
+SQL SUCCESS
+--关键字带双引号-成功
+start transaction;
+SQL SUCCESS
+cursor "current_catalog" for select * from current_catalog_test order by 1;
+SQL SUCCESS
+close "current_catalog";
+SQL SUCCESS
+end;
+SQL SUCCESS
+--关键字带单引号-合理报错
+start transaction;
+SQL SUCCESS
+cursor 'current_catalog' for select * from current_catalog_test order by 1;
+?.*ERROR: syntax error at or near "'current_catalog'".*
+?.*Position.*
+close 'current_catalog';
+?.*ERROR: syntax error at or near "'current_catalog'".*
+?.*Position.*
+end;
+SQL SUCCESS
+--关键字带反引号-合理报错
+start transaction;
+SQL SUCCESS
+cursor `current_catalog` for select * from current_catalog_test order by 1;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+close `current_catalog`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+end;
+SQL SUCCESS
+--清理环境
+drop table current_catalog_test cascade;
+SQL SUCCESS

@@ -1,0 +1,31 @@
+--  @testpoint:opengauss关键字character(非保留)，作为数据库名
+--关键字不带引号-成功
+drop database if exists character;
+SQL SUCCESS
+create database character;
+SQL SUCCESS
+--清理环境
+drop database character;
+SQL SUCCESS
+--关键字带双引号-成功
+drop database if exists "character";
+SQL SUCCESS
+create database "character";
+SQL SUCCESS
+--清理环境
+drop database "character";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop database if exists 'character';
+?.*ERROR: syntax error at or near "'character'".*
+?.*Position: .*
+create database 'character';
+?.*ERROR: syntax error at or near "'character'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop database if exists `character`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create database `character`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

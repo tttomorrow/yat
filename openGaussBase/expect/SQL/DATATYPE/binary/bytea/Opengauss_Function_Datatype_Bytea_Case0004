@@ -1,0 +1,19 @@
+-- @testpoint: 插入字符串形式二进制数
+-- @modify at: 2020-11-04
+--创建表
+drop table if exists test_bytea04;
+SQL SUCCESS
+create table test_bytea04 (name bytea);
+SQL SUCCESS
+--插入数据
+insert into test_bytea04 values ('1010101');
+SQL SUCCESS
+--插入成功，查看数据
+select * from test_bytea04;
++----------------+
+| name           |
++----------------+
++----------------+
+--清理环境
+drop table test_bytea04;
+SQL SUCCESS

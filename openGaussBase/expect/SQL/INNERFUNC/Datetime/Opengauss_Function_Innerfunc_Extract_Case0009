@@ -1,0 +1,21 @@
+--  @testpoint: EXTRACT 时间格式为INTERVAL时取day小数
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (clo1 INTERVAL );
+SQL SUCCESS
+insert into test_date01 values ('3.5 months');
+SQL SUCCESS
+select EXTRACT(DAY FROM clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| 15.0      |
++-----------+
+SELECT EXTRACT(DAY FROM INTERVAL '40 days 3.5 months');
++-----------+
+| date_part |
++-----------+
+| 55.0      |
++-----------+
+drop table if exists test_date01;
+SQL SUCCESS

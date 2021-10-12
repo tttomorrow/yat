@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字excluding(非保留)，作为数据库名
+--关键字不带引号-成功
+drop database if exists excluding;
+SQL SUCCESS
+create database excluding;
+SQL SUCCESS
+drop database excluding;
+SQL SUCCESS
+--关键字带双引号-成功
+drop database if exists "excluding";
+SQL SUCCESS
+create database "excluding";
+SQL SUCCESS
+drop database "excluding";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop database if exists 'excluding';
+?.*ERROR: syntax error at or near "'excluding'"
+?.*Position: .*
+create database 'excluding';
+?.*ERROR: syntax error at or near "'excluding'"
+?.*Position: .*
+--关键字带反引号-合理报错
+drop database if exists `excluding`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+create database `excluding`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*

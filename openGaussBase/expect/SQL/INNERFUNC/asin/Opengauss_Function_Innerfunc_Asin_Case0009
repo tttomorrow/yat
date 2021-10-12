@@ -1,0 +1,18 @@
+-- @testpoint: 输入参数无效值（合理报错）
+
+drop table if exists asin_test_05;
+SQL SUCCESS
+create table asin_test_05(COL_ACOS double precision);
+SQL SUCCESS
+insert into asin_test_05 VALUES(1.23);
+SQL SUCCESS
+insert into asin_test_05 VALUES(-1.23);
+SQL SUCCESS
+SELECT ACOS(COL_ACOS) AS RESULT FROM asin_test_05 WHERE COL_ACOS=1.23;
+?.*ERROR: input is out of range
+  Where: referenced column: result
+SELECT ACOS(COL_ACOS) AS RESULT FROM asin_test_05 WHERE COL_ACOS=-1.23;
+?.*ERROR: input is out of range
+  Where: referenced column: result
+drop table if exists asin_test_05;
+SQL SUCCESS

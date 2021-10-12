@@ -1,0 +1,35 @@
+-- @testpoint: USING method：行存local临时表psort组合索引：合理报错
+--建表
+drop table if exists test_index_table_033;
+SQL SUCCESS
+create TEMPORARY table test_index_table_033(id int, name varchar) with (orientation=row);
+SQL SUCCESS
+--插入数据
+BEGIN
+  for i in 1..10000 LOOP
+    insert into test_index_table_033 values(i,concat('zhangsan',i));
+  end LOOP;
+end;
+/
+SQL SUCCESS
+--创建索引
+drop index if exists index_033;
+SQL SUCCESS
+create index index_033 on test_index_table_033 using psort(id,name);
+?.*ERROR: access method "psort" does not support row store
+explain select * from test_index_table_033 where id=15 or name='zhangsan20';
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*Seq Scan on test_index_table_033.*
+?.*
+?.*
+select relname from pg_class where relname='index_033';
+?.*
+| relname |
+?.*
+?.*
+drop index if exists index_033;
+SQL SUCCESS
+DROP TABLE if EXISTS test_index_table_033 CASCADE;
+SQL SUCCESS

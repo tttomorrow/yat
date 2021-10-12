@@ -1,0 +1,21 @@
+-- @testpoint: 小数和1
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 text);
+SQL SUCCESS
+insert into type_char values ('abcdeF kk');
+SQL SUCCESS
+SELECT repeat(string1,1.1) from type_char;
++-----------+
+| repeat    |
++-----------+
+| abcdeF kk |
++-----------+
+SELECT repeat(string1,1) from type_char;
++-----------+
+| repeat    |
++-----------+
+| abcdeF kk |
++-----------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

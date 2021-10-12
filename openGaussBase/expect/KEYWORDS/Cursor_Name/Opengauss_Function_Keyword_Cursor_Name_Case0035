@@ -1,0 +1,17 @@
+-- @testpoint: 创建一个名为cursor_test的游标
+drop table if exists gg_t1;
+SQL SUCCESS
+create table gg_t1 (stu_name char(20),stu_age int,sex char(10),score int,address char(10));
+SQL SUCCESS
+insert into gg_t1 values('zhangsan',18,'boy'),('lisi',25,'boy'),('wangwu',28,'girl');
+SQL SUCCESS
+START TRANSACTION;
+SQL SUCCESS
+CURSOR cursor_test FOR SELECT * FROM gg_t1;
+SQL SUCCESS
+CLOSE cursor_test;
+SQL SUCCESS
+end;
+SQL SUCCESS
+drop table if exists gg_t1;
+SQL SUCCESS

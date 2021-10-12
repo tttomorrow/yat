@@ -1,0 +1,65 @@
+-- @testpoint: opengauss关键字existing(非保留)，作为同义词对象名，部分测试点合理报错
+--前置条件
+drop table if exists existing_test;
+SQL SUCCESS
+create table existing_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists existing;
+SQL SUCCESS
+create synonym existing for existing_test;
+SQL SUCCESS
+insert into existing values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update existing set existing.name='cici' where existing.id=2;
+SQL SUCCESS
+select * from existing;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+drop synonym if exists existing;
+SQL SUCCESS
+--关键字带双引号-成功
+drop synonym if exists "existing";
+SQL SUCCESS
+create synonym "existing" for existing_test;
+SQL SUCCESS
+drop synonym if exists "existing";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'existing';
+?.*ERROR: syntax error at or near "'existing'"
+?.*Position: .*
+create synonym 'existing' for existing_test;
+?.*ERROR: syntax error at or near "'existing'"
+?.*Position: .*
+insert into 'existing' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'existing'"
+?.*Position: .*
+update 'existing' set 'existing'.name='cici' where 'existing'.id=2;
+?.*ERROR: syntax error at or near "'existing'"
+?.*Position: .*
+select * from 'existing';
+?.*ERROR: syntax error at or near "'existing'"
+?.*Position: .*
+--关键字带反引号-合理报错
+drop synonym if exists `existing`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+create synonym `existing` for existing_test;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+insert into `existing` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+update `existing` set `existing`.name='cici' where `existing`.id=2;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+select * from `existing`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+drop table if exists existing_test;
+SQL SUCCESS

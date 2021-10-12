@@ -1,0 +1,27 @@
+-- @testpoint: EXTRACT函数传入source为interval，获取时间间隔的总秒数
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (clo1 INTERVAL );
+SQL SUCCESS
+insert into test_date01 values ('1 s ');
+SQL SUCCESS
+select EXTRACT(EPOCH FROM clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| 1.0       |
++-----------+
+SELECT EXTRACT(EPOCH FROM INTERVAL  '1 year 2 months 5 days 3 hours 2 m 8 s');
++-------------+
+| date_part   |
++-------------+
+| 3.7184528E7 |
++-------------+
+SELECT EXTRACT(EPOCH FROM INTERVAL  '10000s');
++-----------+
+| date_part |
++-----------+
+| 10000.0   |
++-----------+
+drop table if exists test_date01;
+SQL SUCCESS

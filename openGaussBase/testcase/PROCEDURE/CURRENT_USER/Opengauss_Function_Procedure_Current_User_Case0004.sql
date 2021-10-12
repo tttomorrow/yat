@@ -1,0 +1,13 @@
+-- @testpoint: 创建存储过程时使用authid，合理报错
+
+create or replace procedure pro(p1 integer) authid
+is
+c1 varchar(10);
+begin
+    c1 := 'gauss';
+    raise info '-%',c1;
+    raise info ':%',p1;
+end;
+/
+--清理环境
+drop procedure if exists pro;

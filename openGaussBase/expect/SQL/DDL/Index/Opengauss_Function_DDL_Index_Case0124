@@ -1,0 +1,34 @@
+--  @testpoint: set：FILLFACTOR:无效值：合理报错
+DROP TABLE if EXISTS test_index_table_124 CASCADE;
+SQL SUCCESS
+create table test_index_table_124(
+c_float1 float
+) WITH (ORIENTATION = row) ;
+SQL SUCCESS
+--建btree索引
+drop index if exists index_124_01;
+SQL SUCCESS
+create index index_124_01 on test_index_table_124(c_float1) with (fillfactor=50);
+SQL SUCCESS
+select relname from pg_class where relname like 'index_124_%' order by relname;
++--------------+
+| relname      |
++--------------+
+| index_124_01 |
++--------------+
+--set
+alter index index_124_01 set (fillfactor=9);
+?.*ERROR: value 9 out of bounds for option "fillfactor"
+  Detail: Valid values are between "10" and "100".
+alter index index_124_01 set (fillfactor=101);
+?.*ERROR: value 101 out of bounds for option "fillfactor"
+  Detail: Valid values are between "10" and "100".
+alter index index_124_01 set (fillfactor=50.5);
+?.*ERROR: invalid value for integer option "fillfactor": 50.5
+alter index index_124_01 set (fillfactor='test');
+?.*ERROR: invalid value for integer option "fillfactor": test
+alter index index_124_01 set (fillfactor='$%_#');
+?.*ERROR: invalid value for integer option "fillfactor": \$\%\_\#
+--清理环境
+DROP TABLE if EXISTS test_index_table_124 CASCADE;
+SQL SUCCESS

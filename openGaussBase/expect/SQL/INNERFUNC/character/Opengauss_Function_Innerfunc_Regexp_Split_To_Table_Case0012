@@ -1,0 +1,31 @@
+-- @testpoint: 首字符匹配表达式
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('hello world');
+SQL SUCCESS
+SELECT regexp_split_to_table(string1,'[^h]') from type_char;
++-----------------------+
+| regexp_split_to_table |
++-----------------------+
+| h                     |
+|                       |
+|                       |
+|                       |
+|                       |
+|                       |
+|                       |
+|                       |
+|                       |
+|                       |
+|                       |
++-----------------------+
+select * from type_char;
++------------------------------------------------------------------------------------------------------+
+| string1                                                                                              |
++------------------------------------------------------------------------------------------------------+
+| hello world                                                                                          |
++------------------------------------------------------------------------------------------------------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

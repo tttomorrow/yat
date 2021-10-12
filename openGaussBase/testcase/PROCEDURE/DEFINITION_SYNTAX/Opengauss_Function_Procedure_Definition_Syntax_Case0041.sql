@@ -1,0 +1,18 @@
+-- @testpoint: 匿名块定义 验证匿名块是否支持end if,elsif else 连用
+
+declare
+       v NUMBER;
+   begin
+       if v = 1 then
+           raise info 'Equal to 1';
+       elsif v!= 1 then
+           raise info 'Not equal to 1';
+       elsif v = v then
+           raise info 'Equal to itself';
+       else
+           raise info 'Undefined result';
+       end if;
+       v:=v+1;
+       raise info'New value: %',v;
+   end;
+/

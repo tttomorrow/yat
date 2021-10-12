@@ -1,0 +1,118 @@
+-- @testpoint:  reindex：schema
+drop schema if exists index170 cascade;
+SQL SUCCESS
+create schema index170;
+SQL SUCCESS
+--建普通表
+DROP TABLE if EXISTS index170.test_index_table_170 CASCADE;
+SQL SUCCESS
+create table index170.test_index_table_170(
+c_int int
+) WITH (ORIENTATION = row) partition by range(c_int)(
+partition p1 values less than (100),
+partition p2 values less than (1000),
+partition p3 values less than (5000),
+partition p4 values less than (10001)
+);
+SQL SUCCESS
+begin
+    for i in 0..10000 loop
+        insert into index170.test_index_table_170 values(i);
+    end loop;
+end;
+/
+SQL SUCCESS
+--建local索引
+drop index if exists index170.index_170_01;
+SQL SUCCESS
+create index index170.index_170_01 on index170.test_index_table_170(c_int) local (PARTITION p1,PARTITION p2,PARTITION p3,PARTITION p4);
+SQL SUCCESS
+select relname from pg_class where relname like 'index_170_%' order by relname;
+?.*
+| relname      |
+?.*
+| index_170_01 |
+?.*
+explain select * from index170.test_index_table_170 where c_int > 5000 group by c_int;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*Partition Iterator.*
+?.*
+?.*Partitioned Bitmap Heap Scan on test_index_table_170.*
+?.*
+?.*
+?.*Partitioned Bitmap Index Scan on index_170_01.*
+?.*
+?.*
+?.*
+--reindex
+alter index index170.index_170_01 UNUSABLE;
+SQL SUCCESS
+explain select * from index170.test_index_table_170 where c_int > 500 group by c_int;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*Partition Iterator.*
+?.*
+?.*Partitioned Seq Scan on test_index_table_170.*
+?.*
+?.*
+?.*
+REINDEX INDEX  index170.index_170_01;
+SQL SUCCESS
+explain select * from index170.test_index_table_170 where c_int > 500 group by c_int;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*Partition Iterator.*
+?.*
+?.*Partitioned Bitmap Heap Scan on test_index_table_170.*
+?.*
+?.*
+?.*Partitioned Bitmap Index Scan on index_170_01.*
+?.*
+?.*
+?.*
+alter index index170.index_170_01 UNUSABLE;
+SQL SUCCESS
+explain select * from index170.test_index_table_170 where c_int > 500 group by c_int;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*Partition Iterator.*
+?.*
+?.*Partitioned Seq Scan on test_index_table_170.*
+?.*
+?.*
+?.*
+REINDEX table  index170.test_index_table_170;
+SQL SUCCESS
+explain select * from index170.test_index_table_170 where c_int > 500 group by c_int;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*Partition Iterator.*
+?.*
+?.*Partitioned Bitmap Heap Scan on test_index_table_170.*
+?.*
+?.*
+?.*Partitioned Bitmap Index Scan on index_170_01.*
+?.*
+?.*
+?.*
+--清理环境
+DROP TABLE if EXISTS index170.test_index_table_170 CASCADE;
+SQL SUCCESS
+drop schema if exists index170 cascade;
+SQL SUCCESS

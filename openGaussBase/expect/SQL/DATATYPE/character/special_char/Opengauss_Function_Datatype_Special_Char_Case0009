@@ -1,0 +1,22 @@
+-- @testpoint: 创建行存分区表，设定分区字段为“char”
+-- @modified at: 2020-11-16
+drop table if exists special_char_09;
+SQL SUCCESS
+CREATE TABLE special_char_09 (c1 "char",c2 int) WITH (orientation=row, compression=no)
+PARTITION BY RANGE (c1)
+(
+        PARTITION P1 VALUES LESS THAN('g'),
+        PARTITION P2 VALUES LESS THAN('n'),
+        PARTITION P3 VALUES LESS THAN('t'),
+        PARTITION P4 VALUES LESS THAN('z'));
+SQL SUCCESS
+insert into special_char_09 values ('m',1);
+SQL SUCCESS
+select * from special_char_09;
++----+----+
+| c1 | c2 |
++----+----+
+| m  | 1  |
++----+----+
+drop table special_char_09;
+SQL SUCCESS

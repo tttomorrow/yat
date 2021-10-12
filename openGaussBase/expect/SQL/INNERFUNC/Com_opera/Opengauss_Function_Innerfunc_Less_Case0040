@@ -1,0 +1,12 @@
+-- @testpoint: opengauss比较操作符<,连比，合理报错
+drop table if exists ts_zhparser;
+SQL SUCCESS
+CREATE TABLE ts_zhparser(id TINYINT, index TINYINT,clo TINYINT);
+SQL SUCCESS
+INSERT INTO ts_zhparser VALUES(10,1,3);
+SQL SUCCESS
+select * from ts_zhparser where id < index < clo;
+?.*ERROR: syntax error at or near "<"
+?.*
+drop table if exists ts_zhparser;
+SQL SUCCESS

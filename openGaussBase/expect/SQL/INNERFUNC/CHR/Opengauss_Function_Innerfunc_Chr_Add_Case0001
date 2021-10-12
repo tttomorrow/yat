@@ -1,0 +1,166 @@
+
+
+-- @testpoint: 有效值
+
+drop table if exists TEST_CHR2;
+SQL SUCCESS
+create table TEST_CHR2(COL integer);
+SQL SUCCESS
+insert into TEST_CHR2 values(1);
+SQL SUCCESS
+select chr(COL) as RESULT from TEST_CHR2;
++--------+
+| result |
++--------+
+|       |
++--------+
+drop table TEST_CHR2;
+SQL SUCCESS
+drop table if exists TEST_CHR3;
+SQL SUCCESS
+create table TEST_CHR3(COL integer);
+SQL SUCCESS
+insert into TEST_CHR3 values(9);
+SQL SUCCESS
+select chr(COL) as RESULT from TEST_CHR3;
++--------+
+| result |
++--------+
+| 	      |
++--------+
+drop table TEST_CHR3;
+SQL SUCCESS
+drop table if exists TEST_CHR4;
+SQL SUCCESS
+create table TEST_CHR4(COL integer);
+SQL SUCCESS
+insert into TEST_CHR4 values(10);
+SQL SUCCESS
+select chr(COL) as RESULT from TEST_CHR4;
++--------+
+| result |
++--------+
+| 
+      |
++--------+
+drop table TEST_CHR4;
+SQL SUCCESS
+drop table if exists TEST_CHR5;
+SQL SUCCESS
+create table TEST_CHR5(COL integer);
+SQL SUCCESS
+insert into TEST_CHR5 values(11);
+SQL SUCCESS
+select chr(COL) as RESULT from TEST_CHR5;
++--------+
+| result |
++--------+
+|       |
++--------+
+UPDATE TEST_CHR5 SET COL= 12;
+SQL SUCCESS
+select chr(COL) as RESULT from TEST_CHR5;
++--------+
+| result |
++--------+
+|       |
++--------+
+drop table TEST_CHR5;
+SQL SUCCESS
+drop table if exists TEST_CHR6;
+SQL SUCCESS
+create table TEST_CHR6(COL integer);
+SQL SUCCESS
+insert into TEST_CHR6 values(13);
+SQL SUCCESS
+select chr(COL) as RESULT from TEST_CHR6;
++--------+
+| result |
++--------+
+| 
+      |
++--------+
+drop table TEST_CHR6;
+SQL SUCCESS
+drop table if exists TEST_CHR7;
+SQL SUCCESS
+create table TEST_CHR7(COL integer);
+SQL SUCCESS
+insert into TEST_CHR7 values(40);
+SQL SUCCESS
+select chr(COL) as RESULT from TEST_CHR7;
++--------+
+| result |
++--------+
+| (      |
++--------+
+drop table TEST_CHR7;
+SQL SUCCESS
+drop table if exists TEST_CHR8;
+SQL SUCCESS
+create table TEST_CHR8(COL integer);
+SQL SUCCESS
+insert into TEST_CHR8 values(48);
+SQL SUCCESS
+select chr(COL) as RESULT from TEST_CHR8;
++--------+
+| result |
++--------+
+| 0      |
++--------+
+drop table TEST_CHR8;
+SQL SUCCESS
+drop table if exists TEST_CHR9;
+SQL SUCCESS
+create table TEST_CHR9(COL integer);
+SQL SUCCESS
+insert into TEST_CHR9 values(65);
+SQL SUCCESS
+insert into TEST_CHR9 values(78);
+SQL SUCCESS
+insert into TEST_CHR9 values(90);
+SQL SUCCESS
+select chr(COL) as RESULT from TEST_CHR9 order by RESULT;
++--------+
+| result |
++--------+
+| A      |
+| N      |
+| Z      |
++--------+
+drop table TEST_CHR9;
+SQL SUCCESS
+drop table if exists TEST_CHR10;
+SQL SUCCESS
+create table TEST_CHR10(COL integer);
+SQL SUCCESS
+insert into TEST_CHR10 values(94);
+SQL SUCCESS
+select chr(COL) as RESULT from TEST_CHR10;
++--------+
+| result |
++--------+
+| ^      |
++--------+
+drop table TEST_CHR10;
+SQL SUCCESS
+drop table if exists TEST_CHR11;
+SQL SUCCESS
+create table TEST_CHR11(COL integer);
+SQL SUCCESS
+insert into TEST_CHR11 values(97);
+SQL SUCCESS
+insert into TEST_CHR11 values(116);
+SQL SUCCESS
+insert into TEST_CHR11 values(122);
+SQL SUCCESS
+select chr(COL) as RESULT from TEST_CHR11 order by RESULT;
++--------+
+| result |
++--------+
+| a      |
+| t      |
+| z      |
++--------+
+drop table TEST_CHR11;
+SQL SUCCESS

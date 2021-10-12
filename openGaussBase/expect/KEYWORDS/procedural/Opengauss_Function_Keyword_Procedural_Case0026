@@ -1,0 +1,23 @@
+--  @testpoint:opengauss关键字procedural(非保留)，作为模式名
+--关键字不带引号-成功
+drop schema if exists procedural;
+SQL SUCCESS
+create schema procedural;
+SQL SUCCESS
+drop schema procedural;
+SQL SUCCESS
+--关键字带双引号-成功
+drop schema if exists "procedural";
+SQL SUCCESS
+create schema "procedural";
+SQL SUCCESS
+drop schema "procedural";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop schema if exists 'procedural';
+?.*ERROR: syntax error at or near "'procedural'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop schema if exists `procedural`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

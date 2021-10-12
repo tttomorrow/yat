@@ -1,0 +1,21 @@
+-- @testpoint: 存储过程结合二进制类型的测试 raw输入非二进制类型的字符串
+--创建存储过程
+create or replace procedure proc_binary_003(p1 raw) is
+begin
+raise info 'p1=:%',p1;
+    exception
+when no_data_found then
+    raise info 'no_data_found';
+end;
+/
+SQL SUCCESS
+--调用存储过程
+call proc_binary_003('ab01');
++-----------------+
+| proc_binary_003 |
++-----------------+
+|                 |
++-----------------+
+--恢复环境
+drop procedure if exists proc_binary_003;
+SQL SUCCESS

@@ -1,0 +1,23 @@
+-- @testpoint: default含特殊英文字，合理报错
+drop table if exists tbl_08;
+SQL SUCCESS
+-- @testpoint: 特殊字符
+create table tbl_08(id int,c_name varchar(1023) not null default 'afff1212!@#-|;<>?/.,');
+SQL SUCCESS
+-- @testpoint: 含单引号报错
+create table tbl_08_02(id int,c_varchar varchar(1023) not null default ''aaaaffff1212'');
+?.*ERROR: syntax error at or near "aaaaffff1212"
+?.*
+insert into tbl_08 values(1,default);
+SQL SUCCESS
+insert into tbl_08(id) values(2);
+SQL SUCCESS
+select * from tbl_08;
++----+----------------------+
+| id | c_name               |
++----+----------------------+
+| 1  | afff1212!@#-|;<>?/., |
+| 2  | afff1212!@#-|;<>?/., |
++----+----------------------+
+drop table tbl_08;
+SQL SUCCESS

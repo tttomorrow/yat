@@ -1,0 +1,18 @@
+-- @testpoint: 结合日期函数，在DATE增加/减少月份得到新日期
+DROP TABLE IF EXISTS test_timestamp10;
+SQL SUCCESS
+CREATE TABLE test_timestamp10 (name TIMESTAMP);
+SQL SUCCESS
+INSERT INTO test_timestamp10 VALUES (ADD_MONTHS(TIMESTAMP '2018-09-18 11:22:33.456', +1));
+SQL SUCCESS
+INSERT INTO test_timestamp10 VALUES (ADD_MONTHS(TIMESTAMP '2018-09-18 11:22:33.456', -1));
+SQL SUCCESS
+select * from test_timestamp10;
++-------------------------------+
+| name                          |
++-------------------------------+
+?.*2018-10-18 11:22:33.456.*
+?.*2018-08-18 11:22:33.456.*
++-------------------------------+
+DROP TABLE IF EXISTS test_timestamp10;
+SQL SUCCESS

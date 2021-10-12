@@ -1,0 +1,16 @@
+-- @testpoint: 插入超出默认字节长度值，合理报错
+-- @modify at: 2020-11-05
+drop table if exists test_char_12;
+SQL SUCCESS
+create table test_char_12 (name char);
+SQL SUCCESS
+insert into test_char_12 values ('aa');
+?.*ERROR: value too long for type character\(1\)
+  Where: referenced column: name
+select * from test_char_12;
++------+
+| name |
++------+
++------+
+drop table test_char_12;
+SQL SUCCESS

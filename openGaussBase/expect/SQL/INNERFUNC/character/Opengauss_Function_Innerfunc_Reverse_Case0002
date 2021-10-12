@@ -1,0 +1,13 @@
+-- @testpoint: 中文字符颠倒
+drop database if exists logdb;
+SQL SUCCESS
+create database logdb encoding='UTF8';
+SQL SUCCESS
+select col1 from wdr_xdb_query('dbname=logdb','select reverse(''中国123中文字符颠倒'')') as dd(col1 varchar);
++-------------+
+| col1        |
++-------------+
+| 倒颠符字文中321国中 |
++-------------+
+drop database if exists logdb;
+SQL SUCCESS

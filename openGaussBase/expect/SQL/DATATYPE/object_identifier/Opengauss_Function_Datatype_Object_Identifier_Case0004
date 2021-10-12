@@ -1,0 +1,125 @@
+-- @testpoint:数据类型转换至TINYINT\date,合理报错；
+drop table if exists object_identifier_004;
+SQL SUCCESS
+CREATE  TABLE object_identifier_004(
+	c1 OID,
+	c2 CID,
+	c3 XID,
+	c4 TID,
+	c5 REGCONFIG,
+	c6 REGDICTIONARY,
+	c7 REGOPER,
+	c8 REGOPERATOR,
+	c9 REGPROC,
+	c10 REGPROCEDURE,
+	c11 REGCLASS,
+	c12 REGTYPE
+);
+SQL SUCCESS
+insert into object_identifier_004 values (564182,null,null,null,'english','simple',null,'*(integer,integer)',null,'sum(int4)','pg_type','integer');
+SQL SUCCESS
+alter table object_identifier_004 alter column c1 TYPE TINYINT;
+?.*ERROR: column "c1" cannot be cast automatically to type tinyint.*
+  Hint: Specify a USING expression to perform the conversion.
+alter table object_identifier_004 alter column c2 TYPE TINYINT;
+?.*ERROR: column "c2" cannot be cast automatically to type tinyint.*
+  Hint: Specify a USING expression to perform the conversion.
+alter table object_identifier_004 alter column c3 TYPE TINYINT;
+?.*ERROR: column "c3" cannot be cast automatically to type tinyint.*
+  Hint: Specify a USING expression to perform the conversion.
+alter table object_identifier_004 alter column c4 TYPE TINYINT;
+?.*ERROR: column "c4" cannot be cast automatically to type tinyint.*
+  Hint: Specify a USING expression to perform the conversion.
+alter table object_identifier_004 alter column c5 TYPE TINYINT;
+?.*ERROR: column "c5" cannot be cast automatically to type tinyint.*
+  Hint: Specify a USING expression to perform the conversion.
+alter table object_identifier_004 alter column c6 TYPE TINYINT;
+?.*ERROR: column "c6" cannot be cast automatically to type tinyint.*
+  Hint: Specify a USING expression to perform the conversion.
+alter table object_identifier_004 alter column c7 TYPE TINYINT;
+?.*ERROR: column "c7" cannot be cast automatically to type tinyint.*
+  Hint: Specify a USING expression to perform the conversion.
+alter table object_identifier_004 alter column c8 TYPE TINYINT;
+?.*ERROR: column "c8" cannot be cast automatically to type tinyint.*
+  Hint: Specify a USING expression to perform the conversion.
+alter table object_identifier_004 alter column c9 TYPE TINYINT;
+?.*ERROR: column "c9" cannot be cast automatically to type tinyint.*
+  Hint: Specify a USING expression to perform the conversion.
+alter table object_identifier_004 alter column c10 TYPE TINYINT;
+?.*ERROR: column "c10" cannot be cast automatically to type tinyint.*
+  Hint: Specify a USING expression to perform the conversion.
+alter table object_identifier_004 alter column c11 TYPE TINYINT;
+?.*ERROR: column "c11" cannot be cast automatically to type tinyint.*
+  Hint: Specify a USING expression to perform the conversion.
+alter table object_identifier_004 alter column c12 TYPE TINYINT;
+?.*ERROR: column "c12" cannot be cast automatically to type tinyint.*
+  Hint: Specify a USING expression to perform the conversion.
+select * from object_identifier_004;
++--------+----+----+----+---------+--------+----+--------------------+----+--------------+---------+---------+
+| c1     | c2 | c3 | c4 | c5      | c6     | c7 | c8                 | c9 | c10          | c11     | c12     |
++--------+----+----+----+---------+--------+----+--------------------+----+--------------+---------+---------+
+| 564182 |    |    |    | english | simple |    | *(integer,integer) |    | sum(integer) | pg_type | integer |
++--------+----+----+----+---------+--------+----+--------------------+----+--------------+---------+---------+
+drop table if exists object_identifier_004;
+SQL SUCCESS
+CREATE  TABLE object_identifier_004(
+	c1 OID,
+	c2 CID,
+	c3 XID,
+	c4 TID,
+	c5 REGCONFIG,
+	c6 REGDICTIONARY,
+	c7 REGOPER,
+	c8 REGOPERATOR,
+	c9 REGPROC,
+	c10 REGPROCEDURE,
+	c11 REGCLASS,
+	c12 REGTYPE
+);
+SQL SUCCESS
+insert into object_identifier_004 values (564182,null,null,null,'english','simple',null,'*(integer,integer)',null,'sum(int4)','pg_type','integer');
+SQL SUCCESS
+alter table object_identifier_004 alter column c1 TYPE date;
+?.*ERROR: column "c1" cannot be cast automatically to type timestamp without time zone.*
+  Hint: Specify a USING expression to perform the conversion.
+alter table object_identifier_004 alter column c2 TYPE date;
+?.*ERROR: column "c2" cannot be cast automatically to type timestamp without time zone.*
+  Hint: Specify a USING expression to perform the conversion.
+alter table object_identifier_004 alter column c3 TYPE date;
+?.*ERROR: column "c3" cannot be cast automatically to type timestamp without time zone.*
+  Hint: Specify a USING expression to perform the conversion.
+alter table object_identifier_004 alter column c4 TYPE date;
+?.*ERROR: column "c4" cannot be cast automatically to type timestamp without time zone.*
+  Hint: Specify a USING expression to perform the conversion.
+alter table object_identifier_004 alter column c5 TYPE date;
+?.*ERROR: column "c5" cannot be cast automatically to type timestamp without time zone.*
+  Hint: Specify a USING expression to perform the conversion.
+alter table object_identifier_004 alter column c6 TYPE date;
+?.*ERROR: column "c6" cannot be cast automatically to type timestamp without time zone.*
+  Hint: Specify a USING expression to perform the conversion.
+alter table object_identifier_004 alter column c7 TYPE date;
+?.*ERROR: column "c7" cannot be cast automatically to type timestamp without time zone.*
+  Hint: Specify a USING expression to perform the conversion.
+alter table object_identifier_004 alter column c8 TYPE date;
+?.*ERROR: column "c8" cannot be cast automatically to type timestamp without time zone.*
+  Hint: Specify a USING expression to perform the conversion.
+alter table object_identifier_004 alter column c9 TYPE date;
+?.*ERROR: column "c9" cannot be cast automatically to type timestamp without time zone.*
+  Hint: Specify a USING expression to perform the conversion.
+alter table object_identifier_004 alter column c10 TYPE date;
+?.*ERROR: column "c10" cannot be cast automatically to type timestamp without time zone.*
+  Hint: Specify a USING expression to perform the conversion.
+alter table object_identifier_004 alter column c11 TYPE date;
+?.*ERROR: column "c11" cannot be cast automatically to type timestamp without time zone.*
+  Hint: Specify a USING expression to perform the conversion.
+alter table object_identifier_004 alter column c12 TYPE date;
+?.*ERROR: column "c12" cannot be cast automatically to type timestamp without time zone.*
+  Hint: Specify a USING expression to perform the conversion.
+select * from object_identifier_004;
++--------+----+----+----+---------+--------+----+--------------------+----+--------------+---------+---------+
+| c1     | c2 | c3 | c4 | c5      | c6     | c7 | c8                 | c9 | c10          | c11     | c12     |
++--------+----+----+----+---------+--------+----+--------------------+----+--------------+---------+---------+
+| 564182 |    |    |    | english | simple |    | *(integer,integer) |    | sum(integer) | pg_type | integer |
++--------+----+----+----+---------+--------+----+--------------------+----+--------------+---------+---------+
+drop table if exists object_identifier_004;
+SQL SUCCESS

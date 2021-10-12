@@ -1,0 +1,84 @@
+-- @testpoint: interval分区,分区键数据类型为timestamp with time zone
+drop table if exists partition_table_001;
+SQL SUCCESS
+create table partition_table_001 (logdate timestamp with time zone not null) 
+partition by range (logdate)
+interval ('1 month') 
+(
+	partition partition_table_001_p1 values less than ('2020-03-01 pst'),
+	partition partition_table_001_p2 values less than ('2020-04-01 pst'),
+	partition partition_table_001_p3 values less than ('2020-05-01 pst')
+);
+SQL SUCCESS
+-- 查看分区信息
+select relname, parttype, partstrategy, boundaries from pg_partition
+where parentid = (select oid from pg_class where relname = 'partition_table_001')
+order by relname;
++------------------------+----------+--------------+--------------------------+
+| relname                | parttype | partstrategy | boundaries               |
++------------------------+----------+--------------+--------------------------+
+| partition_table_001    | r        | i            |                          |
+| partition_table_001_p1 | p        | r            | {2020-03-01 16:00:00+08} |
+| partition_table_001_p2 | p        | r            | {2020-04-01 16:00:00+08} |
+| partition_table_001_p3 | p        | r            | {2020-05-01 16:00:00+08} |
++------------------------+----------+--------------+--------------------------+
+insert into partition_table_001 values ('2020-02-23 pst');
+SQL SUCCESS
+insert into partition_table_001 values ('2020-03-23 -8');
+SQL SUCCESS
+insert into partition_table_001 values ('2020-04-23 America/New_York');
+SQL SUCCESS
+insert into partition_table_001 values ('2020-05-23 America/New_York');
+SQL SUCCESS
+insert into partition_table_001 values ('2020-06-23 -8:00');
+SQL SUCCESS
+insert into partition_table_001 values ('2020-07-23 PST');
+SQL SUCCESS
+-- 查看分区信息
+select relname, parttype, partstrategy, boundaries from pg_partition
+where parentid = (select oid from pg_class where relname = 'partition_table_001')
+order by relname;
++------------------------+----------+--------------+--------------------------+
+| relname                | parttype | partstrategy | boundaries               |
++------------------------+----------+--------------+--------------------------+
+| partition_table_001    | r        | i            |                          |
+| partition_table_001_p1 | p        | r            | {2020-03-01 16:00:00+08} |
+| partition_table_001_p2 | p        | r            | {2020-04-01 16:00:00+08} |
+| partition_table_001_p3 | p        | r            | {2020-05-01 16:00:00+08} |
+| sys_p1                 | p        | i            | {2020-06-01 16:00:00+08} |
+| sys_p2                 | p        | i            | {2020-07-01 16:00:00+08} |
+| sys_p3                 | p        | i            | {2020-08-01 16:00:00+08} |
++------------------------+----------+--------------+--------------------------+
+-- 查看各分区中数据
+select * from partition_table_001 partition (partition_table_001_p1)order by logdate;
++-------------------------------+
+| logdate                       |
++-------------------------------+
++-------------------------------+
+select * from partition_table_001 partition (partition_table_001_p2)order by logdate;
++-------------------------------+
+| logdate                       |
++-------------------------------+
++-------------------------------+
+select * from partition_table_001 partition (partition_table_001_p3)order by logdate;
++-------------------------------+
+| logdate                       |
++-------------------------------+
++-------------------------------+
+select * from partition_table_001 partition (sys_p1)order by logdate;
++-------------------------------+
+| logdate                       |
++-------------------------------+
++-------------------------------+
+select * from partition_table_001 partition (sys_p2)order by logdate;
++-------------------------------+
+| logdate                       |
++-------------------------------+
++-------------------------------+
+select * from partition_table_001 partition (sys_p3)order by logdate;
++-------------------------------+
+| logdate                       |
++-------------------------------+
++-------------------------------+
+drop table if exists partition_table_001;
+SQL SUCCESS

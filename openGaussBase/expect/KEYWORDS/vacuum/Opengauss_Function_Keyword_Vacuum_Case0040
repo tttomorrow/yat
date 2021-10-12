@@ -1,0 +1,39 @@
+-- @testpoint: 关键字vacuum,用作字符串
+drop table if exists vacuum_test cascade;
+SQL SUCCESS
+create table vacuum_test(id int,vacuum varchar(20));
+SQL SUCCESS
+create or replace procedure vacuum_insert
+as
+begin
+ for i in 1..10 loop
+    insert into vacuum_test values(i,'vacumm');
+    end loop;
+ end;
+/
+SQL SUCCESS
+call vacuum_insert();
++---------------+
+| vacuum_insert |
++---------------+
+|               |
++---------------+
+select * from vacuum_test;
++----+--------+
+| id | vacuum |
++----+--------+
+| 1  | vacumm |
+| 2  | vacumm |
+| 3  | vacumm |
+| 4  | vacumm |
+| 5  | vacumm |
+| 6  | vacumm |
+| 7  | vacumm |
+| 8  | vacumm |
+| 9  | vacumm |
+| 10 | vacumm |
++----+--------+
+drop table if exists vacuum_test cascade;
+SQL SUCCESS
+drop procedure vacuum_insert;
+SQL SUCCESS

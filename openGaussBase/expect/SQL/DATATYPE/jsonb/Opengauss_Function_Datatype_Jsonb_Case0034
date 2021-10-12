@@ -1,0 +1,41 @@
+-- @testpoint: Jsonb额外支持的操作符:<@左边的JSON的所有项是否存在于右边JSON的顶层，右侧不为jsonb，合理报错
+--当右侧不为jsonb
+select '"ffff"'::jsonb <@ '"ffff"'::json;
+?.*ERROR: operator does not exist: jsonb <@ json.*
+  Hint: No operator matches the given name and argument type(s). You might need to add explicit type casts.
+?.*
+select 'null'::jsonb <@ 'null'::json;
+?.*ERROR: operator does not exist: jsonb <@ json.*
+  Hint: No operator matches the given name and argument type(s). You might need to add explicit type casts.
+?.*
+select 'null'::jsonb <@ ''::json;
+?.*ERROR: operator does not exist: jsonb <@ json.*
+  Hint: No operator matches the given name and argument type(s). You might need to add explicit type casts.
+?.*
+select 'true'::jsonb <@ 'true'::json;
+?.*ERROR: operator does not exist: jsonb <@ json.*
+  Hint: No operator matches the given name and argument type(s). You might need to add explicit type casts.
+?.*
+select '{"a":1, "b": [1,2,3]}'::jsonb <@  '{ "b":    [1,  2,3]}'::json;
+?.*ERROR: operator does not exist: jsonb <@ json.*
+  Hint: No operator matches the given name and argument type(s). You might need to add explicit type casts.
+?.*
+select '[null, false,     "test"]'::jsonb <@ '["test"     , null ]'::json;
+?.*ERROR: operator does not exist: jsonb <@ json.*
+  Hint: No operator matches the given name and argument type(s). You might need to add explicit type casts.
+?.*
+select '105.2e3'::jsonb <@ '1.052e5'::json;
+?.*ERROR: operator does not exist: jsonb <@ json.*
+  Hint: No operator matches the given name and argument type(s). You might need to add explicit type casts.
+?.*
+select '[{"a":true}, null] '::  jsonb <@ "null";
+?.*ERROR: column "null" does not exist.*
+?.*
+select '[{"a":true}, null] '::  jsonb <@ [null];
+?.*ERROR: syntax error at or near "\[.*
+?.*
+select '[{"a":true}, null] '::  jsonb <@ '{a:true}';
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "a" is invalid.
+?.*
+  Where: JSON data, line 1: {a...

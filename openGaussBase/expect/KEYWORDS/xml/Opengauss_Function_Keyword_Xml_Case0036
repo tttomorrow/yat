@@ -1,0 +1,39 @@
+-- @testpoint: 关键字xml，用作字符串
+drop table if exists xml_test cascade;
+SQL SUCCESS
+create table xml_test(id int,name varchar(20));
+SQL SUCCESS
+create or replace procedure xml_insert
+as
+begin
+ for i in 1..10 loop
+    insert into xml_test values(i,'xml'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call xml_insert();
++------------+
+| xml_insert |
++------------+
+|            |
++------------+
+select * from xml_test;
++----+-------+
+| id | name  |
++----+-------+
+| 1  | xml1  |
+| 2  | xml2  |
+| 3  | xml3  |
+| 4  | xml4  |
+| 5  | xml5  |
+| 6  | xml6  |
+| 7  | xml7  |
+| 8  | xml8  |
+| 9  | xml9  |
+| 10 | xml10 |
++----+-------+
+drop table if exists xml_test cascade;
+SQL SUCCESS
+drop procedure xml_insert;
+SQL SUCCESS

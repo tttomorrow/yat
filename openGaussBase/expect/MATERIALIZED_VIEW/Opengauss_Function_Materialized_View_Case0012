@@ -1,0 +1,69 @@
+-- @testpoint: 测试materialized关键字情况，合理报错
+--关键字检查，pg中未将materialized作为关键字，openGauss与pg保持一致
+--行存表
+drop table if exists materialized;
+SQL SUCCESS
+create table materialized
+(
+    id int primary key,
+    name varchar(10) not null
+);
+SQL SUCCESS
+drop table materialized;
+SQL SUCCESS
+--列存表
+drop table if exists materialized;
+SQL SUCCESS
+create table materialized
+(
+    id int,
+    name varchar(10) not null
+) with (orientation = column);
+SQL SUCCESS
+drop table materialized;
+SQL SUCCESS
+--临时表
+drop table if exists materialized;
+SQL SUCCESS
+create global temporary table materialized
+(
+    id int primary key,
+    name varchar(10) not null
+) on commit delete rows;
+SQL SUCCESS
+drop table materialized;
+SQL SUCCESS
+--列名
+drop table if exists student;
+SQL SUCCESS
+create table student
+(
+    id int primary key,
+    materialized varchar(10) not null
+);
+SQL SUCCESS
+drop table student;
+SQL SUCCESS
+--别名
+select 2 materialized from sys_dummy;
+?.*ERROR: syntax error at or near "materialized"
+?.*Position:?.*
+select 2 as materialized from sys_dummy;
++--------------+
+| materialized |
++--------------+
+| 2            |
++--------------+
+--视图名
+drop view if exists materialized;
+SQL SUCCESS
+create view materialized as select * from pg_tablespace where spcname = 'pg_default';
+SQL SUCCESS
+drop view materialized;
+SQL SUCCESS
+drop materialized view if exists materialized;
+SQL SUCCESS
+create materialized view materialized as select * from pg_tablespace where spcname = 'pg_default';
+SQL SUCCESS
+drop materialized view materialized;
+SQL SUCCESS

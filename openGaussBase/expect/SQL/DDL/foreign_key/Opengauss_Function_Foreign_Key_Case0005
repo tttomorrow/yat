@@ -1,0 +1,39 @@
+-- @testpoint: 测试外键约束检查延迟生效，合理报错
+--建立外键表，加入推迟检查约束
+drop table if exists student;
+SQL SUCCESS
+drop table if exists teacher;
+SQL SUCCESS
+create table teacher
+(
+    t_id int primary key,
+    t_name varchar not null
+);
+SQL SUCCESS
+create table student
+(
+    s_id int,
+    s_name varchar not null,
+    t_id int REFERENCES teacher deferrable initially deferred
+);
+SQL SUCCESS
+--添加数据
+SQL SUCCESS
+SQL SUCCESS
+--测试推迟检查约束，应当在commit时报错
+START TRANSACTION;
+SQL SUCCESS
+SQL SUCCESS
+update student set s_id = s_id + 1;
+SQL SUCCESS
+COMMIT;
+?.*ERROR: insert or update on table "student" violates foreign key constraint "student_t_id_fkey"
+select * from student;
++------------+--------+------------+
+| s_id       | s_name | t_id       |
++------------+--------+------------+
++------------+--------+------------+
+drop table if exists student;
+SQL SUCCESS
+drop table if exists teacher;
+SQL SUCCESS

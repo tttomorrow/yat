@@ -1,0 +1,45 @@
+-- @testpoint: date_part函数给浮点数的年月日
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (clo1 interval);
+SQL SUCCESS
+insert into test_date01 values ('1.5 years 1.5 months 1.5 days');
+SQL SUCCESS
+select date_part('year', clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| 1.0       |
++-----------+
+SELECT date_part('year', interval '1.5 years 1.5 months 1.5 days');
++-----------+
+| date_part |
++-----------+
+| 1.0       |
++-----------+
+select date_part('month', clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| 7.0       |
++-----------+
+SELECT date_part('month', interval '1.5 years 1.5 months 1.5 days');
++-----------+
+| date_part |
++-----------+
+| 7.0       |
++-----------+
+select date_part('day', clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| 16.0      |
++-----------+
+SELECT date_part('day', interval '1.5 years 1.5 months 1.5 days');
++-----------+
+| date_part |
++-----------+
+| 16.0      |
++-----------+
+drop table if exists test_date01;
+SQL SUCCESS

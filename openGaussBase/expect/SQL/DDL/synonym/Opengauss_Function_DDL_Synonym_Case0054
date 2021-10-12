@@ -1,0 +1,73 @@
+-- @testpoint: 在同义词上创建视图,依赖对象删除后，查询同义词，合理报错
+-- @modify at: 2020-11-25
+--创建表
+drop table if exists test_SYN_054;
+SQL SUCCESS
+create table test_SYN_054 (a int);
+SQL SUCCESS
+--插入数据
+insert into test_SYN_054 values(1),(2),(3),(4);
+SQL SUCCESS
+--创建同义词
+drop synonym if exists SYN_054;
+SQL SUCCESS
+create synonym SYN_054 for test_SYN_054;
+SQL SUCCESS
+--查询
+select * from SYN_054;
++---+
+| a |
++---+
+| 1 |
+| 2 |
+| 3 |
+| 4 |
++---+
+--创建视图
+drop view if exists v_SYN_054 ;
+SQL SUCCESS
+create view v_SYN_054 as select * from SYN_054;
+SQL SUCCESS
+--查询视图
+select * from v_SYN_054;
++---+
+| a |
++---+
+| 1 |
+| 2 |
+| 3 |
+| 4 |
++---+
+--删除表
+drop table test_SYN_054 cascade;
+SQL SUCCESS
+--查同义词和视图：报错
+select * from SYN_054;
+?.*ERROR: relation "syn_054" does not exist.*
+  Detail: translation for synonym "syn_054" is no longer valid
+?.*
+select * from v_SYN_054;
+?.*ERROR: relation "v_syn_054" does not exist.*
+?.*
+--重新创建表
+drop table if exists test_SYN_054 ;
+SQL SUCCESS
+create table test_SYN_054(a int,b char(1));
+SQL SUCCESS
+--查同义词，成功
+select * from SYN_054;
++---+---+
+| a | b |
++---+---+
++---+---+
+--查视图，报错
+select * from v_SYN_054;
+?.*ERROR: relation "v_syn_054" does not exist.*
+?.*
+--清空环境
+drop table test_SYN_054;
+SQL SUCCESS
+drop view if exists v_SYN_054;
+SQL SUCCESS
+drop synonym SYN_054;
+SQL SUCCESS

@@ -1,0 +1,15 @@
+-- @testpoint: 时间和日期操作符+，time与时间间隔相加
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (col1 time);
+SQL SUCCESS
+insert into test_date01 values ('04:59:59');
+SQL SUCCESS
+select time '04:59:59' + interval '3 hours'    from test_date01;
++----------+
+| ?column? |
++----------+
+| 07:59:59 |
++----------+
+drop table if exists test_date01;
+SQL SUCCESS

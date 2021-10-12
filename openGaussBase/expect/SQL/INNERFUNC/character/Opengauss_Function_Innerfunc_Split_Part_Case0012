@@ -1,0 +1,15 @@
+-- @testpoint: 字符串中找不到分隔字符
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('abc');
+SQL SUCCESS
+SELECT split_part(string1,'d',1) from type_char;
++------------+
+| split_part |
++------------+
+| abc        |
++------------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

@@ -1,0 +1,22 @@
+-- @testpoint: NTILE(num_buckets integer) 描述：根据num_buckets integer将有序的数据集合平均分配到num_buckets所指定数量的桶中，并将桶号分配给每一行。分配时应尽量做到平均分配
+
+--了解支付金额在前20%的用户
+create table user_sales_table ( user_name varchar ( 10 ), pay_amount int );
+insert into user_sales_table
+values
+	('a',50),('a',100),('b',250),('b',20),('b',30),
+	('c',100),('c',180),('d',120),('d',25),('e',408),
+	('f',162),('f',327),('f',198),('f',195),('g',372),
+	('g',291),('g',347),('g',207),('g',412),('h',234),
+	('h',404),('i',377),('i',295),('i',374),('j',311);
+
+--执行步骤
+select
+	a.user_name
+from
+	( select user_name, ntile ( 5 ) over ( order by sum( pay_amount ) desc )  from user_sales_table group by user_name ) a
+where
+	ntile = 1;
+
+--清理环境
+drop table user_sales_table;

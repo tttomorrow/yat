@@ -1,0 +1,9 @@
+--  @testpoint:定义和使用列时不使用account lock，解锁lh用户
+drop user if exists lh cascade;
+SQL SUCCESS
+create user lh with sysadmin password 'Xiaxia2123';
+SQL SUCCESS
+alter user lh account unlock;
+SQL SUCCESS
+drop user if exists lh cascade;
+SQL SUCCESS

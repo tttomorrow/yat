@@ -1,0 +1,186 @@
+-- @testpoint: upsert子查询是否支持PBE/BYPASS/SMP验证，不符合语法要求，合理报错
+--创建upeset及子查询表，插入数据
+drop table if exists t_dml_upsert_sub0130_01;
+SQL SUCCESS
+create table t_dml_upsert_sub0130_01 (b int primary key,c text);
+SQL SUCCESS
+insert into t_dml_upsert_sub0130_01 select generate_series(1,100000),'c-'||generate_series(1,100000);
+SQL SUCCESS
+insert into t_dml_upsert_sub0130_01 select generate_series(100001,200000),'c-'||generate_series(100001,200000);
+SQL SUCCESS
+insert into t_dml_upsert_sub0130_01 select generate_series(200001,300000),'c-'||generate_series(200001,300000);
+SQL SUCCESS
+drop table if exists t_dml_upsert_sub0130_02;
+SQL SUCCESS
+create table t_dml_upsert_sub0130_02 (b int primary key,d text);
+SQL SUCCESS
+insert into t_dml_upsert_sub0130_02 values(generate_series(1,10000),'d-'||generate_series(1,10000));
+SQL SUCCESS
+--创建upsert表，组合主键场景
+drop table if exists t_dml_upsert0130;
+SQL SUCCESS
+create table t_dml_upsert0130 (a int primary key , b text, c text, d text);
+SQL SUCCESS
+insert into t_dml_upsert0130 values (1,1,1),(2,2,2),(3,3,3),(4,4,4);
+SQL SUCCESS
+analyze t_dml_upsert_sub0130_01;
+SQL SUCCESS
+analyze t_dml_upsert_sub0130_02;
+SQL SUCCESS
+analyze t_dml_upsert0130;
+SQL SUCCESS
+select * from t_dml_upsert0130;
++---+---+---+---+
+| a | b | c | d |
++---+---+---+---+
+| 1 | 1 | 1 |   |
+| 2 | 2 | 2 |   |
+| 3 | 3 | 3 |   |
+| 4 | 4 | 4 |   |
++---+---+---+---+
+--PBE，不支持，合理报错
+prepare cdselect(int) AS select distinct(tb1.c),tb2.d from t_dml_upsert_sub0130_01 tb1,t_dml_upsert_sub0130_02 tb2 where tb1.b =$1 and tb1.b=tb2.b limit 1 ;
+SQL SUCCESS
+execute cdselect(1);
++-----+-----+
+| c   | d   |
++-----+-----+
+| c-1 | d-1 |
++-----+-----+
+insert into t_dml_upsert0130 values (3,3) on duplicate key update (c,d) = (execute cdselect(1));
+?.* ERROR: syntax error at or near "cdselect"
+?.*
+deallocate prepare cdselect ;
+SQL SUCCESS
+prepare cdselect(int) AS select distinct(tb1.c) from t_dml_upsert_sub0130_01 tb1,t_dml_upsert_sub0130_02 tb2 where tb1.b =$1 and tb1.b=tb2.b limit 1 ;
+SQL SUCCESS
+execute cdselect(1);
++-----+
+| c   |
++-----+
+| c-1 |
++-----+
+insert into t_dml_upsert0130 values (3,3) on duplicate key update c = (execute cdselect(1));
+?.* ERROR: syntax error at or near "cdselect"
+?.*
+deallocate prepare cdselect ;
+SQL SUCCESS
+--bypass，不支持，但不报错，没有Bypass关键字
+set enable_opfusion=on;
+SQL SUCCESS
+set enable_beta_opfusion=on;
+SQL SUCCESS
+set enable_bitmapscan=off;
+SQL SUCCESS
+set enable_seqscan=off;
+SQL SUCCESS
+set opfusion_debug_mode = 'log';
+SQL SUCCESS
+set log_min_messages=debug;
+SQL SUCCESS
+set logging_module = 'on(OPFUSION)';
+SQL SUCCESS
+explain (costs off, verbose) select c from t_dml_upsert_sub0130_01 where b > 13 limit 1;
++---------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                            |
++---------------------------------------------------------------------------------------+
+| [Bypass]                                                                              |
+| Limit                                                                                 |
+|   Output: c                                                                           |
+|   ->  Index Scan using t_dml_upsert_sub0130_01_pkey on public.t_dml_upsert_sub0130_01 |
+|         Output: c                                                                     |
+|         Index Cond: (t_dml_upsert_sub0130_01.b > 13)                                  |
++---------------------------------------------------------------------------------------+
+explain (costs off, verbose) insert into t_dml_upsert0130 values (3,3) on duplicate key update c = (select c from t_dml_upsert_sub0130_01 where b > 13 limit 1);
++-----------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                    |
++-----------------------------------------------------------------------------------------------+
+| [No Bypass]reason: Bypass not executed because the plan of query is not a simple plan.        |
+| Insert on public.t_dml_upsert0130                                                             |
+|   Conflict Resolution: UPDATE                                                                 |
+|   Conflict Arbiter Indexes: t_dml_upsert0130_pkey                                             |
+|   InitPlan 1 (returns $0)                                                                     |
+|     ->  Limit                                                                                 |
+|           Output: t_dml_upsert_sub0130_01.c                                                   |
+|           ->  Index Scan using t_dml_upsert_sub0130_01_pkey on public.t_dml_upsert_sub0130_01 |
+|                 Output: t_dml_upsert_sub0130_01.c                                             |
+|                 Index Cond: (t_dml_upsert_sub0130_01.b > 13)                                  |
+|   ->  Result                                                                                  |
+|         Output: 3, '3'::text, NULL::text, NULL::text                                          |
++-----------------------------------------------------------------------------------------------+
+insert into t_dml_upsert0130 values (3,3) on duplicate key update c = (select c from t_dml_upsert_sub0130_01 where b > 13 limit 1);
+SQL SUCCESS
+select * from t_dml_upsert0130;
++---+---+------+---+
+| a | b | c    | d |
++---+---+------+---+
+| 1 | 1 | 1    |   |
+| 2 | 2 | 2    |   |
+| 4 | 4 | 4    |   |
+| 3 | 3 | c-14 |   |
++---+---+------+---+
+reset enable_opfusion;
+SQL SUCCESS
+reset enable_beta_opfusion;
+SQL SUCCESS
+reset enable_bitmapscan;
+SQL SUCCESS
+reset enable_seqscan;
+SQL SUCCESS
+reset opfusion_debug_mode;
+SQL SUCCESS
+reset log_min_messages;
+SQL SUCCESS
+reset logging_module;
+SQL SUCCESS
+--smp,不支持，但不报错；查询SQL，单独执行进行并行查询，在upsert语句中子查询不进行并行查询
+set query_dop = 2;
+SQL SUCCESS
+explain (costs off, verbose) select count(*) from t_dml_upsert_sub0130_01;
++--------------------------------------------------------------+
+| QUERY PLAN                                                   |
++--------------------------------------------------------------+
+| Aggregate                                                    |
+|   Output: pg_catalog.count(*)                                |
+|   ->  Streaming(type: LOCAL GATHER dop: 1/2)                 |
+|         Output: (count(*))                                   |
+|         ->  Aggregate                                        |
+|               Output: count(*)                               |
+|               ->  Seq Scan on public.t_dml_upsert_sub0130_01 |
+|                     Output: b, c                             |
++--------------------------------------------------------------+
+explain (costs off, verbose) insert into t_dml_upsert0130 values (4,4,'test') on duplicate key update c = (select count(*) from t_dml_upsert_sub0130_01);
++------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                         |
++------------------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0130                                                  |
+|   Conflict Resolution: UPDATE                                                      |
+|   Conflict Arbiter Indexes: t_dml_upsert0130_pkey                                  |
+|   InitPlan 1 (returns $0)                                                          |
+|     ->  Aggregate                                                                  |
+|           Output: pg_catalog.count(*)                                              |
+|           ->  Aggregate                                                            |
+|                 Output: count(*)                                                   |
+|                 ->  Seq Scan on public.t_dml_upsert_sub0130_01                     |
+|                       Output: t_dml_upsert_sub0130_01.b, t_dml_upsert_sub0130_01.c |
+|   ->  Result                                                                       |
+|         Output: 4, '4'::text, 'test'::text, NULL::text                             |
++------------------------------------------------------------------------------------+
+insert into t_dml_upsert0130 values (4,4,'test') on duplicate key update c = (select count(*) from t_dml_upsert_sub0130_01);
+SQL SUCCESS
+select * from t_dml_upsert0130;
++---+---+--------+---+
+| a | b | c      | d |
++---+---+--------+---+
+| 1 | 1 | 1      |   |
+| 2 | 2 | 2      |   |
+| 3 | 3 | c-14   |   |
+| 4 | 4 | 300000 |   |
++---+---+--------+---+
+--测试数据清理
+drop table if exists t_dml_upsert0130;
+SQL SUCCESS
+drop table if exists t_dml_upsert_sub0130_01;
+SQL SUCCESS
+drop table if exists t_dml_upsert_sub0130_02;
+SQL SUCCESS

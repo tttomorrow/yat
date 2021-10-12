@@ -1,0 +1,13 @@
+-- @testpoint: 类型转换函数to_timestamp，入参为非法日期时合理报错
+select to_timestamp('0000-05-12','yyyy-mm-dd');
+?.*ERROR: invalid data for "year =  0" ,value must be between 1 and 9999, and not be 0.*
+  Where: referenced column: to_timestamp
+select to_timestamp('2018-00-12','yyyy-mm-dd');
+?.*ERROR: invalid data for "month =  0" ,value must be between 1 and 12.*
+  Where: referenced column: to_timestamp
+select to_timestamp('2018-09-00','yyyy-mm-dd');
+?.*ERROR: invalid data for "day of month =  0" ,value must be between 1 and 31.*
+  Where: referenced column: to_timestamp
+select to_timestamp('2018-09-31','yyyy-mm-dd');
+?.*ERROR: invalid data for "day of month =  31" ,value must be be fit for current month.*
+  Where: referenced column: to_timestamp

@@ -1,0 +1,3 @@
+-- @testpoint: 词条位置的词汇中包含常量
+
+SELECT $$the lexeme 'Joe''s' contains a quote$$::tsvector;

@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字until非保留)，作为序列名
+--关键字不带引号-成功
+drop sequence if exists until;
+SQL SUCCESS
+create sequence until start 100 cache 50;
+SQL SUCCESS
+drop sequence until;
+SQL SUCCESS
+--关键字带双引号-成功
+drop sequence if exists "until";
+SQL SUCCESS
+create sequence "until" start 100 cache 50;
+SQL SUCCESS
+drop sequence "until";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'until';
+?.*ERROR: syntax error at or near "'until'".*
+?.*Position: .*
+create sequence 'until' start 100 cache 50;
+?.*ERROR: syntax error at or near "'until'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop sequence if exists `until`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create sequence `until` start 100 cache 50;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

@@ -1,0 +1,2 @@
+-- @testpoint: regexp_substr函数模式为''
+select regexp_substr('str','');

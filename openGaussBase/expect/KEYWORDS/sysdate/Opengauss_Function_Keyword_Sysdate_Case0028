@@ -1,0 +1,66 @@
+-- @testpoint: opengauss关键字sysdate(保留)，作为同义词对象名,部分测试点合理报错
+--前置条件
+drop table if exists sysdate_test;
+SQL SUCCESS
+create table sysdate_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-失败
+drop synonym if exists sysdate;
+?.*ERROR: syntax error at or near "sysdate"
+?.*
+create synonym sysdate for sysdate_test;
+?.*ERROR: syntax error at or near "sysdate"
+?.*
+--关键字带双引号-成功
+drop synonym if exists "sysdate";
+SQL SUCCESS
+create synonym "sysdate" for sysdate_test;
+SQL SUCCESS
+insert into "sysdate" values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update "sysdate" set "sysdate".name='cici' where "sysdate".id=2;
+SQL SUCCESS
+select * from "sysdate";
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+drop synonym "sysdate";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'sysdate';
+?.*ERROR: syntax error at or near "'sysdate'"
+?.*
+create synonym 'sysdate' for sysdate_test;
+?.*ERROR: syntax error at or near "'sysdate'"
+?.*
+insert into 'sysdate' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'sysdate'"
+?.*
+update 'sysdate' set 'sysdate'.name='cici' where 'sysdate'.id=2;
+?.*ERROR: syntax error at or near "'sysdate'"
+?.*
+select * from 'sysdate';
+?.*ERROR: syntax error at or near "'sysdate'"
+?.*
+--关键字带反引号-合理报错
+drop synonym if exists `sysdate`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create synonym `sysdate` for sysdate_test;
+?.*ERROR: syntax error at or near "`"
+?.*
+insert into `sysdate` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`"
+?.*
+update `sysdate` set `sysdate`.name='cici' where `sysdate`.id=2;
+?.*ERROR: syntax error at or near "`"
+?.*
+select * from `sysdate`;
+?.*ERROR: syntax error at or near "`"
+?.*
+--清理环境
+drop table if exists sysdate_test;
+SQL SUCCESS

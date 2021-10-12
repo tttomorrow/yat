@@ -1,0 +1,6 @@
+--  @testpoint:列名为true，应该报错
+drop table if exists dhj;
+SQL SUCCESS
+create table dhj(true bool);
+?.*ERROR: syntax error at or near "true"
+?.*Position: .*

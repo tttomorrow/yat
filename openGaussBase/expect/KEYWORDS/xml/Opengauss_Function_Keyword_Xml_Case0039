@@ -1,0 +1,19 @@
+-- @testpoint: 关键字xml，用作函数名
+drop function if exists xml(num1 bigint,num2 bigint);
+SQL SUCCESS
+create function xml(num1 bigint,num2 bigint)
+return bigint
+as
+begin
+    return num1+num2;
+end;
+/
+SQL SUCCESS
+select * from xml(55555,666666);
++--------+
+| xml    |
++--------+
+| 722221 |
++--------+
+drop function if exists xml(num1 bigint,num2 bigint);
+SQL SUCCESS

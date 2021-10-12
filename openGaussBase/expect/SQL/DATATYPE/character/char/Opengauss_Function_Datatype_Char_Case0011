@@ -1,0 +1,16 @@
+-- @testpoint: 插入合理字符串，默认字节长度
+-- @modify at: 2020-11-05
+drop table if exists test_char_11;
+SQL SUCCESS
+create table test_char_11 (name char);
+SQL SUCCESS
+insert into test_char_11 values ('a');
+SQL SUCCESS
+select * from test_char_11;
++------+
+| name |
++------+
+| a    |
++------+
+drop table test_char_11;
+SQL SUCCESS

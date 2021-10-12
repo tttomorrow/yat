@@ -1,0 +1,11 @@
+-- @testpoint: 回收角色上的sysadmin权限
+drop user if exists user_018 cascade;
+SQL SUCCESS
+create user user_018 identified by 'Gauss_234';
+SQL SUCCESS
+grant all privileges to user_018;
+SQL SUCCESS
+revoke all privileges from user_018;
+SQL SUCCESS
+drop user if exists user_018;
+SQL SUCCESS

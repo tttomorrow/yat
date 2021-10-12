@@ -1,0 +1,9 @@
+-- @testpoint: 定义和使用as列带双引号
+drop table if exists  test_as_002;
+SQL SUCCESS
+create table test_as_002 ("as" int);
+SQL SUCCESS
+insert into test_as_002 ("as")values(20);
+SQL SUCCESS
+drop table if exists  test_as_002;
+SQL SUCCESS

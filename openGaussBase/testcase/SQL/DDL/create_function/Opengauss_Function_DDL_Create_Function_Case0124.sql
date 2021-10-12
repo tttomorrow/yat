@@ -1,0 +1,9 @@
+--  @testpoint:添加package参数，创建重载的函数，指定参数数据类型是variadic，合理报错
+ drop FUNCTION if EXISTS w_testfun1;
+CREATE FUNCTION w_testfun1 (c_int VARIADIC int[] = array[1,2,3,4])  RETURNS int[]  AS $$
+        BEGIN
+                RETURN (c_int);
+        END;
+$$ LANGUAGE plpgsql
+package;
+/

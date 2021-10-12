@@ -1,0 +1,7 @@
+-- @testpoint: 使用ALTER SYSTEM SET 方法设置参数synchronous_commit值为2，合理报错
+--使用ALTER SYSTEM SET 方法设置参数值;ERROR:  unsupport parameter: synchronous_commit
+alter system set synchronous_commit to 2;
+?.*ERROR: unsupport parameter: synchronous_commit
+ALTER SYSTEM SET only support POSTMASTER-level, SIGHUP-level and BACKEND-level guc variable,
+and it must be allowed to set in postgresql.conf.
+--no need to clean

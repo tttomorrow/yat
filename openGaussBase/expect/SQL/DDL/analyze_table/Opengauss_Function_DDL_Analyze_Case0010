@@ -1,0 +1,54 @@
+-- @testpoint: 删除分区表的column_1、column_2列的多列统计信息声明
+drop table if exists customer_par;
+SQL SUCCESS
+create table customer_par
+(
+wr_returned_date_sk       integer                       ,
+wr_returned_time_sk       integer                       ,
+wr_item_sk                integer               not null,
+wr_refunded_customer_sk   integer
+)
+partition by range(wr_returned_date_sk)
+(
+partition p1 values less than(2452275),
+partition p2 values less than(2452640),
+partition p3 values less than(2453000),
+partition p4 values less than(maxvalue)
+);
+SQL SUCCESS
+insert into customer_par values(2452260,11,111,1111);
+SQL SUCCESS
+insert into customer_par values(2452530,22,222,2222);
+SQL SUCCESS
+insert into customer_par values(2452700,33,333,3333);
+SQL SUCCESS
+select * from customer_par;
++---------------------+---------------------+------------+-------------------------+
+| wr_returned_date_sk | wr_returned_time_sk | wr_item_sk | wr_refunded_customer_sk |
++---------------------+---------------------+------------+-------------------------+
+| 2452260             | 11                  | 111        | 1111                    |
+| 2452530             | 22                  | 222        | 2222                    |
+| 2452700             | 33                  | 333        | 3333                    |
++---------------------+---------------------+------------+-------------------------+
+analyze  customer_par ((wr_item_sk,wr_refunded_customer_sk));
+SQL SUCCESS
+select * from pg_statistic where starelid = (select oid from pg_class where relname = 'customer_par');
++----------+------------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------+---------------+------------+
+| starelid | starelkind | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 | stadndistinct | staextinfo |
++----------+------------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------+---------------+------------+
++----------+------------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------+---------------+------------+
+alter table customer_par add statistics (( wr_item_sk,wr_refunded_customer_sk));
+SQL SUCCESS
+analyze  customer_par;
+SQL SUCCESS
+select * from pg_statistic where starelid = (select oid from pg_class where relname = 'customer_par');
++----------+------------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+---------------------------+------------+------------+------------+------------+---------------+------------+
+| starelid | starelkind | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1                | stavalues2 | stavalues3 | stavalues4 | stavalues5 | stadndistinct | staextinfo |
++----------+------------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+---------------------------+------------+------------+------------+------------+---------------+------------+
+?.*| c          | 1         | false      | 0.0         | 4        | -1.0        | 2        | 3        | 0        | 0        | 0        | 97     | 97     | 0      | 0      | 0      |             | \{1.0\}       |             |             |             | \{2452260,2452530,2452700\} |            |            |            |            | 0.0           |            |
+?.*| c          | 2         | false      | 0.0         | 4        | -1.0        | 2        | 3        | 0        | 0        | 0        | 97     | 97     | 0      | 0      | 0      |             | \{1.0\}       |             |             |             | \{11,22,33\}                |            |            |            |            | 0.0           |            |
+?.*| c          | 3         | false      | 0.0         | 4        | -1.0        | 2        | 3        | 0        | 0        | 0        | 97     | 97     | 0      | 0      | 0      |             | \{1.0\}       |             |             |             | \{111,222,333\}             |            |            |            |            | 0.0           |            |
+?.*| c          | 4         | false      | 0.0         | 4        | -1.0        | 2        | 3        | 0        | 0        | 0        | 97     | 97     | 0      | 0      | 0      |             | \{1.0\}       |             |             |             | \{1111,2222,3333\}          |            |            |            |            | 0.0           |            |
++----------+------------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+---------------------------+------------+------------+------------+------------+---------------+------------+
+drop table if exists customer_par;
+SQL SUCCESS

@@ -1,0 +1,16 @@
+-- @testpoint: 定义at为函数名
+CREATE FUNCTION at(integer, integer) RETURNS integer
+    AS 'select $1 + $2;'
+    LANGUAGE SQL
+    IMMUTABLE
+    RETURNS NULL ON NULL INPUT;
+    /
+SQL SUCCESS
+select at (1,2);
++----+
+| at |
++----+
+| 3  |
++----+
+drop function at;
+SQL SUCCESS

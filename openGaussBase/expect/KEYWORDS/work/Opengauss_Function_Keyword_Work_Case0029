@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字work(非保留)，作为表空间名
+--关键字不带引号，创建成功
+drop tablespace if exists work;
+SQL SUCCESS
+CREATE TABLESPACE work RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+SQL SUCCESS
+drop tablespace work;
+SQL SUCCESS
+--关键字带双引号，创建成功
+drop tablespace if exists "work";
+SQL SUCCESS
+CREATE TABLESPACE "work" RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+SQL SUCCESS
+drop tablespace "work";
+SQL SUCCESS
+--关键字带单引号，合理报错
+drop tablespace if exists 'work';
+?.*ERROR: syntax error at or near "'work'".*
+?.*Position: .*
+CREATE TABLESPACE 'work' RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+?.*ERROR: syntax error at or near "'work'".*
+?.*Position: .*
+--关键字带反引号，合理报错
+drop tablespace if exists `work`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+CREATE TABLESPACE `work` RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

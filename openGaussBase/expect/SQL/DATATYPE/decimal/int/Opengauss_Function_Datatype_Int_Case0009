@@ -1,0 +1,21 @@
+-- @testpoint: 插入0值
+drop table if exists int09;
+SQL SUCCESS
+create table int09 (name int);
+SQL SUCCESS
+insert into int09 values (0);
+SQL SUCCESS
+insert into int09 values (0);
+SQL SUCCESS
+insert into int09 values (0);
+SQL SUCCESS
+select * from int09;
++------+
+| name |
++------+
+| 0    |
+| 0    |
+| 0    |
++------+
+drop table int09;
+SQL SUCCESS

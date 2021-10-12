@@ -1,0 +1,11 @@
+--  @testpoint:alter验证表名大小写敏感
+ALTER TABLE false_1 drop v cascade;
+?.*ERROR: column "v" of relation "false_1" does not exist
+alter table FALSE_1 ADD V INT;
+SQL SUCCESS
+ALTER TABLE false_1 add v int;
+?.*ERROR: column "v" of relation "false_1" already exists
+alter table FALSE_1 MODIFY A CHAR(10);
+SQL SUCCESS
+alter table false_1 MODIFY a CHAR(10);
+SQL SUCCESS

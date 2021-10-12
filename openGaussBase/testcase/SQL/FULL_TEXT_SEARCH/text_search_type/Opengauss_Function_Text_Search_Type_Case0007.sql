@@ -1,0 +1,4 @@
+--  @testpoint:get_current_ts_config()函数测试
+--默认文本搜索配置是english
+SELECT get_current_ts_config();
+--清理环境 no need to clean

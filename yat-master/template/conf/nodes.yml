@@ -1,0 +1,71 @@
+default:
+  host: '127.0.0.1'
+  db:
+    type: 'zenith'
+    username: 'yat'
+    password: ''
+    port: 1611
+  ssh:
+    username: yat
+    password: ''
+
+# examples
+#
+# The short configure for postgresql
+#
+# pg:
+#   host: '127.0.0.1'
+#   db:
+#     type: 'postgresql'
+#     username: 'yat'
+#     password: ''
+#     port: 1644
+#     name: 'db_name'
+#
+# The short configure for zenith
+#
+# zenith:
+#   host: '192.168.1.2'
+#   db:
+#     type: 'zenith'
+#     username: 'yat'
+#     password: ''
+#     port: 1611
+#   ssh:
+#     username: yat
+#     password: ''
+#
+# Or, user can use full configure
+#
+# The full configure for postgresql
+#
+# full_pg:
+#   host: '127.0.0.1'
+#   db:
+#     type: 'postgresql'
+#     url: 'jdbc:postgresql://${host}:${port}/${name}'
+#     driver: 'org.postgresql.Driver'
+#     username: 'yat'
+#     password: ''
+#     port: 1611
+#     name: 'db_name'
+#   ssh:
+#     port: 22
+#     username: yat
+#     password: ''
+#
+# The full configure for zenith
+#
+# full_zenith:
+#   host: '127.0.0.1'
+#   db:
+#     type: 'zenith'
+#     url: 'jdbc:zenith:@${host}:${port}'
+#     driver: 'com.huawei.jdbc.ZenithDriver'
+#     username: 'yat'
+#     password: ''
+#     port: 1611
+#   ssh:
+#     port: 22
+#     username: yat
+#     password: ''

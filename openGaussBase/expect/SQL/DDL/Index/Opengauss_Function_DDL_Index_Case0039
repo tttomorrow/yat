@@ -1,0 +1,43 @@
+-- @testpoint: USING method：行存local分区表psort组合索引：合理报错
+--删表
+drop table if exists test_index_table_039 cascade;
+SQL SUCCESS
+create table test_index_table_039(id int,name varchar) WITH (ORIENTATION = row)
+PARTITION BY RANGE(id)(
+        PARTITION P1 VALUES LESS THAN(100),
+        PARTITION P2 VALUES LESS THAN(1000),
+        PARTITION P3 VALUES LESS THAN(MAXVALUE));
+SQL SUCCESS
+--插入数据
+BEGIN
+  for i in 1..2000 LOOP
+    insert into test_index_table_039 values(i);
+  end LOOP;
+end;
+/
+SQL SUCCESS
+explain select * from test_index_table_039 where id = 1985;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*Partition Iterator.*
+?.*
+?.*Partitioned Seq Scan on test_index_table_039.*
+?.*
+?.*
+?.*
+--创建索引
+drop index if exists partition_index_039;
+SQL SUCCESS
+create index partition_index_039 on test_index_table_039 using psort(id, name) LOCAL;
+?.*ERROR: access method "psort" does not support row store
+select relname from pg_class where relname='partition_index_039';
+?.*
+| relname |
+?.*
+?.*
+--清理数据
+drop index if exists partition_index_039;
+SQL SUCCESS
+drop table if exists test_index_table_039 cascade;
+SQL SUCCESS

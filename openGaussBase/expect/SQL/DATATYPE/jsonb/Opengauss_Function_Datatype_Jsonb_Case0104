@@ -1,0 +1,115 @@
+-- @testpoint: Jsonb高级特性：bool-jsonb类型：true > false
+-- = 相等
+select 'true'::jsonb = 'true'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select 'false'::jsonb = 'true'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select 'false'::jsonb = 'false'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+-- <> 不相等
+select 'true'::jsonb <> 'true'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select 'false'::jsonb <> 'true'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select 'false'::jsonb <> 'false'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+-- > 大于
+select 'true'::jsonb > 'true'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select 'false'::jsonb > 'true'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select 'false'::jsonb > 'false'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+-- < 小于
+select 'true'::jsonb < 'true'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select 'false'::jsonb < 'true'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select 'false'::jsonb < 'false'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+-- >= 大于等于
+select 'true'::jsonb >= 'true'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select 'false'::jsonb >= 'true'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select 'false'::jsonb >= 'false'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+-- <= 小于等于
+select 'true'::jsonb <= 'true'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select 'false'::jsonb <= 'true'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select 'false'::jsonb <= 'false'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+

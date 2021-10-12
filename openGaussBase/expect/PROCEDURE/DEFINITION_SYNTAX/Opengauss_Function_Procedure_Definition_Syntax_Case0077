@@ -1,0 +1,22 @@
+-- @testpoint:  匿名块使用操作符 正/负 +/-
+DROP TABLE IF EXISTS test_procedure_insert_077;
+SQL SUCCESS
+create table test_procedure_insert_077 (id int,
+name varchar2(20));
+SQL SUCCESS
+declare
+sqlstr varchar(1024);
+begin
+sqlstr := 'insert into test_procedure_insert_077 (SELECT -2 AS RESULT, 5)';
+execute immediate sqlstr;
+end;
+/
+SQL SUCCESS
+select * from test_procedure_insert_077;
++----+------+
+| id | name |
++----+------+
+| -2 | 5    |
++----+------+
+drop table test_procedure_insert_077;
+SQL SUCCESS

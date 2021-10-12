@@ -1,0 +1,16 @@
+-- @testpoint: 输入超出日期上下限，合理报错
+drop table if exists test_date02;
+SQL SUCCESS
+create table test_date02 (name date);
+SQL SUCCESS
+insert into test_date02 values ('0000-00-00');
+?.*ERROR: date/time field value out of range: "0000-00-00"
+?.*
+  Where: referenced column: name
+insert into test_date02 values ('9999-12-32');
+?.*ERROR: date/time field value out of range: "9999-12-32"
+  Hint: Perhaps you need a different "datestyle" setting.
+?.*
+  Where: referenced column: name
+drop table test_date02;
+SQL SUCCESS

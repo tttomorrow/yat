@@ -1,0 +1,19 @@
+-- @testpoint: 插入字符串类型,合理报错
+drop table if exists smallserial_09;
+SQL SUCCESS
+create table smallserial_09 (name smallserial);
+SQL SUCCESS
+insert into smallserial_09 values ('123abc');
+?.*ERROR: invalid input syntax for integer: "123abc"
+?.*
+  Where: referenced column: name
+insert into smallserial_09 values ('1235ss4563');
+?.*ERROR: invalid input syntax for integer: "1235ss4563"
+?.*
+  Where: referenced column: name
+insert into smallserial_09 values ('abc456');
+?.*ERROR: invalid input syntax for integer: "abc456"
+?.*
+  Where: referenced column: name
+drop table smallserial_09;
+SQL SUCCESS

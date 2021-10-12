@@ -1,0 +1,5 @@
+-- @testpoint: 函数中进行事务管理 合理报错
+create table test1 (a int);
+SQL SUCCESS
+--创建带有事务管理的函数
+Sql parse error: [31:33] expect token, EOF found

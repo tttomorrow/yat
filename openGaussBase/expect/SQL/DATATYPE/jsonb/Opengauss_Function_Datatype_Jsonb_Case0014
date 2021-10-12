@@ -1,0 +1,57 @@
+-- @testpoint: json格式校验：Array-json（不符合格式合理报错）
+--符合规范
+select '["qq",123,"null","true","false"]'::json;
++----------------------------------+
+| json                             |
++----------------------------------+
+| ["qq",123,"null","true","false"] |
++----------------------------------+
+select '["123","null"," "]'::json;
++--------------------+
+| json               |
++--------------------+
+| ["123","null"," "] |
++--------------------+
+select '["123","-123","0.58","1.2345e+6"]'::json;
++-----------------------------------+
+| json                              |
++-----------------------------------+
+| ["123","-123","0.58","1.2345e+6"] |
++-----------------------------------+
+select '[null,true,false]'::json;
++-------------------+
+| json              |
++-------------------+
+| [null,true,false] |
++-------------------+
+select '["abcdefg",123,{"db":"test"},null,"true",false]'::json;
++-------------------------------------------------+
+| json                                            |
++-------------------------------------------------+
+| ["abcdefg",123,{"db":"test"},null,"true",false] |
++-------------------------------------------------+
+select '["abcdefg",123,{"db":789},null,"true",false]'::json;
++----------------------------------------------+
+| json                                         |
++----------------------------------------------+
+| ["abcdefg",123,{"db":789},null,"true",false] |
++----------------------------------------------+
+--不符合规范
+select '["abcdefg",123,{"db":test}]'::json;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "test" is invalid.
+?.*
+  Where: JSON data, line 1: ["abcdefg",123,{"db":test...
+referenced column: json
+select '[\"www@13^\", 1, {\"name\": \"john\"}, \"2\"]'::json;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "\" is invalid.
+?.*
+  Where: JSON data, line 1: [\...
+referenced column: json
+select '"["www@13^", 1, {"name": "john"}, "2"]"'::json;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "www" is invalid.
+?.*
+  Where: JSON data, line 1: "["www...
+referenced column: json

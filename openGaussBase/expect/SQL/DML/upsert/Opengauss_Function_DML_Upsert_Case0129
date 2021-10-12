@@ -1,0 +1,904 @@
+-- @testpoint: upsert子查询多表关联查询覆盖，不符合语法要求，合理报错
+--创建upeset及子查询表，插入数据
+drop table if exists t_dml_upsert_sub0129_01;
+SQL SUCCESS
+create table t_dml_upsert_sub0129_01 (b int,c text);
+SQL SUCCESS
+insert into t_dml_upsert_sub0129_01 values(generate_series(1,10),'c-'||generate_series(1,10));
+SQL SUCCESS
+insert into t_dml_upsert_sub0129_01 values(generate_series(11,20),'c-'||generate_series(11,20));
+SQL SUCCESS
+drop table if exists t_dml_upsert_sub0129_02;
+SQL SUCCESS
+create table t_dml_upsert_sub0129_02 (b int,d text);
+SQL SUCCESS
+insert into t_dml_upsert_sub0129_02 values(generate_series(1,10),'d-'||generate_series(1,10));
+SQL SUCCESS
+--创建upsert表，组合主键场景
+drop table if exists t_dml_upsert0129;
+SQL SUCCESS
+create table t_dml_upsert0129 (a int primary key , b text, c text, d text);
+SQL SUCCESS
+insert into t_dml_upsert0129 values (1,1,1),(2,2,2),(3,3,3),(4,4,4);
+SQL SUCCESS
+analyze t_dml_upsert_sub0129_01;
+SQL SUCCESS
+analyze t_dml_upsert_sub0129_02;
+SQL SUCCESS
+analyze t_dml_upsert0129;
+SQL SUCCESS
+select * from t_dml_upsert0129;
++---+---+---+---+
+| a | b | c | d |
++---+---+---+---+
+| 1 | 1 | 1 |   |
+| 2 | 2 | 2 |   |
+| 3 | 3 | 3 |   |
+| 4 | 4 | 4 |   |
++---+---+---+---+
+--join; muilt-set/single-set均支持
+explain (costs off, verbose) select tb1.c,tb2.d from t_dml_upsert_sub0129_01 tb1 join t_dml_upsert_sub0129_02 tb2 on tb1.b=tb2.b where tb1.b = 2;
++------------------------------------------------------+
+| QUERY PLAN                                           |
++------------------------------------------------------+
+| Nested Loop                                          |
+|   Output: tb1.c, tb2.d                               |
+|   ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1 |
+|         Output: tb1.b, tb1.c                         |
+|         Filter: (tb1.b = 2)                          |
+|   ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2 |
+|         Output: tb2.b, tb2.d                         |
+|         Filter: (tb2.b = 2)                          |
++------------------------------------------------------+
+insert into t_dml_upsert0129 values(2,2,3) on duplicate key update(c,d)=(select tb1.c,tb2.d from t_dml_upsert_sub0129_01 tb1 join t_dml_upsert_sub0129_02 tb2 on tb1.b=tb2.b where tb1.b = 2);
+SQL SUCCESS
+select * from t_dml_upsert0129;
++---+---+-----+-----+
+| a | b | c   | d   |
++---+---+-----+-----+
+| 1 | 1 | 1   |     |
+| 3 | 3 | 3   |     |
+| 4 | 4 | 4   |     |
+| 2 | 2 | c-2 | d-2 |
++---+---+-----+-----+
+explain (costs off, verbose) insert into t_dml_upsert0129 values(2,2,3) on duplicate key update(c,d)=(select tb1.c,tb2.d from t_dml_upsert_sub0129_01 tb1 join t_dml_upsert_sub0129_02 tb2 on tb1.b=tb2.b where tb1.b = 2);
++--------------------------------------------------------------+
+| QUERY PLAN                                                   |
++--------------------------------------------------------------+
+| Insert on public.t_dml_upsert0129                            |
+|   Conflict Resolution: UPDATE                                |
+|   Conflict Arbiter Indexes: t_dml_upsert0129_pkey            |
+|   InitPlan 1 (returns $0)                                    |
+|     ->  Nested Loop                                          |
+|           Output: tb1.c                                      |
+|           ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1 |
+|                 Output: tb1.b, tb1.c                         |
+|                 Filter: (tb1.b = 2)                          |
+|           ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2 |
+|                 Output: tb2.b, tb2.d                         |
+|                 Filter: (tb2.b = 2)                          |
+|   InitPlan 2 (returns $1)                                    |
+|     ->  Nested Loop                                          |
+|           Output: tb2.d                                      |
+|           ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1 |
+|                 Output: tb1.b, tb1.c                         |
+|                 Filter: (tb1.b = 2)                          |
+|           ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2 |
+|                 Output: tb2.b, tb2.d                         |
+|                 Filter: (tb2.b = 2)                          |
+|   ->  Result                                                 |
+|         Output: 2, '2'::text, '3'::text, NULL::text          |
++--------------------------------------------------------------+
+explain (costs off, verbose) select tb1.c from t_dml_upsert_sub0129_01 tb1 join t_dml_upsert_sub0129_02 tb2 on tb1.b=tb2.b where tb2.d = 'd-10';
++------------------------------------------------------------+
+| QUERY PLAN                                                 |
++------------------------------------------------------------+
+| Hash Join                                                  |
+|   Output: tb1.c                                            |
+|   Hash Cond: (tb1.b = tb2.b)                               |
+|   ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1       |
+|         Output: tb1.b, tb1.c                               |
+|   ->  Hash                                                 |
+|         Output: tb2.b                                      |
+|         ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2 |
+|               Output: tb2.b                                |
+|               Filter: (tb2.d = 'd-10'::text)               |
++------------------------------------------------------------+
+insert into t_dml_upsert0129 values(2,2,3) on duplicate key update c =(select tb1.c from t_dml_upsert_sub0129_01 tb1 join t_dml_upsert_sub0129_02 tb2 on tb1.b=tb2.b where tb2.d = 'd-10');
+SQL SUCCESS
+select * from t_dml_upsert0129;
++---+---+------+-----+
+| a | b | c    | d   |
++---+---+------+-----+
+| 1 | 1 | 1    |     |
+| 3 | 3 | 3    |     |
+| 4 | 4 | 4    |     |
+| 2 | 2 | c-10 | d-2 |
++---+---+------+-----+
+explain (costs off, verbose) insert into t_dml_upsert0129 values(2,2,3) on duplicate key update c =(select tb1.c from t_dml_upsert_sub0129_01 tb1 join t_dml_upsert_sub0129_02 tb2 on tb1.b=tb2.b where tb2.d = 'd-10');
++--------------------------------------------------------------------+
+| QUERY PLAN                                                         |
++--------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0129                                  |
+|   Conflict Resolution: UPDATE                                      |
+|   Conflict Arbiter Indexes: t_dml_upsert0129_pkey                  |
+|   InitPlan 1 (returns $0)                                          |
+|     ->  Hash Join                                                  |
+|           Output: tb1.c                                            |
+|           Hash Cond: (tb1.b = tb2.b)                               |
+|           ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1       |
+|                 Output: tb1.b, tb1.c                               |
+|           ->  Hash                                                 |
+|                 Output: tb2.b                                      |
+|                 ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2 |
+|                       Output: tb2.b                                |
+|                       Filter: (tb2.d = 'd-10'::text)               |
+|   ->  Result                                                       |
+|         Output: 2, '2'::text, '3'::text, NULL::text                |
++--------------------------------------------------------------------+
+--right join; muilt-set/single-set均支持
+explain (costs off, verbose) select tb1.c,tb2.d from t_dml_upsert_sub0129_01 tb1 right join t_dml_upsert_sub0129_02 tb2 on tb1.b=tb2.b where tb1.b = 3;
++------------------------------------------------------+
+| QUERY PLAN                                           |
++------------------------------------------------------+
+| Nested Loop                                          |
+|   Output: tb1.c, tb2.d                               |
+|   ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1 |
+|         Output: tb1.b, tb1.c                         |
+|         Filter: (tb1.b = 3)                          |
+|   ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2 |
+|         Output: tb2.b, tb2.d                         |
+|         Filter: (tb2.b = 3)                          |
++------------------------------------------------------+
+insert into t_dml_upsert0129 values(3,2,3) on duplicate key update(c,d)=(select tb1.c,tb2.d from t_dml_upsert_sub0129_01 tb1 right join t_dml_upsert_sub0129_02 tb2 on tb1.b=tb2.b where tb1.b = 3);
+SQL SUCCESS
+select * from t_dml_upsert0129;
++---+---+------+-----+
+| a | b | c    | d   |
++---+---+------+-----+
+| 1 | 1 | 1    |     |
+| 4 | 4 | 4    |     |
+| 2 | 2 | c-10 | d-2 |
+| 3 | 3 | c-3  | d-3 |
++---+---+------+-----+
+explain (costs off, verbose) insert into t_dml_upsert0129 values(2,2,3) on duplicate key update(c,d)=(select tb1.c,tb2.d from t_dml_upsert_sub0129_01 tb1 right join t_dml_upsert_sub0129_02 tb2 on tb1.b=tb2.b where tb1.b = 3);
++--------------------------------------------------------------+
+| QUERY PLAN                                                   |
++--------------------------------------------------------------+
+| Insert on public.t_dml_upsert0129                            |
+|   Conflict Resolution: UPDATE                                |
+|   Conflict Arbiter Indexes: t_dml_upsert0129_pkey            |
+|   InitPlan 1 (returns $0)                                    |
+|     ->  Nested Loop                                          |
+|           Output: tb1.c                                      |
+|           ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1 |
+|                 Output: tb1.b, tb1.c                         |
+|                 Filter: (tb1.b = 3)                          |
+|           ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2 |
+|                 Output: tb2.b, tb2.d                         |
+|                 Filter: (tb2.b = 3)                          |
+|   InitPlan 2 (returns $1)                                    |
+|     ->  Nested Loop                                          |
+|           Output: tb2.d                                      |
+|           ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1 |
+|                 Output: tb1.b, tb1.c                         |
+|                 Filter: (tb1.b = 3)                          |
+|           ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2 |
+|                 Output: tb2.b, tb2.d                         |
+|                 Filter: (tb2.b = 3)                          |
+|   ->  Result                                                 |
+|         Output: 2, '2'::text, '3'::text, NULL::text          |
++--------------------------------------------------------------+
+explain (costs off, verbose) select tb1.c from t_dml_upsert_sub0129_01 tb1 right join t_dml_upsert_sub0129_02 tb2 on tb1.b=tb2.b where tb2.d = 'd-10';
++------------------------------------------------------------+
+| QUERY PLAN                                                 |
++------------------------------------------------------------+
+| Hash Right Join                                            |
+|   Output: tb1.c                                            |
+|   Hash Cond: (tb1.b = tb2.b)                               |
+|   ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1       |
+|         Output: tb1.b, tb1.c                               |
+|   ->  Hash                                                 |
+|         Output: tb2.b                                      |
+|         ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2 |
+|               Output: tb2.b                                |
+|               Filter: (tb2.d = 'd-10'::text)               |
++------------------------------------------------------------+
+insert into t_dml_upsert0129 values(3,2,3) on duplicate key update c =(select tb1.c from t_dml_upsert_sub0129_01 tb1 right join t_dml_upsert_sub0129_02 tb2 on tb1.b=tb2.b where tb2.d = 'd-10');
+SQL SUCCESS
+select * from t_dml_upsert0129;
++---+---+------+-----+
+| a | b | c    | d   |
++---+---+------+-----+
+| 1 | 1 | 1    |     |
+| 4 | 4 | 4    |     |
+| 2 | 2 | c-10 | d-2 |
+| 3 | 3 | c-10 | d-3 |
++---+---+------+-----+
+explain (costs off, verbose) insert into t_dml_upsert0129 values(2,2,3) on duplicate key update c =(select tb1.c from t_dml_upsert_sub0129_01 tb1 right join t_dml_upsert_sub0129_02 tb2 on tb1.b=tb2.b where tb2.d = 'd-10');
++--------------------------------------------------------------------+
+| QUERY PLAN                                                         |
++--------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0129                                  |
+|   Conflict Resolution: UPDATE                                      |
+|   Conflict Arbiter Indexes: t_dml_upsert0129_pkey                  |
+|   InitPlan 1 (returns $0)                                          |
+|     ->  Hash Right Join                                            |
+|           Output: tb1.c                                            |
+|           Hash Cond: (tb1.b = tb2.b)                               |
+|           ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1       |
+|                 Output: tb1.b, tb1.c                               |
+|           ->  Hash                                                 |
+|                 Output: tb2.b                                      |
+|                 ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2 |
+|                       Output: tb2.b                                |
+|                       Filter: (tb2.d = 'd-10'::text)               |
+|   ->  Result                                                       |
+|         Output: 2, '2'::text, '3'::text, NULL::text                |
++--------------------------------------------------------------------+
+--left join; muilt-set/single-set均支持
+explain (costs off, verbose) select tb1.c,tb2.d from t_dml_upsert_sub0129_01 tb1 left join t_dml_upsert_sub0129_02 tb2 on tb1.b=tb2.b where tb1.b = 13;
++------------------------------------------------------------+
+| QUERY PLAN                                                 |
++------------------------------------------------------------+
+| Hash Left Join                                             |
+|   Output: tb1.c, tb2.d                                     |
+|   Hash Cond: (tb1.b = tb2.b)                               |
+|   ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1       |
+|         Output: tb1.b, tb1.c                               |
+|         Filter: (tb1.b = 13)                               |
+|   ->  Hash                                                 |
+|         Output: tb2.d, tb2.b                               |
+|         ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2 |
+|               Output: tb2.d, tb2.b                         |
+|               Filter: (tb2.b = 13)                         |
++------------------------------------------------------------+
+insert into t_dml_upsert0129 values(3,2,3) on duplicate key update(c,d)=(select tb1.c,tb2.d from t_dml_upsert_sub0129_01 tb1 left join t_dml_upsert_sub0129_02 tb2 on tb1.b=tb2.b where tb1.b = 13);
+SQL SUCCESS
+explain (costs off, verbose) insert into t_dml_upsert0129 values(2,2,3) on duplicate key update(c,d)=(select tb1.c,tb2.d from t_dml_upsert_sub0129_01 tb1 left join t_dml_upsert_sub0129_02 tb2 on tb1.b=tb2.b where tb1.b = 13);
++--------------------------------------------------------------------+
+| QUERY PLAN                                                         |
++--------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0129                                  |
+|   Conflict Resolution: UPDATE                                      |
+|   Conflict Arbiter Indexes: t_dml_upsert0129_pkey                  |
+|   InitPlan 1 (returns $0)                                          |
+|     ->  Hash Left Join                                             |
+|           Output: tb1.c                                            |
+|           Hash Cond: (tb1.b = tb2.b)                               |
+|           ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1       |
+|                 Output: tb1.b, tb1.c                               |
+|                 Filter: (tb1.b = 13)                               |
+|           ->  Hash                                                 |
+|                 Output: tb2.b                                      |
+|                 ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2 |
+|                       Output: tb2.b                                |
+|                       Filter: (tb2.b = 13)                         |
+|   InitPlan 2 (returns $1)                                          |
+|     ->  Hash Left Join                                             |
+|           Output: tb2.d                                            |
+|           Hash Cond: (tb1.b = tb2.b)                               |
+|           ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1       |
+|                 Output: tb1.b, tb1.c                               |
+|                 Filter: (tb1.b = 13)                               |
+|           ->  Hash                                                 |
+|                 Output: tb2.d, tb2.b                               |
+|                 ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2 |
+|                       Output: tb2.d, tb2.b                         |
+|                       Filter: (tb2.b = 13)                         |
+|   ->  Result                                                       |
+|         Output: 2, '2'::text, '3'::text, NULL::text                |
++--------------------------------------------------------------------+
+select * from t_dml_upsert0129;
++---+---+------+-----+
+| a | b | c    | d   |
++---+---+------+-----+
+| 1 | 1 | 1    |     |
+| 4 | 4 | 4    |     |
+| 2 | 2 | c-10 | d-2 |
+| 3 | 3 | c-13 |     |
++---+---+------+-----+
+explain (costs off, verbose) select tb1.c from t_dml_upsert_sub0129_01 tb1 left join t_dml_upsert_sub0129_02 tb2 on tb1.b=tb2.b where tb2.d = 'd-13';
++------------------------------------------------------------+
+| QUERY PLAN                                                 |
++------------------------------------------------------------+
+| Hash Join                                                  |
+|   Output: tb1.c                                            |
+|   Hash Cond: (tb1.b = tb2.b)                               |
+|   ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1       |
+|         Output: tb1.b, tb1.c                               |
+|   ->  Hash                                                 |
+|         Output: tb2.b                                      |
+|         ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2 |
+|               Output: tb2.b                                |
+|               Filter: (tb2.d = 'd-13'::text)               |
++------------------------------------------------------------+
+insert into t_dml_upsert0129 values(3,2,3) on duplicate key update c =(select tb1.c from t_dml_upsert_sub0129_01 tb1 left join t_dml_upsert_sub0129_02 tb2 on tb1.b=tb2.b where tb2.d = 'd-13');
+SQL SUCCESS
+explain (costs off, verbose) insert into t_dml_upsert0129 values(2,2,3) on duplicate key update c =(select tb1.c from t_dml_upsert_sub0129_01 tb1 left join t_dml_upsert_sub0129_02 tb2 on tb1.b=tb2.b where tb2.d = 'd-13');
++--------------------------------------------------------------------+
+| QUERY PLAN                                                         |
++--------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0129                                  |
+|   Conflict Resolution: UPDATE                                      |
+|   Conflict Arbiter Indexes: t_dml_upsert0129_pkey                  |
+|   InitPlan 1 (returns $0)                                          |
+|     ->  Hash Join                                                  |
+|           Output: tb1.c                                            |
+|           Hash Cond: (tb1.b = tb2.b)                               |
+|           ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1       |
+|                 Output: tb1.b, tb1.c                               |
+|           ->  Hash                                                 |
+|                 Output: tb2.b                                      |
+|                 ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2 |
+|                       Output: tb2.b                                |
+|                       Filter: (tb2.d = 'd-13'::text)               |
+|   ->  Result                                                       |
+|         Output: 2, '2'::text, '3'::text, NULL::text                |
++--------------------------------------------------------------------+
+select * from t_dml_upsert0129;
++---+---+------+-----+
+| a | b | c    | d   |
++---+---+------+-----+
+| 1 | 1 | 1    |     |
+| 4 | 4 | 4    |     |
+| 2 | 2 | c-10 | d-2 |
+| 3 | 3 |      |     |
++---+---+------+-----+
+--CTE with子句 多表关联查询
+explain (costs off, verbose) with tmptb(a,c,d) as (select * from t_dml_upsert_sub0129_01 tb1 ,t_dml_upsert_sub0129_02 tb2 where tb1.b=tb2.b) select c from tmptb where a=4;
++--------------------------------------------------------------------+
+| QUERY PLAN                                                         |
++--------------------------------------------------------------------+
+| CTE Scan on tmptb                                                  |
+|   Output: tmptb.c                                                  |
+|   Filter: (tmptb.a = 4)                                            |
+|   CTE tmptb                                                        |
+|     ->  Hash Join                                                  |
+|           Output: tb1.b, tb1.c, tb2.b, tb2.d                       |
+|           Hash Cond: (tb1.b = tb2.b)                               |
+|           ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1       |
+|                 Output: tb1.b, tb1.c                               |
+|           ->  Hash                                                 |
+|                 Output: tb2.b, tb2.d                               |
+|                 ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2 |
+|                       Output: tb2.b, tb2.d                         |
++--------------------------------------------------------------------+
+insert into t_dml_upsert0129 values (4,4) on duplicate key update c = (with tmptb(a,c,d) as (select * from t_dml_upsert_sub0129_01 tb1 ,t_dml_upsert_sub0129_02 tb2 where tb1.b=tb2.b) select c from tmptb where a=4);
+SQL SUCCESS
+select * from t_dml_upsert0129;
++---+---+------+-----+
+| a | b | c    | d   |
++---+---+------+-----+
+| 1 | 1 | 1    |     |
+| 2 | 2 | c-10 | d-2 |
+| 3 | 3 |      |     |
+| 4 | 4 | c-4  |     |
++---+---+------+-----+
+explain (costs off, verbose) insert into t_dml_upsert0129 values (4,4) on duplicate key update c = (with tmptb(a,c,d) as (select * from t_dml_upsert_sub0129_01 tb1 ,t_dml_upsert_sub0129_02 tb2 where tb1.b=tb2.b) select c from tmptb where a=4);
++----------------------------------------------------------------------------+
+| QUERY PLAN                                                                 |
++----------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0129                                          |
+|   Conflict Resolution: UPDATE                                              |
+|   Conflict Arbiter Indexes: t_dml_upsert0129_pkey                          |
+|   InitPlan 2 (returns $1)                                                  |
+|     ->  CTE Scan on tmptb                                                  |
+|           Output: tmptb.c                                                  |
+|           Filter: (tmptb.a = 4)                                            |
+|           CTE tmptb                                                        |
+|             ->  Hash Join                                                  |
+|                   Output: tb1.b, tb1.c, tb2.b, tb2.d                       |
+|                   Hash Cond: (tb1.b = tb2.b)                               |
+|                   ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1       |
+|                         Output: tb1.b, tb1.c                               |
+|                   ->  Hash                                                 |
+|                         Output: tb2.b, tb2.d                               |
+|                         ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2 |
+|                               Output: tb2.b, tb2.d                         |
+|   ->  Result                                                               |
+|         Output: 4, '4'::text, NULL::text, NULL::text                       |
++----------------------------------------------------------------------------+
+--except 多表关联查询
+explain (costs off, verbose) select c from t_dml_upsert_sub0129_01 where b = (select b from t_dml_upsert_sub0129_01 except select b from t_dml_upsert_sub0129_02 order by b limit 1);
++----------------------------------------------------------------------------------+
+| QUERY PLAN                                                                       |
++----------------------------------------------------------------------------------+
+| Seq Scan on public.t_dml_upsert_sub0129_01                                       |
+|   Output: public.t_dml_upsert_sub0129_01.c                                       |
+|   Filter: (public.t_dml_upsert_sub0129_01.b = $0)                                |
+|   InitPlan 1 (returns $0)                                                        |
+|     ->  Limit                                                                    |
+|           Output: "*SELECT* 1".b, (0)                                            |
+|           ->  Sort                                                               |
+|                 Output: "*SELECT* 1".b, (0)                                      |
+|                 Sort Key: "*SELECT* 1".b                                         |
+|                 ->  HashSetOp Except                                             |
+|                       Output: "*SELECT* 1".b, (0)                                |
+|                       ->  Append                                                 |
+|                             ->  Subquery Scan on "*SELECT* 1"                    |
+|                                   Output: "*SELECT* 1".b, 0                      |
+|                                   ->  Seq Scan on public.t_dml_upsert_sub0129_01 |
+|                                         Output: public.t_dml_upsert_sub0129_01.b |
+|                             ->  Subquery Scan on "*SELECT* 2"                    |
+|                                   Output: "*SELECT* 2".b, 1                      |
+|                                   ->  Seq Scan on public.t_dml_upsert_sub0129_02 |
+|                                         Output: t_dml_upsert_sub0129_02.b        |
++----------------------------------------------------------------------------------+
+insert into t_dml_upsert0129 values (3,3) on duplicate key update c = (select c from t_dml_upsert_sub0129_01 where b = (select b from t_dml_upsert_sub0129_01 except select b from t_dml_upsert_sub0129_02 order by b limit 1)) ;
+SQL SUCCESS
+select * from t_dml_upsert0129;
++---+---+------+-----+
+| a | b | c    | d   |
++---+---+------+-----+
+| 1 | 1 | 1    |     |
+| 2 | 2 | c-10 | d-2 |
+| 4 | 4 | c-4  |     |
+| 3 | 3 | c-11 |     |
++---+---+------+-----+
+explain (costs off, verbose) insert into t_dml_upsert0129 values (3,3) on duplicate key update c = (select c from t_dml_upsert_sub0129_01 where b = (select b from t_dml_upsert_sub0129_01 except select b from t_dml_upsert_sub0129_02 order by b limit 1)) ;
++------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                               |
++------------------------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0129                                                        |
+|   Conflict Resolution: UPDATE                                                            |
+|   Conflict Arbiter Indexes: t_dml_upsert0129_pkey                                        |
+|   InitPlan 2 (returns $1)                                                                |
+|     ->  Seq Scan on public.t_dml_upsert_sub0129_01                                       |
+|           Output: public.t_dml_upsert_sub0129_01.c                                       |
+|           Filter: (public.t_dml_upsert_sub0129_01.b = $0)                                |
+|           InitPlan 1 (returns $0)                                                        |
+|             ->  Limit                                                                    |
+|                   Output: "*SELECT* 1".b, (0)                                            |
+|                   ->  Sort                                                               |
+|                         Output: "*SELECT* 1".b, (0)                                      |
+|                         Sort Key: "*SELECT* 1".b                                         |
+|                         ->  HashSetOp Except                                             |
+|                               Output: "*SELECT* 1".b, (0)                                |
+|                               ->  Append                                                 |
+|                                     ->  Subquery Scan on "*SELECT* 1"                    |
+|                                           Output: "*SELECT* 1".b, 0                      |
+|                                           ->  Seq Scan on public.t_dml_upsert_sub0129_01 |
+|                                                 Output: public.t_dml_upsert_sub0129_01.b |
+|                                     ->  Subquery Scan on "*SELECT* 2"                    |
+|                                           Output: "*SELECT* 2".b, 1                      |
+|                                           ->  Seq Scan on public.t_dml_upsert_sub0129_02 |
+|                                                 Output: t_dml_upsert_sub0129_02.b        |
+|   ->  Result                                                                             |
+|         Output: 3, '3'::text, NULL::text, NULL::text                                     |
++------------------------------------------------------------------------------------------+
+--excluded;join; muilt-set/single-set均支持
+insert into t_dml_upsert0129 values(2,2,3) on duplicate key update(c,d)=(select tb1.c,tb2.d from t_dml_upsert_sub0129_01 tb1 join t_dml_upsert_sub0129_02 tb2 on tb1.b=tb2.b where tb1.b = excluded.b);
+SQL SUCCESS
+select * from t_dml_upsert0129;
++---+---+------+-----+
+| a | b | c    | d   |
++---+---+------+-----+
+| 1 | 1 | 1    |     |
+| 4 | 4 | c-4  |     |
+| 3 | 3 | c-11 |     |
+| 2 | 2 | c-2  | d-2 |
++---+---+------+-----+
+explain (costs off, verbose) insert into t_dml_upsert0129 values(2,2,3) on duplicate key update(c,d)=(select tb1.c,tb2.d from t_dml_upsert_sub0129_01 tb1 join t_dml_upsert_sub0129_02 tb2 on tb1.b=tb2.b where tb1.b = excluded.b);
++--------------------------------------------------------------+
+| QUERY PLAN                                                   |
++--------------------------------------------------------------+
+| Insert on public.t_dml_upsert0129                            |
+|   Conflict Resolution: UPDATE                                |
+|   Conflict Arbiter Indexes: t_dml_upsert0129_pkey            |
+|   ->  Result                                                 |
+|         Output: 2, '2'::text, '3'::text, NULL::text          |
+|   SubPlan 1                                                  |
+|     ->  Nested Loop                                          |
+|           Output: tb1.c                                      |
+|           ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1 |
+|                 Output: tb1.b, tb1.c                         |
+|                 Filter: (tb1.b = ("excluded".b)::bigint)     |
+|           ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2 |
+|                 Output: tb2.b, tb2.d                         |
+|                 Filter: (tb2.b = ("excluded".b)::bigint)     |
+|   SubPlan 2                                                  |
+|     ->  Nested Loop                                          |
+|           Output: tb2.d                                      |
+|           ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1 |
+|                 Output: tb1.b, tb1.c                         |
+|                 Filter: (tb1.b = ("excluded".b)::bigint)     |
+|           ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2 |
+|                 Output: tb2.b, tb2.d                         |
+|                 Filter: (tb2.b = ("excluded".b)::bigint)     |
++--------------------------------------------------------------+
+insert into t_dml_upsert0129 values(2,2,3) on duplicate key update c =(select tb1.c from t_dml_upsert_sub0129_01 tb1 join t_dml_upsert_sub0129_02 tb2 on tb1.b=tb2.b where tb2.d = 'd-'||(excluded.b+excluded.c)*2);
+SQL SUCCESS
+select * from t_dml_upsert0129;
++---+---+------+-----+
+| a | b | c    | d   |
++---+---+------+-----+
+| 1 | 1 | 1    |     |
+| 4 | 4 | c-4  |     |
+| 3 | 3 | c-11 |     |
+| 2 | 2 | c-10 | d-2 |
++---+---+------+-----+
+explain (costs off, verbose) insert into t_dml_upsert0129 values(2,2,3) on duplicate key update c =(select tb1.c from t_dml_upsert_sub0129_01 tb1 join t_dml_upsert_sub0129_02 tb2 on tb1.b=tb2.b where tb2.d = 'd-'||(excluded.b+excluded.c)*2);
++------------------------------------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                                                         |
++------------------------------------------------------------------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0129                                                                                                  |
+|   Conflict Resolution: UPDATE                                                                                                      |
+|   Conflict Arbiter Indexes: t_dml_upsert0129_pkey                                                                                  |
+|   ->  Result                                                                                                                       |
+|         Output: 2, '2'::text, '3'::text, NULL::text                                                                                |
+|   SubPlan 1                                                                                                                        |
+|     ->  Hash Join                                                                                                                  |
+|           Output: tb1.c                                                                                                            |
+|           Hash Cond: (tb1.b = tb2.b)                                                                                               |
+|           ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1                                                                       |
+|                 Output: tb1.b, tb1.c                                                                                               |
+|           ->  Hash                                                                                                                 |
+|                 Output: tb2.b                                                                                                      |
+|                 ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2                                                                 |
+|                       Output: tb2.b                                                                                                |
+|                       Filter: (tb2.d = ('d-'::text || (((("excluded".b)::numeric + ("excluded".c)::numeric) * 2::numeric))::text)) |
++------------------------------------------------------------------------------------------------------------------------------------+
+--excluded;right join; muilt-set/single-set均支持
+insert into t_dml_upsert0129 values(3,2,3) on duplicate key update(c,d)=(select tb1.c,tb2.d from t_dml_upsert_sub0129_01 tb1 right join t_dml_upsert_sub0129_02 tb2 on tb1.b=tb2.b where tb1.b = excluded.a);
+SQL SUCCESS
+select * from t_dml_upsert0129;
++---+---+------+-----+
+| a | b | c    | d   |
++---+---+------+-----+
+| 1 | 1 | 1    |     |
+| 4 | 4 | c-4  |     |
+| 2 | 2 | c-10 | d-2 |
+| 3 | 3 | c-3  | d-3 |
++---+---+------+-----+
+explain (costs off, verbose) insert into t_dml_upsert0129 values(3,2,3) on duplicate key update(c,d)=(select tb1.c,tb2.d from t_dml_upsert_sub0129_01 tb1 right join t_dml_upsert_sub0129_02 tb2 on tb1.b=tb2.b where tb1.b = excluded.a);
++--------------------------------------------------------------+
+| QUERY PLAN                                                   |
++--------------------------------------------------------------+
+| Insert on public.t_dml_upsert0129                            |
+|   Conflict Resolution: UPDATE                                |
+|   Conflict Arbiter Indexes: t_dml_upsert0129_pkey            |
+|   ->  Result                                                 |
+|         Output: 3, '2'::text, '3'::text, NULL::text          |
+|   SubPlan 1                                                  |
+|     ->  Nested Loop                                          |
+|           Output: tb1.c                                      |
+|           ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1 |
+|                 Output: tb1.b, tb1.c                         |
+|                 Filter: (tb1.b = "excluded".a)               |
+|           ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2 |
+|                 Output: tb2.b, tb2.d                         |
+|                 Filter: (tb2.b = "excluded".a)               |
+|   SubPlan 2                                                  |
+|     ->  Nested Loop                                          |
+|           Output: tb2.d                                      |
+|           ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1 |
+|                 Output: tb1.b, tb1.c                         |
+|                 Filter: (tb1.b = "excluded".a)               |
+|           ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2 |
+|                 Output: tb2.b, tb2.d                         |
+|                 Filter: (tb2.b = "excluded".a)               |
++--------------------------------------------------------------+
+insert into t_dml_upsert0129 values(3,2,3) on duplicate key update c =(select tb1.c from t_dml_upsert_sub0129_01 tb1 right join t_dml_upsert_sub0129_02 tb2 on tb1.b=tb2.b where tb2.d = 'd-'||(excluded.b+excluded.c)*2);
+SQL SUCCESS
+select * from t_dml_upsert0129;
++---+---+------+-----+
+| a | b | c    | d   |
++---+---+------+-----+
+| 1 | 1 | 1    |     |
+| 4 | 4 | c-4  |     |
+| 2 | 2 | c-10 | d-2 |
+| 3 | 3 | c-10 | d-3 |
++---+---+------+-----+
+explain (costs off, verbose) insert into t_dml_upsert0129 values(3,2,3) on duplicate key update c =(select tb1.c from t_dml_upsert_sub0129_01 tb1 right join t_dml_upsert_sub0129_02 tb2 on tb1.b=tb2.b where tb2.d = 'd-'||(excluded.b+excluded.c)*2);
++------------------------------------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                                                         |
++------------------------------------------------------------------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0129                                                                                                  |
+|   Conflict Resolution: UPDATE                                                                                                      |
+|   Conflict Arbiter Indexes: t_dml_upsert0129_pkey                                                                                  |
+|   ->  Result                                                                                                                       |
+|         Output: 3, '2'::text, '3'::text, NULL::text                                                                                |
+|   SubPlan 1                                                                                                                        |
+|     ->  Hash Right Join                                                                                                            |
+|           Output: tb1.c                                                                                                            |
+|           Hash Cond: (tb1.b = tb2.b)                                                                                               |
+|           ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1                                                                       |
+|                 Output: tb1.b, tb1.c                                                                                               |
+|           ->  Hash                                                                                                                 |
+|                 Output: tb2.b                                                                                                      |
+|                 ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2                                                                 |
+|                       Output: tb2.b                                                                                                |
+|                       Filter: (tb2.d = ('d-'::text || (((("excluded".b)::numeric + ("excluded".c)::numeric) * 2::numeric))::text)) |
++------------------------------------------------------------------------------------------------------------------------------------+
+--excluded;left join; muilt-set/single-set均支持
+explain (costs off, verbose) select tb1.c,tb2.d from t_dml_upsert_sub0129_01 tb1 left join t_dml_upsert_sub0129_02 tb2 on tb1.b=tb2.b where tb1.b = 13;
++------------------------------------------------------------+
+| QUERY PLAN                                                 |
++------------------------------------------------------------+
+| Hash Left Join                                             |
+|   Output: tb1.c, tb2.d                                     |
+|   Hash Cond: (tb1.b = tb2.b)                               |
+|   ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1       |
+|         Output: tb1.b, tb1.c                               |
+|         Filter: (tb1.b = 13)                               |
+|   ->  Hash                                                 |
+|         Output: tb2.d, tb2.b                               |
+|         ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2 |
+|               Output: tb2.d, tb2.b                         |
+|               Filter: (tb2.b = 13)                         |
++------------------------------------------------------------+
+insert into t_dml_upsert0129 values(2,2,3) on duplicate key update(c,d)=(select tb1.c,tb2.d from t_dml_upsert_sub0129_01 tb1 left join t_dml_upsert_sub0129_02 tb2 on tb1.b=tb2.b where tb1.b = (excluded.b+excluded.c)*2 + excluded.c);
+SQL SUCCESS
+explain (costs off, verbose) insert into t_dml_upsert0129 values(2,2,3) on duplicate key update(c,d)=(select tb1.c,tb2.d from t_dml_upsert_sub0129_01 tb1 left join t_dml_upsert_sub0129_02 tb2 on tb1.b=tb2.b where tb1.b = (excluded.b+excluded.c)*2 + excluded.c);
++---------------------------------------------------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                                                                        |
++---------------------------------------------------------------------------------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0129                                                                                                                 |
+|   Conflict Resolution: UPDATE                                                                                                                     |
+|   Conflict Arbiter Indexes: t_dml_upsert0129_pkey                                                                                                 |
+|   ->  Result                                                                                                                                      |
+|         Output: 2, '2'::text, '3'::text, NULL::text                                                                                               |
+|   SubPlan 1                                                                                                                                       |
+|     ->  Hash Right Join                                                                                                                           |
+|           Output: tb1.c                                                                                                                           |
+|           Hash Cond: (tb2.b = tb1.b)                                                                                                              |
+|           ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2                                                                                      |
+|                 Output: tb2.b, tb2.d                                                                                                              |
+|           ->  Hash                                                                                                                                |
+|                 Output: tb1.c, tb1.b                                                                                                              |
+|                 ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1                                                                                |
+|                       Output: tb1.c, tb1.b                                                                                                        |
+|                       Filter: ((tb1.b)::numeric = (((("excluded".b)::numeric + ("excluded".c)::numeric) * 2::numeric) + ("excluded".c)::numeric)) |
+|   SubPlan 2                                                                                                                                       |
+|     ->  Hash Right Join                                                                                                                           |
+|           Output: tb2.d                                                                                                                           |
+|           Hash Cond: (tb2.b = tb1.b)                                                                                                              |
+|           ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2                                                                                      |
+|                 Output: tb2.b, tb2.d                                                                                                              |
+|           ->  Hash                                                                                                                                |
+|                 Output: tb1.b                                                                                                                     |
+|                 ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1                                                                                |
+|                       Output: tb1.b                                                                                                               |
+|                       Filter: ((tb1.b)::numeric = (((("excluded".b)::numeric + ("excluded".c)::numeric) * 2::numeric) + ("excluded".c)::numeric)) |
++---------------------------------------------------------------------------------------------------------------------------------------------------+
+select * from t_dml_upsert0129;
++---+---+------+-----+
+| a | b | c    | d   |
++---+---+------+-----+
+| 1 | 1 | 1    |     |
+| 4 | 4 | c-4  |     |
+| 3 | 3 | c-10 | d-3 |
+| 2 | 2 | c-13 |     |
++---+---+------+-----+
+explain (costs off, verbose) select tb1.c from t_dml_upsert_sub0129_01 tb1 left join t_dml_upsert_sub0129_02 tb2 on tb1.b=tb2.b where tb2.d = 'd-13';
++------------------------------------------------------------+
+| QUERY PLAN                                                 |
++------------------------------------------------------------+
+| Hash Join                                                  |
+|   Output: tb1.c                                            |
+|   Hash Cond: (tb1.b = tb2.b)                               |
+|   ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1       |
+|         Output: tb1.b, tb1.c                               |
+|   ->  Hash                                                 |
+|         Output: tb2.b                                      |
+|         ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2 |
+|               Output: tb2.b                                |
+|               Filter: (tb2.d = 'd-13'::text)               |
++------------------------------------------------------------+
+insert into t_dml_upsert0129 values(2,2,3) on duplicate key update c =(select tb1.c from t_dml_upsert_sub0129_01 tb1 left join t_dml_upsert_sub0129_02 tb2 on tb1.b=tb2.b where tb2.d = 'd-'||(excluded.b+excluded.c)*2 + excluded.c);
+SQL SUCCESS
+explain (costs off, verbose) insert into t_dml_upsert0129 values(2,2,3) on duplicate key update c =(select tb1.c from t_dml_upsert_sub0129_01 tb1 left join t_dml_upsert_sub0129_02 tb2 on tb1.b=tb2.b where tb2.d = 'd-'||(excluded.b+excluded.c)*2 + excluded.c);
++----------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                                                                                     |
++----------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0129                                                                                                                              |
+|   Conflict Resolution: UPDATE                                                                                                                                  |
+|   Conflict Arbiter Indexes: t_dml_upsert0129_pkey                                                                                                              |
+|   ->  Result                                                                                                                                                   |
+|         Output: 2, '2'::text, '3'::text, NULL::text                                                                                                            |
+|   SubPlan 1                                                                                                                                                    |
+|     ->  Hash Join                                                                                                                                              |
+|           Output: tb1.c                                                                                                                                        |
+|           Hash Cond: (tb1.b = tb2.b)                                                                                                                           |
+|           ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1                                                                                                   |
+|                 Output: tb1.b, tb1.c                                                                                                                           |
+|           ->  Hash                                                                                                                                             |
+|                 Output: tb2.b                                                                                                                                  |
+|                 ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2                                                                                             |
+|                       Output: tb2.b                                                                                                                            |
+|                       Filter: (tb2.d = ('d-'::text || ((((("excluded".b)::numeric + ("excluded".c)::numeric) * 2::numeric) + ("excluded".c)::numeric))::text)) |
++----------------------------------------------------------------------------------------------------------------------------------------------------------------+
+select * from t_dml_upsert0129;
++---+---+------+-----+
+| a | b | c    | d   |
++---+---+------+-----+
+| 1 | 1 | 1    |     |
+| 4 | 4 | c-4  |     |
+| 3 | 3 | c-10 | d-3 |
+| 2 | 2 |      |     |
++---+---+------+-----+
+--excluded;CTE with子句 多表关联查询
+insert into t_dml_upsert0129 values (4,4) on duplicate key update c = (with tmptb(a,c,d) as (select * from t_dml_upsert_sub0129_01 tb1 ,t_dml_upsert_sub0129_02 tb2 where tb1.b=tb2.b) select c from tmptb where a=excluded.a);
+SQL SUCCESS
+select * from t_dml_upsert0129;
++---+---+------+-----+
+| a | b | c    | d   |
++---+---+------+-----+
+| 1 | 1 | 1    |     |
+| 3 | 3 | c-10 | d-3 |
+| 2 | 2 |      |     |
+| 4 | 4 | c-4  |     |
++---+---+------+-----+
+explain (costs off, verbose) insert into t_dml_upsert0129 values (4,4) on duplicate key update c = (with tmptb(a,c,d) as (select * from t_dml_upsert_sub0129_01 tb1 ,t_dml_upsert_sub0129_02 tb2 where tb1.b=tb2.b) select c from tmptb where a=excluded.a);
++----------------------------------------------------------------------------+
+| QUERY PLAN                                                                 |
++----------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0129                                          |
+|   Conflict Resolution: UPDATE                                              |
+|   Conflict Arbiter Indexes: t_dml_upsert0129_pkey                          |
+|   ->  Result                                                               |
+|         Output: 4, '4'::text, NULL::text, NULL::text                       |
+|   SubPlan 2                                                                |
+|     ->  CTE Scan on tmptb                                                  |
+|           Output: tmptb.c                                                  |
+|           Filter: (tmptb.a = "excluded".a)                                 |
+|           CTE tmptb                                                        |
+|             ->  Hash Join                                                  |
+|                   Output: tb1.b, tb1.c, tb2.b, tb2.d                       |
+|                   Hash Cond: (tb1.b = tb2.b)                               |
+|                   ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1       |
+|                         Output: tb1.b, tb1.c                               |
+|                   ->  Hash                                                 |
+|                         Output: tb2.b, tb2.d                               |
+|                         ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2 |
+|                               Output: tb2.b, tb2.d                         |
++----------------------------------------------------------------------------+
+--excluded;except 多表关联查询
+insert into t_dml_upsert0129 values (3,3) on duplicate key update c = (select c from t_dml_upsert_sub0129_01 where b in (select b from t_dml_upsert_sub0129_01 except select b from t_dml_upsert_sub0129_02 order by b) and b > excluded.b*6 limit 1) ;
+SQL SUCCESS
+select * from t_dml_upsert0129;
++---+---+------+-----+
+| a | b | c    | d   |
++---+---+------+-----+
+| 1 | 1 | 1    |     |
+| 2 | 2 |      |     |
+| 4 | 4 | c-4  |     |
+| 3 | 3 | c-20 | d-3 |
++---+---+------+-----+
+explain (costs off, verbose) insert into t_dml_upsert0129 values (3,3) on duplicate key update c = (select c from t_dml_upsert_sub0129_01 where b in (select b from t_dml_upsert_sub0129_01 except select b from t_dml_upsert_sub0129_02 order by b) and b>excluded.b*6 limit 1) ;
++--------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                             |
++--------------------------------------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0129                                                                      |
+|   Conflict Resolution: UPDATE                                                                          |
+|   Conflict Arbiter Indexes: t_dml_upsert0129_pkey                                                      |
+|   ->  Result                                                                                           |
+|         Output: 3, '3'::text, NULL::text, NULL::text                                                   |
+|   SubPlan 1                                                                                            |
+|     ->  Limit                                                                                          |
+|           Output: public.t_dml_upsert_sub0129_01.c                                                     |
+|           ->  Hash Join                                                                                |
+|                 Output: public.t_dml_upsert_sub0129_01.c                                               |
+|                 Hash Cond: ("ANY_subquery".b = public.t_dml_upsert_sub0129_01.b)                       |
+|                 ->  Subquery Scan on "ANY_subquery"                                                    |
+|                       Output: "ANY_subquery".b                                                         |
+|                       ->  HashSetOp Except                                                             |
+|                             Output: "*SELECT* 1".b, (0)                                                |
+|                             ->  Append                                                                 |
+|                                   ->  Subquery Scan on "*SELECT* 1"                                    |
+|                                         Output: "*SELECT* 1".b, 0                                      |
+|                                         ->  Seq Scan on public.t_dml_upsert_sub0129_01                 |
+|                                               Output: public.t_dml_upsert_sub0129_01.b                 |
+|                                   ->  Subquery Scan on "*SELECT* 2"                                    |
+|                                         Output: "*SELECT* 2".b, 1                                      |
+|                                         ->  Seq Scan on public.t_dml_upsert_sub0129_02                 |
+|                                               Output: t_dml_upsert_sub0129_02.b                        |
+|                 ->  Hash                                                                               |
+|                       Output: public.t_dml_upsert_sub0129_01.c, public.t_dml_upsert_sub0129_01.b       |
+|                       ->  Seq Scan on public.t_dml_upsert_sub0129_01                                   |
+|                             Output: public.t_dml_upsert_sub0129_01.c, public.t_dml_upsert_sub0129_01.b |
+|                             Filter: (public.t_dml_upsert_sub0129_01.b > (("excluded".b)::bigint * 6))  |
++--------------------------------------------------------------------------------------------------------+
+--函数及表达式
+explain (costs off, verbose) insert into t_dml_upsert0129 values (3,3) on duplicate key update (c) =(select excluded.a in (select b from t_dml_upsert_sub0129_01));
++------------------------------------------------------------+
+| QUERY PLAN                                                 |
++------------------------------------------------------------+
+| Insert on public.t_dml_upsert0129                          |
+|   Conflict Resolution: UPDATE                              |
+|   Conflict Arbiter Indexes: t_dml_upsert0129_pkey          |
+|   ->  Result                                               |
+|         Output: 3, '3'::text, NULL::text, NULL::text       |
+|   SubPlan 2                                                |
+|     ->  Result                                             |
+|           Output: (hashed SubPlan 1)                       |
+|           SubPlan 1                                        |
+|             ->  Seq Scan on public.t_dml_upsert_sub0129_01 |
+|                   Output: t_dml_upsert_sub0129_01.b        |
++------------------------------------------------------------+
+insert into t_dml_upsert0129 values (3,3) on duplicate key update (c) =(select excluded.a in (select b from t_dml_upsert_sub0129_01));
+SQL SUCCESS
+select * from t_dml_upsert0129;
++---+---+------+-----+
+| a | b | c    | d   |
++---+---+------+-----+
+| 1 | 1 | 1    |     |
+| 2 | 2 |      |     |
+| 4 | 4 | c-4  |     |
+| 3 | 3 | true | d-3 |
++---+---+------+-----+
+explain (costs off, verbose) insert into t_dml_upsert0129 values (3,3) on duplicate key update (c) =(select excluded.a not in (select b from t_dml_upsert_sub0129_01));
++------------------------------------------------------------+
+| QUERY PLAN                                                 |
++------------------------------------------------------------+
+| Insert on public.t_dml_upsert0129                          |
+|   Conflict Resolution: UPDATE                              |
+|   Conflict Arbiter Indexes: t_dml_upsert0129_pkey          |
+|   ->  Result                                               |
+|         Output: 3, '3'::text, NULL::text, NULL::text       |
+|   SubPlan 2                                                |
+|     ->  Result                                             |
+|           Output: (NOT (hashed SubPlan 1))                 |
+|           SubPlan 1                                        |
+|             ->  Seq Scan on public.t_dml_upsert_sub0129_01 |
+|                   Output: t_dml_upsert_sub0129_01.b        |
++------------------------------------------------------------+
+insert into t_dml_upsert0129 values (3,3) on duplicate key update (c) =(select excluded.a not in (select b from t_dml_upsert_sub0129_01));
+SQL SUCCESS
+select * from t_dml_upsert0129;
++---+---+-------+-----+
+| a | b | c     | d   |
++---+---+-------+-----+
+| 1 | 1 | 1     |     |
+| 2 | 2 |       |     |
+| 4 | 4 | c-4   |     |
+| 3 | 3 | false | d-3 |
++---+---+-------+-----+
+explain (costs off, verbose) insert into t_dml_upsert0129 values (3,3) on duplicate key update (c) =(select min(t_dml_upsert_sub0129_02.b) from t_dml_upsert_sub0129_01 left join t_dml_upsert_sub0129_02 on t_dml_upsert_sub0129_01.b=t_dml_upsert_sub0129_02.b-1 where t_dml_upsert_sub0129_01.b in (select b from t_dml_upsert0129));
++----------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                               |
++----------------------------------------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0129                                                                        |
+|   Conflict Resolution: UPDATE                                                                            |
+|   Conflict Arbiter Indexes: t_dml_upsert0129_pkey                                                        |
+|   InitPlan 1 (returns $0)                                                                                |
+|     ->  Aggregate                                                                                        |
+|           Output: min(t_dml_upsert_sub0129_02.b)                                                         |
+|           ->  Hash Right Join                                                                            |
+|                 Output: t_dml_upsert_sub0129_02.b                                                        |
+|                 Hash Cond: ((t_dml_upsert_sub0129_02.b - 1) = t_dml_upsert_sub0129_01.b)                 |
+|                 ->  Seq Scan on public.t_dml_upsert_sub0129_02                                           |
+|                       Output: t_dml_upsert_sub0129_02.b, t_dml_upsert_sub0129_02.d                       |
+|                 ->  Hash                                                                                 |
+|                       Output: t_dml_upsert_sub0129_01.b                                                  |
+|                       ->  Hash Semi Join                                                                 |
+|                             Output: t_dml_upsert_sub0129_01.b                                            |
+|                             Hash Cond: (t_dml_upsert_sub0129_01.b = (public.t_dml_upsert0129.b)::bigint) |
+|                             ->  Seq Scan on public.t_dml_upsert_sub0129_01                               |
+|                                   Output: t_dml_upsert_sub0129_01.b, t_dml_upsert_sub0129_01.c           |
+|                             ->  Hash                                                                     |
+|                                   Output: public.t_dml_upsert0129.b                                      |
+|                                   ->  Seq Scan on public.t_dml_upsert0129                                |
+|                                         Output: public.t_dml_upsert0129.b                                |
+|   ->  Result                                                                                             |
+|         Output: 3, '3'::text, NULL::text, NULL::text                                                     |
++----------------------------------------------------------------------------------------------------------+
+insert into t_dml_upsert0129 values (3,3) on duplicate key update (c) =(select min(t_dml_upsert_sub0129_02.b) from t_dml_upsert_sub0129_01 left join t_dml_upsert_sub0129_02 on t_dml_upsert_sub0129_01.b=t_dml_upsert_sub0129_02.b-1 where t_dml_upsert_sub0129_01.b in (select b from t_dml_upsert0129));
+SQL SUCCESS
+select * from t_dml_upsert0129;
++---+---+-----+-----+
+| a | b | c   | d   |
++---+---+-----+-----+
+| 1 | 1 | 1   |     |
+| 2 | 2 |     |     |
+| 4 | 4 | c-4 |     |
+| 3 | 3 | 2   | d-3 |
++---+---+-----+-----+
+--测试数据清理
+drop table if exists t_dml_upsert0129;
+SQL SUCCESS
+drop table if exists t_dml_upsert_sub0129_01;
+SQL SUCCESS
+drop table if exists t_dml_upsert_sub0129_02;
+SQL SUCCESS

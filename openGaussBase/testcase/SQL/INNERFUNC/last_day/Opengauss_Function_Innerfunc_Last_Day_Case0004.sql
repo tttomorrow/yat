@@ -1,0 +1,3 @@
+-- @testpoint: last_day函数与to_timestamp结合使用
+select last_day(to_timestamp('2019-01-03 14:58:54.000000','YYYY-MM-DD HH24:MI:SS.FFFFFF')) from sys_dummy;
+select to_timestamp(cast(last_day('2019-01-03 14:58:54') as varchar(1024)),'YYYY-MM-DD HH24:MI:SS.FFFFFF') from sys_dummy;

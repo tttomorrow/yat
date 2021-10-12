@@ -1,0 +1,21 @@
+-- @testpoint: select语句绑定日期类型
+
+--创建存储过
+create or replace procedure pro_008()
+as
+    sqlstat varchar(500);
+	v2 timestamp;
+	r2 timestamp;
+begin
+
+	v2 := to_date('2020-11-24 13:14:15', 'yyyy-mm-dd hh24:mi:ss');
+    sqlstat := 'select :p2';
+    execute immediate sqlstat into r2 using v2;
+    raise info 'result:%',v2;
+end;
+/
+--调用存储过程
+call pro_008();
+
+--清理环境
+drop procedure pro_008;

@@ -1,0 +1,13 @@
+-- @testpoint: 插入右边界范围值
+drop table if exists binary_integer04;
+SQL SUCCESS
+create table binary_integer04 (name binary_integer);
+SQL SUCCESS
+SQL SUCCESS
+select * from binary_integer04;
++------------+
+| name       |
++------------+
++------------+
+drop table binary_integer04;
+SQL SUCCESS

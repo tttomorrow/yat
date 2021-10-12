@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字message_text非保留)，作为序列名
+--关键字不带引号-成功
+drop sequence if exists message_text;
+SQL SUCCESS
+create sequence message_text start 100 cache 50;
+SQL SUCCESS
+drop sequence message_text;
+SQL SUCCESS
+--关键字带双引号-成功
+drop sequence if exists "message_text";
+SQL SUCCESS
+create sequence "message_text" start 100 cache 50;
+SQL SUCCESS
+drop sequence "message_text";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'message_text';
+?.*ERROR: syntax error at or near "'message_text'".*
+?.*Position: .*
+create sequence 'message_text' start 100 cache 50;
+?.*ERROR: syntax error at or near "'message_text'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop sequence if exists `message_text`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create sequence `message_text` start 100 cache 50;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

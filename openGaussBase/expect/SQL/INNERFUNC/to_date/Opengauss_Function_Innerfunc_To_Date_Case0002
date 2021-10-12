@@ -1,0 +1,13 @@
+-- @testpoint: to_date函数，将文本类型的值转换为指定格式的时间戳，非法输入的函数测试，合理报错
+select to_date('2018-01-15','yyyy');
+?.*ERROR: invalid data for match  in date string.*
+  Where: referenced column: to_date
+select to_date('2018-01-15','yyyy-mm');
+?.*ERROR: invalid data for match  in date string.*
+  Where: referenced column: to_date
+select to_date('09-18 06:25:46','yyyy-mm-dd HH:MI:SS:FF');
+?.*ERROR: invalid data for "month =  18" ,value must be between 1 and 12.*
+  Where: referenced column: to_date
+select to_date('2018-09 16:25:46:45354','yyyy-mm-dd hh24:mi:ss:ff');
+?.*ERROR: invalid data for "hour =  25" ,value must be between 0 and 24.*
+  Where: referenced column: to_date

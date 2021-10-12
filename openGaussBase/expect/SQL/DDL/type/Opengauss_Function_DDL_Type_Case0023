@@ -1,0 +1,30 @@
+--  @testpoint:改变一种复合类型中某个属性的类型
+--创建类型
+drop type if exists test2_type cascade;
+SQL SUCCESS
+create type test2_type as(a int,b text);
+SQL SUCCESS
+--改变一种复合类型中某个属性的类型
+ALTER TYPE test2_type ALTER ATTRIBUTE a SET DATA TYPE decimal(10,4);
+SQL SUCCESS
+--建表
+drop table if exists test_t1 cascade;
+SQL SUCCESS
+create table test_t1 (id int,d test2_type);
+SQL SUCCESS
+--插入数据
+insert into test_t1 values(1,(10.654,'hello'));
+SQL SUCCESS
+--查询
+select * from test_t1;
++----+-----------------+
+| id | d               |
++----+-----------------+
+| 1  | (10.6540,hello) |
++----+-----------------+
+--删除表
+drop table if exists test_t1 cascade;
+SQL SUCCESS
+--删除类型
+drop type if exists test2_type cascade;
+SQL SUCCESS

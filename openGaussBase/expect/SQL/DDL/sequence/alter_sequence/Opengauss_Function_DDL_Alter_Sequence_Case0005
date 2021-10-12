@@ -1,0 +1,23 @@
+-- @testpoint: 修改序列其他参数（START，MINVALUE ）合理报错
+--testpoint1:
+drop SEQUENCE if exists serial;
+SQL SUCCESS
+CREATE SEQUENCE serial START 101;
+SQL SUCCESS
+--修改序列start,合理报错
+alter SEQUENCE if exists serial START 100;
+?.*ERROR: ALTER SEQUENCE is not yet supported.
+--删除序列
+drop SEQUENCE serial;
+SQL SUCCESS
+--testpoint2:创建序列
+drop SEQUENCE if exists serial2;
+SQL SUCCESS
+CREATE SEQUENCE serial2 MINVALUE 100 START 101;
+SQL SUCCESS
+--修改序列最小值，合理报错
+alter SEQUENCE if exists serial2 MINVALUE 99;
+?.*ERROR: ALTER SEQUENCE is not yet supported.
+--删除序列
+drop SEQUENCE serial2;
+SQL SUCCESS

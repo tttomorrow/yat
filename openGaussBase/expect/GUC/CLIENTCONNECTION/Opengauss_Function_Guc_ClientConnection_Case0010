@@ -1,0 +1,39 @@
+-- @testpoint: 设置参数search_path为不存在值，设置成功，建表，合理报错
+--查看默认值
+show search_path;
++----------------+
+| search_path    |
++----------------+
+| "$user",public |
++----------------+
+--设置为不存在的模式
+drop schema if exists t_myschema010 cascade;
+SQL SUCCESS
+set search_path to t_myschema010;
+SQL SUCCESS
+--建表，报错
+drop table if exists test_search_path010;
+SQL SUCCESS
+create table test_search_path010(id int);
+?.*ERROR: schema "t_myschema010" does not exist
+--设置数字
+set search_path to 110000;
+SQL SUCCESS
+--建表，报错
+drop table if exists test_search_path010_bak;
+SQL SUCCESS
+create table test_search_path010_bak(id int);
+?.*ERROR: schema "110000" does not exist
+--设置为特殊字符，报错
+set search_path to *&$#^;
+?.*ERROR: syntax error at or near "\*\&"
+?.*
+--恢复默认
+set search_path to "$user",public;
+SQL SUCCESS
+show search_path;
++-----------------+
+| search_path     |
++-----------------+
+| "$user", public |
++-----------------+

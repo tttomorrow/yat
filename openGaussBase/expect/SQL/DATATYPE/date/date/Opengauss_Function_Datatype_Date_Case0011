@@ -1,0 +1,17 @@
+-- @testpoint: 日期类型相减,合理报错
+DROP TABLE IF EXISTS test_date11;
+SQL SUCCESS
+CREATE TABLE test_date11 (name date);
+SQL SUCCESS
+insert into  test_date11 values (date'2018-09-17' - date'2018-09-16');
+?.*ERROR: column "name" is of type timestamp without time zone but expression is of type interval
+  Hint: You will need to rewrite or cast the expression.
+?.*
+  Where: referenced column: name
+select * from test_date11;
++------+
+| name |
++------+
++------+
+DROP TABLE test_date11;
+SQL SUCCESS

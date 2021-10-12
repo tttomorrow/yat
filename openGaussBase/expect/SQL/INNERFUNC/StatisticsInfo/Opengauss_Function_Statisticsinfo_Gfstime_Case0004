@@ -1,0 +1,28 @@
+-- @testpoint: pg_stat_get_function_self_time(oid)函数的异常校验，合理报错
+-- -- testpoint：空值、多参、少参、oid错误、超范围、表不存在
+select pg_stat_get_function_self_time('')  from PG_PROC a where a.proname = 'func_add_sql';
++--------------------------------+
+| pg_stat_get_function_self_time |
++--------------------------------+
++--------------------------------+
+select pg_stat_get_function_self_time(a.oid,a.oid,a.oid)  from PG_PROC a where a.proname = 'func_add_sql';
+?.*ERROR: function pg_stat_get_function_self_time\(oid, oid, oid\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_stat_get_function_self_time
+select pg_stat_get_function_self_time()  from PG_PROC a where a.proname = 'func_add_sql';
+?.*ERROR: function pg_stat_get_function_self_time\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_stat_get_function_self_time
+select pg_stat_get_function_self_time('&^%^&*')  from PG_PROC a where a.proname = 'func_add_sql';
+?.*ERROR: invalid input syntax for type oid: \"\&\^\%\^\&\*\"
+?.*
+  Where: referenced column: pg_stat_get_function_self_time
+?.*ERROR: OID out of range
+  Where: referenced column: pg_stat_get_function_self_time
+select pg_stat_get_function_self_time(a.oid) from PG_PROC a where a.proname = 'func_add_sql';
++--------------------------------+
+| pg_stat_get_function_self_time |
++--------------------------------+
++--------------------------------+

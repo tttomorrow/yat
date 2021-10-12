@@ -1,0 +1,38 @@
+-- @testpoint: opengauss比较操作符,参数互换结果互斥
+-- 运算的交换性
+select 'ABC'::text = 'ABC'::CHAR(3);
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select 'ABC'::CHAR(3) = 'ABC'::text;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '521'::money = '520'::money;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '520'::money = '521'::money;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select 't'::BOOLEAN = 'TRUE'::BOOLEAN;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select 'TRUE'::BOOLEAN = 't'::BOOLEAN;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+

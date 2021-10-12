@@ -1,0 +1,15 @@
+-- @testpoint: 第二个参数之后都是null
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values (concat_ws(' ', null,null,null));
+SQL SUCCESS
+SELECT * from type_char;
++---------+
+| string1 |
++---------+
+|         |
++---------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

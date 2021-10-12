@@ -1,0 +1,16 @@
+-- @testpoint: 创建临时表，表名长度为63
+-- @modify at: 2020-11-24
+--建表，成功
+drop table if exists qwertyuiopqasdfghjklzxcvbnmpolkijuyhtgfrdppoiuytrqwelkijhgfdmnb;
+SQL SUCCESS
+create  temporary table qwertyuiopqasdfghjklzxcvbnmpolkijuyhtgfrdppoiuytrqwelkijhgfdmnb(a int);
+SQL SUCCESS
+--查询
+select * from qwertyuiopqasdfghjklzxcvbnmpolkijuyhtgfrdppoiuytrqwelkijhgfdmnb;
++---+
+| a |
++---+
++---+
+--删表
+drop table qwertyuiopqasdfghjklzxcvbnmpolkijuyhtgfrdppoiuytrqwelkijhgfdmnb;
+SQL SUCCESS

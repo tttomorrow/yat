@@ -1,0 +1,29 @@
+-- @testpoint: opengauss关键字collation_schema(非保留)，作为序列名 合理报错
+--关键字不带引号-成功
+drop sequence if exists collation_schema;
+SQL SUCCESS
+create sequence collation_schema start 100 cache 50;
+SQL SUCCESS
+drop sequence collation_schema;
+SQL SUCCESS
+--关键字带双引号-成功
+drop sequence if exists "collation_schema";
+SQL SUCCESS
+create sequence "collation_schema" start 100 cache 50;
+SQL SUCCESS
+drop sequence "collation_schema";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'collation_schema';
+?.*ERROR: syntax error at or near "'collation_schema'".*
+?.*Position.*
+create sequence 'collation_schema' start 100 cache 50;
+?.*ERROR: syntax error at or near "'collation_schema'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop sequence if exists `collation_schema`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create sequence `collation_schema` start 100 cache 50;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*

@@ -1,0 +1,101 @@
+-- @testpoint: jsonb操作符：->> 通过object-jsonb的键获得值，不存在返回空，输入不合理时，合理报错
+--合理输入1.左侧输入值为object-jsonb类型，右侧为text类型
+select '{"a": 1, "b": {"a": 2, "b": null}}'::jsonb ->> 'b' ;
++---------------------+
+| ?column?            |
++---------------------+
+| {"a": 2, "b": null} |
++---------------------+
+select '{"foo": [true, "bar"], "tags": {"a": 1, "b": null}}'::jsonb  ->> 'tags';
++---------------------+
+| ?column?            |
++---------------------+
+| {"a": 1, "b": null} |
++---------------------+
+select '{"a":null, "bb": 1, "bb": "A",   "cde": [1,2,   "re"], "abc": 1}'::jsonb  ->> 'bb';
++----------+
+| ?column? |
++----------+
+| A        |
++----------+
+select '{"a":null, "[1,2,\"re\"]": 1, "bb": "A", "cde": [1,2,   "re"], "abc": 1}'::jsonb  ->> 'abcd';
++----------+
+| ?column? |
++----------+
+|          |
++----------+
+--合理输入2.左侧输入键的值为空的object-jsonb类型，右侧为text类型
+select '{}'::jsonb  ->>'';
++----------+
+| ?column? |
++----------+
+|          |
++----------+
+select '{"":true}'::jsonb ->> '';
++----------+
+| ?column? |
++----------+
+|          |
++----------+
+select '{"":"qwe"}'::jsonb ->> '""';
++----------+
+| ?column? |
++----------+
+|          |
++----------+
+select '{" ":"qwe"}'::jsonb ->> ' ';
++----------+
+| ?column? |
++----------+
+| qwe      |
++----------+
+--不合理输入1.左侧输入值为object-jsonb类型，右侧为非text类型
+select '{}'::jsonb ->> 2;
+?.*ERROR: cannot call jsonb_array_element_text on an objec.*
+select '{"a": 1, "b": {"a": 2, "b": null}}'::jsonb  ->> a;
+?.*ERROR: column "a" does not exist.*
+?.*
+select '{"a": 1, "b": {"a": 2, "b": null}}'::jsonb  ->> 2021-05-31 12:59:08;
+?.*ERROR: syntax error at or near "12.*
+?.*
+select '{"foo": [true, "bar"], "tags": {"a": 1, "b": null}}'::jsonb ->> 192.168.100.128/25;
+?.*ERROR: syntax error at or near ".100.*
+?.*
+select '{"a":null, "bb": 1, "bb": "A",   "cde": [1,2,   "re"], "abc": 1}'::jsonb ->> true;
+?.*ERROR: cannot call jsonb_array_element_text on an objec.*
+select '{"a":null, "[1,2,\"re\"]": 1, "bb": "A", "cde": [1,2,   "re"], "abc": 1}':: jsonb->> null;
++----------+
+| ?column? |
++----------+
+|          |
++----------+
+--不合理输入2.左侧输入值为非object-jsonb类型，右侧为text类型
+select '138'::jsonb ->> '138';
+?.*ERROR: cannot call jsonb_object_field_text \(jsonb ->> text operator\) on a scala.*
+select '"ALL"'::jsonb ->> 'A';
+?.*ERROR: cannot call jsonb_object_field_text \(jsonb ->> text operator\) on a scala.*
+select 'null'::jsonb ->>'null';
+?.*ERROR: cannot call jsonb_object_field_text \(jsonb ->> text operator\) on a scala.*
+select 'true'::jsonb ->'true';
+?.*ERROR: cannot call jsonb_object_field \(jsonb -> text operator\) on a scala.*
+select '[{"a":"foo"},{"b":"bar"},{"c":"baz"}]'::jsonb ->> 'a';
+?.*ERROR: cannot call jsonb_object_field_text \(jsonb ->> text operator\) on an arra.*
+--不合理输入3.左侧输入值为非object-jsonb类型，右侧为非text类型
+select 'abcdefg'::jsonb ->> ab;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "abcdefg" is invalid.
+?.*
+  Where: JSON data, line 1: abcdefg
+select '''abcdefg'''::jsonb ->> 2021-05-31;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "'" is invalid.
+?.*
+  Where: JSON data, line 1: '...
+select '\"$$\"'::jsonb ->>192.168.100.128/25;
+?.*ERROR: syntax error at or near ".100.*
+?.*
+select '"["www@13^", 1, {"name": "john"}, "2"]"'::jsonb ->> 1/2;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "www" is invalid.
+?.*
+  Where: JSON data, line 1: "["www...

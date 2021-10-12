@@ -1,0 +1,48 @@
+--  @testpoint:结合存储过程，隐式游标，结合insert into语句，属性%FOUND的使用；
+--前置条件
+drop table if exists cur_test_135;
+SQL SUCCESS
+create table cur_test_135(c_id int,c_num int,c_name varchar(10),c_city varchar(10),c_add varchar(20));
+SQL SUCCESS
+insert into cur_test_135 values(1,18,'Allen','Beijing','AAAAABAAAAA'),(2,368,'Bob','Shanghai','AAAAACAAAAA'),
+                           (3,59,'Cathy','Shenzhen','AAAAADAAAAA'),(4,96,'David','Suzhou','AAAAAEAAAAA'),
+                           (5,17,'Edrwd','Fenghuang','AAAAAFAAAAA'),(6,253,'Fendi','Changsha','AAAAAGAAAAA');
+SQL SUCCESS
+create table test_135(id int);
+SQL SUCCESS
+--创建存储过程，结合insert into语句，隐式游标属性%FOUND为False,不会影响下一步SQL执行结果；
+drop procedure if exists cursor_ftest_135;
+SQL SUCCESS
+create or replace procedure cursor_ftest_135()
+as
+begin
+    insert into test_135 select c_id from cur_test_135 where c_num=100;
+    if sql%found then
+        delete from cur_test_135 where c_id <= 3;
+    end if;
+end;
+/
+SQL SUCCESS
+call cursor_ftest_135();
++------------------+
+| cursor_ftest_135 |
++------------------+
+|                  |
++------------------+
+select * from cur_test_135;
++------+-------+--------+-----------+-------------+
+| c_id | c_num | c_name | c_city    | c_add       |
++------+-------+--------+-----------+-------------+
+| 1    | 18    | Allen  | Beijing   | AAAAABAAAAA |
+| 2    | 368   | Bob    | Shanghai  | AAAAACAAAAA |
+| 3    | 59    | Cathy  | Shenzhen  | AAAAADAAAAA |
+| 4    | 96    | David  | Suzhou    | AAAAAEAAAAA |
+| 5    | 17    | Edrwd  | Fenghuang | AAAAAFAAAAA |
+| 6    | 253   | Fendi  | Changsha  | AAAAAGAAAAA |
++------+-------+--------+-----------+-------------+
+drop table cur_test_135;
+SQL SUCCESS
+drop procedure cursor_ftest_135;
+SQL SUCCESS
+drop table test_135;
+SQL SUCCESS

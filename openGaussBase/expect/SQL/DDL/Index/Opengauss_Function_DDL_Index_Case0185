@@ -1,0 +1,97 @@
+-- @testpoint: create index与insert结合：先插入数据，再建索引，再插入数据，再删除数据，再重建索引
+--建普通表
+DROP TABLE if EXISTS test_index_table_185 CASCADE;
+SQL SUCCESS
+create table test_index_table_185(
+c_int int);
+SQL SUCCESS
+--插入数据
+begin
+    for i in 0..30000 loop
+        insert into test_index_table_185 values(i);
+    end loop;
+end;
+/
+SQL SUCCESS
+--建索引
+explain select * from test_index_table_185 where c_int >= 50 group by c_int;
++--------------------------------------------------------------------------------+
+| QUERY PLAN                                                                     |
++--------------------------------------------------------------------------------+
+?.*
+?.*
+?.*
+?.*
++--------------------------------------------------------------------------------+
+drop index if exists index_185_01;
+SQL SUCCESS
+create index index_185_01 on test_index_table_185(c_int);
+SQL SUCCESS
+select relname from pg_class where relname like 'index_185_%';
++--------------+
+| relname      |
++--------------+
+| index_185_01 |
++--------------+
+explain select * from test_index_table_185 where c_int >= 50 group by c_int;
++------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                               |
++------------------------------------------------------------------------------------------+
+?.*
+?.*
+?.*Bitmap.*
+?.*
+?.*Bitmap.*
+?.*
++------------------------------------------------------------------------------------------+
+--插入数据
+begin
+    for i in 30000..60000 loop
+        insert into test_index_table_185 values(i);
+    end loop;
+end;
+/
+SQL SUCCESS
+--删除数据后重建索引
+explain select * from test_index_table_185 where c_int >= 50 group by c_int;
++------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                               |
++------------------------------------------------------------------------------------------+
+?.*
+?.*
+?.*Bitmap.*
+?.*
+?.*Bitmap.*
+?.*
++------------------------------------------------------------------------------------------+
+delete from test_index_table_185;
+SQL SUCCESS
+explain select * from test_index_table_185 where c_int >= 50 group by c_int;
++------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                               |
++------------------------------------------------------------------------------------------+
+?.*
+?.*
+?.*Bitmap.*
+?.*
+?.*Bitmap.*
+?.*
++------------------------------------------------------------------------------------------+
+ALTER INDEX index_185_01 REBUILD;
+SQL SUCCESS
+explain select * from test_index_table_185 where c_int >= 50 group by c_int;
++------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                               |
++------------------------------------------------------------------------------------------+
+?.*
+?.*
+?.*Bitmap.*
+?.*
+?.*Bitmap.*
+?.*
++------------------------------------------------------------------------------------------+
+--清理环境
+DROP TABLE if EXISTS test_index_table_185_01 CASCADE;
+SQL SUCCESS
+DROP TABLE if EXISTS test_index_table_185 CASCADE;
+SQL SUCCESS

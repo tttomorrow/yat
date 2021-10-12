@@ -1,0 +1,47 @@
+site_name: yat
+nav:
+  - 入门:
+    - Yat快速入门: index.md
+    - Playbook入门: playbook.md
+  - 命令行:
+    - suite: cli/suite.md
+    - schedule: cli/schedule.md
+    - check: cli/check.md
+    - playbook: cli/playbook.md
+  - 配置:
+    - configure.yml: config/configure.md
+    - nodes.yml: config/nodes.md
+    - macro.yml: config/macro.md
+    - env.sh: config/env.md
+    - 调度文件: config/schedule.md
+    - 多测试套调度: config/multi-suite-schedule.md
+  - 用例编写指导:
+    - sql: case/sql.md
+    - unit sql: case/unit_sql.md
+    - unit python: case/unit_python.md
+    - python: case/python.md
+    - shell: case/shell.md
+    - zsql: case/zsql.md
+    - unit groovy: case/unit_groovy.md
+  - 高级:
+    - 用例组织最佳实践: advanced/case_layout.md
+    - yat升级指导: advanced/yat_update.md
+    - 常见问题和解决办法: advanced/FAQ.md
+    - 用例超时设置: advanced/timeout.md
+  - 关于: about.md
+theme:
+  name: readthedocs
+  highlightjs: true
+
+extra_css:
+  - css/extra.css
+
+markdown_extensions:
+  - toc
+  - admonition
+  - def_list
+  - tables
+
+plugins:
+  - search
+  - mkdocs-add-number-plugin

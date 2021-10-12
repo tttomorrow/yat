@@ -1,0 +1,2 @@
+-- @testpoint: npoints(path)函数计算路径的顶点数
+SELECT npoints(path '[(0,0),(1,1),(2,0)]') AS RESULT;

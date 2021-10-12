@@ -1,0 +1,8 @@
+--  @testpoint:只有一个参数，指定参数模式为VARIADIC且参数类型为int4，合理报错
+DROP FUNCTION if EXISTS k_testfun3 (arg1 VARIADIC int4);
+CREATE  FUNCTION k_testfun3 (arg1 VARIADIC int4) RETURNS int4 AS $$
+        BEGIN
+                RETURN arg1 + 1;
+        END;
+$$ LANGUAGE plpgsql;
+/

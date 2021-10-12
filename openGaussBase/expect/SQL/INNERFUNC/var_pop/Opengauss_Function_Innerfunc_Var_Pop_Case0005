@@ -1,0 +1,13 @@
+-- @testpoint: 聚集函数var_pop，入参为字符串，合理报错
+drop table if exists t_nvl_rca_tab;
+SQL SUCCESS
+create table t_nvl_rca_tab(col_1 varchar);
+SQL SUCCESS
+insert into t_nvl_rca_tab values ('sqlll');
+SQL SUCCESS
+insert into t_nvl_rca_tab values ('pythonnnn');
+SQL SUCCESS
+select var_pop(col_1) from t_nvl_rca_tab;
+?.*ERROR: invalid input syntax for type numeric: "sqlll".*
+drop table if exists t_nvl_rca_tab;
+SQL SUCCESS

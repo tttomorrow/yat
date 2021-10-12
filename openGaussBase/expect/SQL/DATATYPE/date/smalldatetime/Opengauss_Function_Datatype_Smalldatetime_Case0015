@@ -1,0 +1,16 @@
+-- @testpoint: 无效边界值测试，合理报错
+drop table if exists test_smalldatetime15;
+SQL SUCCESS
+create table test_smalldatetime15 (name smalldatetime);
+SQL SUCCESS
+insert into test_smalldatetime15 values ('0000-00-00 00:00:00.000000');
+?.*ERROR: date/time field value out of range: "0000-00-00 00:00:00.000000"
+?.*
+  Where: referenced column: name
+select * from test_smalldatetime15;
++------+
+| name |
++------+
++------+
+drop table test_smalldatetime15;
+SQL SUCCESS

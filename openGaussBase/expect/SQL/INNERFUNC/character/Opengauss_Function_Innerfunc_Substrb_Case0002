@@ -1,0 +1,15 @@
+-- @testpoint: 字符串为空
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('');
+SQL SUCCESS
+SELECT substrb(string1,10,5) from type_char;
++---------+
+| substrb |
++---------+
+|         |
++---------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

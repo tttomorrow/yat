@@ -1,0 +1,11 @@
+--  @testpoint: --创建 NOT NULL约束，区别大小写
+delete from false_2 where a is null;
+SQL SUCCESS
+alter table false_2 add constraint cc check(a is not null);
+SQL SUCCESS
+alter table false_2 add constraint CC check(A is not null);
+?.*ERROR: constraint "cc" for relation "false_2" already exists
+alter table false_2 add constraint DD check(B is not null);
+SQL SUCCESS
+alter table false_2 add constraint DD check(b is not null);
+?.*ERROR: constraint "dd" for relation "false_2" already exists

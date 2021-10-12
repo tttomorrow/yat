@@ -1,0 +1,23 @@
+-- @testpoint: 关键字volatile,用作字段类型（合理报错）
+drop table if exists volatile_test cascade;
+SQL SUCCESS
+create table volatile_test(id int,name volatile(20));
+?.*ERROR.*
+?.*Position: .*
+create or replace procedure volatile_insert
+as
+begin
+ for i in 1..10 loop
+    insert into volatile_test values(i,'vola+'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call volatile_insert();
+?.*ERROR.*
+  Where: PL/pgSQL function volatile_insert() line 4 at SQL statement
+select * from volatile_test;
+?.*ERROR.*
+?.*Position: .*
+drop procedure volatile_insert;
+SQL SUCCESS

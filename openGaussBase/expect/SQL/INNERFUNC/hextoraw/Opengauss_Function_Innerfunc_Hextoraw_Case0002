@@ -1,0 +1,30 @@
+-- @testpoint: hextoraw函数测试，参数为无效值，合理报错
+--将一个十六进制构成的字符串转换为二进制
+--报错
+select hextoraw();
+?.*ERROR: function hextoraw\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: hextoraw
+select hextoraw(-1);
+?.*ERROR: invalid hexadecimal digit: "\-"
+  Where: referenced column: hextoraw
+--函数使用成功
+select hextoraw(0);
++----------+
+| hextoraw |
++----------+
+| 00       |
++----------+
+select hextoraw(2);
++----------+
+| hextoraw |
++----------+
+| 02       |
++----------+
+select hextoraw('');
++----------+
+| hextoraw |
++----------+
+|          |
++----------+

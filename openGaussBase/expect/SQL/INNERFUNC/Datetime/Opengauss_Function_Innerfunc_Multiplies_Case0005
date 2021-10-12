@@ -1,0 +1,30 @@
+-- @testpoint: 时间和日期操作符*，年月日时分秒分别于浮点数相乘
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (col1 interval);
+SQL SUCCESS
+insert into test_date01 values ('1 day');
+SQL SUCCESS
+insert into test_date01 values ('1 month');
+SQL SUCCESS
+insert into test_date01 values ('1 year');
+SQL SUCCESS
+insert into test_date01 values ('1 hour');
+SQL SUCCESS
+insert into test_date01 values ('1 m');
+SQL SUCCESS
+insert into test_date01 values ('1 second');
+SQL SUCCESS
+select double precision '1.5' * col1  from test_date01;
++-------------------------------------------------+
+| ?column?                                        |
++-------------------------------------------------+
+| 0 years 0 mons 1 days 12 hours 0 mins 0.00 secs |
+| 0 years 1 mons 15 days 0 hours 0 mins 0.00 secs |
+| 1 years 6 mons 0 days 0 hours 0 mins 0.00 secs  |
+| 0 years 0 mons 0 days 1 hours 30 mins 0.00 secs |
+| 0 years 0 mons 0 days 0 hours 1 mins 30.00 secs |
+| 0 years 0 mons 0 days 0 hours 0 mins 1.50 secs  |
++-------------------------------------------------+
+drop table if exists test_date01;
+SQL SUCCESS

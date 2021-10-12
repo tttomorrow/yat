@@ -1,0 +1,19 @@
+-- @testpoint: 插入空值
+-- @modify at: 2020-11-05
+DROP TABLE IF EXISTS type_boolean03;
+SQL SUCCESS
+CREATE TABLE type_boolean03 (datev boolean);
+SQL SUCCESS
+insert into type_boolean03 values (null);
+SQL SUCCESS
+insert into type_boolean03 values ('');
+SQL SUCCESS
+select * from type_boolean03;
++-------+
+| datev |
++-------+
+|       |
+|       |
++-------+
+drop table type_boolean03;
+SQL SUCCESS

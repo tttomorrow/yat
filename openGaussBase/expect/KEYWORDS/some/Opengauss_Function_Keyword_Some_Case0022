@@ -1,0 +1,30 @@
+--  @testpoint:opengauss关键字some(保留)，作为用户组名
+--关键字不带引号-合理报错
+drop group if exists some;
+?.*ERROR: syntax error at or near "some".*
+?.*Position.*
+create group some with password 'gauss@123';
+?.*ERROR: syntax error at or near "some".*
+?.*Position.*
+--关键字带双引号-成功
+drop group if exists "some";
+SQL SUCCESS
+create group "some" with password 'gauss@123';
+SQL SUCCESS
+--清理环境
+drop group "some";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop group if exists 'some';
+?.*ERROR: syntax error at or near "'some'".*
+?.*Position.*
+create group 'some' with password 'gauss@123';
+?.*ERROR: syntax error at or near "'some'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop group if exists `some`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create group `some` with password 'gauss@123';
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*

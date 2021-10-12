@@ -1,0 +1,11 @@
+-- @testpoint: lower函数多参数校验，合理报错
+select lower(1,2);
+?.*ERROR: function lower\(integer, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: lower
+select lower('A','B','C','D');
+?.*ERROR: function lower\(unknown, unknown, unknown, unknown\) does not exist
+    Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+    Where: referenced column: lower

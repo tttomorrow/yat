@@ -1,0 +1,118 @@
+-- @testpoint: 创建时设置CYCLE 修改cache 合理报错
+--创建序列
+drop sequence if exists test_seq_011;
+SQL SUCCESS
+CREATE sequence test_seq_011 minvalue 1 maxvalue 10  cycle;
+SQL SUCCESS
+drop table if exists table_seq_011 cascade;
+SQL SUCCESS
+create table table_seq_011(id int);
+SQL SUCCESS
+--查询cache值
+select last_value,cache_value from test_seq_011;
++------------+-------------+
+| last_value | cache_value |
++------------+-------------+
+| 1          | 1           |
++------------+-------------+
+--修改cache*步长 小于最小值 期望：修改失败 合理报错
+alter sequence test_seq_011 cache -10;
+?.*ERROR: CACHE \(-10\) must be greater than zero?.*
+--查询cache值
+select last_value,cache_value from test_seq_011;
++------------+-------------+
+| last_value | cache_value |
++------------+-------------+
+| 1          | 1           |
++------------+-------------+
+select nextval('test_seq_011');
++---------+
+| nextval |
++---------+
+| 1       |
++---------+
+insert into table_seq_011 values(nextval('test_seq_011'));
+SQL SUCCESS
+alter sequence test_seq_011 maxvalue 15;
+SQL SUCCESS
+select last_value,cache_value,max_value from test_seq_011;
++------------+-------------+-----------+
+| last_value | cache_value | max_value |
++------------+-------------+-----------+
+| 2          | 1           | 15        |
++------------+-------------+-----------+
+select nextval('test_seq_011');
++---------+
+| nextval |
++---------+
+| 3       |
++---------+
+--修改cache*步长 大于最大值 期望：修改成功
+alter sequence test_seq_011 cache 15;
+SQL SUCCESS
+--查询cache值
+select last_value,cache_value from test_seq_011;
++------------+-------------+
+| last_value | cache_value |
++------------+-------------+
+| 3          | 15          |
++------------+-------------+
+select nextval('test_seq_011');
++---------+
+| nextval |
++---------+
+| 4       |
++---------+
+insert into table_seq_011 values(nextval('test_seq_011'));
+SQL SUCCESS
+alter sequence test_seq_011 maxvalue 15;
+SQL SUCCESS
+select last_value,cache_value,max_value from test_seq_011;
++------------+-------------+-----------+
+| last_value | cache_value | max_value |
++------------+-------------+-----------+
+| 15         | 15          | 15        |
++------------+-------------+-----------+
+select nextval('test_seq_011');
++---------+
+| nextval |
++---------+
+| 1       |
++---------+
+--修改cache*步长 大于最小值小于最大值 期望：修改成功
+alter sequence test_seq_011 cache 15;
+SQL SUCCESS
+--查询cache值
+select last_value,cache_value from test_seq_011;
++------------+-------------+
+| last_value | cache_value |
++------------+-------------+
+| 15         | 15          |
++------------+-------------+
+select nextval('test_seq_011');
++---------+
+| nextval |
++---------+
+| 1       |
++---------+
+insert into table_seq_011 values(nextval('test_seq_011'));
+SQL SUCCESS
+alter sequence test_seq_011 maxvalue 15;
+SQL SUCCESS
+select last_value,cache_value,max_value from test_seq_011;
++------------+-------------+-----------+
+| last_value | cache_value | max_value |
++------------+-------------+-----------+
+| 15         | 15          | 15        |
++------------+-------------+-----------+
+select nextval('test_seq_011');
++---------+
+| nextval |
++---------+
+| 1       |
++---------+
+--清理环境
+drop table if exists table_seq_011 cascade;
+SQL SUCCESS
+drop sequence if exists test_seq_011;
+SQL SUCCESS

@@ -1,0 +1,27 @@
+-- @testpoint: 函数corr(Y, X)，相关系数，当入参中有无效参数时，合理报错
+drop table if exists table_test;
+SQL SUCCESS
+create table table_test(id integer,
+name varchar(10),
+age integer,
+height decimal(5,2),
+hobbies text,
+tel bigint
+);
+SQL SUCCESS
+SQL SUCCESS
+--当入参中有非int类型参数时，合理报错
+select corr(id, name)from  table_test where age <20;
+?.*ERROR: invalid input syntax for type double precision: "张三".*
+select corr(id, hobbies)from  table_test where age <20;
+?.*ERROR: invalid input syntax for type double precision: "sings".*
+select corr(name, hobbies)from  table_test where age <20;
+?.*ERROR: invalid input syntax for type double precision: "张三".*
+--当有三个入参时合理报错
+select regr_syy(id, tel, height)from  table_test where age <20;
+?.*ERROR: function regr_syy\(integer, bigint, numeric\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position.*
+  Where: referenced column: regr_syy
+drop table table_test;
+SQL SUCCESS

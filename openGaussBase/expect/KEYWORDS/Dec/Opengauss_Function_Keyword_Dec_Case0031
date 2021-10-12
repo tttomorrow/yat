@@ -1,0 +1,21 @@
+--  @testpoint:opengauss关键字dec(非保留)，作为字段数据类型
+--前置条件
+drop table if exists dec_test cascade;
+SQL SUCCESS
+--关键字不带引号-成功
+create table dec_test(id int,name dec);
+SQL SUCCESS
+drop table dec_test;
+SQL SUCCESS
+--关键字带双引号-合理报错
+create table dec_test(id int,name "dec");
+?.*ERROR: type "dec" does not exist
+?.*
+--关键字带单引号-合理报错
+create table dec_test(id int,name 'dec');
+?.*ERROR: syntax error at or near "'dec'"
+?.*
+--关键字带反引号-合理报错
+create table dec_test(id int,name `dec`);
+?.*ERROR: syntax error at or near "`"
+?.*

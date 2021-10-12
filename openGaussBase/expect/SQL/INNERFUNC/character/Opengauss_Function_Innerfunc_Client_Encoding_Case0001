@@ -1,0 +1,11 @@
+-- @testpoint: 设置客户端编码格式后查询
+set client_encoding to 'utf8';
+SQL SUCCESS
+SELECT pg_client_encoding();
++--------------------+
+| pg_client_encoding |
++--------------------+
+| UTF8               |
++--------------------+
+set client_encoding to 'utf8';
+SQL SUCCESS

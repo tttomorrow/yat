@@ -1,0 +1,19 @@
+-- @testpoint: 插入字符串类型，合理报错
+drop table if exists tinyint10;
+SQL SUCCESS
+create table tinyint10 (name tinyint);
+SQL SUCCESS
+insert into tinyint10 values ('123abc');
+?.*ERROR: invalid input syntax for integer: "123abc"
+?.*
+  Where: referenced column: name
+insert into tinyint10 values ('1a2');
+?.*ERROR: invalid input syntax for integer: "1a2"
+?.*
+  Where: referenced column: name
+insert into tinyint10 values ('abc123');
+?.*ERROR: invalid input syntax for integer: "abc123"
+?.*
+  Where: referenced column: name
+drop table tinyint10;
+SQL SUCCESS

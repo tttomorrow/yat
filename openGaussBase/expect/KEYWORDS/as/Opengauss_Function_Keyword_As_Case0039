@@ -1,0 +1,7 @@
+-- @testpoint: 列名为as，并且定义as和default
+drop table if exists  test_as_005;
+SQL SUCCESS
+create table  test_as_005 ("as" char(20),stu_age int,sex char(10),score int,address char(10) default 'gauss');
+SQL SUCCESS
+drop table if exists  test_as_005;
+SQL SUCCESS

@@ -1,0 +1,15 @@
+--  @testpoint:插入正整数
+drop table if exists bigint05;
+SQL SUCCESS
+create table bigint05 (name bigint);
+SQL SUCCESS
+insert into bigint05 values (1216561);
+SQL SUCCESS
+select * from bigint05;
++---------+
+| name    |
++---------+
+| 1216561 |
++---------+
+drop table if exists bigint05;
+SQL SUCCESS

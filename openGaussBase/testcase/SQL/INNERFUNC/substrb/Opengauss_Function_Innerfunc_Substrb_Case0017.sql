@@ -1,0 +1,2 @@
+-- @testpoint: substrb函数无缺省参数提取子串
+SELECT substrb('string',2,3);

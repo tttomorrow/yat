@@ -1,0 +1,32 @@
+-- @testpoint: DQL语法，结合desc排序
+drop table if exists sc;
+SQL SUCCESS
+create table sc(sno varchar2(10),cno varchar2(10),score number(4,2),constraint pk_sc primary key (sno,cno));
+SQL SUCCESS
+insert into sc values ('s001','c001',78.9);
+SQL SUCCESS
+insert into sc values ('s002','c001',80.9);
+SQL SUCCESS
+insert into sc values ('s003','c001',81.9);
+SQL SUCCESS
+insert into sc values ('s004','c001',60.9);
+SQL SUCCESS
+insert into sc values ('s001','c002',82.9);
+SQL SUCCESS
+insert into sc values ('s002','c002',72.9);
+SQL SUCCESS
+insert into sc values ('s003','c002',81.9);
+SQL SUCCESS
+insert into sc values ('s001','c003',59);
+SQL SUCCESS
+select sno from sc where score<80 order by score desc;
++------+
+| sno  |
++------+
+| s001 |
+| s002 |
+| s004 |
+| s001 |
++------+
+drop table sc;
+SQL SUCCESS

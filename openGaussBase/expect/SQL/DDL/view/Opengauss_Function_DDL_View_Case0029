@@ -1,0 +1,23 @@
+-- @testpoint: 重置视图的选项
+--建表
+drop table if exists table_view_029;
+SQL SUCCESS
+create table table_view_029(id int,name varchar(20));
+SQL SUCCESS
+--插入数据
+insert into table_view_029 values(1,'hello'),(2,'world');
+SQL SUCCESS
+--创建视图
+drop view if exists temp_view_029 cascade;
+SQL SUCCESS
+create view temp_view_029 as select * from table_view_029;
+SQL SUCCESS
+--设置视图选项
+alter view if exists temp_view_029 set (security_barrier = true);
+SQL SUCCESS
+--重置视图选项
+alter view if exists temp_view_029 reset (security_barrier );
+SQL SUCCESS
+--删表
+drop table table_view_029 cascade;
+SQL SUCCESS

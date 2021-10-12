@@ -1,0 +1,9 @@
+-- @testpoint: 创建表，数据类型为clob\
+drop table if exists test12;
+SQL SUCCESS
+create table test12 (name clob);
+SQL SUCCESS
+insert into test12 (name) values('liuzi');
+SQL SUCCESS
+drop table if exists test12;
+SQL SUCCESS

@@ -1,0 +1,46 @@
+-- @testpoint: datalength(any)函数的异常校验，合理报错。
+-- 不支持
+SELECT datalength('postmaster.pid');
+?.*ERROR: unsupport type unknown
+  Where: referenced column: datalength
+-- 多参
+SELECT datalength(0::TINYINT，0::TINYINT);
+?.*ERROR: type \"tinyint\，0\" does not exist
+?.*
+  Where: referenced column: datalength
+-- 少参
+SELECT datalength();
+?.*ERROR: function datalength\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: datalength
+-- 与类型不符
+SELECT datalength(256::TINYINT);
+?.*ERROR: tinyint out of range
+  Where: referenced column: datalength
+-- 数值
+-- 整数
+-- 任意精度
+-- DECIMAL[(p[,s])]
+SELECT datalength(123456.122331::DECIMAL(-10,4));
+?.*ERROR: NUMERIC precision \-10 must be between 1 and 1000
+?.*
+  Where: referenced column: datalength
+-- NUMBER[(p[,s])]
+SELECT datalength(123456.12354::NUMERIC(10,40));
+?.*ERROR: NUMERIC scale 40 must be between 0 and precision 10
+?.*
+  Where: referenced column: datalength
+--布尔类型
+--    BOOLEAN
+SELECT datalength(yes);
+?.*ERROR: column \"yes\" does not exist
+?.*
+  Where: referenced column: datalength
+--时间类型
+--    DATE
+SELECT datalength(date '13-50-2010');
+?.*ERROR: date/time field value out of range: \"13\-50\-2010\"
+  Hint: Perhaps you need a different "datestyle" setting.
+?.*
+  Where: referenced column: datalength

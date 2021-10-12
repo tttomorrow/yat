@@ -1,0 +1,24 @@
+-- @testpoint: 关键字unlisten，用作字段类型（合理报错）
+drop table if exists unlisten_test cascade;
+SQL SUCCESS
+create table if not exists unlisten_test(id int,cid unlisten);
+?.*ERROR: type "unlisten" does not exist.*
+?.*
+create or replace procedure unlisten_insert
+as
+begin
+ for i in 1..10 loop
+    insert into unlisten_test values(i,i^i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call unlisten_insert();
+?.*ERROR: relation "unlisten_test" does not exist.*
+?.*
+select * from unlisten_test;
+?.*ERROR: relation "unlisten_test" does not exist.*
+?.*
+--清理环境
+drop procedure unlisten_insert;
+SQL SUCCESS

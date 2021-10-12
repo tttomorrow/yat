@@ -1,0 +1,18 @@
+-- @testpoint: 插入字符串类型整数
+drop table if exists bigint04;
+SQL SUCCESS
+create table bigint04 (name bigint);
+SQL SUCCESS
+insert into bigint04 values ('123');
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+select * from bigint04;
++-----------+
+| name      |
++-----------+
+| 123       |
+| 456       |
++-----------+
+drop table bigint04;
+SQL SUCCESS

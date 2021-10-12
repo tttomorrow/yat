@@ -1,0 +1,63 @@
+-- @testpoint: EXTRACT从date类型中判断入参是星期几
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (clo1 date);
+SQL SUCCESS
+insert into test_date01 values ('2020-08-16 00:00:00');
+SQL SUCCESS
+insert into test_date01 values ('2020-08-17');
+SQL SUCCESS
+insert into test_date01 values ('1998-01-01');
+SQL SUCCESS
+insert into test_date01 values ('1830-01-01 23:00:00 pst');
+SQL SUCCESS
+insert into test_date01 values ('2020-08-22 00:00:00+8');
+SQL SUCCESS
+select EXTRACT(dow FROM clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| 0.0       |
+| 1.0       |
+| 4.0       |
+| 5.0       |
+| 6.0       |
++-----------+
+SELECT EXTRACT(dow FROM date '0001-01-01 00:00:00');
++-----------+
+| date_part |
++-----------+
+| 1.0       |
++-----------+
+SELECT EXTRACT(dow FROM date '0101-01-01 00:00:00');
++-----------+
+| date_part |
++-----------+
+| 6.0       |
++-----------+
+SELECT EXTRACT(dow FROM date '0218-01-01 pst');
++-----------+
+| date_part |
++-----------+
+| 4.0       |
++-----------+
+SELECT EXTRACT(dow FROM date '1998-01-01');
++-----------+
+| date_part |
++-----------+
+| 4.0       |
++-----------+
+SELECT EXTRACT(dow FROM date '1830-01-01 23:00:00 pst');
++-----------+
+| date_part |
++-----------+
+| 5.0       |
++-----------+
+SELECT EXTRACT(dow FROM date '9999-12-31 00:00:00+8');
++-----------+
+| date_part |
++-----------+
+| 5.0       |
++-----------+
+drop table if exists test_date01;
+SQL SUCCESS

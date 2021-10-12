@@ -1,0 +1,39 @@
+-- @testpoint: 关键字variable，用作字符串
+drop table if exists variable_test cascade;
+SQL SUCCESS
+create table variable_test(id int,name varchar(20));
+SQL SUCCESS
+create or replace procedure variable_insert
+as
+begin
+ for i in 1..10 loop
+    insert into variable_test values(i,'variable');
+    end loop;
+ end;
+/
+SQL SUCCESS
+call variable_insert();
++-----------------+
+| variable_insert |
++-----------------+
+|                 |
++-----------------+
+select * from variable_test;
++----+----------+
+| id | name     |
++----+----------+
+| 1  | variable |
+| 2  | variable |
+| 3  | variable |
+| 4  | variable |
+| 5  | variable |
+| 6  | variable |
+| 7  | variable |
+| 8  | variable |
+| 9  | variable |
+| 10 | variable |
++----+----------+
+drop table if exists variable_test cascade;
+SQL SUCCESS
+drop procedure variable_insert;
+SQL SUCCESS

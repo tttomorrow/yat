@@ -1,0 +1,37 @@
+-- @testpoint: json额外支持操作函数：json_object（从一个文本数组构造一个 JSON 对象，当入参不合理时，合理报错）
+--合理入参
+select json_object('{a,1,b,2,3,NULL,"d e f","a b c"}');
++-------------------------------------------------------+
+| json_object                                           |
++-------------------------------------------------------+
+| {"a" : "1", "b" : "2", "3" : null, "d e f" : "a b c"} |
++-------------------------------------------------------+
+select json_object('{a,b,"a b c"}', '{a,1,1}');
++---------------------------------------+
+| json_object                           |
++---------------------------------------+
+| {"a" : "a", "b" : "1", "a b c" : "1"} |
++---------------------------------------+
+--不合理入参：合理报错
+select json_object('[{"a":1,"b":"foo","d":false},{"a":2,"b":"bar","c":true}]');
+?.*ERROR: missing dimension valu.*
+?.*
+  Where: referenced column: json_object
+select json_object('{a,1,b,2,3,"d e f","a b c"}');
+?.*ERROR: array must have even number of element.*
+  Where: referenced column: json_object
+select json_object('{a,1,b,2,null,"a b c"}');
+?.*ERROR: null value not allowed for object ke.*
+  Where: referenced column: json_object
+select json_object('{"a":1,"b":"foo","d":false}');
+?.*ERROR: malformed array literal: "\{"a":1,"b":"foo","d":false\}.*
+?.*
+  Where: referenced column: json_object
+select json_object('[a,1,b,2,3,NULL,"d e f","a b c"]');
+?.*ERROR: missing dimension valu.*
+?.*
+  Where: referenced column: json_object
+select json_object('[{"a":1,"b":"foo","d":false},{"a":2,"b":"bar","c":true}]');
+?.*ERROR: missing dimension valu.*
+?.*
+  Where: referenced column: json_object

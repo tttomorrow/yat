@@ -1,0 +1,13 @@
+-- @testpoint: lpad函数参数二为空值
+SELECT lpad('hi', '','xyza');
++------+
+| lpad |
++------+
+|      |
++------+
+SELECT lpad('hi', null,'xyza');
++------+
+| lpad |
++------+
+|      |
++------+

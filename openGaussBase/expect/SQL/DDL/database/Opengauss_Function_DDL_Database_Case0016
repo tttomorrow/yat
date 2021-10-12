@@ -1,0 +1,24 @@
+-- @testpoint: 在事务中创建修改删除数据库失败,合理报错
+START TRANSACTION;
+SQL SUCCESS
+create database test_db;
+?.*ERROR: CREATE DATABASE cannot run inside a transaction block
+end;
+SQL SUCCESS
+create database test_db;
+SQL SUCCESS
+START TRANSACTION;
+SQL SUCCESS
+ALTER DATABASE test_db with CONNECTION LIMIT 2;
+SQL SUCCESS
+end;
+SQL SUCCESS
+START TRANSACTION;
+SQL SUCCESS
+drop database test_db;
+?.*ERROR: DROP DATABASE cannot run inside a transaction block
+end;
+SQL SUCCESS
+--tearDown
+drop database if exists test_db;
+SQL SUCCESS

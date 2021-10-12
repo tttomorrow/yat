@@ -1,0 +1,13 @@
+-- @testpoint: 入参为null或''，求数据集的标准差
+select STDDEV_POP(null);
++------------+
+| stddev_pop |
++------------+
+|            |
++------------+
+select STDDEV_POP('');
++------------+
+| stddev_pop |
++------------+
+|            |
++------------+

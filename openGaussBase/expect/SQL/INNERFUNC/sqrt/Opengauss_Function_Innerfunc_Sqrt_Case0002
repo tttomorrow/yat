@@ -1,0 +1,10 @@
+-- @testpoint: 输入参数为负数,合理报错
+SELECT sqrt(-64) AS RESULT;
+?.*ERROR: cannot take square root of a negative number
+  Where: referenced column: result
+SELECT sqrt(-2.00) AS RESULT;
+?.*ERROR: cannot take square root of a negative number
+  Where: referenced column: result
+SELECT sqrt(-3.56) AS RESULT;
+?.*ERROR: cannot take square root of a negative number
+  Where: referenced column: result

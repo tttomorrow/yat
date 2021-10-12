@@ -1,0 +1,13 @@
+-- @testpoint: 数字操作符%(求余),货币类型求余，合理报错
+drop table if exists data_01;
+SQL SUCCESS
+create table data_01 (clo1 money,clo2 money);
+SQL SUCCESS
+insert into data_01 values (12.34, 0.01);
+SQL SUCCESS
+select clo1 % 20 from data_01;
+?.*ERROR: operator does not exist: money .* integer
+  Hint: No operator matches the given name and argument type(s). You might need to add explicit type casts.
+?.*Position: .*
+drop table if exists data_01;
+SQL SUCCESS

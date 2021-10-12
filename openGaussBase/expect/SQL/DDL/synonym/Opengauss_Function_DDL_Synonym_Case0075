@@ -1,0 +1,40 @@
+-- @testpoint: 删除同义词+RESTRICT选项,有依赖对象，合理报错
+-- @modify at: 2020-11-26
+--建表
+drop table if exists SYN_TAB_075_001 cascade;
+SQL SUCCESS
+create table SYN_TAB_075_001 (a int,b clob);
+SQL SUCCESS
+--插入数据
+insert into SYN_TAB_075_001 values(1,'a');
+SQL SUCCESS
+--建表的同义词
+drop synonym if exists SYN_TAB_SYN_075_001 cascade;
+SQL SUCCESS
+create or replace synonym SYN_TAB_SYN_075_001 for SYN_TAB_075_001;
+SQL SUCCESS
+select * from SYN_TAB_SYN_075_001;
++---+---+
+| a | b |
++---+---+
+| 1 | a |
++---+---+
+--建视图同义词
+drop view if exists v1;
+SQL SUCCESS
+create view v1 as select * from SYN_TAB_SYN_075_001;
+SQL SUCCESS
+--删除同义词，报错
+drop synonym  SYN_TAB_SYN_075_001 ;
+?.*ERROR: cannot drop synonym public.syn_tab_syn_075_001 because other objects depend on it
+  Detail: view v1 depends on synonym public.syn_tab_syn_075_001
+  Hint: Use DROP ... CASCADE to drop the dependent objects too.
+drop synonym  SYN_TAB_SYN_075_001 RESTRICT;
+?.*ERROR: cannot drop synonym public.syn_tab_syn_075_001 because other objects depend on it
+  Detail: view v1 depends on synonym public.syn_tab_syn_075_001
+  Hint: Use DROP ... CASCADE to drop the dependent objects too.
+--清理数据
+drop synonym if exists SYN_TAB_SYN_075_001 cascade;
+SQL SUCCESS
+drop table if exists SYN_TAB_075_001 cascade;
+SQL SUCCESS

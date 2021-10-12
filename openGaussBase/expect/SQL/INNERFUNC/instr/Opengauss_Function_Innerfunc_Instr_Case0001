@@ -1,0 +1,18 @@
+-- @testpoint: instr函数，结合插入语句使用
+--建表
+drop table if exists INSTR_TABLE3;
+SQL SUCCESS
+CREATE TABLE  INSTR_TABLE3( COL_INSTR1  INTEGER,COL_INSTR2  INTEGER,COL_INSTR3  INTEGER);
+SQL SUCCESS
+--插入数据
+INSERT INTO INSTR_TABLE3(COL_INSTR1,COL_INSTR2,COL_INSTR3) VALUES(instr('Gaussbd','s',1,2),instr('#@$*@@**@*@#$%ssbd','@*',1,2),instr(1232.3234578,23,1,2));
+SQL SUCCESS
+SELECT * FROM INSTR_TABLE3;
++------------+------------+------------+
+| col_instr1 | col_instr2 | col_instr3 |
++------------+------------+------------+
+| 5          | 9          | 7          |
++------------+------------+------------+
+--清理环境
+drop table INSTR_TABLE3;
+SQL SUCCESS

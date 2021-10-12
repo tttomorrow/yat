@@ -1,0 +1,13 @@
+-- @testpoint: 创建相同表名的临时表，合理报错
+-- @modify at: 2020-11-24
+--建表1
+drop table if exists temp_table_038;
+create temporary table temp_table_038(c_id int,c_d_id int NOT NULL,c_w_id int NOT NULL,c_first varchar(16) NOT NULL,
+c_middle char(2),c_last varchar(16) NOT NULL,c_street_1 varchar(20) NOT NULL,c_street_2 varchar(20),c_city varchar(20) NOT NULL,
+c_state char(2) NOT NULL,c_zip char(9) NOT NULL,c_phone char(16) NOT NULL);
+--创建相同的临时表名，报错
+create temporary table temp_table_038(c_id int,c_d_id int NOT NULL,c_w_id int NOT NULL,c_first varchar(16) NOT NULL,
+c_middle char(2),c_last varchar(16) NOT NULL,c_street_1 varchar(20) NOT NULL,c_street_2 varchar(20),c_city varchar(20) NOT NULL,
+c_state char(2) NOT NULL,c_zip char(9) NOT NULL,c_phone char(16) NOT NULL);
+--删表
+drop table temp_table_038;

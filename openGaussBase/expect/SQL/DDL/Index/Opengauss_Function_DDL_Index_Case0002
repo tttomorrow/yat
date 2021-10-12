@@ -1,0 +1,35 @@
+-- @testpoint:  create index:模式名为63位：success
+--建模式63位
+SQL SUCCESS
+SQL SUCCESS
+--建表
+SQL SUCCESS
+SQL SUCCESS
+--插数据
+BEGIN
+  for i in 1..10000 LOOP
+  end LOOP;
+end;
+/
+SQL SUCCESS
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*Seq Scan on test_index_schema_02.*
+|   Filter: (id = 1)                                                    |
+?.*
+--建索引
+SQL SUCCESS
+SQL SUCCESS
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*Bitmap Heap Scan on test_index_schema_02.*
+|   Recheck Cond: (id = 999)                                                    |
+?.*Bitmap Index Scan on schema_index_02.*
+|         Index Cond: (id = 999)                                                |
+?.*
+--清理数据
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS

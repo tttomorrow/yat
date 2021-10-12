@@ -1,0 +1,36 @@
+--  @testpoint:使用insert...nothing语句，给主键列插入null值，合理报错
+--预置条件enable_upsert_to_merge为off
+drop table if exists products_c6;
+SQL SUCCESS
+--建表，指定一列是主键
+CREATE TABLE products_c6 (
+    product_no integer PRIMARY KEY,
+    name text,
+    price numeric
+);
+SQL SUCCESS
+--常规插入一条数据
+insert into  products_c6 values(10,'grains',5.5);
+SQL SUCCESS
+select * from  products_c6;
++------------+--------+-------+
+| product_no | name   | price |
++------------+--------+-------+
+| 10         | grains | 5.5   |
++------------+--------+-------+
+--使用insert...nothing语句,给主键列插入null值
+insert into products_c6( name,price) values('grains1',5.25) on DUPLICATE key update nothing;
+?.*ERROR: null value in column "product_no" violates not-null constraint
+  Detail: Failing row contains (null, grains1, 5.25).
+--给主键列插入null值
+insert into products_c6 values(null,'grains1',5.25) on DUPLICATE key update nothing;
+?.*ERROR: null value in column "product_no" violates not-null constraint
+  Detail: Failing row contains (null, grains1, 5.25).
+select * from  products_c6;
++------------+--------+-------+
+| product_no | name   | price |
++------------+--------+-------+
+| 10         | grains | 5.5   |
++------------+--------+-------+
+drop table products_c6;
+SQL SUCCESS

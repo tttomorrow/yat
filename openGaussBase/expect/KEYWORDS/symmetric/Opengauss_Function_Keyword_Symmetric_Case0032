@@ -1,0 +1,20 @@
+--  @testpoint:openGauss保留关键字symmetric作为用户名
+--不带引号，合理报错
+create user symmetric password 'Bigdata@123';
+?.*ERROR: syntax error at or near "symmetric"
+?.*Position: .*
+--openGauss保留关键字symmetric作为 用户名，加双引号，创建成功
+drop user if exists "symmetric";
+SQL SUCCESS
+create user "symmetric" password 'Bigdata@123';
+SQL SUCCESS
+drop user "symmetric";
+SQL SUCCESS
+--openGauss保留关键字symmetric作为 用户名，加单引号，合理报错
+create user 'symmetric' password 'Bigdata@123';
+?.*ERROR: syntax error at or near "'symmetric'"
+?.*Position: .*
+--openGauss保留关键字symmetric作为 用户名，加反引号，合理报错
+create user `symmetric` password 'Bigdata@123';
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*

@@ -1,0 +1,21 @@
+-- @testpoint: 创建普通list分区表，验证分区键支持个数，多列合理报错
+
+--分区键仅支持单列（1个）
+drop table if exists partition_list_tab01;
+create table partition_list_tab01(p_id int,p_name varchar,p_age int)
+partition by list(p_id)
+(partition part_1 values(10),
+ partition part_2 values(20),
+ partition part_3 values(30));
+
+ --分区键指定多个列，合理报错
+drop table if exists partition_list_tab02;
+create table partition_list_tab02(p_id int,p_name varchar,p_age int)
+partition by list(p_id,p_name)
+(partition part_1 values(10),
+ partition part_2 values(20),
+ partition part_3 values(30));
+
+--清理环境
+drop table if exists partition_list_tab01;
+drop table if exists partition_list_tab02;

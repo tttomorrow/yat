@@ -1,0 +1,54 @@
+-- @testpoint: CASE_NOT_FOUND,declare语句不捕获异常，合理报错；捕获异常，执行成功；(搜索式case语句)
+drop table if exists TB_USER_1;
+SQL SUCCESS
+CREATE TABLE TB_USER_1
+(
+    ID INTEGER NOT NULL,
+    USER_NAME VARCHAR2(20) NOT NULL,
+    USER_AGE INTEGER NOT NULL
+);
+SQL SUCCESS
+insert into TB_USER_1(ID,USER_NAME,USER_AGE)values(20,'zz',80);
+SQL SUCCESS
+declare
+V_AGE TB_USER_1.USER_AGE%TYPE;
+V_NAME TB_USER_1.USER_NAME%TYPE;
+BEGIN
+  SELECT USER_NAME, USER_AGE INTO V_NAME, V_AGE FROM TB_USER_1 WHERE ID=20;
+   raise info  ':%',V_NAME;
+    raise info ':%',V_AGE;
+  CASE
+    WHEN V_AGE < 18 THEN
+       raise info 'is a child%',V_NAME;
+    WHEN V_AGE < 50 THEN
+       raise info 'is not child%',V_NAME;
+  END CASE;
+END;
+/
+?.*ERROR: case not found.*
+  Hint: CASE statement is missing ELSE part.
+?.*Where: PL/pgSQL function inline_code_block line.*
+----捕获异常，执行成功；
+declare
+V_AGE TB_USER_1.USER_AGE%TYPE;
+V_NAME TB_USER_1.USER_NAME%TYPE;
+BEGIN
+  SELECT USER_NAME, USER_AGE INTO V_NAME, V_AGE FROM TB_USER_1 WHERE ID=20;
+     raise info  ':%',V_NAME;
+    raise info ':%',V_AGE;
+  CASE
+    WHEN V_AGE < 18 THEN
+        raise info 'is a child%',V_NAME;
+    WHEN V_AGE < 50 THEN
+      raise info 'is not child%',V_NAME;
+  END CASE;
+  EXCEPTION
+    WHEN CASE_NOT_FOUND THEN
+       raise info 'case not found';
+    WHEN OTHERS THEN
+        raise info 'ERROR CODE:%',SQLCODE,'ERROR CODE:%',CHR(10),'ERROR MSG:%',SQLERRM;
+END;
+/
+SQL SUCCESS
+drop table TB_USER_1;
+SQL SUCCESS

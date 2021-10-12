@@ -1,0 +1,31 @@
+--  @testpoint:opengauss关键字backward(非保留)，作为数据库名
+--关键字不带引号-成功
+drop database if exists backward;
+SQL SUCCESS
+create database backward;
+SQL SUCCESS
+--清理环境
+drop database backward;
+SQL SUCCESS
+--关键字带双引号-成功
+drop database if exists "backward";
+SQL SUCCESS
+create database "backward";
+SQL SUCCESS
+--清理环境
+drop database "backward";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop database if exists 'backward';
+?.*ERROR: syntax error at or near "'backward'".*
+?.*Position: .*
+create database 'backward';
+?.*ERROR: syntax error at or near "'backward'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop database if exists `backward`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create database `backward`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

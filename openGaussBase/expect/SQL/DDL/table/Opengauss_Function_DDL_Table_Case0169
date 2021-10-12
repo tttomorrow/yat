@@ -1,0 +1,16 @@
+-- @testpoint: 创建列存表以及btree索引
+drop table if exists table_1;
+SQL SUCCESS
+DROP INDEX if exists table_1_index1;
+SQL SUCCESS
+create table table_1(id int,sname char(20),city varchar(20),number number)with (ORIENTATION=COLUMN);
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+CREATE INDEX table_1_index1 ON table_1 USING btree(id);
+SQL SUCCESS
+DROP INDEX if exists table_index;
+SQL SUCCESS
+drop table if exists table_1;
+SQL SUCCESS

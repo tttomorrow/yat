@@ -1,0 +1,33 @@
+-- @testpoint: 创建临时表同义词：创建不会报错，查询时，合理报错
+-- @modify at: 2020-11-25
+--建表
+drop table if exists test_tempsyn;
+SQL SUCCESS
+CREATE TEMPORARY table test_tempsyn(id int);
+SQL SUCCESS
+--插入数据
+insert into test_tempsyn values(1);
+SQL SUCCESS
+--查询
+select * from test_tempsyn;
++----+
+| id |
++----+
+| 1  |
++----+
+--创建临时表同义词
+drop synonym if exists tmp_syn_01;
+SQL SUCCESS
+create synonym tmp_syn_01 for test_tempsyn;
+SQL SUCCESS
+--查询，报错
+select * from tmp_syn_01;
+?.*ERROR: relation "tmp_syn_01" does not exist.*
+  Detail: translation for synonym "tmp_syn_01" is no longer valid
+?.*
+--删表
+drop table if exists test_tempsyn;
+SQL SUCCESS
+--删同义词
+drop synonym if exists tmp_syn_01;
+SQL SUCCESS

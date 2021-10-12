@@ -1,0 +1,2 @@
+-- @testpoint:验证cast函数能否将字符型转换为decimal类型  
+select cast('123.89' as decimal);

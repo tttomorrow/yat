@@ -1,0 +1,18 @@
+-- @testpoint: round函数函数嵌套的测试
+drop table if exists tb;
+SQL SUCCESS
+create table tb (dp1 double precision, nem numeric);
+SQL SUCCESS
+insert into tb values (99999.2,10000.134);
+SQL SUCCESS
+insert into tb values (9.2, 9.56);
+SQL SUCCESS
+select round(round(dp1)),round(round(nem)) from tb order by 2;
++---------+-------+
+| round   | round |
++---------+-------+
+| 9.0     | 10    |
+| 99999.0 | 10000 |
++---------+-------+
+drop table tb;
+SQL SUCCESS

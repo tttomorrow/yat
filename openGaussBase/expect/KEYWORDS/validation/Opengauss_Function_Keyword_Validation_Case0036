@@ -1,0 +1,39 @@
+-- @testpoint: 关键字validation,用作字段名
+drop table if exists validation_test cascade;
+SQL SUCCESS
+create table validation_test(id int,validation varchar(20));
+SQL SUCCESS
+create or replace procedure validation_insert
+as
+begin
+ for i in 1..10 loop
+    insert into validation_test values(i,'vali+'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call validation_insert();
++-------------------+
+| validation_insert |
++-------------------+
+|                   |
++-------------------+
+select * from validation_test;
++----+------------+
+| id | validation |
++----+------------+
+| 1  | vali+1     |
+| 2  | vali+2     |
+| 3  | vali+3     |
+| 4  | vali+4     |
+| 5  | vali+5     |
+| 6  | vali+6     |
+| 7  | vali+7     |
+| 8  | vali+8     |
+| 9  | vali+9     |
+| 10 | vali+10    |
++----+------------+
+drop table if exists validation_test cascade;
+SQL SUCCESS
+drop procedure validation_insert;
+SQL SUCCESS

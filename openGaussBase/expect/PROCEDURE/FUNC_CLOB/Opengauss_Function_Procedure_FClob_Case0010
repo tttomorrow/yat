@@ -1,0 +1,22 @@
+-- @testpoint: 自定义函数clob数据类型的测试:结合to_date函数
+--创建自定义函数
+create or replace function fvt_func_clob_007(p1 in clob) return clob
+is
+begin
+  return p1;
+  exception
+  when no_data_found
+  then
+    raise info 'no_data_found';
+end;
+/
+SQL SUCCESS
+select fvt_func_clob_007(to_date('0001-01-01 00:00:00','yyyy-mm-dd hh24:mi:ss'));
++---------------------+
+| fvt_func_clob_007   |
++---------------------+
+| 0001-01-01 00:00:00 |
++---------------------+
+--恢复环境
+drop function if exists fvt_func_clob_007;
+SQL SUCCESS

@@ -1,0 +1,93 @@
+-- @testpoint: 通用函数：json_extract_path（返回由path_elems指向的JSON值,路径不存在则返回空同操作符 #>，当入参不合理时，合理报错）
+--json_extract_path函数，入参合理
+select json_extract_path('{"f2":{"f3":1},"f4":{"f5":99,"f6":"stringy"}}', 'f4','f6');
++-------------------+
+| json_extract_path |
++-------------------+
+| "stringy"         |
++-------------------+
+select json_extract_path ('{"f1":[1,2,3],"f2":{"f3":1},"f4":null}','f2','f3');
++-------------------+
+| json_extract_path |
++-------------------+
+| 1                 |
++-------------------+
+select json_extract_path ('{"a":1, "b":"test", "a":2,"b":true}','a','0');
++-------------------+
+| json_extract_path |
++-------------------+
+|                   |
++-------------------+
+select json_extract_path ('{"a": {"b":{"a":{"b":{"a":{"b":88}}}}}}','a','b');
++----------------------------+
+| json_extract_path          |
++----------------------------+
+| {"a":{"b":{"a":{"b":88}}}} |
++----------------------------+
+select json_extract_path ('[{"a":"foo"},{"b":"bar"},{"c":"baz"}]','2','1');
++-------------------+
+| json_extract_path |
++-------------------+
+|                   |
++-------------------+
+select json_extract_path ('[{"a":"foo"},{"b":"bar"},{"c":"baz"}]','2');
++-------------------+
+| json_extract_path |
++-------------------+
+| {"c":"baz"}       |
++-------------------+
+select json_extract_path('true','1');
++-------------------+
+| json_extract_path |
++-------------------+
+|                   |
++-------------------+
+select json_extract_path('138158','138');
++-------------------+
+| json_extract_path |
++-------------------+
+|                   |
++-------------------+
+select json_extract_path('null','n');
++-------------------+
+| json_extract_path |
++-------------------+
+|                   |
++-------------------+
+--json_extract_path函数，入参不合理
+select json_extract_path ('[{"a":"foo"},{"b":"bar"},{"c":"baz"}]','2','1');
++-------------------+
+| json_extract_path |
++-------------------+
+|                   |
++-------------------+
+select json_extract_path ('"a","foo","b","bar","c":"baz"','b','c');
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Expected end of input, but found ",".
+?.*
+  Where: JSON data, line 1: "a",...
+referenced column: json_extract_path
+select json_extract_path('true,false','true');
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Expected end of input, but found ",".
+?.*
+  Where: JSON data, line 1: true,...
+referenced column: json_extract_path
+select json_extract_path('138,158,369','138');
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Expected end of input, but found ",".
+?.*
+  Where: JSON data, line 1: 138,...
+referenced column: json_extract_path
+select json_extract_path('null');
+?.*ERROR: function json_extract_path\(unknown\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: json_extract_path
+--返回结果类型校验：json
+select pg_typeof(json_extract_path ('{"a": {"b":{"a":{"b":{"a":{"b":88}}}}}}','a','b'));
++-----------+
+| pg_typeof |
++-----------+
+| json      |
++-----------+

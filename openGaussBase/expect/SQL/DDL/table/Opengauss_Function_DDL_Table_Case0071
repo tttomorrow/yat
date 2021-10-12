@@ -1,0 +1,10 @@
+-- @testpoint: create table与 with 子句（VERSION），非dfs表合理报错
+DROP TABLE IF EXISTS tab_17;
+SQL SUCCESS
+CREATE TABLE tab_17
+(id               NUMBER(7),
+ name              VARCHAR2(20)
+  )with(VERSION=0.12);
+?.*ERROR: It is not allowed to assign version option for non-dfs table..*
+DROP TABLE IF EXISTS tab_17;
+SQL SUCCESS

@@ -1,0 +1,15 @@
+-- @testpoint: 验证是否支持loop循环
+
+BEGIN
+<<outer_loop>>
+  FOR i IN 1..3 LOOP 
+    <<inner_loop>>
+    FOR i IN 1..3 LOOP
+      IF outer_loop.i = 2 THEN
+        raise info 'outer: %', TO_CHAR(outer_loop.i);
+        raise info ' inner:% ',TO_CHAR(inner_loop.i);
+      END IF;
+    END LOOP inner_loop;
+  END LOOP outer_loop;
+END;
+/

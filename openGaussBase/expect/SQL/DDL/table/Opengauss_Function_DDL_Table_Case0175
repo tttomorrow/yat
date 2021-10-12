@@ -1,0 +1,37 @@
+-- @testpoint: 表和视图
+drop table if exists table_1;
+SQL SUCCESS
+create table table_1(id int,sname char(20),city varchar(20),number number);
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+CREATE VIEW table_1_View AS SELECT * FROM table_1 WHERE sname like 'j%';
+SQL SUCCESS
+SELECT * FROM table_1_View;
++----+----------------------+------+--------------+
+| id | sname                | city | number       |
++----+----------------------+------+--------------+
++----+----------------------+------+--------------+
+DROP VIEW table_1_View;
+SQL SUCCESS
+CREATE VIEW table_2_View AS SELECT * FROM table_1 WHERE id =1;
+SQL SUCCESS
+SELECT * FROM table_2_View;
++----+----------------------+------+-------------+
+| id | sname                | city | number      |
++----+----------------------+------+-------------+
++----+----------------------+------+-------------+
+DROP VIEW table_2_View;
+SQL SUCCESS
+CREATE VIEW table_3_View AS SELECT * FROM table_1;
+SQL SUCCESS
+SELECT * FROM table_3_View;
++----+----------------------+------+--------------+
+| id | sname                | city | number       |
++----+----------------------+------+--------------+
++----+----------------------+------+--------------+
+DROP VIEW table_3_View;
+SQL SUCCESS
+drop table if exists table_1;
+SQL SUCCESS

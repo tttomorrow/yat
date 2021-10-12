@@ -1,0 +1,23 @@
+-- @testpoint: 创建表，并指定该表数据不写入预写日志
+drop table if exists warehouse_t6;
+SQL SUCCESS
+CREATE UNLOGGED TABLE warehouse_t6
+(
+    W_WAREHOUSE_SK            INTEGER               NOT NULL,
+    W_WAREHOUSE_id         CHAR(16)              NOT NULL,
+    W_WAREHOUSE_name         VARCHAR(20)                   ,
+    W_WAREHOUSE_SQ_FT         INTEGER                       ,
+    W_STREET_NUMBER           CHAR(10)                      ,
+    W_STREET_name            VARCHAR(60)                   ,
+    W_STREET_TYPE             CHAR(15)                      ,
+    W_SUITE_NUMBER            CHAR(10)                      ,
+    W_CITY                    VARCHAR(60)                   ,
+    W_COUNTY                  VARCHAR(30)                   ,
+    W_STATE                   CHAR(2)                       ,
+    W_ZIP                     CHAR(10)                      ,
+    W_COUNTRY                 VARCHAR(20)                   ,
+    W_GMT_OFFSET             decimal(5,2)
+);
+SQL SUCCESS
+drop table if exists warehouse_t6;
+SQL SUCCESS

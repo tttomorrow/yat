@@ -1,0 +1,30 @@
+--  @testpoint:改变一种复合类型中某个属性的类型，省略SET DATA选项
+--创建类型
+drop type if exists test3_type cascade;
+SQL SUCCESS
+create type test3_type as(a int,b text);
+SQL SUCCESS
+--改变一种复合类型中某个属性的类型，省略SET DATA
+ALTER TYPE test3_type ALTER ATTRIBUTE b TYPE date;
+SQL SUCCESS
+--建表
+drop table if exists test_t2 cascade;
+SQL SUCCESS
+create table test_t2 (id int,d test3_type);
+SQL SUCCESS
+--插入数据
+insert into test_t2 values(1,(1,'2020-10-31'));
+SQL SUCCESS
+--查询
+select * from test_t2;
++----+---------------------------+
+| id | d                         |
++----+---------------------------+
+| 1  | (1,"2020-10-31 00:00:00") |
++----+---------------------------+
+--删除表
+drop table if exists test_t2 cascade;
+SQL SUCCESS
+--删除类型
+drop type if exists test3_type cascade;
+SQL SUCCESS

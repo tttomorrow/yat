@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字Iterate(非保留)，作为数据库名
+--关键字不带引号-成功
+drop database if exists Iterate;
+SQL SUCCESS
+create database Iterate;
+SQL SUCCESS
+drop database Iterate;
+SQL SUCCESS
+--关键字带双引号-成功
+drop database if exists "Iterate";
+SQL SUCCESS
+create database "Iterate";
+SQL SUCCESS
+drop database "Iterate";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop database if exists 'Iterate';
+?.*ERROR: syntax error at or near "'Iterate'".*
+?.*Position: .*
+create database 'Iterate';
+?.*ERROR: syntax error at or near "'Iterate'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop database if exists `Iterate`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create database `Iterate`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

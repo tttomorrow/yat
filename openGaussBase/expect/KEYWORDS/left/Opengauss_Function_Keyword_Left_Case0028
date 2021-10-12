@@ -1,0 +1,67 @@
+-- @testpoint: opengauss关键字left(保留)，作为同义词对象名,部分测试点合理报错
+--前置条件
+drop table if exists left_test;
+SQL SUCCESS
+create table left_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-失败
+drop synonym if exists left;
+?.*ERROR: syntax error at or near "left".*
+?.*Position.*
+create synonym left for left_test;
+?.*ERROR: syntax error at or near "left".*
+?.*Position.*
+--关键字带双引号-成功
+drop synonym if exists "left";
+SQL SUCCESS
+create synonym "left" for left_test;
+SQL SUCCESS
+insert into "left" values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update "left" set "left".name='cici' where "left".id=2;
+SQL SUCCESS
+select * from "left";
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--清理环境
+drop synonym "left";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'left';
+?.*ERROR: syntax error at or near "'left'".*
+?.*Position.*
+create synonym 'left' for left_test;
+?.*ERROR: syntax error at or near "'left'".*
+?.*Position.*
+insert into 'left' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'left'".*
+?.*Position.*
+update 'left' set 'left'.name='cici' where 'left'.id=2;
+?.*ERROR: syntax error at or near "'left'".*
+?.*Position.*
+select * from 'left';
+?.*ERROR: syntax error at or near "'left'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop synonym if exists `left`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create synonym `left` for left_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+insert into `left` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+update `left` set `left`.name='cici' where `left`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+select * from `left`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+--清理环境
+drop table if exists left_test cascade;
+SQL SUCCESS

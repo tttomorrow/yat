@@ -1,0 +1,20 @@
+-- @testpoint: 创建列类型为特殊字符类型“char”的表,插入非字符类型时合理报错
+drop table if exists table_2;
+SQL SUCCESS
+create table table_2(a "char");
+SQL SUCCESS
+insert into table_2 values('qwweerth');
+SQL SUCCESS
+insert into table_2 values(122);
+?.*ERROR: column "a" is of type "char" but expression is of type integer
+  Hint: You will need to rewrite or cast the expression.
+?.*Position: .*
+  Where: referenced column: a
+select * from table_2;
++---+
+| a |
++---+
+| q |
++---+
+drop table if exists table_2;
+SQL SUCCESS

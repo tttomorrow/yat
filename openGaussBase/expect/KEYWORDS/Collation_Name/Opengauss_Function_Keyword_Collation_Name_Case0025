@@ -1,0 +1,25 @@
+--  @testpoint:opengauss关键字collation_name(非保留)，作为角色名
+--关键字不带引号-成功
+drop role if exists collation_name;
+SQL SUCCESS
+create role collation_name with password 'gauss@123' valid until '2020-12-31';
+SQL SUCCESS
+--关键字带双引号-成功
+drop role if exists "collation_name";
+SQL SUCCESS
+create role "collation_name" with password 'gauss@123' valid until '2020-12-31';
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop role if exists 'collation_name';
+?.*ERROR: syntax error at or near "'collation_name'"
+?.*
+create role 'collation_name' with password 'gauss@123' valid until '2020-12-31';
+?.*ERROR: syntax error at or near "'collation_name'"
+?.*
+--关键字带反引号-合理报错
+drop role if exists `collation_name`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create role `collation_name` with password 'gauss@123' valid until '2020-12-31';
+?.*ERROR: syntax error at or near "`"
+?.*

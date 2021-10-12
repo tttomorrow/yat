@@ -1,0 +1,13 @@
+-- @testpoint: max函数入参为空值
+select max('') from sys_dummy;
++-----+
+| max |
++-----+
+|     |
++-----+
+select max(null) from sys_dummy;
++-----+
+| max |
++-----+
+|     |
++-----+

@@ -1,0 +1,49 @@
+-- @testpoint: 关键字yes，用作字符串
+drop table if exists yes_test cascade;
+SQL SUCCESS
+create table yes_test(id int,name varchar(20));
+SQL SUCCESS
+create or replace procedure yes_insert
+as
+begin
+ for i in 1..20 loop
+    insert into yes_test values(i,'yes'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call yes_insert();
++------------+
+| yes_insert |
++------------+
+|            |
++------------+
+select * from yes_test;
++----+-------+
+| id | name  |
++----+-------+
+| 1  | yes1  |
+| 2  | yes2  |
+| 3  | yes3  |
+| 4  | yes4  |
+| 5  | yes5  |
+| 6  | yes6  |
+| 7  | yes7  |
+| 8  | yes8  |
+| 9  | yes9  |
+| 10 | yes10 |
+| 11 | yes11 |
+| 12 | yes12 |
+| 13 | yes13 |
+| 14 | yes14 |
+| 15 | yes15 |
+| 16 | yes16 |
+| 17 | yes17 |
+| 18 | yes18 |
+| 19 | yes19 |
+| 20 | yes20 |
++----+-------+
+drop table if exists yes_test cascade;
+SQL SUCCESS
+drop procedure yes_insert;
+SQL SUCCESS

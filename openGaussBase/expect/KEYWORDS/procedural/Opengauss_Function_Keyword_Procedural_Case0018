@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字procedural(非保留)，作为数据库名
+--关键字不带引号-成功
+drop database if exists procedural;
+SQL SUCCESS
+create database procedural;
+SQL SUCCESS
+drop database procedural;
+SQL SUCCESS
+--关键字带双引号-成功
+drop database if exists "procedural";
+SQL SUCCESS
+create database "procedural";
+SQL SUCCESS
+drop database "procedural";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop database if exists 'procedural';
+?.*ERROR: syntax error at or near "'procedural'".*
+?.*Position: .*
+create database 'procedural';
+?.*ERROR: syntax error at or near "'procedural'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop database if exists `procedural`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create database `procedural`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

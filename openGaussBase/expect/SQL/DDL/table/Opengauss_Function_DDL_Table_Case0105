@@ -1,0 +1,15 @@
+-- @testpoint: 创建带DEFERRABLE INITIALLY IMMEDIATE约束的表，插入重复值合理报错
+DROP TABLE IF EXISTS tab_18;
+SQL SUCCESS
+CREATE TABLE IF not EXISTS tab_18
+(id                      NUMBER(7)PRIMARY KEY DEFERRABLE INITIALLY IMMEDIATE,
+name              VARCHAR2(20)
+);
+SQL SUCCESS
+insert into tab_18 values(1,'小龙');
+SQL SUCCESS
+insert into tab_18 values(1,'小牛');
+?.*ERROR: duplicate key value violates unique constraint "tab_18_pkey".*
+  Detail: Key (id)=(1) already exists.
+DROP TABLE IF EXISTS tab_18 CASCADE;
+SQL SUCCESS

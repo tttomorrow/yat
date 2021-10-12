@@ -1,0 +1,8 @@
+-- @testpoint: hll_hash_any(anytype, int32),当入参2为其他类型时,合理报错
+?.*ERROR: function hll_hash_any\(integer, bigint\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: hll_hash_any
+select hll_hash_any ('101'::bit, -1);
+?.*ERROR: negative seed values not compatible.*
+  Where: referenced column: hll_hash_any

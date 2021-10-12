@@ -1,0 +1,24 @@
+-- @testpoint: path类型，使用[(x1,y1),...,(xn,yn)]方式插入正数坐标值
+drop table if exists test_path02;
+SQL SUCCESS
+create table test_path02 (name path);
+SQL SUCCESS
+insert into test_path02 values (path'[(-1,-1),(-2,-2),(-3,-3)]');
+SQL SUCCESS
+insert into test_path02 values (path'[(-1.2,-1.3),(-2.2,-2.3),(-3.301,-3.226)]');
+SQL SUCCESS
+insert into test_path02 values (path'[(-1,-1),(-2,-2),(-3,-3),(-4,-4)]');
+SQL SUCCESS
+insert into test_path02 values (path'[(-1.02,-1.32),(-2.52,-2.002),(-3.23,-3.33),(-4.12,-4.023)]');
+SQL SUCCESS
+select * from test_path02;
++-------------------------------------------------------------+
+| name                                                        |
++-------------------------------------------------------------+
+| [(-1.0,-1.0),(-2.0,-2.0),(-3.0,-3.0)]                       |
+| [(-1.2,-1.3),(-2.2,-2.3),(-3.301,-3.226)]                   |
+| [(-1.0,-1.0),(-2.0,-2.0),(-3.0,-3.0),(-4.0,-4.0)]           |
+| [(-1.02,-1.32),(-2.52,-2.002),(-3.23,-3.33),(-4.12,-4.023)] |
++-------------------------------------------------------------+
+drop table test_path02;
+SQL SUCCESS

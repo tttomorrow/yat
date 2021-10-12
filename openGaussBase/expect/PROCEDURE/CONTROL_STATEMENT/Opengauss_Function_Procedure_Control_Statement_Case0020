@@ -1,0 +1,104 @@
+-- @testpoint: 存储过程使用序列
+drop table if exists t_cust;
+SQL SUCCESS
+drop sequence if exists seq_t001;
+SQL SUCCESS
+drop sequence if exists seq_t002;
+SQL SUCCESS
+drop sequence if exists seq_t003;
+SQL SUCCESS
+drop table if exists test_seq_table_01;
+SQL SUCCESS
+drop table if exists test_seq_table_02;
+SQL SUCCESS
+drop table if exists test_seq_table_03;
+SQL SUCCESS
+create table t_cust(
+  cust_id int,
+  name varchar2(200),
+  user_id int
+);
+SQL SUCCESS
+insert into t_cust values(1,'rt',1);
+SQL SUCCESS
+insert into t_cust values(1,'rt',2);
+SQL SUCCESS
+insert into t_cust values(1,'rt',3);
+SQL SUCCESS
+insert into t_cust values(2,'hw',1);
+SQL SUCCESS
+insert into t_cust values(3,'zr',2);
+SQL SUCCESS
+insert into t_cust values(4,'zr',2);
+SQL SUCCESS
+insert into t_cust values(5,'zr',2);
+SQL SUCCESS
+insert into t_cust values(10,'zr',2);
+SQL SUCCESS
+create sequence seq_t001 increment by 1 start with 10001;
+SQL SUCCESS
+create sequence seq_t002 increment by 2 start with 20001;
+SQL SUCCESS
+create sequence seq_t003 increment by 5 start with 30001;
+SQL SUCCESS
+create or replace procedure p002(v_id int) is
+begin
+  execute immediate 'create table test_seq_table_01 as select seq_t001.nextval as b,seq_t002.nextval as b1,seq_t003.nextval as b2 from sys_dummy';
+  execute immediate 'create table test_seq_table_02 as select seq_t001.nextval as id,seq_t002.nextval as b1,seq_t003.nextval as b2,
+  cust_id,name,user_id from t_cust where cust_id<=5';
+  execute immediate 'create table test_seq_table_03 as select seq_t001.nextval as id,seq_t002.nextval as b1,seq_t003.nextval as b2,seq_t001.nextval as id1,
+  cust_id,name,user_id from t_cust where cust_id<= '||v_id;
+end;
+/
+SQL SUCCESS
+call p002(4);
++------+
+| p002 |
++------+
+|      |
++------+
+select * from test_seq_table_01 order by b;
++-------+-------+-------+
+| b     | b1    | b2    |
++-------+-------+-------+
+| 10001 | 20001 | 30001 |
++-------+-------+-------+
+select * from test_seq_table_02 order by id;
++-------+-------+-------+---------+------+---------+
+| id    | b1    | b2    | cust_id | name | user_id |
++-------+-------+-------+---------+------+---------+
+| 10002 | 20003 | 30006 | 1       | rt   | 1       |
+| 10003 | 20005 | 30011 | 1       | rt   | 2       |
+| 10004 | 20007 | 30016 | 1       | rt   | 3       |
+| 10005 | 20009 | 30021 | 2       | hw   | 1       |
+| 10006 | 20011 | 30026 | 3       | zr   | 2       |
+| 10007 | 20013 | 30031 | 4       | zr   | 2       |
+| 10008 | 20015 | 30036 | 5       | zr   | 2       |
++-------+-------+-------+---------+------+---------+
+select * from test_seq_table_03 order by id;
++-------+-------+-------+-------+---------+------+---------+
+| id    | b1    | b2    | id1   | cust_id | name | user_id |
++-------+-------+-------+-------+---------+------+---------+
+| 10009 | 20017 | 30041 | 10010 | 1       | rt   | 1       |
+| 10011 | 20019 | 30046 | 10012 | 1       | rt   | 2       |
+| 10013 | 20021 | 30051 | 10014 | 1       | rt   | 3       |
+| 10015 | 20023 | 30056 | 10016 | 2       | hw   | 1       |
+| 10017 | 20025 | 30061 | 10018 | 3       | zr   | 2       |
+| 10019 | 20027 | 30066 | 10020 | 4       | zr   | 2       |
++-------+-------+-------+-------+---------+------+---------+
+drop table if exists t_cust;
+SQL SUCCESS
+drop table test_seq_table_01;
+SQL SUCCESS
+drop table test_seq_table_02;
+SQL SUCCESS
+drop table test_seq_table_03;
+SQL SUCCESS
+drop sequence if exists seq_t001;
+SQL SUCCESS
+drop sequence if exists seq_t002;
+SQL SUCCESS
+drop sequence if exists seq_t003;
+SQL SUCCESS
+drop procedure p002;
+SQL SUCCESS

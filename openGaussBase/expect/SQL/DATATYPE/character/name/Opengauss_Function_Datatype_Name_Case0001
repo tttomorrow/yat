@@ -1,0 +1,16 @@
+-- @testpoint: 创建行存表，插入正常值
+-- @modified at: 2020-11-13
+drop table if exists name_01;
+SQL SUCCESS
+CREATE  TABLE name_01 (id name) WITH (orientation=row);
+SQL SUCCESS
+insert into name_01 values ('test');
+SQL SUCCESS
+select * from name_01;
++------+
+| id   |
++------+
+| test |
++------+
+drop table name_01;
+SQL SUCCESS

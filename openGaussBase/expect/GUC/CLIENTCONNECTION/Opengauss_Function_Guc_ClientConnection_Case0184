@@ -1,0 +1,13 @@
+-- @testpoint: ALTER SYSTEM SET方法设置update_lockwait_timeout参数，合理报错
+--查看默认
+show update_lockwait_timeout;
++-------------------------+
+| update_lockwait_timeout |
++-------------------------+
+| 2min                    |
++-------------------------+
+--设置，报错
+ALTER SYSTEM SET update_lockwait_timeout to 600000;
+?.*ERROR: unsupport parameter: update_lockwait_timeout
+ALTER SYSTEM SET only support POSTMASTER-level, SIGHUP-level and BACKEND-level guc variable,
+and it must be allowed to set in postgresql.conf.

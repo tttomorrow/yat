@@ -1,0 +1,41 @@
+-- @testpoint: 使用truncate+同义词:合理报错
+--建表
+drop table if exists SYN_TAB_076 cascade;
+SQL SUCCESS
+create table SYN_TAB_076(a int,b clob);
+SQL SUCCESS
+insert into SYN_TAB_076 values(1,'a');
+SQL SUCCESS
+--建表的同义词
+drop synonym if exists SYN_TAB_SYN_076_001 cascade;
+SQL SUCCESS
+create or replace synonym SYN_TAB_SYN_076_001 for SYN_TAB_076;
+SQL SUCCESS
+select * from SYN_TAB_SYN_076_001;
++---+---+
+| a | b |
++---+---+
+| 1 | a |
++---+---+
+--清理同义词，报错
+TRUNCATE SYN_TAB_SYN_076_001;
+?.*ERROR: relation "syn_tab_syn_076_001" does not exist
+select * from SYN_TAB_SYN_076_001;
++---+---+
+| a | b |
++---+---+
+| 1 | a |
++---+---+
+select * from SYN_TAB_SYN_076_001;
++---+---+
+| a | b |
++---+---+
+| 1 | a |
++---+---+
+--清理环境
+drop table if exists SYN_TAB_076_001 cascade;
+SQL SUCCESS
+drop table if exists SYN_TAB_076 cascade;
+SQL SUCCESS
+drop synonym if exists SYN_TAB_SYN_076_001 cascade;
+SQL SUCCESS

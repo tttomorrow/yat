@@ -1,0 +1,17 @@
+-- @testpoint: usage赋权（对象权限），验证功能正常
+drop schema if exists usage_schema;
+SQL SUCCESS
+create schema usage_schema;
+SQL SUCCESS
+drop user if exists usage_test;
+SQL SUCCESS
+create user usage_test password 'gauss@123';
+SQL SUCCESS
+grant usage on schema usage_schema to usage_test;
+SQL SUCCESS
+revoke usage on schema usage_schema from usage_test;
+SQL SUCCESS
+drop schema if exists usage_schema;
+SQL SUCCESS
+drop user if exists usage_test;
+SQL SUCCESS

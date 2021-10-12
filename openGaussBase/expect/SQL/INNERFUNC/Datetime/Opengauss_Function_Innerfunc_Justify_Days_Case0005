@@ -1,0 +1,21 @@
+--  @testpoint: justify_days 
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (clo1 reltime);
+SQL SUCCESS
+insert into test_date01 values ('31.25');
+SQL SUCCESS
+select justify_days(clo1) from test_date01;
++------------------------------------------------+
+| justify_days                                   |
++------------------------------------------------+
+| 0 years 1 mons 1 days 6 hours 0 mins 0.00 secs |
++------------------------------------------------+
+SELECT justify_days(reltime  '31.25');
++------------------------------------------------+
+| justify_days                                   |
++------------------------------------------------+
+| 0 years 1 mons 1 days 6 hours 0 mins 0.00 secs |
++------------------------------------------------+
+drop table if exists test_date01;
+SQL SUCCESS

@@ -1,0 +1,40 @@
+-- @testpoint: BINARY类型的测试———测试RAW类型
+drop table if exists FVT_PROC_BINARY_TABLE_006;
+SQL SUCCESS
+create table FVT_PROC_BINARY_TABLE_006(T1 INT,T2 RAW(100));
+SQL SUCCESS
+INSERT INTO FVT_PROC_BINARY_TABLE_006 VALUES(1,'FF098');
+SQL SUCCESS
+--创建自定义函数
+create or replace function FVT_PROC_BINARY_006() return RAW
+is
+V1 RAW(100);
+begin
+    select T2 into V1 from FVT_PROC_BINARY_TABLE_006 where T1=1;
+    return V1;
+    EXCEPTION
+    WHEN NO_DATA_FOUND THEN  raise info 'NO_DATA_FOUND';
+end;
+/
+SQL SUCCESS
+--调用自定义函数
+select FVT_PROC_BINARY_006();
++---------------------+
+| fvt_proc_binary_006 |
++---------------------+
+| 0FF098              |
++---------------------+
+update FVT_PROC_BINARY_TABLE_006 set T2='FFFFDDD' where T1=1;
+SQL SUCCESS
+--调用自定义函数
+select FVT_PROC_BINARY_006();
++---------------------+
+| fvt_proc_binary_006 |
++---------------------+
+| 0FFFFDDD            |
++---------------------+
+--恢复环境
+drop table if exists FVT_PROC_BINARY_TABLE_006;
+SQL SUCCESS
+drop function if exists FVT_PROC_BINARY_006;
+SQL SUCCESS

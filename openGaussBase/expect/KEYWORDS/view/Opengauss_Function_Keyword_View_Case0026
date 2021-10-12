@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字view(非保留)，作为模式名
+--关键字不带引号-成功
+drop schema if exists view;
+SQL SUCCESS
+create schema view;
+SQL SUCCESS
+drop schema view;
+SQL SUCCESS
+--关键字带双引号-成功
+drop schema if exists "view";
+SQL SUCCESS
+create schema "view";
+SQL SUCCESS
+drop schema "view";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop schema if exists 'view';
+?.*ERROR: syntax error at or near "'view'".*
+?.*Position: .*
+create schema 'view';
+?.*ERROR: syntax error at or near "'view'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop schema if exists `view`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create schema `view`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

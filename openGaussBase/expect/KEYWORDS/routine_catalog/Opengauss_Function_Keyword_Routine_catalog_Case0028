@@ -1,0 +1,65 @@
+-- @testpoint: opengauss关键字routine_catalog(非保留)，作为同义词对象名，部分测试点合理报错
+--前置条件
+drop table if exists explain_test;
+SQL SUCCESS
+create table explain_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists routine_catalog;
+SQL SUCCESS
+create synonym routine_catalog for explain_test;
+SQL SUCCESS
+insert into routine_catalog values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update routine_catalog set routine_catalog.name='cici' where routine_catalog.id=2;
+SQL SUCCESS
+select * from routine_catalog;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+drop synonym if exists routine_catalog;
+SQL SUCCESS
+--关键字带双引号-成功
+drop synonym if exists "routine_catalog";
+SQL SUCCESS
+create synonym "routine_catalog" for explain_test;
+SQL SUCCESS
+drop synonym if exists "routine_catalog";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'routine_catalog';
+?.*ERROR: syntax error at or near "'routine_catalog'".*
+?.*Position: .*
+create synonym 'routine_catalog' for explain_test;
+?.*ERROR: syntax error at or near "'routine_catalog'".*
+?.*Position: .*
+insert into 'routine_catalog' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'routine_catalog'".*
+?.*Position: .*
+update 'routine_catalog' set 'routine_catalog'.name='cici' where 'routine_catalog'.id=2;
+?.*ERROR: syntax error at or near "'routine_catalog'".*
+?.*Position: .*
+select * from 'routine_catalog';
+?.*ERROR: syntax error at or near "'routine_catalog'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop synonym if exists `routine_catalog`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create synonym `routine_catalog` for explain_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+insert into `routine_catalog` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+update `routine_catalog` set `routine_catalog`.name='cici' where `routine_catalog`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+select * from `routine_catalog`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+drop table if exists explain_test;
+SQL SUCCESS

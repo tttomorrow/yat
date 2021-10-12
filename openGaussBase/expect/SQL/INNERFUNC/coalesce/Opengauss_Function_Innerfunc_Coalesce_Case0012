@@ -1,0 +1,17 @@
+-- @testpoint:having的使用
+drop table if exists t_coalesce;
+SQL SUCCESS
+create table t_coalesce(id int,numb int);
+SQL SUCCESS
+insert into t_coalesce values(1,111);
+SQL SUCCESS
+insert into t_coalesce values(3,222);
+SQL SUCCESS
+select sum(numb) from t_coalesce having coalesce(1,null,2)=1;
++-----+
+| sum |
++-----+
+| 333 |
++-----+
+drop table if exists t_coalesce;
+SQL SUCCESS

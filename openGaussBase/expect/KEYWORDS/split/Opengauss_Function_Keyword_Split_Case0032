@@ -1,0 +1,19 @@
+--  @testpoint:openGauss保留关键字split作为用户名
+--不带引号，成功
+CREATE USER split PASSWORD 'Bigdata@123';
+SQL SUCCESS
+--openGauss保留关键字split作为 用户名，加双引号，创建成功
+drop user if exists "split";
+SQL SUCCESS
+CREATE USER "split" PASSWORD 'Bigdata@123';
+SQL SUCCESS
+drop user "split";
+SQL SUCCESS
+--openGauss保留关键字split作为 用户名，加单引号，合理报错
+CREATE USER 'split' PASSWORD 'Bigdata@123';
+?.*ERROR: syntax error at or near "'split'"
+?.*Position: .*
+--openGauss保留关键字split作为 用户名，加反引号，合理报错
+CREATE USER `split` PASSWORD 'Bigdata@123';
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*

@@ -1,0 +1,15 @@
+-- @testpoint: 最小值1测试
+drop table if exists test_char_003;
+SQL SUCCESS
+create table test_char_003 (name char(1));
+SQL SUCCESS
+insert into test_char_003 values ('a');
+SQL SUCCESS
+select bit_length(name) from test_char_003;
++------------+
+| bit_length |
++------------+
+| 8          |
++------------+
+DROP TABLE IF EXISTS test_char_003;
+SQL SUCCESS

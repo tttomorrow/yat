@@ -1,0 +1,43 @@
+--  @testpoint:opengauss关键字true(保留)，作为逻辑操作符，验证功能正常
+select true and false as result;
++--------+
+| result |
++--------+
+| false  |
++--------+
+select false and true as result;
++--------+
+| result |
++--------+
+| false  |
++--------+
+select true or false as result;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select false or true as result;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select true and null as result;
++--------+
+| result |
++--------+
+|        |
++--------+
+select true or null as result;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select not true as result;
++--------+
+| result |
++--------+
+| false  |
++--------+

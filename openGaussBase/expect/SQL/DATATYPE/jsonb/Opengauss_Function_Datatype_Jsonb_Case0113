@@ -1,0 +1,43 @@
+-- @testpoint: 普通表使用数据类型为json的列创建主外键，不支持，合理报错
+--创建普通列存表创建主键
+drop table if exists tab1131;
+SQL SUCCESS
+create table tab1131(id int,name varchar,message json primary key);
+?.*ERROR: data type json has no default operator class for access method "btree.*
+  Hint: You must specify an operator class for the index or define a default operator class for the data type.
+drop table if exists tab1132;
+SQL SUCCESS
+create table tab1132(id int,name varchar,message json, primary key(message));
+?.*ERROR: data type json has no default operator class for access method "btree.*
+  Hint: You must specify an operator class for the index or define a default operator class for the data type.
+--创建普通列存表创建外键
+drop table if exists tab1133;
+SQL SUCCESS
+drop table if exists tab1134;
+SQL SUCCESS
+create table tab1133(a int primary key, b json,c integer);
+SQL SUCCESS
+create table tab1134(a int, b json,c integer,  foreign key(a) references  tab1133(a));
+SQL SUCCESS
+drop table if exists tab1135;
+SQL SUCCESS
+drop table if exists tab1136;
+SQL SUCCESS
+create table tab1135(a json primary key, b int,c integer);
+?.*ERROR: data type json has no default operator class for access method "btree.*
+  Hint: You must specify an operator class for the index or define a default operator class for the data type.
+create table tab1136(a json,b int,c integer,foreign key(a) references  tab1136(a));
+?.*ERROR: there is no unique constraint matching given keys for referenced table "tab1136.*
+--清理数据
+drop table if exists tab1131 cascade;
+SQL SUCCESS
+drop table if exists tab1132 cascade;
+SQL SUCCESS
+drop table if exists tab1133 cascade;
+SQL SUCCESS
+drop table if exists tab1134 cascade;
+SQL SUCCESS
+drop table if exists tab1135 cascade;
+SQL SUCCESS
+drop table if exists tab1136 cascade;
+SQL SUCCESS

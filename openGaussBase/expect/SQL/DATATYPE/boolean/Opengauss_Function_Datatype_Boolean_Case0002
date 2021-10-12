@@ -1,0 +1,28 @@
+-- @testpoint: 插入无效值,合理报错
+-- @modify at: 2020-11-05
+DROP TABLE IF EXISTS type_boolean02;
+SQL SUCCESS
+CREATE TABLE type_boolean02 (datev boolean);
+SQL SUCCESS
+insert into type_boolean02 values ('efwqwe');
+?.*ERROR: invalid input syntax for type boolean: "efwqwe"
+?.*
+  Where: referenced column: datev
+insert into type_boolean02 values ('哈');
+?.*ERROR: invalid input syntax for type boolean: "哈"
+?.*
+  Where: referenced column: datev
+insert into type_boolean02 values ('123.456');
+?.*ERROR: invalid input syntax for type boolean: "123.456"
+?.*
+  Where: referenced column: datev
+insert into type_boolean02 values ();
+?.*ERROR: syntax error at or near "\)"
+?.*
+select * from type_boolean02;
++-------+
+| datev |
++-------+
++-------+
+drop table type_boolean02;
+SQL SUCCESS

@@ -1,0 +1,18 @@
+-- @testpoint: 插入含时区time类型正常值
+DROP TABLE IF EXISTS test_time10;
+SQL SUCCESS
+CREATE TABLE test_time10 (name time);
+SQL SUCCESS
+INSERT INTO test_time10 VALUES (time '04:05:06 PST');
+SQL SUCCESS
+INSERT INTO test_time10 VALUES (time '15:05:55 PST');
+SQL SUCCESS
+select * from test_time10;
++----------+
+| name     |
++----------+
+| 04:05:06 |
+| 15:05:55 |
++----------+
+DROP TABLE IF EXISTS test_time10;
+SQL SUCCESS

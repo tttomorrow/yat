@@ -1,0 +1,2 @@
+--  @testpoint:使用char_length，查询字符串中的字符个数
+SELECT char_length('hello123');

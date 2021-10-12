@@ -1,0 +1,11 @@
+-- @testpoint: * 范围函数的交集，当范围函数类型不同时，合理报错
+select int4range(1,3) * int8range(25,35) as result;
+?.*ERROR: operator does not exist: int4range \* int8rang.*
+  Hint: No operator matches the given name and argument type(s). You might need to add explicit type casts.
+?.*
+  Where: referenced column: result
+select tsrange('[2021-01-01,2021-03-01)') * '[3,4]'::int4range  as result;
+?.*ERROR: operator does not exist: tsrange \* int4rang.*
+  Hint: No operator matches the given name and argument type(s). You might need to add explicit type casts.
+?.*
+  Where: referenced column: result

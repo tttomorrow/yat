@@ -1,0 +1,7 @@
+-- @testpoint: 创建表user_01
+drop table if  exists user_01;
+SQL SUCCESS
+create table user_01 (name varchar(13),school varchar(13));
+SQL SUCCESS
+drop table if  exists user_01;
+SQL SUCCESS

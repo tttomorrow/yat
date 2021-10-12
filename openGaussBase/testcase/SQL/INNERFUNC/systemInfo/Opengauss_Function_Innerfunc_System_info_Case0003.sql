@@ -1,0 +1,3 @@
+-- @testpoint: 函数getdatabaseencoding(),获取数据库编码格式
+
+select getdatabaseencoding();

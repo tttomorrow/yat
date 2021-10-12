@@ -1,0 +1,18 @@
+-- @testpoint: 定义表的别名为all
+drop table if exists t_student;
+SQL SUCCESS
+create table t_student (stu_name char(20),stu_age int,sex char(10),score int,address char(10));
+SQL SUCCESS
+drop table if exists "all";
+SQL SUCCESS
+alter table  t_student rename to "all";
+SQL SUCCESS
+select * from "all";
++----------+---------+-----+-------+---------+
+| stu_name | stu_age | sex | score | address |
++----------+---------+-----+-------+---------+
++----------+---------+-----+-------+---------+
+drop table if exists t_student;
+SQL SUCCESS
+drop table if exists "all";
+SQL SUCCESS

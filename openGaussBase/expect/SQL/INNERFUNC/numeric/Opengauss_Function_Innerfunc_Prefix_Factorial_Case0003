@@ -1,0 +1,26 @@
+-- @testpoint: 数字操作符!!(前缀阶乘),负数的阶乘,合理报错
+drop table if exists data_01;
+SQL SUCCESS
+create table data_01 (clo1 float,clo2 float);
+SQL SUCCESS
+insert into data_01 values (-8.1, -2.0);
+SQL SUCCESS
+select  !!clo1 from data_01;
++----------+
+| ?column? |
++----------+
+| 1        |
++----------+
+select  !!clo2 from data_01;
++----------+
+| ?column? |
++----------+
+| 1        |
++----------+
+SELECT !!-5.5 AS RESULT;
+?.*ERROR: operator does not exist: !!- numeric
+  Hint: No operator matches the given name and argument type(s). You might need to add explicit type casts.
+?.*Position: .*
+  Where: referenced column: result
+drop table if exists data_01;
+SQL SUCCESS

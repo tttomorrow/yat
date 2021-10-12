@@ -1,0 +1,25 @@
+-- @testpoint: opengauss关键字octet_length(非保留)，统计字符串中的字节数
+SELECT octet_length('jose');
++--------------+
+| octet_length |
++--------------+
+| 4            |
++--------------+
+SELECT octet_length('你好');
++--------------+
+| octet_length |
++--------------+
+| 6            |
++--------------+
+SELECT octet_length('你好@123');
++--------------+
+| octet_length |
++--------------+
+| 10           |
++--------------+
+SELECT octet_length('');
++--------------+
+| octet_length |
++--------------+
+|              |
++--------------+

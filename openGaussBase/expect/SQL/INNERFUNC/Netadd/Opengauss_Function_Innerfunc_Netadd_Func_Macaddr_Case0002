@@ -1,0 +1,50 @@
+-- @testpoint: 网络地址函数trunc(macaddr)异常校验，合理报错
+-- .-:穿插使用
+SELECT trunc(macaddr '08:00:2b-01:02-03') AS RESULT;
+?.*ERROR: invalid input syntax for type macaddr: "08:00:2b-01:02-03"
+?.*
+  Where: referenced column: result
+SELECT trunc(macaddr '08-00.2b-01-02-03') AS RESULT;
+?.*ERROR: invalid input syntax for type macaddr: "08-00.2b-01-02-03"
+?.*
+  Where: referenced column: result
+--给f以外的字母
+SELECT trunc(macaddr '08002y:010203') AS RESULT;
+?.*ERROR: invalid input syntax for type macaddr: "08002y:010203"
+?.*
+  Where: referenced column: result
+-- 特殊字符等
+SELECT trunc(macaddr '0800$2b01$0203') AS RESULT;
+?.*ERROR: invalid input syntax for type macaddr: \"0800\$2b01\$0203\"
+?.*
+  Where: referenced column: result
+-- :或-之间超过2字节
+SELECT trunc(macaddr '080:02b0:10203') AS RESULT;
+?.*ERROR: invalid input syntax for type macaddr: "080:02b0:10203"
+?.*
+  Where: referenced column: result
+-- 超过48bits
+SELECT trunc(macaddr '08-10-10-2b-01-02-03') AS RESULT;
+?.*ERROR: invalid input syntax for type macaddr: "08-10-10-2b-01-02-03"
+?.*
+  Where: referenced column: result
+-- 空值
+SELECT trunc(macaddr '') AS RESULT;
++--------+
+| result |
++--------+
+|        |
++--------+
+SELECT trunc() AS RESULT;
+?.*ERROR: function trunc\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: result
+SELECT trunc(mac '08:00:2b:01:02:03') AS RESULT;
+?.*ERROR: type "mac" does not exist
+?.*
+  Where: referenced column: result
+SELECT trunc(macaddr '08:00:2b-01:02-03','08:00:2b-01:02-03') AS RESULT;
+?.*ERROR: invalid input syntax for type macaddr: "08:00:2b-01:02-03"
+?.*
+  Where: referenced column: result

@@ -1,0 +1,30 @@
+-- @testpoint: interval分区,创建时声明like子句,源表是普通表,新表是分区表,指定选项INCLUDING COMMENTS
+drop table if exists common_table_001;
+drop table if exists partition_table_001;
+
+-- 创建普通表作为分区表like的源表
+create table common_table_001(
+col_1 smallint primary key check (col_1 > 0),
+col_2 char(30) default 'hey boy',
+col_3 int unique,
+col_4 date,
+col_5 boolean,
+col_6 nchar(30),
+col_7 float);
+comment on column common_table_001.col_6 is 'this is a comment to be verified.';
+
+-- like指定INCLUDING COMMENTS
+create table partition_table_001(
+like common_table_001 including comments)
+partition by range (col_4)
+interval ('1 year')
+(
+	partition partition_p1 values less than ('2018-01-01'),
+	partition partition_p2 values less than ('2019-01-01'),
+	partition partition_p3 values less than ('2020-01-01')
+);
+-- 验证注释被继承
+select description from pg_description where objoid=(select oid from pg_class where relname='partition_table_001');
+
+drop table if exists common_table_001;
+drop table if exists partition_table_001;

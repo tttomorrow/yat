@@ -1,0 +1,21 @@
+-- @testpoint: 插入负浮点数
+drop table if exists float4_02;
+SQL SUCCESS
+create table float4_02 (name float4);
+SQL SUCCESS
+insert into float4_02 values (-1212.5);
+SQL SUCCESS
+insert into float4_02 values (-99999.99999);
+SQL SUCCESS
+insert into float4_02 values (-0.00001);
+SQL SUCCESS
+select * from float4_02;
++-----------+
+| name      |
++-----------+
+| -1212.5   |
+| -100000.0 |
+| -1.0E-5   |
++-----------+
+drop table float4_02;
+SQL SUCCESS

@@ -1,0 +1,17 @@
+-- @testpoint: alter table修改表的属主
+drop table if exists alter_table_tb010;
+SQL SUCCESS
+create table alter_table_tb010(col1 int, col2 int,col3 int,col4 int);
+SQL SUCCESS
+drop user if exists alt_tb_02 cascade;
+SQL SUCCESS
+create user alt_tb_02 identified by 'gauss_234';
+SQL SUCCESS
+grant ALL PRIVILEGES to alt_tb_02;
+SQL SUCCESS
+ALTER TABLE public.alter_table_tb010 owner to alt_tb_02;
+SQL SUCCESS
+drop user if exists alt_tb_02 cascade;
+SQL SUCCESS
+drop table if exists alter_table_tb010;
+SQL SUCCESS

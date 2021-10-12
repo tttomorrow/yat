@@ -1,0 +1,54 @@
+-- @testpoint: pg_relation_size(text)函数的异常校验，合理报错
+create schema tpcds;
+SQL SUCCESS
+CREATE TABLE tpcds.ship_mode_t1
+(
+    SM_SHIP_MODE_SK           INTEGER               NOT NULL,
+    SM_SHIP_MODE_ID           CHAR(16)              NOT NULL,
+    SM_TYPE                   CHAR(30)
+);
+SQL SUCCESS
+CREATE UNIQUE INDEX ds_ship_mode_t1_index1 ON tpcds.ship_mode_t1(SM_SHIP_MODE_SK);
+SQL SUCCESS
+select pg_relation_size('ship_mode_t1');
+?.*ERROR: relation "ship_mode_t1" does not exist
+?.*
+  Where: referenced column: pg_relation_size
+select pg_relation_size('ds_ship_mode_t1_index1');
+?.*ERROR: relation "ds_ship_mode_t1_index1" does not exist
+?.*
+  Where: referenced column: pg_relation_size
+select pg_relation_size('tpcdsds_ship_mode_t1_index1');
+?.*ERROR: relation "tpcdsds_ship_mode_t1_index1" does not exist
+?.*
+  Where: referenced column: pg_relation_size
+select pg_relation_size('tpcds-ds_ship_mode_t1_index1');
+?.*ERROR: relation "tpcds-ds_ship_mode_t1_index1" does not exist
+?.*
+  Where: referenced column: pg_relation_size
+select pg_relation_size('nofile');
+?.*ERROR: relation "nofile" does not exist
+?.*
+  Where: referenced column: pg_relation_size
+select pg_relation_size('');
++------------------+
+| pg_relation_size |
++------------------+
+|                  |
++------------------+
+select pg_relation_size();
+?.*ERROR: function pg_relation_size\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_relation_size
+select pg_relation_size('tpcds.ship_mode_t1','tpcds.ds_ship_mode_t1_index1','tpcds.ship_mode_t1');
+?.*ERROR: function pg_relation_size\(unknown, unknown, unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_relation_size
+DROP INDEX tpcds.ds_ship_mode_t1_index1;
+SQL SUCCESS
+DROP TABLE tpcds.ship_mode_t1;
+SQL SUCCESS
+DROP schema tpcds;
+SQL SUCCESS

@@ -1,0 +1,20 @@
+-- @testpoint: ALTER SYSTEM SET方法设置max_locks_per_transaction参数为无效值，合理报错
+--查看默认
+show max_locks_per_transaction;
++---------------------------+
+| max_locks_per_transaction |
++---------------------------+
+| 256                       |
++---------------------------+
+--设置，报错
+ALTER SYSTEM SET max_locks_per_transaction to 9;
+  Hint: Value exceeds integer range.
+ALTER SYSTEM SET max_locks_per_transaction to 'test';
+?.*ERROR: invalid value for parameter "max_locks_per_transaction": "test"
+ALTER SYSTEM SET max_locks_per_transaction to 182.589;
+?.*ERROR: invalid value for parameter "max_locks_per_transaction": "182.589"
+ALTER SYSTEM SET max_locks_per_transaction to '10&%$#';
+?.*ERROR: invalid value for parameter "max_locks_per_transaction": "10\&\%\$\#"
+ALTER SYSTEM SET max_locks_per_transaction to '';
+?.*ERROR: invalid value for parameter "max_locks_per_transaction": ""
+--no need to clean

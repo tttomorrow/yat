@@ -1,0 +1,9 @@
+-- @testpoint: 插入超出左边界范围值，合理报错
+drop table if exists int02;
+SQL SUCCESS
+create table int02 (name int);
+SQL SUCCESS
+?.*ERROR: integer out of range
+  Where: referenced column: name
+drop table int02;
+SQL SUCCESS

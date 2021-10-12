@@ -1,0 +1,4 @@
+--  @testpoint:opengauss关键字nvl(非保留)，如果value1为NULL则返回value2，如果value1非NULL，则返回value1
+SELECT nvl(null,1);
+SELECT nvl ('Hello World' ,1);
+SELECT nvl (null ,null);

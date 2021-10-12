@@ -1,0 +1,11 @@
+-- @testpoint: 插入非法空值，合理报错
+drop table if exists real_08;
+SQL SUCCESS
+create table real_08 (id int,name real);
+SQL SUCCESS
+insert into real_08 values (1,' ');
+?.*ERROR: invalid input syntax for type real: " "
+?.*
+  Where: referenced column: name
+drop table real_08;
+SQL SUCCESS

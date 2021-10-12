@@ -1,0 +1,63 @@
+-- @testpoint: 表与聚合函数,入参类型不符合，合理报错
+drop table if exists tab136;
+SQL SUCCESS
+create table tab136 (id int,name char(20),class char(10),course char(20),score jsonb);
+SQL SUCCESS
+insert into tab136 values(4,'小明',1,'数学','[87.5]');
+SQL SUCCESS
+insert into tab136 values(2,'小红',2,'数学','[62]');
+SQL SUCCESS
+insert into tab136 values(1,'小蓝',1,'数学','[77.5]');
+SQL SUCCESS
+insert into tab136 values(2,'小黑',1,'数学','[97.5]');
+SQL SUCCESS
+insert into tab136 values(3,'小黄',2,'数学','[88]');
+SQL SUCCESS
+insert into tab136 values(5,'小紫',1,'数学','[57]');
+SQL SUCCESS
+insert into tab136 values(7,'小白',1,'数学','[100]');
+SQL SUCCESS
+--sum(expression)
+select sum(score)fromtab136whereclass=2andcourse='数学';
+?.*ERROR: syntax error at or near "=.*
+?.*
+--max(expression)
+select max(score)fromtab136whereclass=2andcourse='数学';
+?.*ERROR: syntax error at or near "=.*
+?.*
+--min(expression)
+select min(score)fromtab136whereclass=2andcourse='数学';
+?.*ERROR: syntax error at or near "=.*
+?.*
+--avg(expression)
+select avg(score)fromtab136whereclass=1andcourse='数学';
+?.*ERROR: syntax error at or near "=.*
+?.*
+--string_agg(expression, delimiter)
+select string_agg(score,';') from tab136;
+?.*ERROR: function string_agg\(jsonb, unknown\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: string_agg
+--count（）
+select count(*) from tab136;
++-------+
+| count |
++-------+
+| 7     |
++-------+
+--array_agg(expression)
+select array_agg(score) from tab136 ;
++---------------------------------------------+
+| array_agg                                   |
++---------------------------------------------+
+| {[87.5],[62],[77.5],[97.5],[88],[57],[100]} |
++---------------------------------------------+
+--bit_length(string)
+select char_length(score) from tab136 ;
+?.*ERROR: function char_length\(jsonb\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: char_length
+drop table if exists tab136;
+SQL SUCCESS

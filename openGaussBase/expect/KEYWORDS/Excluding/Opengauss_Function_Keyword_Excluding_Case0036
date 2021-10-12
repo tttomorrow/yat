@@ -1,0 +1,36 @@
+-- @testpoint: 创建表指定like选项，使用excluding关键字
+drop table if exists test_1;
+SQL SUCCESS
+create table test_1 (id int not null,name char(20)not null);
+SQL SUCCESS
+drop table if exists test_2;
+SQL SUCCESS
+create table test_2(like test_1 excluding CONSTRAINTS);
+SQL SUCCESS
+select * from test_2;
++----+------+
+| id | name |
++----+------+
++----+------+
+SELECT col_description(a.attrelid,a.attnum) as comment,format_type(a.atttypid,a.atttypmod) as type,a.attname as name, a.attnotnull as notnull
+FROM pg_class as c,pg_attribute as a
+where c.relname = 'test_2' and a.attrelid = c.oid and a.attnum>0;
++---------+---------------+------+---------+
+| comment | type          | name | notnull |
++---------+---------------+------+---------+
+|         | integer       | id   | true    |
+|         | character(20) | name | true    |
++---------+---------------+------+---------+
+insert into test_2 values (1,'abc'),(2,'bcd');
+SQL SUCCESS
+select * from test_2;
++----+----------------------+
+| id | name                 |
++----+----------------------+
+| 1  | abc                  |
+| 2  | bcd                  |
++----+----------------------+
+drop table if exists test_1;
+SQL SUCCESS
+drop table if exists test_2;
+SQL SUCCESS

@@ -1,0 +1,7 @@
+-- @testpoint: 创建角色并设置登录密码
+drop ROLE if exists manager;
+SQL SUCCESS
+CREATE ROLE manager IDENTIFIED BY 'Bigdata@123';
+SQL SUCCESS
+drop ROLE if exists manager;
+SQL SUCCESS

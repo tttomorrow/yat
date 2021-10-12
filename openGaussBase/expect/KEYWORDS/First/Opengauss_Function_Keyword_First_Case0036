@@ -1,0 +1,23 @@
+-- @testpoint: first用于抓取游标中的第一行数据
+drop TABLE if EXISTS test_1;
+SQL SUCCESS
+CREATE TABLE test_1(ID INT,NAME CHAR(20));
+SQL SUCCESS
+INSERT INTO test_1 VALUES(1,'Lily'),(2,'Tom'),(3,'Maria');
+SQL SUCCESS
+START TRANSACTION;
+SQL SUCCESS
+CURSOR cursor1 FOR SELECT * FROM test_1 ORDER by name;
+SQL SUCCESS
+FETCH FIRST from CURSOR1;
++----+----------------------+
+| id | name                 |
++----+----------------------+
+| 1  | Lily                 |
++----+----------------------+
+CLOSE cursor1;
+SQL SUCCESS
+end;
+SQL SUCCESS
+drop TABLE test_1;
+SQL SUCCESS

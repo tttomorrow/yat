@@ -1,0 +1,44 @@
+-- @testpoint: 创建索引使用不同索引名称,合理报错
+-- 1.创建表
+drop table if exists test;
+SQL SUCCESS
+create table test(i int, c char(5));
+SQL SUCCESS
+-- 2.创建索引，索引名以字母开头
+create unique index unique_123idx on test(i,c);
+SQL SUCCESS
+--3.创建索引，索引名以下划线开头
+create unique index _123$idx on test(i,c);
+SQL SUCCESS
+--4.创建索引，索引名为数字
+create index 123 on test(i);
+?.*ERROR: syntax error at or near "123"
+?.*
+--5.创建索引，索引名为数字开头
+create index 1_idx on test(i);
+?.*ERROR: syntax error at or near "1"
+?.*
+--6.创建索引，索引名包含特殊符号
+create index a%idx on test(i);
+?.*ERROR: syntax error at or near "%"
+?.*
+--7.创建schema
+drop schema if exists new_schema cascade;
+SQL SUCCESS
+create schema new_schema create table sc_tb(i int);
+SQL SUCCESS
+drop schema if exists test_schema cascade;
+SQL SUCCESS
+create schema test_schema;
+SQL SUCCESS
+create index test_schema.schema_idx on new_schema.sc_tb(i);
+?.*ERROR: index and table must be in the same schema
+--tearDown
+drop table if exists new_schema.sc_tb cascade;
+SQL SUCCESS
+drop table if exists test cascade;
+SQL SUCCESS
+drop schema if exists new_schema cascade;
+SQL SUCCESS
+drop schema if exists test_schema cascade;
+SQL SUCCESS

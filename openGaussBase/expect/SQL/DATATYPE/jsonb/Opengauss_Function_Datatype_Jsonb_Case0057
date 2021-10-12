@@ -1,0 +1,90 @@
+-- @testpoint: 通用函数：json_extract_path_text_op（在指定的路径获取JSON对象为text,等效于#>>操作符，当入参不合理时，合理报错）
+--json_extract_path_text_op函数，入参合理
+select json_extract_path_text_op('{"f2":{"f3":1},"f4":{"f5":99,"f6":"stringy"}}','{"f4","f6"}');
++---------------------------+
+| json_extract_path_text_op |
++---------------------------+
+| stringy                   |
++---------------------------+
+select json_extract_path_text_op ('{"f1":[1,2,3],"f2":{"f3":1},"f4":null}','{"f2","f3"}');
++---------------------------+
+| json_extract_path_text_op |
++---------------------------+
+| 1                         |
++---------------------------+
+select json_extract_path_text_op ('{"a":1, "b":"test", "a":2,"b":true}','{"a","4"}');
++---------------------------+
+| json_extract_path_text_op |
++---------------------------+
+|                           |
++---------------------------+
+select json_extract_path_text_op ('{"a": {"b":{"a":{"b":{"a":{"b":88}}}}}}','{"a","b"}');
++----------------------------+
+| json_extract_path_text_op  |
++----------------------------+
+| {"a":{"b":{"a":{"b":88}}}} |
++----------------------------+
+select json_extract_path_text_op ('[{"a":"foo"},{"b":"bar"},{"c":"baz"}]','{"a","4"}');
++---------------------------+
+| json_extract_path_text_op |
++---------------------------+
+|                           |
++---------------------------+
+select json_extract_path_text_op ('[{"a":"foo"},{"b":"bar"},{"c":"baz"}]','{"2"}');
++---------------------------+
+| json_extract_path_text_op |
++---------------------------+
+| {"c":"baz"}               |
++---------------------------+
+select json_extract_path_text_op('true','{"2"}');
++---------------------------+
+| json_extract_path_text_op |
++---------------------------+
+|                           |
++---------------------------+
+select json_extract_path_text_op('138158','{"138"}');
++---------------------------+
+| json_extract_path_text_op |
++---------------------------+
+|                           |
++---------------------------+
+select json_extract_path_text_op('null','{"n"}');
++---------------------------+
+| json_extract_path_text_op |
++---------------------------+
+|                           |
++---------------------------+
+--json_extract_path_text_op函数，入参不合理
+select json_extract_path_text_op ('[{"a":"foo"},{"b":"bar"},{"c":"baz"}]','2,1');
+?.*ERROR: array value must start with "\{" or dimension informatio.*
+?.*
+  Where: referenced column: json_extract_path_text_op
+select json_extract_path_text_op ('"a","foo","b","bar","c":"baz"','{"b","c"}');
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Expected end of input, but found ",".
+?.*
+  Where: JSON data, line 1: "a",...
+referenced column: json_extract_path_text_op
+select json_extract_path_text_op('true,false','true');
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Expected end of input, but found ",".
+?.*
+  Where: JSON data, line 1: true,...
+referenced column: json_extract_path_text_op
+select json_extract_path_text_op('138,158,369','138');
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Expected end of input, but found ",".
+?.*
+  Where: JSON data, line 1: 138,...
+referenced column: json_extract_path_text_op
+select json_extract_path_text_op('null','n');
+?.*ERROR: array value must start with "\{" or dimension informatio.*
+?.*
+  Where: referenced column: json_extract_path_text_op
+--返回结果类型校验：text
+select pg_typeof(json_extract_path_text_op ('{"a": {"b":{"a":{"b":{"a":{"b":88}}}}}}','{"a","b"}'));
++-----------+
+| pg_typeof |
++-----------+
+| text      |
++-----------+

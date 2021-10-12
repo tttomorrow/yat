@@ -1,0 +1,32 @@
+--  @testpoint:opengauss关键字do(保留)，作为序列名
+--关键字不带引号-失败
+drop sequence if exists do;
+?.*ERROR: syntax error at or near "do"
+?.*Position: .*
+create sequence do start 100 cache 50;
+?.*ERROR: syntax error at or near "do"
+?.*Position: .*
+drop sequence do;
+?.*ERROR: syntax error at or near "do"
+?.*Position: .*
+--关键字带双引号-成功
+drop sequence if exists "do";
+SQL SUCCESS
+create sequence "do" start 100 cache 50;
+SQL SUCCESS
+drop sequence "do";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'do';
+?.*ERROR: syntax error at or near "'do'"
+?.*Position: .*
+create sequence 'do' start 100 cache 50;
+?.*ERROR: syntax error at or near "'do'"
+?.*Position: .*
+--关键字带反引号-合理报错
+drop sequence if exists `do`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+create sequence `do` start 100 cache 50;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*

@@ -1,0 +1,39 @@
+-- @testpoint: 关键字volatile,用作表名创建普通表
+drop table if exists volatile cascade;
+SQL SUCCESS
+create table volatile(id int,name varchar(20));
+SQL SUCCESS
+create or replace procedure volatile_insert
+as
+begin
+ for i in 1..10 loop
+    insert into volatile values(i,'vola+'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call volatile_insert();
++-----------------+
+| volatile_insert |
++-----------------+
+|                 |
++-----------------+
+select * from volatile;
++----+---------+
+| id | name    |
++----+---------+
+| 1  | vola+1  |
+| 2  | vola+2  |
+| 3  | vola+3  |
+| 4  | vola+4  |
+| 5  | vola+5  |
+| 6  | vola+6  |
+| 7  | vola+7  |
+| 8  | vola+8  |
+| 9  | vola+9  |
+| 10 | vola+10 |
++----+---------+
+drop table if exists volatile cascade;
+SQL SUCCESS
+drop procedure volatile_insert;
+SQL SUCCESS

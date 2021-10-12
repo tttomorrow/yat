@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字prepare(非保留)，作为外部数据源名
+--关键字不带引号-成功
+drop data source if exists prepare;
+SQL SUCCESS
+create data source prepare;
+SQL SUCCESS
+drop data source prepare;
+SQL SUCCESS
+--关键字带双引号-成功
+drop data source if exists "prepare";
+SQL SUCCESS
+create data source "prepare";
+SQL SUCCESS
+drop data source "prepare";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop data source if exists 'prepare';
+?.*ERROR: syntax error at or near "'prepare'".*
+?.*Position: .*
+create data source 'prepare';
+?.*ERROR: syntax error at or near "'prepare'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop data source if exists `prepare`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create data source `prepare`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

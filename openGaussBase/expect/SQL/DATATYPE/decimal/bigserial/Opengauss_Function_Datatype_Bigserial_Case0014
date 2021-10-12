@@ -1,0 +1,13 @@
+-- @testpoint: 插入空值,合理报错
+drop table if exists bigserial_14;
+SQL SUCCESS
+create table bigserial_14 (id int,name bigserial);
+SQL SUCCESS
+insert into bigserial_14 values (1,null);
+?.*ERROR: null value in column "name" violates not-null constraint
+  Detail: Failing row contains (1, null).
+insert into bigserial_14 values (2,'');
+?.*ERROR: null value in column "name" violates not-null constraint
+  Detail: Failing row contains (2, null).
+drop table bigserial_14;
+SQL SUCCESS

@@ -1,0 +1,44 @@
+/* 
+ * Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+ *
+ * openGauss is licensed under Mulan PSL v2.
+ * You can use this software according to the terms and conditions of the Mulan PSL v2.
+ * You may obtain a copy of Mulan PSL v2 at:
+ *
+ *           http://license.coscl.org.cn/MulanPSL2
+ *        
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ * See the Mulan PSL v2 for more details.
+ */
+
+package com.huawei.gauss.yat.sql.parser.statement
+
+class DescStatement : XStatement {
+    enum class DescType { OBJECT, QUERY }
+
+    constructor(type: DescType, query: String) {
+        this.type = type
+        this.query = query
+    }
+
+    constructor(type: DescType, table: String, schema: String) {
+        this.type = type
+        this.table = table
+        this.schema = schema
+    }
+
+    val type: DescType
+    lateinit var query: String
+    var schema: String = ""
+    lateinit var table: String
+
+    override fun toString(): String {
+        return if (type == DescType.OBJECT) {
+            "Desc { type: $type, schema: \"$schema\", table: \"$table\" }"
+        } else {
+            "Desc { type: $type, query: \"$query\" }"
+        }
+    }
+}

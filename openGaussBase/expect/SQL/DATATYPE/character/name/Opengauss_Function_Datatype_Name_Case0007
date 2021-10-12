@@ -1,0 +1,30 @@
+-- @testpoint: 插入其他类型
+drop table if exists name_07;
+SQL SUCCESS
+CREATE TABLE name_07 (id name);
+SQL SUCCESS
+insert into name_07 values ('test');
+SQL SUCCESS
+insert into name_07 values (10000);
+SQL SUCCESS
+insert into name_07 values (100.999);
+SQL SUCCESS
+insert into name_07 values (date'2020-02-02');
+SQL SUCCESS
+insert into name_07 values (TRUE);
+SQL SUCCESS
+insert into name_07 values (HEXTORAW('DEADBEEF'));
+SQL SUCCESS
+select * from name_07;
++---------------------+
+| id                  |
++---------------------+
+| test                |
+| 10000               |
+| 100.999             |
+| 2020-02-02 00:00:00 |
+| t                   |
+| DEADBEEF            |
++---------------------+
+drop table name_07;
+SQL SUCCESS

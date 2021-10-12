@@ -1,0 +1,43 @@
+-- @testpoint: 创建的同义词存在相同的视图名或者表名
+--创建表
+drop table if exists test_SYN_060 cascade;
+SQL SUCCESS
+drop table if exists test_SYN_060_2 cascade;
+SQL SUCCESS
+create table test_SYN_060(a int);
+SQL SUCCESS
+create table test_SYN_060_2(b int);
+SQL SUCCESS
+--创建视图
+create or replace VIEW  v_SYN_060 as select * from test_SYN_060;
+SQL SUCCESS
+--创建与表名相同的同义词
+drop synonym if exists test_SYN_060;
+SQL SUCCESS
+create synonym test_SYN_060 for test_SYN_060_2;
+SQL SUCCESS
+--创建与视图名相同的同义词
+drop synonym if exists v_SYN_060;
+SQL SUCCESS
+create synonym v_SYN_060 for test_SYN_060_2;
+SQL SUCCESS
+--查询
+SELECT * from test_SYN_060;
++---+
+| a |
++---+
++---+
+SELECT * from v_SYN_060;
++---+
+| a |
++---+
++---+
+--数据清理
+drop table test_SYN_060 cascade;
+SQL SUCCESS
+drop table test_SYN_060_2 cascade;
+SQL SUCCESS
+drop synonym if exists test_SYN_060;
+SQL SUCCESS
+drop synonym if exists v_SYN_060;
+SQL SUCCESS

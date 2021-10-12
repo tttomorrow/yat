@@ -1,0 +1,21 @@
+-- @testpoint: 测试含in out参数的存储过程返回值
+--创建存储过程
+create or replace procedure proc_return_value_004(p1 in out integer)  as
+begin
+    raise info 'p1 old:%',p1;
+    p1:=p1+1;
+    raise info 'p1 new:%',p1;
+end;
+/
+SQL SUCCESS
+--调用存储过程
+declare
+    v1 integer:=1023;
+begin
+    proc_return_value_004(v1);
+end;
+/
+SQL SUCCESS
+--清理环境
+drop procedure proc_return_value_004;
+SQL SUCCESS

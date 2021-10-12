@@ -1,0 +1,38 @@
+-- @testpoint: 关键字unlisten，用作字段名
+drop table if exists unlisten_test cascade;
+SQL SUCCESS
+create table if not exists unlisten_test(id int,unlisten bigint);
+SQL SUCCESS
+create or replace procedure unlisten_insert
+as
+begin
+ for i in 1..10 loop
+    insert into unlisten_test values(i,i^i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call unlisten_insert();
++-----------------+
+| unlisten_insert |
++-----------------+
+|                 |
++-----------------+
+select * from unlisten_test;
++----+-------------+
+| id | unlisten    |
++----+-------------+
+| 1  | 1           |
+| 2  | 4           |
+| 3  | 27          |
+| 4  | 256         |
+| 5  | 3125        |
+| 6  | 46656       |
+| 7  | 823543      |
+| 8  | 16777216    |
++----+-------------+
+--清理环境
+drop table if exists unlisten_test cascade;
+SQL SUCCESS
+drop procedure unlisten_insert;
+SQL SUCCESS

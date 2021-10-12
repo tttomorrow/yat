@@ -1,0 +1,37 @@
+--  @testpoint: --WITH语句验证视图以及视图字段大小写
+with
+VIEW_3 AS (SELECT A FROM view_3)
+select * from VIEW_3;
++----+
+| a  |
++----+
+| 22 |
+| 0  |
++----+
+with
+ad as (select * from VIEW_3)
+select * from ad;
++----+----+
+| a  | f  |
++----+----+
+| 22 | 33 |
+| 0  | 1  |
++----+----+
+with
+AD as (select * from view_3)
+select * from ad;
++----+----+
+| a  | f  |
++----+----+
+| 22 | 33 |
+| 0  | 1  |
++----+----+
+with
+SYS_VIEWS AS (SELECT F FROM view_3)
+SELECT * FROM SYS_VIEWS;
++----+
+| f  |
++----+
+| 33 |
+| 1  |
++----+

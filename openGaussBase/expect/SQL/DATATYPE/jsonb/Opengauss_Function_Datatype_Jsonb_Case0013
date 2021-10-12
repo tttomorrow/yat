@@ -1,0 +1,57 @@
+-- @testpoint: jsonb格式校验：Array-jsonb（不符合格式合理报错）
+--符合规范(使用反斜杠转义后，数据库显示包含反斜杠)
+select '["qq",123,"null","true","false"]'::jsonb;
++--------------------------------------+
+| jsonb                                |
++--------------------------------------+
+| ["qq", 123, "null", "true", "false"] |
++--------------------------------------+
+select '["123","null"," "]'::jsonb;
++----------------------+
+| jsonb                |
++----------------------+
+| ["123", "null", " "] |
++----------------------+
+select '["123","-123","0.58","1.2345e+6"]'::jsonb;
++--------------------------------------+
+| jsonb                                |
++--------------------------------------+
+| ["123", "-123", "0.58", "1.2345e+6"] |
++--------------------------------------+
+select '[null,true,false]'::jsonb;
++---------------------+
+| jsonb               |
++---------------------+
+| [null, true, false] |
++---------------------+
+select '["abcdefg",123,{"db":"test"},null,"true",false]'::jsonb;
++-------------------------------------------------------+
+| jsonb                                                 |
++-------------------------------------------------------+
+| ["abcdefg", 123, {"db": "test"}, null, "true", false] |
++-------------------------------------------------------+
+select '["abcdefg",123,{"db":789},null,"true",false]'::jsonb;
++----------------------------------------------------+
+| jsonb                                              |
++----------------------------------------------------+
+| ["abcdefg", 123, {"db": 789}, null, "true", false] |
++----------------------------------------------------+
+--不符合规范
+select '["abcdefg",123,{"db":test}]'::jsonb;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "test" is invalid.
+?.*
+  Where: JSON data, line 1: ["abcdefg",123,{"db":test...
+referenced column: jsonb
+select '[\"www@13^\", 1, {\"name\": \"john\"}, \"2\"]'::jsonb;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "\" is invalid.
+?.*
+  Where: JSON data, line 1: [\...
+referenced column: jsonb
+select '"["www@13^", 1, {"name": "john"}, "2"]"'::jsonb;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "www" is invalid.
+?.*
+  Where: JSON data, line 1: "["www...
+referenced column: jsonb

@@ -1,0 +1,123 @@
+-- @testpoint: COALESCE 合理报错
+--COALESCE返回它的第一个非NULL的参数值。如果参数都为NULL，则返回NULL。
+--它常用于在显示数据时用缺省值替换NULL。和CASE表达式一样，COALESCE只计算用来判断结果的参数，即在第一个非空参数右边的参数不会被计算
+DROP TABLE if exists test_expression_11 cascade;
+SQL SUCCESS
+CREATE TABLE test_expression_11(description varchar(10), short_description varchar(10), last_value varchar(10)) ;
+SQL SUCCESS
+INSERT INTO test_expression_11 VALUES('abc', 'efg', '123');
+SQL SUCCESS
+INSERT INTO test_expression_11 VALUES(NULL, 'efg', '123');
+SQL SUCCESS
+INSERT INTO test_expression_11 VALUES(NULL, NULL, '123');
+SQL SUCCESS
+SELECT description, short_description, last_value, COALESCE(description, short_description, last_value) FROM test_expression_11 ORDER BY 1, 2, 3, 4;
++-------------+-------------------+------------+----------+
+| description | short_description | last_value | coalesce |
++-------------+-------------------+------------+----------+
+| abc         | efg               | 123        | abc      |
+|             | efg               | 123        | efg      |
+|             |                   | 123        | 123      |
++-------------+-------------------+------------+----------+
+--如果description不为NULL，则返回description的值，否则计算下一个参数short_description；
+--如果short_description不为NULL，则返回short_description的值，否则计算下一个参数last_value；
+--如果last_value不为NULL，则返回last_value的值，否则返回（none）。
+--无参
+SELECT COALESCE();
+?.*ERROR: syntax error at or near "\)"
+?.*
+--1参
+SELECT COALESCE(NULL);
++----------+
+| coalesce |
++----------+
+|          |
++----------+
+SELECT COALESCE('test');
++----------+
+| coalesce |
++----------+
+| test     |
++----------+
+SELECT COALESCE(1);
++----------+
+| coalesce |
++----------+
+| 1        |
++----------+
+SELECT COALESCE(1::int);
++----------+
+| coalesce |
++----------+
+| 1        |
++----------+
+SELECT COALESCE('test'::varchar);
++----------+
+| coalesce |
++----------+
+| test     |
++----------+
+SELECT COALESCE('test'::clob);
++----------+
+| coalesce |
++----------+
+| test     |
++----------+
+SELECT COALESCE('test'::text);
++----------+
+| coalesce |
++----------+
+| test     |
++----------+
+SELECT COALESCE('3 days'::reltime);
++----------+
+| coalesce |
++----------+
+| 3 days   |
++----------+
+SELECT COALESCE('false'::boolean);
++----------+
+| coalesce |
++----------+
+| false    |
++----------+
+SELECT COALESCE(inet '0.0.5.0/24'::cidr);
++------------+
+| coalesce   |
++------------+
+| 0.0.5.0/24 |
++------------+
+SELECT COALESCE(lseg '(1,2),(3,2)');
++-----------------------+
+| coalesce              |
++-----------------------+
+| [(1.0,2.0),(3.0,2.0)] |
++-----------------------+
+--多参含有null
+SELECT COALESCE(NULL,'Hello World','test','expression');
++-------------+
+| coalesce    |
++-------------+
+| Hello World |
++-------------+
+SELECT COALESCE('Hello World','test',NULL,'expression');
++-------------+
+| coalesce    |
++-------------+
+| Hello World |
++-------------+
+SELECT COALESCE('Hello World','test','expression',NULL);
++-------------+
+| coalesce    |
++-------------+
+| Hello World |
++-------------+
+SELECT COALESCE(NULL,NULL,NULL,'expression');
++------------+
+| coalesce   |
++------------+
+| expression |
++------------+
+--清理环境
+DROP TABLE if exists test_expression_11 cascade;
+SQL SUCCESS

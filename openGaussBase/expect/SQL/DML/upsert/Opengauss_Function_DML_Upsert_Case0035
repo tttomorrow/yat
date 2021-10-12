@@ -1,0 +1,30 @@
+--  @testpoint:使用insert...update语句插入一条数据，添加EXCLUDED关键字，主键列数据不存在，其他列数据不存在，新插入一条数据成功
+drop table if exists products32;
+SQL SUCCESS
+CREATE TABLE products32 (
+    product_no integer PRIMARY KEY,
+    name text,
+    price numeric
+);
+SQL SUCCESS
+--常规插入一条数据
+insert into  products32 values(10,'grains',5.5);
+SQL SUCCESS
+select * from  products32;
++------------+--------+-------+
+| product_no | name   | price |
++------------+--------+-------+
+| 10         | grains | 5.5   |
++------------+--------+-------+
+--添加EXCLUDED关键字,主键列不重复，update  name 列，新插入一条数据成功
+insert into  products32 values(11,'apple',6.2) on DUPLICATE key update name=EXCLUDED.name;
+SQL SUCCESS
+select * from  products32;
++------------+--------+-------+
+| product_no | name   | price |
++------------+--------+-------+
+| 10         | grains | 5.5   |
+| 11         | apple  | 6.2   |
++------------+--------+-------+
+drop table products32;
+SQL SUCCESS

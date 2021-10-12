@@ -1,0 +1,66 @@
+-- @testpoint: opengauss关键字transactions_committed(非保留)，作为同义词对象名,部分测试点合理报错
+--前置条件
+drop table if exists explain_test;
+SQL SUCCESS
+create table explain_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists transactions_committed;
+SQL SUCCESS
+create synonym transactions_committed for explain_test;
+SQL SUCCESS
+insert into transactions_committed values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update transactions_committed set transactions_committed.name='cici' where transactions_committed.id=2;
+SQL SUCCESS
+select * from transactions_committed;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+drop synonym if exists transactions_committed;
+SQL SUCCESS
+--关键字带双引号-成功
+drop synonym if exists "transactions_committed";
+SQL SUCCESS
+create synonym "transactions_committed" for explain_test;
+SQL SUCCESS
+drop synonym if exists "transactions_committed";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'transactions_committed';
+?.*ERROR: syntax error at or near "'transactions_committed'".*
+?.*Position: .*
+create synonym 'transactions_committed' for explain_test;
+?.*ERROR: syntax error at or near "'transactions_committed'".*
+?.*Position: .*
+insert into 'transactions_committed' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'transactions_committed'".*
+?.*Position: .*
+update 'transactions_committed' set 'transactions_committed'.name='cici' where 'transactions_committed'.id=2;
+?.*ERROR: syntax error at or near "'transactions_committed'".*
+?.*Position: .*
+select * from 'transactions_committed';
+?.*ERROR: syntax error at or near "'transactions_committed'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop synonym if exists `transactions_committed`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create synonym `transactions_committed` for explain_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+insert into `transactions_committed` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+update `transactions_committed` set `transactions_committed`.name='cici' where `transactions_committed`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+select * from `transactions_committed`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+--清理环境
+drop table if exists explain_test;
+SQL SUCCESS

@@ -1,0 +1,2 @@
+-- @testpoint: power函数,两参数都为算术表达式
+select power(2*8/4,7%3*2+1) as result from sys_dummy;

@@ -1,0 +1,15 @@
+--  @testpoint:cursor声明游标，使用value子句，子句类型为网络地址类型；
+start transaction;
+SQL SUCCESS
+cursor cursor25 for values(broadcast('192.168.1.5/24'),abbrev(inet '10.1.0.0/16'));
+SQL SUCCESS
+fetch from cursor25;
++------------------+-------------+
+| column1          | column2     |
++------------------+-------------+
+| 192.168.1.255/24 | 10.1.0.0/16 |
++------------------+-------------+
+close cursor25;
+SQL SUCCESS
+end;
+SQL SUCCESS

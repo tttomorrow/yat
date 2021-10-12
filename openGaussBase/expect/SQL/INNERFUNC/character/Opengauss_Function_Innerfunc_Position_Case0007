@@ -1,0 +1,15 @@
+-- @testpoint: 特殊符号
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (stringv char(20));
+SQL SUCCESS
+insert into type_char values ('##$');
+SQL SUCCESS
+SELECT position('$' in stringv) from type_char;
++----------+
+| position |
++----------+
+| 3        |
++----------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

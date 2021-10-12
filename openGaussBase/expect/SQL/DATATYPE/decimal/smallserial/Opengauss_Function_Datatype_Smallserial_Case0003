@@ -1,0 +1,24 @@
+-- @testpoint: 插入浮点数
+drop table if exists smallserial_03;
+SQL SUCCESS
+create table smallserial_03 (name smallserial);
+SQL SUCCESS
+insert into smallserial_03 values (12122.12);
+SQL SUCCESS
+insert into smallserial_03 values (0.000001);
+SQL SUCCESS
+insert into smallserial_03 values (-12122.23);
+SQL SUCCESS
+insert into smallserial_03 values (-0.000001);
+SQL SUCCESS
+select * from smallserial_03;
++--------+
+| name   |
++--------+
+| 12122  |
+| 0      |
+| -12122 |
+| 0      |
++--------+
+drop table smallserial_03;
+SQL SUCCESS

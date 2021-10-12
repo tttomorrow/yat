@@ -1,0 +1,49 @@
+-- @testpoint: 游标绑定的selectwhere后带like_子句
+drop table if exists emp;
+SQL SUCCESS
+create table emp(empno int,ename varchar(10),job varchar(10) ,sal integer);
+SQL SUCCESS
+insert into emp values(1,'zhangsan','doctor1',10000),(2,'zhangsan2','doctor2',10001),(3,'zhangsan3','doctor3',10002);
+SQL SUCCESS
+insert into emp values(1,'zhansi','doctor1',10003),(2,'lisiabc','doctor2',10004),(3,'zhangwu123','doctor3',10005);
+SQL SUCCESS
+create or replace procedure p_emp_010(str boolean)
+as
+declare
+    a emp%rowtype;
+    cursor mycursor is  select * from emp where emp.ename like  'zhang_' order by empno,ename,job,sal;
+begin
+open mycursor;
+    loop
+    if mycursor%isopen then
+        update emp set job='teacher' where empno=2;
+        fetch mycursor into a;
+    end if;
+    exit
+    when  mycursor%notfound;
+    update emp set job='students' where empno=2;
+    end loop;
+end;
+/
+SQL SUCCESS
+call p_emp_010(true);
++-----------+
+| p_emp_010 |
++-----------+
+|           |
++-----------+
+select * from emp;
++-------+------------+---------+-------+
+| empno | ename      | job     | sal   |
++-------+------------+---------+-------+
+| 1     | zhangsan   | doctor1 | 10000 |
+| 3     | zhangsan3  | doctor3 | 10002 |
+| 1     | zhansi     | doctor1 | 10003 |
+| 3     | zhangwu123 | doctor3 | 10005 |
+| 2     | zhangsan2  | teacher | 10001 |
+| 2     | lisiabc    | teacher | 10004 |
++-------+------------+---------+-------+
+drop procedure p_emp_010;
+SQL SUCCESS
+drop table emp;
+SQL SUCCESS

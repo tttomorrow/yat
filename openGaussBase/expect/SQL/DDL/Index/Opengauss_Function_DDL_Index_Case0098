@@ -1,0 +1,30 @@
+--  @testpoint: TABLESPACE：不存在的表空间
+DROP TABLE if EXISTS test_index_table_098 CASCADE;
+SQL SUCCESS
+create table test_index_table_098(
+c_float1 float
+) WITH (ORIENTATION = row);
+SQL SUCCESS
+--建索引
+drop index if exists index_098_01;
+SQL SUCCESS
+--不存在的表空间
+create index index_098_01 on test_index_table_098 using btree(c_float1)  TABLESPACE test_space_notexist where c_float1 >50;
+?.*ERROR: tablespace "test_space_notexist" does not exist
+--建表空间又删除
+drop tablespace if exists test_space_01;
+SQL SUCCESS
+CREATE TABLESPACE test_space_01 RELATIVE LOCATION 'tablespace/tablespace_1';
+SQL SUCCESS
+drop tablespace if exists test_space_01;
+SQL SUCCESS
+create index index_098_01 on test_index_table_098 using btree(c_float1)  TABLESPACE test_space_01 where c_float1 >50;
+?.*ERROR: tablespace "test_space_01" does not exist
+select relname from pg_class where relname like 'index_098_%' order by relname;
++---------+
+| relname |
++---------+
++---------+
+--清理环境
+DROP TABLE if EXISTS test_index_table_098 CASCADE;
+SQL SUCCESS

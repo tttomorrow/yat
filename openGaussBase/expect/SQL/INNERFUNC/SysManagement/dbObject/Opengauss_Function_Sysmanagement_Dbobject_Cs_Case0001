@@ -1,0 +1,207 @@
+-- @testpoint: pg_column_size(any)存储一个指定的数值需要的字节数（可能压缩过）
+-- 未压缩
+-- 整数
+-- TINYINT
+SELECT pg_column_size(0::TINYINT);
++----------------+
+| pg_column_size |
++----------------+
+| 1              |
++----------------+
+SELECT pg_column_size(8::TINYINT);
++----------------+
+| pg_column_size |
++----------------+
+| 1              |
++----------------+
+SELECT pg_column_size(255::TINYINT);
++----------------+
+| pg_column_size |
++----------------+
+| 1              |
++----------------+
+-- SMALLINT
+SELECT pg_column_size(-32767::SMALLINT);
++----------------+
+| pg_column_size |
++----------------+
+| 2              |
++----------------+
+SELECT pg_column_size(-8::SMALLINT);
++----------------+
+| pg_column_size |
++----------------+
+| 2              |
++----------------+
+SELECT pg_column_size(0::SMALLINT);
++----------------+
+| pg_column_size |
++----------------+
+| 2              |
++----------------+
+SELECT pg_column_size(9::SMALLINT);
++----------------+
+| pg_column_size |
++----------------+
+| 2              |
++----------------+
+SELECT pg_column_size(32767::SMALLINT);
++----------------+
+| pg_column_size |
++----------------+
+| 2              |
++----------------+
+-- INTEGER
++----------------+
+| pg_column_size |
++----------------+
+| 4              |
++----------------+
+SELECT pg_column_size(-88888::INTEGER);
++----------------+
+| pg_column_size |
++----------------+
+| 4              |
++----------------+
+SELECT pg_column_size(0::INTEGER);
++----------------+
+| pg_column_size |
++----------------+
+| 4              |
++----------------+
+SELECT pg_column_size(99999::INTEGER);
++----------------+
+| pg_column_size |
++----------------+
+| 4              |
++----------------+
++----------------+
+| pg_column_size |
++----------------+
+| 4              |
++----------------+
+-- BINARY_INTEGER
++----------------+
+| pg_column_size |
++----------------+
+| 4              |
++----------------+
+SELECT pg_column_size(-8::BINARY_INTEGER);
++----------------+
+| pg_column_size |
++----------------+
+| 4              |
++----------------+
+SELECT pg_column_size(0::BINARY_INTEGER);
++----------------+
+| pg_column_size |
++----------------+
+| 4              |
++----------------+
+SELECT pg_column_size(9::BINARY_INTEGER);
++----------------+
+| pg_column_size |
++----------------+
+| 4              |
++----------------+
++----------------+
+| pg_column_size |
++----------------+
+| 4              |
++----------------+
+-- BIGINT
++----------------+
+| pg_column_size |
++----------------+
+| 8              |
++----------------+
++----------------+
+| pg_column_size |
++----------------+
+| 8              |
++----------------+
+SELECT pg_column_size(0::BIGINT);
++----------------+
+| pg_column_size |
++----------------+
+| 8              |
++----------------+
++----------------+
+| pg_column_size |
++----------------+
+| 8              |
++----------------+
++----------------+
+| pg_column_size |
++----------------+
+| 8              |
++----------------+
+-- 任意精度
+-- DECIMAL[(p[,s])]
+SELECT pg_column_size(123456.122331::DECIMAL(10,4));
++----------------+
+| pg_column_size |
++----------------+
+| 12             |
++----------------+
+-- NUMBER[(p[,s])]
+SELECT pg_column_size(123456.12354::NUMERIC(10,4));
++----------------+
+| pg_column_size |
++----------------+
+| 12             |
++----------------+
+
+-- 浮点类型
+-- REAL
+SELECT pg_column_size(10.365456::REAL);
++----------------+
+| pg_column_size |
++----------------+
+| 4              |
++----------------+
+-- DOUBLE PRECISION
+SELECT pg_column_size(123456.1234::DOUBLE PRECISION);
++----------------+
+| pg_column_size |
++----------------+
+| 8              |
++----------------+
+-- BINARY_DOUBLE
+SELECT pg_column_size(321.321::BINARY_DOUBLE);
++----------------+
+| pg_column_size |
++----------------+
+| 8              |
++----------------+
+-- DEC[(p[,s])]
+SELECT pg_column_size(123.123654::DECIMAL(10,4));
++----------------+
+| pg_column_size |
++----------------+
+| 10             |
++----------------+
+-- INTEGER[(p[,s])]
+SELECT pg_column_size(123.123654::INTEGER(6,3));
++----------------+
+| pg_column_size |
++----------------+
+| 10             |
++----------------+
+-- 压缩过的数值：压缩存在列存表当中
+CREATE TABLE table1
+        (
+          num    integer,
+          date1  character(100)
+        ) WITH (ORIENTATION = COLUMN);
+SQL SUCCESS
+INSERT INTO table1 VALUES (9999, '20200910');
+SQL SUCCESS
+SELECT pg_column_size(num) from table1  limit 1;
++----------------+
+| pg_column_size |
++----------------+
+| 4              |
++----------------+
+DROP TABLE table1;
+SQL SUCCESS

@@ -1,0 +1,8 @@
+-- @testpoint: 数组操作符<@，判断一个数组是否被包含于另一个数组
+
+--当前面数组被包含于后面数组时返回true
+select array[2,7] <@ array[1,7,4,2,6] as result;
+select array[2,7] <@ array[7,2] as result;
+
+--当前面数组不被包含于后面数组时返回false
+select array[2,7,1,2] <@ array[7,2] as result;

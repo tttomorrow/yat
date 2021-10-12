@@ -1,0 +1,32 @@
+--  @testpoint: 创建触发器验证名称大小写
+--创建源表及触发表
+DROP TABLE IF EXISTS test_trigger_src_tbl CASCADE;
+SQL SUCCESS
+DROP TABLE IF EXISTS test_trigger_des_tbl CASCADE;
+SQL SUCCESS
+CREATE TABLE test_trigger_src_tbl(id1 INT, id2 INT, id3 INT);
+SQL SUCCESS
+CREATE TABLE test_trigger_des_tbl(id1 INT, id2 INT, id3 INT);
+SQL SUCCESS
+--创建触发器函数
+CREATE OR REPLACE FUNCTION tri_insert_func() RETURNS TRIGGER AS
+$$
+DECLARE
+BEGIN
+  INSERT INTO test_trigger_des_tbl VALUES(NEW.id1, NEW.id2, NEW.id3);
+    RETURN NEW;
+      END
+$$ LANGUAGE PLPGSQL;
+/
+SQL SUCCESS
+--创建INSERT触发器
+CREATE TRIGGER insert_trigger BEFORE INSERT ON test_trigger_src_tbl FOR EACH ROW EXECUTE PROCEDURE tri_insert_func();
+/
+SQL SUCCESS
+CREATE TRIGGER INSERT_TRIGGER BEFORE INSERT ON test_trigger_src_tbl FOR EACH ROW EXECUTE PROCEDURE tri_insert_func();
+/
+?.*ERROR: trigger "insert_trigger" for relation "test_trigger_src_tbl" already exists?.*
+DROP TABLE IF EXISTS test_trigger_src_tbl CASCADE;
+SQL SUCCESS
+DROP TABLE IF EXISTS test_trigger_des_tbl CASCADE;
+SQL SUCCESS

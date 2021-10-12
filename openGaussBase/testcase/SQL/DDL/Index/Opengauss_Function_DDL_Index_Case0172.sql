@@ -1,0 +1,25 @@
+--  @testpoint: 在同一列重复删除和创建同一索引1000+次
+
+--建普通表
+DROP TABLE if EXISTS test_index_table_172 CASCADE;
+create table test_index_table_172(
+c_int int
+) WITH (ORIENTATION = row) partition by range(c_int)(
+partition p1 values less than (100),
+partition p2 values less than (1000),
+partition p3 values less than (5000),
+partition p4 values less than (10001)
+);
+
+begin
+    for i in 0..1000 loop
+        drop index if exists index_172_01;
+        create index index_172_01 on test_index_table_172 using btree(c_int);
+    end loop;
+end;
+/
+select relname from pg_class where relname like 'index_172_%';
+explain select c_int from test_index_table_172 where c_int > 5000 group by c_int;
+
+--清理环境
+DROP TABLE if EXISTS test_index_table_172 CASCADE;

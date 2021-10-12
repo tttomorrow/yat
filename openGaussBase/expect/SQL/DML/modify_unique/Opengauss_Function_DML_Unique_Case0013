@@ -1,0 +1,16 @@
+-- @testpoint: 在创建unique约束之后，向表中插入相同的数据，合理报错
+drop table if exists t1;
+SQL SUCCESS
+create table t1(a int);
+SQL SUCCESS
+alter table t1 add constraint studentkey primary key(a);
+SQL SUCCESS
+alter table t1 add constraint unkey  unique (a);
+SQL SUCCESS
+insert into t1 values(1);
+SQL SUCCESS
+insert into t1 values(1);
+?.*ERROR: duplicate key value violates unique constraint "studentkey".*
+  Detail: Key (a)=(1) already exists.
+drop table if exists t1;
+SQL SUCCESS

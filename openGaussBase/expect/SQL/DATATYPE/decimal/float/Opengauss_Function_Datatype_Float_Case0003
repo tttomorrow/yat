@@ -1,0 +1,24 @@
+-- @testpoint: 不指定精度，插入整数
+drop table if exists float03;
+SQL SUCCESS
+create table float03 (name float);
+SQL SUCCESS
+insert into float03 values (12122);
+SQL SUCCESS
+insert into float03 values (-12122);
+SQL SUCCESS
+insert into float03 values (000009);
+SQL SUCCESS
+insert into float03 values (-98652171);
+SQL SUCCESS
+select * from float03;
++--------------+
+| name         |
++--------------+
+| 12122.0      |
+| -12122.0     |
+| 9.0          |
+| -9.8652171E7 |
++--------------+
+drop table float03;
+SQL SUCCESS

@@ -1,0 +1,15 @@
+
+
+-- @testpoint: 与HAVING、ORDER BY联用
+
+drop table if exists zsharding_tbl;
+SQL SUCCESS
+create table zsharding_tbl(C_REAL TINYINT);
+SQL SUCCESS
+select C_REAL,ASCII(ASCII('=')) from zsharding_tbl group by C_REAL,ASCII(ASCII('=')) having ASCII(ASCII('='))=54 order by C_REAL,ASCII(ASCII('='));
++--------+-------+
+| c_real | ascii |
++--------+-------+
++--------+-------+
+drop table if exists zsharding_tbl;
+SQL SUCCESS

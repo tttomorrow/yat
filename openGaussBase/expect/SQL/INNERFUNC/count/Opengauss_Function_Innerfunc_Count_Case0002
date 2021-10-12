@@ -1,0 +1,23 @@
+-- @testpoint: 给定参数超过固定参数个数，合理报错
+drop table if exists tbc;
+SQL SUCCESS
+create table tbc
+(
+id integer,
+name char(50),
+sex char(50)
+);
+SQL SUCCESS
+create index tbc_index on tbc(id);
+SQL SUCCESS
+insert into tbc values(1,'wang','male');
+SQL SUCCESS
+insert into tbc values(2,'zhang','female');
+SQL SUCCESS
+select sex,count(1,2) from tbc group by sex order by 1;
+?.*ERROR: function count\(integer, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: count
+drop table if exists tbc;
+SQL SUCCESS

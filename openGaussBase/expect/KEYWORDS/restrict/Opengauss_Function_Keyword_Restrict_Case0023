@@ -1,0 +1,30 @@
+-- @testpoint: opengauss关键字restrict非保留)，作为索引名，部分测试点合理报错
+--前置条件，创建一个表
+drop table if exists restrict_test;
+SQL SUCCESS
+create table restrict_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop index if exists restrict;
+SQL SUCCESS
+create index restrict on restrict_test(id);
+SQL SUCCESS
+drop index restrict;
+SQL SUCCESS
+--关键字带双引号-成功
+drop index if exists "restrict";
+SQL SUCCESS
+create index "restrict" on restrict_test(id);
+SQL SUCCESS
+drop index "restrict";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop index if exists 'restrict';
+?.*ERROR: syntax error at or near "'restrict'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop index if exists `restrict`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+drop table if exists restrict_test;
+SQL SUCCESS

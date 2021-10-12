@@ -1,0 +1,43 @@
+-- @testpoint: 修改表并重命名索引，合理报错
+drop table if exists table_alter_029;
+CREATE TABLE table_alter_029 (c1 VARCHAR(255),c2 int);
+insert into table_alter_029 values ('ddd',1);
+insert into table_alter_029 values ('',2);
+insert into table_alter_029 values (null,3);
+insert into table_alter_029 values ('',4);
+insert into table_alter_029 values (null,5);
+ALTER TABLE table_alter_029 add constraint con_table_alter_029_1 check(c1 != '');
+ALTER TABLE table_alter_029 add constraint con_table_alter_029_2 check(c2 != '');
+insert into table_alter_029 values ('',7);
+insert into table_alter_029 values ('','');
+ALTER TABLE table_alter_029 rename constraint con_table_alter_029_2 to con_table_alter_029_3;
+ALTER TABLE table_alter_029 add constraint con_table_alter_029_4 check(c1 !='');
+--defult '84'
+drop table if exists table_alter_029;
+CREATE TABLE table_alter_029 (c1 VARCHAR(255) default '4',c2 int default 4);
+insert into table_alter_029 values ('ddd',1);
+insert into table_alter_029 values ('',2);
+insert into table_alter_029 values (null,3);
+insert into table_alter_029 values ('',4);
+insert into table_alter_029 values (null,5);
+ALTER TABLE table_alter_029 add constraint con_table_alter_029_1 check(c1 !='');
+ALTER TABLE table_alter_029 add constraint con_table_alter_029_2 check(c2 !='');
+insert into table_alter_029 values ('84',7);
+insert into table_alter_029 values ('',4);
+ALTER TABLE table_alter_029 rename constraint con_table_alter_029_2 to con_table_alter_029_3;
+ALTER TABLE table_alter_029 add constraint con_table_alter_029_4 check(c1 !='');
+--参数
+drop table if exists table_alter_029;
+CREATE TABLE table_alter_029 (c1 VARCHAR(255) default '4',c2 int default 4);
+insert into table_alter_029 values ('ddd',1);
+insert into table_alter_029 values ('',2);
+insert into table_alter_029 values (null,3);
+insert into table_alter_029 values ('',4);
+insert into table_alter_029 values (null,5);
+ALTER TABLE table_alter_029 add constraint con_table_alter_029_1 check(c1 !='');
+ALTER TABLE table_alter_029 add constraint con_table_alter_029_2 check(c2 !='');
+insert into table_alter_029 values ('84',7);
+insert into table_alter_029 values ('',4);
+ALTER TABLE table_alter_029 rename constraint con_table_alter_029_2 to con_table_alter_029_3;
+ALTER TABLE table_alter_029 add constraint con_table_alter_029_4 check(c1 !='');
+drop table if exists table_alter_029;

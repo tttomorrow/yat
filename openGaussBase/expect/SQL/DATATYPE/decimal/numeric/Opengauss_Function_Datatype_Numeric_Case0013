@@ -1,0 +1,21 @@
+-- @testpoint: 插入0值
+drop table if exists numeric_13;
+SQL SUCCESS
+create table numeric_13 (name numeric);
+SQL SUCCESS
+insert into numeric_13 values (0);
+SQL SUCCESS
+insert into numeric_13 values (0);
+SQL SUCCESS
+insert into numeric_13 values (0);
+SQL SUCCESS
+select * from numeric_13;
++------+
+| name |
++------+
+| 0    |
+| 0    |
+| 0    |
++------+
+drop table numeric_13;
+SQL SUCCESS

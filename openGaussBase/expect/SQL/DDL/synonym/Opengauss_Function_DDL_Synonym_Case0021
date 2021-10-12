@@ -1,0 +1,66 @@
+-- @testpoint: 自定义函数同义词与if结合使用
+-- @modify at: 2020-11-25
+--自定义函数
+drop function if exists SYN_FUN_021;
+SQL SUCCESS
+create or replace function SYN_FUN_021(c bigint) return int
+as
+  b int := c;
+begin
+	for i in 1..3 loop
+		b := b + c;
+	end loop;
+	return b;
+end;
+/
+SQL SUCCESS
+--建自定义函数同义词
+drop synonym if exists SYN_FUN_SYN_021;
+SQL SUCCESS
+create or replace synonym SYN_FUN_SYN_021 for SYN_FUN_021;
+SQL SUCCESS
+--创建函数
+drop function if exists SYN_FUN_005 ;
+SQL SUCCESS
+create or replace function SYN_FUN_005(e int) return int
+as
+e int;
+d int :=0;
+begin
+	if SYN_FUN_SYN_021(e)<0 then
+		d := 1;
+	elseif SYN_FUN_SYN_021(e)=0 then
+		d := 2;
+	else
+		d := 3;
+	end if;
+	return d;
+end;
+/
+SQL SUCCESS
+--调用函数
+select SYN_FUN_005(-1);
++-------------+
+| syn_fun_005 |
++-------------+
+| 3           |
++-------------+
+select SYN_FUN_005(0);
++-------------+
+| syn_fun_005 |
++-------------+
+| 3           |
++-------------+
+select SYN_FUN_005(2);
++-------------+
+| syn_fun_005 |
++-------------+
+| 3           |
++-------------+
+--清理环境
+drop function if exists SYN_FUN_021;
+SQL SUCCESS
+drop function if exists SYN_FUN_005;
+SQL SUCCESS
+drop synonym if exists SYN_FUN_SYN_021;
+SQL SUCCESS

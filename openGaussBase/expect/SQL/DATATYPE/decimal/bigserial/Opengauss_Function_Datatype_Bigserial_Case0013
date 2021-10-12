@@ -1,0 +1,15 @@
+-- @testpoint: 插入0值
+drop table if exists bigserial_13;
+SQL SUCCESS
+create table bigserial_13 (name bigserial);
+SQL SUCCESS
+insert into bigserial_13 values (-1);
+SQL SUCCESS
+select * from bigserial_13;
++------+
+| name |
++------+
+| -1   |
++------+
+drop table bigserial_13;
+SQL SUCCESS

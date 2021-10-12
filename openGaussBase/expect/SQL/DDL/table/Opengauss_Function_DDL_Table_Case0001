@@ -1,0 +1,30 @@
+-- @testpoint: alter table 修改有空值的列为not null,合理报错
+drop table if exists table_alter_001;
+SQL SUCCESS
+create table table_alter_001
+(
+c1 int,
+c2 bigint,
+c3 varchar(20)
+);
+SQL SUCCESS
+insert into table_alter_001 values('11',null,'sss');
+SQL SUCCESS
+insert into table_alter_001 values('21','','sss');
+SQL SUCCESS
+insert into table_alter_001 values('31',66,'');
+SQL SUCCESS
+insert into table_alter_001 values('41',66,null);
+SQL SUCCESS
+alter table table_alter_001 modify c3 varchar(50);
+SQL SUCCESS
+alter table table_alter_001 modify c3 not null;
+?.*ERROR: column "c3" contains null values.*
+insert into table_alter_001 values('','','');
+SQL SUCCESS
+alter table table_alter_001 modify c2 varchar(60);
+SQL SUCCESS
+alter table table_alter_001 modify c1 varchar(60);
+SQL SUCCESS
+drop table if exists table_alter_001;
+SQL SUCCESS

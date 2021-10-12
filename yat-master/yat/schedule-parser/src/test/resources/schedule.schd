@@ -1,0 +1,56 @@
+# schedule file with pg_regress like format
+# when schedule.yat is exists this schedule file will not be loaded
+
+name: default
+macro: EXPORT_TYPE bin
+test: shell_001
+      shell_003
+      shell_004
+test: shell_002
+    
+# test case with properties
+test: data_type_test_gauss(valid=false)
+      data_type_test_oracle
+
+test: setup_l setup_r
+test: create
+test: user
+test: insert
+test: select multi_select
+test: error
+test: function procedure declare
+test: shell
+test: test_long_name_00000000000000001
+      test_long_name_000000000000000002
+      test_long_name_000000000000003
+      test_long_name_00000000000004
+      test_long_name_00000000000000000005
+test: zsql
+
+------
+
+name: txt
+macro: EXPORT_TYPE txt
+test: shell_001
+      shell_003
+      shell_004
+test: shell_002
+
+# test case with properties
+test: data_type_test_gauss(valid=false)
+      data_type_test_oracle
+
+test: setup_l setup_r
+test: create
+test: user
+test: insert
+test: select multi_select
+test: error
+test: function procedure declare
+test: shell
+test: test_long_name_00000000000000001
+      test_long_name_000000000000000002
+      test_long_name_000000000000003
+      test_long_name_00000000000004
+      test_long_name_00000000000000000005
+test: zsql

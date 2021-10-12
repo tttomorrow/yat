@@ -1,0 +1,66 @@
+-- @testpoint: opengauss关键字nocompress(非保留)，作为同义词对象名,部分测试点合理报错
+--前置条件
+drop table if exists explain_test;
+SQL SUCCESS
+create table explain_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists nocompress;
+SQL SUCCESS
+create synonym nocompress for explain_test;
+SQL SUCCESS
+insert into nocompress values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update nocompress set nocompress.name='cici' where nocompress.id=2;
+SQL SUCCESS
+select * from nocompress;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--关键字带双引号-成功
+drop synonym if exists "nocompress";
+SQL SUCCESS
+create synonym "nocompress" for explain_test;
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'nocompress';
+?.*ERROR: syntax error at or near "'nocompress'".*
+?.*Position: .*
+create synonym 'nocompress' for explain_test;
+?.*ERROR: syntax error at or near "'nocompress'".*
+?.*Position: .*
+insert into 'nocompress' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'nocompress'".*
+?.*Position: .*
+update 'nocompress' set 'nocompress'.name='cici' where 'nocompress'.id=2;
+?.*ERROR: syntax error at or near "'nocompress'".*
+?.*Position: .*
+select * from 'nocompress';
+?.*ERROR: syntax error at or near "'nocompress'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop synonym if exists `nocompress`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create synonym `nocompress` for explain_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+insert into `nocompress` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+update `nocompress` set `nocompress`.name='cici' where `nocompress`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+select * from `nocompress`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+--清理环境
+drop synonym if exists "nocompress";
+SQL SUCCESS
+drop synonym if exists nocompress;
+SQL SUCCESS
+drop table if exists explain_test;
+SQL SUCCESS

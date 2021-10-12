@@ -1,0 +1,15 @@
+-- @testpoint: 搜索文本包含所有string字符
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('& xxxxTRIaM');
+SQL SUCCESS
+SELECT ltrim(string1,'& xxxxTRIaM') from type_char;
++-------+
+| ltrim |
++-------+
+|       |
++-------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

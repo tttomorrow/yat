@@ -1,0 +1,27 @@
+-- @testpoint: 指定错误网络地址类型输入值，合理报错
+drop table if exists test_cidr_02;
+SQL SUCCESS
+create table test_cidr_02(type cidr);
+SQL SUCCESS
+insert into test_cidr_02 values('528.23.10.100/24');
+?.*ERROR: invalid input syntax for type cidr: "528.23.10.100/24"
+?.*
+  Where: referenced column: type
+insert into test_cidr_02 values('192.623.10.100/24');
+?.*ERROR: invalid input syntax for type cidr: "192.623.10.100/24"
+?.*
+  Where: referenced column: type
+insert into test_cidr_02 values('192.168.300.100/24');
+?.*ERROR: invalid input syntax for type cidr: "192.168.300.100/24"
+?.*
+  Where: referenced column: type
+insert into test_cidr_02 values('192.168.32.623/24');
+?.*ERROR: invalid input syntax for type cidr: "192.168.32.623/24"
+?.*
+  Where: referenced column: type
+insert into test_cidr_02 values('192.168/322');
+?.*ERROR: invalid input syntax for type cidr: "192.168/322"
+?.*
+  Where: referenced column: type
+drop table test_cidr_02;
+SQL SUCCESS

@@ -1,0 +1,2 @@
+--  @testpoint:定义breadth为函数名，应该报错
+Sql parse error: [9:21] expect token, EOF found

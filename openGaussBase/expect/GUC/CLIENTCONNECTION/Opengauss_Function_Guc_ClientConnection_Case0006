@@ -1,0 +1,21 @@
+-- @testpoint: 使用ALTER SYSTEM SET方法设置search_path参数值，合理报错
+--查看默认值
+show search_path;
++----------------+
+| search_path    |
++----------------+
+| "$user",public |
++----------------+
+--创建模式
+drop schema if exists t_myschema005 cascade;
+SQL SUCCESS
+create schema t_myschema005;
+SQL SUCCESS
+--修改参数值，报错
+ALTER SYSTEM SET search_path to t_myschema005;
+?.*ERROR: unsupport parameter: search_path
+ALTER SYSTEM SET only support POSTMASTER-level, SIGHUP-level and BACKEND-level guc variable,
+and it must be allowed to set in postgresql.conf.
+--清理环境
+drop schema if exists t_myschema005 cascade;
+SQL SUCCESS

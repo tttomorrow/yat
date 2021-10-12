@@ -1,0 +1,43 @@
+-- @testpoint: pg_stat_get_partition_live_tuples(oid)函数的异常校验，合理报错
+drop table if exists sales;
+SQL SUCCESS
+--创建表sales
+CREATE TABLE sales
+(prod_id NUMBER(6),
+ cust_id NUMBER,
+ time_id DATE,
+ channel_id CHAR(1),
+ promo_id NUMBER(6),
+ quantity_sold NUMBER(3),
+ amount_sold NUMBER(10,2)
+)
+PARTITION BY RANGE (time_id)
+INTERVAL('1 day')
+( PARTITION p1 VALUES LESS THAN ('2019-01-01 00:00:00'),
+  PARTITION p2 VALUES LESS THAN ('2019-12-31 00:00:00')
+);
+SQL SUCCESS
+select pg_stat_get_partition_live_tuples(a.oid) from pg_class  a where a.relname = 'sales';
++-----------------------------------+
+| pg_stat_get_partition_live_tuples |
++-----------------------------------+
+| 0                                 |
++-----------------------------------+
+select pg_stat_get_partition_live_tuples() from pg_partition  a where a.relname = 'p2';
+?.*ERROR: function pg_stat_get_partition_live_tuples\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_stat_get_partition_live_tuples
+INSERT INTO sales VALUES(1, 12, '2018-01-10 00:00:00', 'a', 1, 1, 1);
+SQL SUCCESS
+select pg_stat_get_partition_live_tuples(a.oid,a.oid,a.oid) from pg_partition  a where a.relname = 'p1';
+?.*ERROR: function pg_stat_get_partition_live_tuples\(oid, oid, oid\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_stat_get_partition_live_tuples
+?.*ERROR: function pg_stat_get_partition_live_tuples\(numeric\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_stat_get_partition_live_tuples
+drop table sales cascade;
+SQL SUCCESS

@@ -1,0 +1,26 @@
+-- @testpoint: 格式化字符串:空值,合理报错
+SELECT format('Hello %s, %1$s', '');
++----------+
+| format   |
++----------+
+| Hello ,  |
++----------+
+SELECT format('Hello %s, %1$s', ' ');
++------------+
+| format     |
++------------+
+| Hello  ,   |
++------------+
+SELECT format('Hello %s, %1$s', );
+?.*ERROR: syntax error at or near "\)".*
+?.*Position:.*
+SELECT format('Hello %s, %1$s',null);
++----------+
+| format   |
++----------+
+| Hello ,  |
++----------+
+SELECT format('Hello %s, %1$s', none);
+?.*ERROR: column "none" does not exist.*
+?.*Position:.*
+  Where: referenced column: format

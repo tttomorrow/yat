@@ -1,0 +1,55 @@
+--  @testpoint:opengauss关键字directory(非保留)，自定义数据类型名为directory
+--关键字directory作为数据类型不带引号，创建成功
+drop type if exists directory;
+SQL SUCCESS
+CREATE TYPE directory AS (f1 int, f2 text);
+SQL SUCCESS
+select typname from pg_type where typname ='directory';
++-----------+
+| typname   |
++-----------+
+| directory |
++-----------+
+drop type directory;
+SQL SUCCESS
+--关键字directory作为用户名加双引号，创建成功
+drop type if exists "directory";
+SQL SUCCESS
+CREATE TYPE "directory" AS (f1 int, f2 text);
+SQL SUCCESS
+select typname from pg_type where typname ='directory';
++-----------+
+| typname   |
++-----------+
+| directory |
++-----------+
+drop type "directory";
+SQL SUCCESS
+--关键字directory作为用户名加单引号，合理报错
+drop type if exists 'directory';
+?.*ERROR: syntax error at or near "'directory'"
+?.*
+CREATE TYPE 'directory' AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "'directory'"
+?.*
+select * from pg_type where typname ='directory';
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+----------+-----------+------------+---------+----------+-----------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
+| typname | typnamespace | typowner | typlen | typbyval | typtype | typcategory | typispreferred | typisdefined | typdelim | typrelid | typelem | typarray | typinput | typoutput | typreceive | typsend | typmodin | typmodout | typanalyze | typalign | typstorage | typnotnull | typbasetype | typtypmod | typndims | typcollation | typdefaultbin | typdefault | typacl |
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+----------+-----------+------------+---------+----------+-----------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+----------+-----------+------------+---------+----------+-----------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
+drop type 'directory';
+?.*ERROR: syntax error at or near "'directory'"
+?.*
+--关键字directory作为用户名加反引号，合理报错
+drop type if exists `directory`;
+?.*ERROR: syntax error at or near "`"
+?.*
+CREATE TYPE `directory` AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "`"
+?.*
+select * from pg_type where typname =`directory`;
+?.*ERROR: column "directory" does not exist
+?.*
+drop type `directory`;
+?.*ERROR: syntax error at or near "`"
+?.*

@@ -1,0 +1,51 @@
+--  @testpoint:opengauss关键字foreign(保留)，作为游标名
+--前置条件
+drop table if exists foreign_test cascade;
+SQL SUCCESS
+create table foreign_test(cid int,fid int);
+SQL SUCCESS
+--关键字不带引号-失败
+start transaction;
+SQL SUCCESS
+cursor foreign for select * from foreign_test order by 1;
+?.*ERROR: syntax error at or near "foreign".*
+?.*Position.*
+close foreign;
+?.*ERROR: syntax error at or near "foreign".*
+?.*Position.*
+end;
+SQL SUCCESS
+--关键字带双引号-成功
+start transaction;
+SQL SUCCESS
+cursor "foreign" for select * from foreign_test order by 1;
+SQL SUCCESS
+close "foreign";
+SQL SUCCESS
+end;
+SQL SUCCESS
+--关键字带单引号-合理报错
+start transaction;
+SQL SUCCESS
+cursor 'foreign' for select * from foreign_test order by 1;
+?.*ERROR: syntax error at or near "'foreign'".*
+?.*Position.*
+close 'foreign';
+?.*ERROR: syntax error at or near "'foreign'".*
+?.*Position.*
+end;
+SQL SUCCESS
+--关键字带反引号-合理报错
+start transaction;
+SQL SUCCESS
+cursor `foreign` for select * from foreign_test order by 1;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+close `foreign`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+end;
+SQL SUCCESS
+--清理环境
+drop table foreign_test cascade;
+SQL SUCCESS

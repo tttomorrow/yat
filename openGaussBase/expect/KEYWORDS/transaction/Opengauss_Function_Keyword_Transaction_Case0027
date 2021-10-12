@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字transaction非保留)，作为序列名
+--关键字不带引号-成功
+drop sequence if exists transaction;
+SQL SUCCESS
+create sequence transaction start 100 cache 50;
+SQL SUCCESS
+drop sequence transaction;
+SQL SUCCESS
+--关键字带双引号-成功
+drop sequence if exists "transaction";
+SQL SUCCESS
+create sequence "transaction" start 100 cache 50;
+SQL SUCCESS
+drop sequence "transaction";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'transaction';
+?.*ERROR: syntax error at or near "'transaction'".*
+?.*Position: .*
+create sequence 'transaction' start 100 cache 50;
+?.*ERROR: syntax error at or near "'transaction'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop sequence if exists `transaction`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create sequence `transaction` start 100 cache 50;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

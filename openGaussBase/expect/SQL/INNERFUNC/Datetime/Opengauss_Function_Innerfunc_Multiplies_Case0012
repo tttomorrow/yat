@@ -1,0 +1,21 @@
+-- @testpoint: 时间和日期操作符*，入参给reltimeISO-8601格式表示时间段
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (col1 reltime);
+SQL SUCCESS
+insert into test_date01 values ('P-1.1Y10M');
+SQL SUCCESS
+select double precision '1.5' * col1  from test_date01;
++------------------------------------------------------+
+| ?column?                                             |
++------------------------------------------------------+
+| 0 years -4 mons -22 days -21 hours 0 mins -0.00 secs |
++------------------------------------------------------+
+select '10' * col1  from test_date01;
++-------------------------------------------------------+
+| ?column?                                              |
++-------------------------------------------------------+
+| -2 years -6 mons -52 days -12 hours 0 mins -0.00 secs |
++-------------------------------------------------------+
+drop table if exists test_date01;
+SQL SUCCESS

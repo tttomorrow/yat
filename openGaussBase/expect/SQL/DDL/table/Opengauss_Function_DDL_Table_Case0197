@@ -1,0 +1,34 @@
+-- @testpoint: 存储过程中truncate table
+drop procedure if exists proc_001;
+SQL SUCCESS
+drop table if exists table_001;
+SQL SUCCESS
+create table table_001(id int);
+SQL SUCCESS
+select * from table_001;
++----+
+| id |
++----+
++----+
+CREATE OR REPLACE PROCEDURE proc_001()
+AS
+BEGIN
+    truncate table table_001;
+END;
+/
+SQL SUCCESS
+call proc_001();
++----------+
+| proc_001 |
++----------+
+|          |
++----------+
+select * from table_001;
++----+
+| id |
++----+
++----+
+drop procedure if exists proc_001;
+SQL SUCCESS
+drop table if exists table_001;
+SQL SUCCESS

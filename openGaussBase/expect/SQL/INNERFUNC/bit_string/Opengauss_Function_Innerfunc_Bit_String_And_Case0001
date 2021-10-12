@@ -1,0 +1,3 @@
+-- @testpoint: 操作符&，bit和bit varying 位数不一致,合理报错
+?.*ERROR: cannot AND bit strings of different sizes
+  Where: referenced column: result

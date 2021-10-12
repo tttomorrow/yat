@@ -1,0 +1,27 @@
+
+
+--  @testpoint:不同个数参数及类型测试(合理报错)
+
+select acos() as result;
+?.*ERROR: function acos\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: result
+select acos(2  2) as result;
+?.*ERROR: syntax error at or near \"2\"
+?.*
+select acos(2,2) as result;
+?.*ERROR: function acos\(integer, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: result
+select acos(2)(2) as result;
+?.*ERROR: syntax error at or near \"\(\"
+?.*
+select acos('abcd') as result;
+?.*ERROR: invalid input syntax for type double precision: \"abcd\"
+?.*
+  Where: referenced column: result
+select acos 1 as result;
+?.*ERROR: syntax error at or near \"1\"
+?.*

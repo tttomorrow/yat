@@ -1,0 +1,24 @@
+-- @testpoint: 带schema，按参数值传递,调用函数（schema已存在）
+drop SCHEMA if EXISTS hs;
+SQL SUCCESS
+CREATE SCHEMA hs;
+SQL SUCCESS
+drop FUNCTION if EXISTS hs.func_add_sql002;
+SQL SUCCESS
+CREATE FUNCTION hs.func_add_sql002(num1 integer, num2 integer) RETURN integer
+AS
+BEGIN
+RETURN num1 + num2;
+END;
+/
+SQL SUCCESS
+CALL hs.func_add_sql002(1, 3);
++-----------------+
+| func_add_sql002 |
++-----------------+
+| 4               |
++-----------------+
+drop FUNCTION hs.func_add_sql002;
+SQL SUCCESS
+drop schema hs;
+SQL SUCCESS

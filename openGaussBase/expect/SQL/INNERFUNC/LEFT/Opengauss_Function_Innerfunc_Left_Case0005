@@ -1,0 +1,24 @@
+
+
+-- @testpoint: having条件
+
+drop table if exists test_left;
+SQL SUCCESS
+create table test_left(a int,b int);
+SQL SUCCESS
+insert into test_left values(0,1);
+SQL SUCCESS
+insert into test_left values(1,4);
+SQL SUCCESS
+insert into test_left values(2,2);
+SQL SUCCESS
+select sum(a),b from test_left group by b having LEFT('xiexiaoyu', 4)='xiex' order by b;
++-----+---+
+| sum | b |
++-----+---+
+| 0   | 1 |
+| 2   | 2 |
+| 1   | 4 |
++-----+---+
+drop table if exists test_left;
+SQL SUCCESS

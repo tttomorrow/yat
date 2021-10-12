@@ -1,0 +1,112 @@
+default:
+  host: '主机ip'
+  db:
+    url: 'jdbc:postgresql://${host}:${port}/${name}'
+    driver: 'org.postgresql.Driver'
+    username: 'tpccuser'
+    password: '*******'
+    port: 30830
+    name: 'tpccdb'
+  ssh:
+    port: 22
+    username: root
+    password: '*******'
+
+dbuser:
+  host: 'ip'
+  db:
+    url: 'jdbc:postgresql://${host}:${port}/${name}'
+    driver: 'org.postgresql.Driver'
+    username: 'tpccuser'
+    password: '*******'
+    port: 30830
+    name: 'tpccdb'
+  ssh:
+    port: 22
+    username: function0830
+    password: '*******'
+
+PrimaryRoot:
+  host: 'ip'
+  db:
+    url: 'jdbc:postgresql://${host}:${port}/${name}'
+    driver: 'org.postgresql.Driver'
+    username: 'tpccuser'
+    password: '*******'
+    port: 30830
+    name: 'tpccdb'
+  ssh:
+    port: 22
+    username: root
+    password: '*******'
+
+PrimaryDbUser:
+  host: 'ip'
+  db:
+    url: 'jdbc:postgresql://${host}:${port}/${name}'
+    driver: 'org.postgresql.Driver'
+    username: 'tpccuser'
+    password: '*******'
+    port: 30830
+    name: 'tpccdb'
+  ssh:
+    port: 22
+    username: function0830
+    password: '*******'
+
+Standby1Root:
+  host: 'ip'
+  db:
+    url: 'jdbc:postgresql://${host}:${port}/${name}'
+    driver: 'org.postgresql.Driver'
+    username: 'tpccuser'
+    password: '*******'
+    port: 30830
+    name: 'tpccdb'
+  ssh:
+    port: 22
+    username: root
+    password: '*******'
+
+Standby1DbUser:
+  host: 'ip'
+  db:
+    url: 'jdbc:postgresql://${host}:${port}/${name}'
+    driver: 'org.postgresql.Driver'
+    username: 'tpccuser'
+    password: '*******'
+    port: 30830
+    name: 'tpccdb'
+  ssh:
+    port: 22
+    username: function0830
+    password: '*******'
+
+Standby2Root:
+  host: 'ip'
+  db:
+    url: 'jdbc:postgresql://${host}:${port}/${name}'
+    driver: 'org.postgresql.Driver'
+    username: 'tpccuser'
+    password: '*******'
+    port: 30830
+    name: 'tpccdb'
+  ssh:
+    port: 22
+    username: root
+    password: '*******'
+
+Standby2DbUser:
+  host: 'ip'
+  db:
+    url: 'jdbc:postgresql://${host}:${port}/${name}'
+    driver: 'org.postgresql.Driver'
+    username: 'tpccuser'
+    password: '*******'
+    port: 30830
+    name: 'tpccdb'
+  ssh:
+    port: 22
+    username: function0830
+    password: '*******'
+

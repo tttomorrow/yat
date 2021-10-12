@@ -1,0 +1,15 @@
+-- @testpoint: 参数不为字符串
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 int);
+SQL SUCCESS
+insert into type_char values (123);
+SQL SUCCESS
+SELECT ltrim(string1,1) from type_char;
++-------+
+| ltrim |
++-------+
+| 23    |
++-------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

@@ -1,0 +1,15 @@
+-- @testpoint: 使用committed开启事务隔离级别为读已提交
+drop table if exists t_student;
+SQL SUCCESS
+create table t_student (stu_name char(20),stu_age int,sex char(10));
+SQL SUCCESS
+insert into t_student values('zhangsan',18,'boy'),('lisi',25,'boy'),('wangwu',28,'girl');
+SQL SUCCESS
+start transaction isolation level read committed read write;
+SQL SUCCESS
+update t_student set stu_age=21 where stu_name='zhangsan';
+SQL SUCCESS
+commit;
+SQL SUCCESS
+drop table if exists t_student;
+SQL SUCCESS

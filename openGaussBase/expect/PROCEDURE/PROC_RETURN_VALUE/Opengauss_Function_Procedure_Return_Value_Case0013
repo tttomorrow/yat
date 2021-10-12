@@ -1,0 +1,77 @@
+-- @testpoint: 测试存储过程返回值类型——boolean
+--创建存储过程
+create or replace procedure proc_return_value_013(p1 bool)  as
+begin
+    if(p1)
+    then
+		raise info 'the condition is %',p1;
+    else
+        raise info 'the condition is %',p1;
+    end if;
+end;
+/
+SQL SUCCESS
+--调用存储过程
+call proc_return_value_013(true);
++-----------------------+
+| proc_return_value_013 |
++-----------------------+
+|                       |
++-----------------------+
+call proc_return_value_013(false);
++-----------------------+
+| proc_return_value_013 |
++-----------------------+
+|                       |
++-----------------------+
+call proc_return_value_013(true);
++-----------------------+
+| proc_return_value_013 |
++-----------------------+
+|                       |
++-----------------------+
+call proc_return_value_013(false);
++-----------------------+
+| proc_return_value_013 |
++-----------------------+
+|                       |
++-----------------------+
+call proc_return_value_013('t');
++-----------------------+
+| proc_return_value_013 |
++-----------------------+
+|                       |
++-----------------------+
+call proc_return_value_013('f');
++-----------------------+
+| proc_return_value_013 |
++-----------------------+
+|                       |
++-----------------------+
+call proc_return_value_013('t');
++-----------------------+
+| proc_return_value_013 |
++-----------------------+
+|                       |
++-----------------------+
+call proc_return_value_013('f');
++-----------------------+
+| proc_return_value_013 |
++-----------------------+
+|                       |
++-----------------------+
+call proc_return_value_013(1);
++-----------------------+
+| proc_return_value_013 |
++-----------------------+
+|                       |
++-----------------------+
+call proc_return_value_013(0);
++-----------------------+
+| proc_return_value_013 |
++-----------------------+
+|                       |
++-----------------------+
+--清理环境
+drop procedure proc_return_value_013;
+SQL SUCCESS

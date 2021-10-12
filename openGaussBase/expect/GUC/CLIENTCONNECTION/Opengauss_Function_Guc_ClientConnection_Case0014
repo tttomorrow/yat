@@ -1,0 +1,33 @@
+-- @testpoint: 将pg_catalog模式加入search_path设为搜素路径第一位置，建表，合理报错
+--查看
+show search_path;
++----------------+
+| search_path    |
++----------------+
+| "$user",public |
++----------------+
+--设置
+set search_path to pg_catalog,"$user",public;
+SQL SUCCESS
+--查看
+show search_path;
++-----------------------------+
+| search_path                 |
++-----------------------------+
+| pg_catalog, "$user", public |
++-----------------------------+
+--创建表,报错
+drop table if exists test_search_path014;
+SQL SUCCESS
+create table test_search_path014(id int);
+?.*ERROR: permission denied to create "pg_catalog.test_search_path014"
+  Detail: System catalog modifications are currently disallowed.
+--恢复默认
+set search_path to "$user",public;
+SQL SUCCESS
+show search_path;
++-----------------+
+| search_path     |
++-----------------+
+| "$user", public |
++-----------------+

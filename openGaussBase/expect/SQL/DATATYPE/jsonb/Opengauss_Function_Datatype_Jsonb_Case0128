@@ -1,0 +1,98 @@
+-- @testpoint: 对数据时jsonb的表进行DML操作
+drop table if exists tab128;
+SQL SUCCESS
+create table tab128(id int,name varchar,message jsonb,number text);
+SQL SUCCESS
+insert into tab128 values(001,'Jane','{"age":18,"city":"xianyang"}',1596);
+SQL SUCCESS
+insert into tab128 values(012,'Joy','{"age":19,"city":"qingdao"}',2586);
+SQL SUCCESS
+insert into tab128 values(023,'Jack','{"age":20,"city":"xiamen"}',85236);
+SQL SUCCESS
+insert into tab128 values(004,'Json','{"age":23,"city":"shenzhen"}',45632);
+SQL SUCCESS
+insert into tab128 values(005,'Jim','{"age":21,"city":"shanghai"}',635486);
+SQL SUCCESS
+select * from  tab128;
++----+------+---------------------------------+--------+
+| id | name | message                         | number |
++----+------+---------------------------------+--------+
+| 1  | Jane | {"age": 18, "city": "xianyang"} | 1596   |
+| 12 | Joy  | {"age": 19, "city": "qingdao"}  | 2586   |
+| 23 | Jack | {"age": 20, "city": "xiamen"}   | 85236  |
+| 4  | Json | {"age": 23, "city": "shenzhen"} | 45632  |
+| 5  | Jim  | {"age": 21, "city": "shanghai"} | 635486 |
++----+------+---------------------------------+--------+
+--update
+update tab128 set number = 888888 where id = 012;
+SQL SUCCESS
+select * from  tab128;
++----+------+---------------------------------+--------+
+| id | name | message                         | number |
++----+------+---------------------------------+--------+
+| 1  | Jane | {"age": 18, "city": "xianyang"} | 1596   |
+| 23 | Jack | {"age": 20, "city": "xiamen"}   | 85236  |
+| 4  | Json | {"age": 23, "city": "shenzhen"} | 45632  |
+| 5  | Jim  | {"age": 21, "city": "shanghai"} | 635486 |
+| 12 | Joy  | {"age": 19, "city": "qingdao"}  | 888888 |
++----+------+---------------------------------+--------+
+update tab128 set number = 888888;
+SQL SUCCESS
+select * from  tab128;
++----+------+---------------------------------+--------+
+| id | name | message                         | number |
++----+------+---------------------------------+--------+
+| 1  | Jane | {"age": 18, "city": "xianyang"} | 888888 |
+| 23 | Jack | {"age": 20, "city": "xiamen"}   | 888888 |
+| 4  | Json | {"age": 23, "city": "shenzhen"} | 888888 |
+| 5  | Jim  | {"age": 21, "city": "shanghai"} | 888888 |
+| 12 | Joy  | {"age": 19, "city": "qingdao"}  | 888888 |
++----+------+---------------------------------+--------+
+--delete
+delete from tab128 where id < 10;
+SQL SUCCESS
+select * from  tab128;
++----+------+--------------------------------+--------+
+| id | name | message                        | number |
++----+------+--------------------------------+--------+
+| 23 | Jack | {"age": 20, "city": "xiamen"}  | 888888 |
+| 12 | Joy  | {"age": 19, "city": "qingdao"} | 888888 |
++----+------+--------------------------------+--------+
+delete from tab128;
+SQL SUCCESS
+select * from  tab128;
++----+------+---------+--------+
+| id | name | message | number |
++----+------+---------+--------+
++----+------+---------+--------+
+--truncate
+insert into tab128 values(001,'Jane','{"age":18,"city":"xianyang"}',1596);
+SQL SUCCESS
+insert into tab128 values(012,'Joy','{"age":19,"city":"qingdao"}',2586);
+SQL SUCCESS
+insert into tab128 values(023,'Jack','{"age":20,"city":"xiamen"}',85236);
+SQL SUCCESS
+insert into tab128 values(004,'Json','{"age":23,"city":"shenzhen"}',45632);
+SQL SUCCESS
+insert into tab128 values(005,'Jim','{"age":21,"city":"shanghai"}',635486);
+SQL SUCCESS
+select * from  tab128;
++----+------+---------------------------------+--------+
+| id | name | message                         | number |
++----+------+---------------------------------+--------+
+| 1  | Jane | {"age": 18, "city": "xianyang"} | 1596   |
+| 12 | Joy  | {"age": 19, "city": "qingdao"}  | 2586   |
+| 23 | Jack | {"age": 20, "city": "xiamen"}   | 85236  |
+| 4  | Json | {"age": 23, "city": "shenzhen"} | 45632  |
+| 5  | Jim  | {"age": 21, "city": "shanghai"} | 635486 |
++----+------+---------------------------------+--------+
+truncate table tab128;
+SQL SUCCESS
+select * from  tab128;
++----+------+---------+--------+
+| id | name | message | number |
++----+------+---------+--------+
++----+------+---------+--------+
+--删除表
+drop table if exists tab128;
+SQL SUCCESS

@@ -1,0 +1,39 @@
+-- @testpoint: 关键字xml，用作表名创建普通表
+drop table if exists xml cascade;
+SQL SUCCESS
+create table xml(id int,name varchar(20));
+SQL SUCCESS
+create or replace procedure xml_insert
+as
+begin
+ for i in 1..10 loop
+    insert into xml values(i,'att+'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call xml_insert();
++------------+
+| xml_insert |
++------------+
+|            |
++------------+
+select * from xml;
++----+--------+
+| id | name   |
++----+--------+
+| 1  | att+1  |
+| 2  | att+2  |
+| 3  | att+3  |
+| 4  | att+4  |
+| 5  | att+5  |
+| 6  | att+6  |
+| 7  | att+7  |
+| 8  | att+8  |
+| 9  | att+9  |
+| 10 | att+10 |
++----+--------+
+drop table if exists xml cascade;
+SQL SUCCESS
+drop procedure xml_insert;
+SQL SUCCESS

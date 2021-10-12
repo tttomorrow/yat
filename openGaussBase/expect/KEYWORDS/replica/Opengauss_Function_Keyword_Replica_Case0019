@@ -1,0 +1,23 @@
+--  @testpoint:opengauss关键字replica(非保留)，作为外部数据源名
+--关键字不带引号-成功
+drop data source if exists replica;
+SQL SUCCESS
+create data source replica;
+SQL SUCCESS
+drop data source replica;
+SQL SUCCESS
+--关键字带双引号-成功
+drop data source if exists "replica";
+SQL SUCCESS
+create data source "replica";
+SQL SUCCESS
+drop data source "replica";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop data source if exists 'replica';
+?.*ERROR: syntax error at or near "'replica'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop data source if exists `replica`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

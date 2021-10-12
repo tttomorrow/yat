@@ -1,0 +1,49 @@
+--  @testpoint:opengauss关键字bit_length(非保留)，作为游标名
+--前置条件
+drop table if exists bit_length_test cascade;
+SQL SUCCESS
+create table bit_length_test(cid int,fid int);
+SQL SUCCESS
+--关键字不带引号-成功
+start transaction;
+SQL SUCCESS
+cursor bit_length for select * from bit_length_test order by 1;
+SQL SUCCESS
+close bit_length;
+SQL SUCCESS
+end;
+SQL SUCCESS
+--关键字带双引号-成功
+start transaction;
+SQL SUCCESS
+cursor "bit_length" for select * from bit_length_test order by 1;
+SQL SUCCESS
+close "bit_length";
+SQL SUCCESS
+end;
+SQL SUCCESS
+--关键字带单引号-合理报错
+start transaction;
+SQL SUCCESS
+cursor 'bit_length' for select * from bit_length_test order by 1;
+?.*ERROR: syntax error at or near "'bit_length'".*
+?.*Position: .*
+close 'bit_length';
+?.*ERROR: syntax error at or near "'bit_length'".*
+?.*Position: .*
+end;
+SQL SUCCESS
+--关键字带反引号-合理报错
+start transaction;
+SQL SUCCESS
+cursor `bit_length` for select * from bit_length_test order by 1;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+close `bit_length`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+end;
+SQL SUCCESS
+--清理环境
+drop table bit_length_test;
+SQL SUCCESS

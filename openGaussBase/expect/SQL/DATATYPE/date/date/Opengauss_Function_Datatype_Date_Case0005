@@ -1,0 +1,18 @@
+-- @testpoint: 输入日期类型字符,合理报错
+-- @modified at: 2020-11-18
+DROP TABLE IF EXISTS test_date05;
+SQL SUCCESS
+CREATE TABLE test_date05 (A INT,B date);
+SQL SUCCESS
+INSERT INTO test_date05 VALUES (1,2018-09-16);
+?.*ERROR: column "b" is of type timestamp without time zone but expression is of type integer
+  Hint: You will need to rewrite or cast the expression.
+?.*
+  Where: referenced column: b
+SELECT *  FROM test_date05;
++---+---+
+| a | b |
++---+---+
++---+---+
+drop table test_date05;
+SQL SUCCESS

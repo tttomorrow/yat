@@ -1,0 +1,28 @@
+--  @testpoint:opengauss关键字Language(非保留),LANGUAGE plpgsql创建触发器
+drop table if exists test_trigger_src_tbl;
+SQL SUCCESS
+CREATE TABLE test_trigger_src_tbl(id1 INT, id2 INT, id3 INT);
+SQL SUCCESS
+drop table if exists test_trigger_des_tbl;
+SQL SUCCESS
+CREATE TABLE test_trigger_des_tbl(id1 INT, id2 INT, id3 INT);
+SQL SUCCESS
+CREATE OR REPLACE FUNCTION tri_insert_func() RETURNS TRIGGER AS
+           $$
+           DECLARE
+           BEGIN
+                   INSERT INTO test_trigger_des_tbl VALUES(NEW.id1, NEW.id2, NEW.id3);
+                   RETURN NEW;
+           END
+           $$ LANGUAGE PLPGSQL;
+/
+SQL SUCCESS
+select * from tri_insert_func;
+?.*ERROR: relation "tri_insert_func" does not exist.*
+?.*Position.*
+drop FUNCTION tri_insert_func;
+SQL SUCCESS
+drop table test_trigger_src_tbl;
+SQL SUCCESS
+drop table test_trigger_des_tbl;
+SQL SUCCESS

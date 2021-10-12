@@ -1,0 +1,12 @@
+-- @testpoint: 输入参数不合法，合理报错
+select cot('Infinity');
+?.*ERROR: input is out of range
+  Where: referenced column: cot
+select cot('a');
+?.*ERROR: invalid input syntax for type double precision: "a"
+?.*
+  Where: referenced column: cot
+select cot('~');
+?.*ERROR: invalid input syntax for type double precision: "~"
+?.*
+  Where: referenced column: cot

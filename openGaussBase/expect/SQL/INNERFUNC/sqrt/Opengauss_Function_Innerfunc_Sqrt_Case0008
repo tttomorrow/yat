@@ -1,0 +1,16 @@
+-- @testpoint: 输入多个参数或无参，合理报错
+SELECT sqrt(1,2) AS RESULT;
+?.*ERROR: function sqrt\(integer, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: result
+SELECT sqrt((1),(2)) AS RESULT;
+?.*ERROR: function sqrt\(integer, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: result
+SELECT sqrt() AS RESULT;
+?.*ERROR: function sqrt\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: result

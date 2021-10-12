@@ -1,0 +1,42 @@
+-- @testpoint: 参数default_statistics_target测试,无效取值，合理报错
+--查看默认值（100）
+show default_statistics_target;
++---------------------------+
+| default_statistics_target |
++---------------------------+
+| 100                       |
++---------------------------+
+--使用set方式设置参数值
+set default_statistics_target = -100;
+SQL SUCCESS
+--查看参数值（-100）
+show default_statistics_target;
++---------------------------+
+| default_statistics_target |
++---------------------------+
+| -100                      |
++---------------------------+
+--使用set方式设置参数值
+set default_statistics_target = 10000;
+SQL SUCCESS
+--查看参数值（10000）
+show default_statistics_target;
++---------------------------+
+| default_statistics_target |
++---------------------------+
+| 10000                     |
++---------------------------+
+--使用set方式设置参数为无效值，合理报错，ERROR:  -101 is outside the valid range for parameter "default_statistics_target" (-100 .. 10000)
+set default_statistics_target = -101;
+?.*ERROR: -101 is outside the valid range for parameter "default_statistics_target" \(-100 .. 10000\)
+set default_statistics_target = 10001;
+?.*ERROR: 10001 is outside the valid range for parameter "default_statistics_target" \(-100 .. 10000\)
+--设置参数值包含特殊字符，ERROR:  invalid value for parameter "default_statistics_target": "100*&^%"
+set default_statistics_target = '100*&^%';
+?.*ERROR: invalid value for parameter "default_statistics_target": "100\*\&\^\%"
+--设置参数值为小数，ERROR:  invalid value for parameter "default_statistics_target": "100.558"
+set default_statistics_target = 100.558;
+?.*ERROR: invalid value for parameter "default_statistics_target": "100.558"
+--恢复设置
+reset default_statistics_target;
+SQL SUCCESS

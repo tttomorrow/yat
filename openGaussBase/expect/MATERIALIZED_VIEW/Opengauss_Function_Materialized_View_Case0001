@@ -1,0 +1,201 @@
+-- @testpoint: 测试创建物化视图时指定列名，合理报错
+--创建物化视图
+--测试点1：测试创建物化视图时指定列名，基础功能
+drop table if exists student cascade;
+SQL SUCCESS
+create table student
+(
+    id int primary key,
+    name varchar(10) not null
+);
+SQL SUCCESS
+insert into student values (1, 'aaa');
+SQL SUCCESS
+insert into student values (2, 'bbb');
+SQL SUCCESS
+insert into student values (3, 'ccc');
+SQL SUCCESS
+insert into student values (4, 'ddd');
+SQL SUCCESS
+insert into student values (5, 'eee');
+SQL SUCCESS
+insert into student values (6, 'fff');
+SQL SUCCESS
+--不指定列名
+create materialized view student_mv as select * from student;
+SQL SUCCESS
+select * from student_mv;
++----+------+
+| id | name |
++----+------+
+| 1  | aaa  |
+| 2  | bbb  |
+| 3  | ccc  |
+| 4  | ddd  |
+| 5  | eee  |
+| 6  | fff  |
++----+------+
+drop materialized view student_mv;
+SQL SUCCESS
+--指定列名，与被参照表相同
+create materialized view student_mv (id, name) as select * from student;
+SQL SUCCESS
+select * from student_mv;
++----+------+
+| id | name |
++----+------+
+| 1  | aaa  |
+| 2  | bbb  |
+| 3  | ccc  |
+| 4  | ddd  |
+| 5  | eee  |
+| 6  | fff  |
++----+------+
+drop materialized view student_mv;
+SQL SUCCESS
+create materialized view student_mv (id, name) as select id, name from student;
+SQL SUCCESS
+select * from student_mv;
++----+------+
+| id | name |
++----+------+
+| 1  | aaa  |
+| 2  | bbb  |
+| 3  | ccc  |
+| 4  | ddd  |
+| 5  | eee  |
+| 6  | fff  |
++----+------+
+drop materialized view student_mv;
+SQL SUCCESS
+create materialized view student_mv (s_id, s_name) as select id s_id, name s_name from student;
+SQL SUCCESS
+select * from student_mv;
++------+--------+
+| s_id | s_name |
++------+--------+
+| 1    | aaa    |
+| 2    | bbb    |
+| 3    | ccc    |
+| 4    | ddd    |
+| 5    | eee    |
+| 6    | fff    |
++------+--------+
+drop materialized view student_mv;
+SQL SUCCESS
+--指定列名，与被参照表不同
+create materialized view student_mv (name, id) as select * from student;
+SQL SUCCESS
+select * from student_mv;
++------+-----+
+| name | id  |
++------+-----+
+| 1    | aaa |
+| 2    | bbb |
+| 3    | ccc |
+| 4    | ddd |
+| 5    | eee |
+| 6    | fff |
++------+-----+
+drop materialized view student_mv;
+SQL SUCCESS
+create materialized view student_mv (name, id) as select id s_id, name s_name from student;
+SQL SUCCESS
+select * from student_mv;
++------+-----+
+| name | id  |
++------+-----+
+| 1    | aaa |
+| 2    | bbb |
+| 3    | ccc |
+| 4    | ddd |
+| 5    | eee |
+| 6    | fff |
++------+-----+
+drop materialized view student_mv;
+SQL SUCCESS
+create materialized view student_mv (s_name, name) as select id s_id, name s_name from student;
+SQL SUCCESS
+select * from student_mv;
++--------+------+
+| s_name | name |
++--------+------+
+| 1      | aaa  |
+| 2      | bbb  |
+| 3      | ccc  |
+| 4      | ddd  |
+| 5      | eee  |
+| 6      | fff  |
++--------+------+
+drop materialized view student_mv;
+SQL SUCCESS
+--测试点2：测试创建物化视图时指定列名，包含聚集函数
+drop table if exists student cascade;
+SQL SUCCESS
+create table student
+(
+    id int primary key,
+    name varchar(10) not null,
+    score int,
+    class_id int
+);
+SQL SUCCESS
+insert into student values (1, 'aaa', 88, 101);
+SQL SUCCESS
+insert into student values (2, 'bbb', 70, 101);
+SQL SUCCESS
+insert into student values (3, 'ccc', 99, 102);
+SQL SUCCESS
+insert into student values (4, 'ddd', 45, 102);
+SQL SUCCESS
+insert into student values (5, 'eee', 98, 102);
+SQL SUCCESS
+insert into student values (6, 'fff', 90, 103);
+SQL SUCCESS
+--不指定列名
+create materialized view student_mv as select count(score > 75), avg(score), max(score), min(score), class_id from student group by class_id;
+SQL SUCCESS
+select * from student_mv;
++-------+---------------------+-----+-----+----------+
+| count | avg                 | max | min | class_id |
++-------+---------------------+-----+-----+----------+
++-------+---------------------+-----+-----+----------+
+drop materialized view student_mv;
+SQL SUCCESS
+--指定列名
+create materialized view student_mv (cont, avg, max, min, class_no) as select count(score > 75), avg(score), max(score), min(score), class_id from student group by class_id;
+SQL SUCCESS
+select * from student_mv;
++------+---------------------+-----+-----+----------+
+| cont | avg                 | max | min | class_no |
++------+---------------------+-----+-----+----------+
++------+---------------------+-----+-----+----------+
+drop materialized view student_mv;
+SQL SUCCESS
+--查看执行计划
+EXPLAIN (analyze on, costs off) 
+create materialized view student_mv (cont, avg, max, min, class_no) as select count(score > 75), avg(score), max(score), min(score), class_id from student group by class_id;
+?.*ERROR: syntax error at or near "materialized"
+?.*Position:?.*
+drop materialized view student_mv;
+?.*ERROR: materialized view "student_mv" does not exist
+--物化视图中列数量与select中不符
+create materialized view student_mv (name1, name2) as select count(score > 75), min(score), class_id from student group by class_id;
+SQL SUCCESS
+select * from student_mv;
++-------+-------+----------+
+| name1 | name2 | class_id |
++-------+-------+----------+
+| 1     | 90    | 103      |
+| 2     | 70    | 101      |
+| 3     | 45    | 102      |
++-------+-------+----------+
+drop materialized view student_mv;
+SQL SUCCESS
+--以下执行期望报错
+create materialized view student_mv (name0, name0, name0, name0, name0, name0) as select count(score > 75), avg(score), max(score), min(score), class_id from student group by class_id;
+?.*ERROR: too many column names are specified
+create materialized view student_mv (name1, name2, name3, name4, name5) as select count(score > 75), min(score), class_id from student group by class_id;
+?.*ERROR: too many column names are specified
+drop table student;
+SQL SUCCESS

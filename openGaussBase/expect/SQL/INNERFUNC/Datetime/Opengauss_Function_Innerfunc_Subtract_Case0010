@@ -1,0 +1,15 @@
+-- @testpoint: interval时间间隔相减
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (col1 interval);
+SQL SUCCESS
+insert into test_date01 values ('1 day' );
+SQL SUCCESS
+select col1 - interval '1 hour'  from test_date01;
++-------------------------------------------------+
+| ?column?                                        |
++-------------------------------------------------+
+| 0 years 0 mons 0 days 23 hours 0 mins 0.00 secs |
++-------------------------------------------------+
+drop table if exists test_date01;
+SQL SUCCESS

@@ -1,0 +1,25 @@
+-- @testpoint: 创建列存临时表
+-- @modify at: 2020-11-24
+drop table if exists temp_table_054;
+SQL SUCCESS
+create  temporary table temp_table_054(a int,b int,c int)WITH (ORIENTATION = COLUMN);
+SQL SUCCESS
+--插入数据
+insert into temp_table_054 values(1,2,3);
+SQL SUCCESS
+insert into temp_table_054 values(11,22,33);
+SQL SUCCESS
+insert into temp_table_054 values(111,222,333);
+SQL SUCCESS
+--查询
+select * from temp_table_054;
++-----+-----+-----+
+| a   | b   | c   |
++-----+-----+-----+
+| 1   | 2   | 3   |
+| 11  | 22  | 33  |
+| 111 | 222 | 333 |
++-----+-----+-----+
+--删表
+drop table temp_table_054;
+SQL SUCCESS

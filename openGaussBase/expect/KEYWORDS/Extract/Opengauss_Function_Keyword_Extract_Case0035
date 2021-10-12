@@ -1,0 +1,41 @@
+-- @testpoint: opengauss关键字extract(非保留)，自定义数据类型名为extract，作为数据类型加单引号或反引号时合理报错
+--关键字extract作为数据类型不带引号，创建成功
+drop type if exists public.extract;
+SQL SUCCESS
+create type extract as (f1 int, f2 text);
+SQL SUCCESS
+select typname from pg_type where typname ='extract';
++---------+
+| typname |
++---------+
+| extract |
++---------+
+drop type public.extract;
+SQL SUCCESS
+--关键字extract作为数据类型加双引号，创建成功
+drop type if exists "public.extract";
+SQL SUCCESS
+create type "extract" as (f1 int, f2 text);
+SQL SUCCESS
+select typname from pg_type where typname ='extract';
++---------+
+| typname |
++---------+
+| extract |
++---------+
+drop type public."extract";
+SQL SUCCESS
+--关键字extract作为数据类型加单引号，合理报错
+drop type if exists 'public.extract';
+?.*ERROR: syntax error at or near "'public.extract'".*
+?.*Position.*
+create type 'extract' as (f1 int, f2 text);
+?.*ERROR: syntax error at or near "'extract'".*
+?.*Position.*
+--关键字extract作为数据类型加反引号，合理报错
+drop type if exists public.`extract`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create type `extract` as (f1 int, f2 text);
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*

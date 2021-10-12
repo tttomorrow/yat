@@ -1,0 +1,7 @@
+-- @testpoint: 文本检索操作符||，先用to_tsvector将文本转换，将tsquery类型的词汇进行“或”操作后检查词汇类型是否匹配
+select to_tsvector('fat cats ate rats') @@('rat'::tsquery || 'cat'::tsquery) as result;
++--------+
+| result |
++--------+
+| true   |
++--------+

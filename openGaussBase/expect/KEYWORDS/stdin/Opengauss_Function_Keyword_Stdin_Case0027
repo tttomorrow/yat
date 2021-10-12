@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字stdin非保留)，作为序列名
+--关键字不带引号-成功
+drop sequence if exists stdin;
+SQL SUCCESS
+create sequence stdin start 100 cache 50;
+SQL SUCCESS
+drop sequence stdin;
+SQL SUCCESS
+--关键字带双引号-成功
+drop sequence if exists "stdin";
+SQL SUCCESS
+create sequence "stdin" start 100 cache 50;
+SQL SUCCESS
+drop sequence "stdin";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'stdin';
+?.*ERROR: syntax error at or near "'stdin'".*
+?.*Position: .*
+create sequence 'stdin' start 100 cache 50;
+?.*ERROR: syntax error at or near "'stdin'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop sequence if exists `stdin`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create sequence `stdin` start 100 cache 50;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

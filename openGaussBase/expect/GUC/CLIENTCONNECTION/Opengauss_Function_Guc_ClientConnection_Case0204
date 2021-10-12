@@ -1,0 +1,31 @@
+-- @testpoint: alter system set方法设置参数fault_mon_timeout为无效值，合理报错
+--查看默认
+show fault_mon_timeout;
++-------------------+
+| fault_mon_timeout |
++-------------------+
+| 5min              |
++-------------------+
+--设置超临界值，报错
+ALTER SYSTEM SET fault_mon_timeout to -1;
+?.*ERROR: -1 is outside the valid range for parameter "fault_mon_timeout" \(0 .. 1440\)
+ALTER SYSTEM SET fault_mon_timeout to 1441;
+?.*ERROR: 1441 is outside the valid range for parameter "fault_mon_timeout" \(0 .. 1440\)
+--设置浮点型，报错
+ALTER SYSTEM SET fault_mon_timeout to 1582.256;
+?.*ERROR: invalid value for parameter "fault_mon_timeout": "1582.256"
+  Hint: Valid units for this parameter are "ms", "s", "min", "h", and "d".
+--设置字符型，报错
+ALTER SYSTEM SET fault_mon_timeout to 'test';
+?.*ERROR: invalid value for parameter "fault_mon_timeout": "test"
+ALTER SYSTEM SET fault_mon_timeout to '20%$#';
+?.*ERROR: invalid value for parameter "fault_mon_timeout": "20\%\$\#"
+  Hint: Valid units for this parameter are "ms", "s", "min", "h", and "d".
+--设置空串，报错
+ALTER SYSTEM SET fault_mon_timeout to '';
+?.*ERROR: invalid value for parameter "fault_mon_timeout": ""
+ALTER SYSTEM SET fault_mon_timeout to 'null';
+?.*ERROR: invalid value for parameter "fault_mon_timeout": "null"
+--恢复默认值
+ALTER SYSTEM SET fault_mon_timeout to 5;
+SQL SUCCESS

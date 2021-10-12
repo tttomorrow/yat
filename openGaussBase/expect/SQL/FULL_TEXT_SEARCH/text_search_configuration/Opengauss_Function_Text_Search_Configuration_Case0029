@@ -1,0 +1,22 @@
+--  @testpoint:重置文本搜索配置属性语法测试
+--创建文本搜索配置
+DROP TEXT SEARCH CONFIGURATION if exists ngram2;
+SQL SUCCESS
+CREATE TEXT SEARCH CONFIGURATION ngram2 (parser=ngram) WITH (gram_size = 2, grapsymbol_ignore = false);
+SQL SUCCESS
+--增加映射
+ALTER TEXT SEARCH CONFIGURATION ngram2 ADD MAPPING FOR numeric WITH simple,english_stem;
+SQL SUCCESS
+--重置文本搜索配置属性
+ALTER TEXT SEARCH CONFIGURATION ngram2 reset (gram_size,grapsymbol_ignore);
+SQL SUCCESS
+--查询配置信息
+select cfgname,cfoptions from pg_ts_config where cfgname='ngram2';
++---------+---------------------------------------+
+| cfgname | cfoptions                             |
++---------+---------------------------------------+
+| ngram2  | {gram_size=2,grapsymbol_ignore=false} |
++---------+---------------------------------------+
+--删除文本搜索配置
+DROP TEXT SEARCH CONFIGURATION ngram2;
+SQL SUCCESS

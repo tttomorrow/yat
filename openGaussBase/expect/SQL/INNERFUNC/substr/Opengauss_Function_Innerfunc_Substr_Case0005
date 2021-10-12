@@ -1,0 +1,23 @@
+-- @testpoint: substr函数作为where条件
+drop table if exists test;
+SQL SUCCESS
+create table test(id int, name text);
+SQL SUCCESS
+insert into test values(1,'university students');
+SQL SUCCESS
+insert into test values(2,'university labary');
+SQL SUCCESS
+insert into test values(3,'university playground');
+SQL SUCCESS
+insert into test values(4,'university classroom');
+SQL SUCCESS
+insert into test values(5,'kindergarten child');
+SQL SUCCESS
+select id,name from test where substr(name,1,10) != 'university';
++----+--------------------+
+| id | name               |
++----+--------------------+
+| 5  | kindergarten child |
++----+--------------------+
+drop table test;
+SQL SUCCESS

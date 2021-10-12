@@ -1,0 +1,105 @@
+--  @testpoint: partition_name：分区的名称
+--建普通表
+DROP TABLE if EXISTS test_index_table_162 CASCADE;
+SQL SUCCESS
+create table test_index_table_162(
+c_int int
+) WITH (ORIENTATION = row) partition by range(c_int)(
+partition p1 values less than (100),
+partition p2 values less than (1000),
+partition p3 values less than (5000),
+partition p4 values less than (10001)
+);
+SQL SUCCESS
+--建local索引
+drop index if exists index_162_01;
+SQL SUCCESS
+create index index_162_01 on test_index_table_162(c_int) local (PARTITION p1,PARTITION p2,PARTITION p3,PARTITION p4);
+SQL SUCCESS
+select relname from pg_class where relname like 'index_162_%' order by relname;
++--------------+
+| relname      |
++--------------+
+| index_162_01 |
++--------------+
+explain select * from test_index_table_162 where c_int > 500 group by c_int;
++--------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                             |
++--------------------------------------------------------------------------------------------------------+
+?.*
+?.*
+?.*
+?.*
+?.*Bitmap.*
+?.*
+?.*
+?.*Bitmap.*
+?.*
+?.*
++--------------------------------------------------------------------------------------------------------+
+--reindex
+alter index index_162_01 MODIFY PARTITION p2 UNUSABLE;
+SQL SUCCESS
+explain select * from test_index_table_162 where c_int > 500 group by c_int;
++-----------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                    |
++-----------------------------------------------------------------------------------------------+
+?.*
+?.*
+?.*
+?.*
+?.*
+?.*
+?.*
++-----------------------------------------------------------------------------------------------+
+REINDEX table test_index_table_162 PARTITION p2;
+SQL SUCCESS
+explain select * from test_index_table_162 where c_int > 500 group by c_int;
++--------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                             |
++--------------------------------------------------------------------------------------------------------+
+?.*
+?.*
+?.*
+?.*
+?.*Bitmap.*
+?.*
+?.*
+?.*Bitmap.*
+?.*
+?.*
++--------------------------------------------------------------------------------------------------------+
+alter index index_162_01 MODIFY PARTITION p2 UNUSABLE;
+SQL SUCCESS
+explain select * from test_index_table_162 where c_int > 500 group by c_int;
++-----------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                    |
++-----------------------------------------------------------------------------------------------+
+?.*
+?.*
+?.*
+?.*
+?.*
+?.*
+?.*
++-----------------------------------------------------------------------------------------------+
+REINDEX table test_index_table_162 PARTITION p2 FORCE;
+SQL SUCCESS
+explain select * from test_index_table_162 where c_int > 500 group by c_int;
++--------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                             |
++--------------------------------------------------------------------------------------------------------+
+?.*
+?.*
+?.*
+?.*
+?.*Bitmap.*
+?.*
+?.*
+?.*Bitmap.*
+?.*
+?.*
++--------------------------------------------------------------------------------------------------------+
+--清理环境
+DROP TABLE if EXISTS test_index_table_162 CASCADE;
+SQL SUCCESS

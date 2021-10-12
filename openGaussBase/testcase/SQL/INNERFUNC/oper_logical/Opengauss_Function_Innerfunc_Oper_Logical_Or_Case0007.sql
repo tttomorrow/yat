@@ -1,0 +1,3 @@
+-- @testpoint: opengauss逻辑操作符OR,与AND运算优先级
+select 0 and 1 or 1 and 0;
+select 0 and 1 or 1 and 1;

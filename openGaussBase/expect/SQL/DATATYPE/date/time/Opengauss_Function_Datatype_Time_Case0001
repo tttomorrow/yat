@@ -1,0 +1,18 @@
+-- @testpoint: 输入边界值
+drop table if exists test_time01;
+SQL SUCCESS
+create table test_time01 (name time);
+SQL SUCCESS
+insert into test_time01 values ('00:00:00');
+SQL SUCCESS
+insert into test_time01 values ('23:59:59');
+SQL SUCCESS
+select * from test_time01;
++----------+
+| name     |
++----------+
+| 00:00:00 |
+| 23:59:59 |
++----------+
+drop table test_time01;
+SQL SUCCESS

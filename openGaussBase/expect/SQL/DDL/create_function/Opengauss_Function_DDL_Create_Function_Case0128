@@ -1,0 +1,17 @@
+drop FUNCTION if exists func_add_sqld;
+SQL SUCCESS
+CREATE FUNCTION func_add_sqld(integer, integer) RETURNS integer DETERMINISTIC
+    AS 'select $1 + $2;'
+    LANGUAGE SQL
+    STABLE
+    RETURNS NULL ON NULL INPUT;
+/
+SQL SUCCESS
+call func_add_sqld(999,1);
++---------------+
+| func_add_sqld |
++---------------+
+| 1000          |
++---------------+
+drop FUNCTION func_add_sqld;
+SQL SUCCESS

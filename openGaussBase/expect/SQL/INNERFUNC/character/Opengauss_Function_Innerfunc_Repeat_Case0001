@@ -1,0 +1,15 @@
+-- @testpoint: 中文字母数字特殊字符
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('abcdeF1中国@#￥');
+SQL SUCCESS
+SELECT repeat(string1,4) from type_char;
++--------------------------------------------------+
+| repeat                                           |
++--------------------------------------------------+
+| abcdeF1中国@#￥abcdeF1中国@#￥abcdeF1中国@#￥abcdeF1中国@#￥ |
++--------------------------------------------------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

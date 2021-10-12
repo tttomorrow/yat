@@ -1,0 +1,122 @@
+--  @testpoint:函数ts_token_type测试，通过parser_oid 获取分析器定义的记号类型
+--查看default解析器的oid
+select oid from PG_TS_PARSER where prsname = 'default';
++------+
+| oid  |
++------+
+| 3722 |
++------+
+SELECT ts_token_type(3722);
++--------------------------------------------------------------+
+| ts_token_type                                                |
++--------------------------------------------------------------+
+| (1,asciiword,"Word, all ASCII")                              |
+| (2,word,"Word, all letters")                                 |
+| (3,numword,"Word, letters and digits")                       |
+| (4,email,"Email address")                                    |
+| (5,url,URL)                                                  |
+| (6,host,Host)                                                |
+| (7,sfloat,"Scientific notation")                             |
+| (8,version,"Version number")                                 |
+| (9,hword_numpart,"Hyphenated word part, letters and digits") |
+| (10,hword_part,"Hyphenated word part, all letters")          |
+| (11,hword_asciipart,"Hyphenated word part, all ASCII")       |
+| (12,blank,"Space symbols")                                   |
+| (13,tag,"XML tag")                                           |
+| (14,protocol,"Protocol head")                                |
+| (15,numhword,"Hyphenated word, letters and digits")          |
+| (16,asciihword,"Hyphenated word, all ASCII")                 |
+| (17,hword,"Hyphenated word, all letters")                    |
+| (18,url_path,"URL path")                                     |
+| (19,file,"File or path name")                                |
+| (20,float,"Decimal notation")                                |
+| (21,int,"Signed integer")                                    |
+| (22,uint,"Unsigned integer")                                 |
+| (23,entity,"XML entity")                                     |
++--------------------------------------------------------------+
+SELECT * from ts_token_type(3722);
++-------+-----------------+------------------------------------------+
+| tokid | alias           | description                              |
++-------+-----------------+------------------------------------------+
+| 1     | asciiword       | Word, all ASCII                          |
+| 2     | word            | Word, all letters                        |
+| 3     | numword         | Word, letters and digits                 |
+| 4     | email           | Email address                            |
+| 5     | url             | URL                                      |
+| 6     | host            | Host                                     |
+| 7     | sfloat          | Scientific notation                      |
+| 8     | version         | Version number                           |
+| 9     | hword_numpart   | Hyphenated word part, letters and digits |
+| 10    | hword_part      | Hyphenated word part, all letters        |
+| 11    | hword_asciipart | Hyphenated word part, all ASCII          |
+| 12    | blank           | Space symbols                            |
+| 13    | tag             | XML tag                                  |
+| 14    | protocol        | Protocol head                            |
+| 15    | numhword        | Hyphenated word, letters and digits      |
+| 16    | asciihword      | Hyphenated word, all ASCII               |
+| 17    | hword           | Hyphenated word, all letters             |
+| 18    | url_path        | URL path                                 |
+| 19    | file            | File or path name                        |
+| 20    | float           | Decimal notation                         |
+| 21    | int             | Signed integer                           |
+| 22    | uint            | Unsigned integer                         |
+| 23    | entity          | XML entity                               |
++-------+-----------------+------------------------------------------+
+--查看ngram解析器的oid
+select oid from PG_TS_PARSER where prsname = 'ngram';
++------+
+| oid  |
++------+
+| 3789 |
++------+
+SELECT ts_token_type(3789);
++-----------------------------------+
+| ts_token_type                     |
++-----------------------------------+
+| (1,zh_words,"chinese words")      |
+| (2,en_word,"english word")        |
+| (3,numeric,"numeric data")        |
+| (4,alnum,"alnum string")          |
+| (5,grapsymbol,"graphic symbol")   |
+| (6,multisymbol,"multiple symbol") |
++-----------------------------------+
+SELECT * from ts_token_type(3789);
++-------+-------------+-----------------+
+| tokid | alias       | description     |
++-------+-------------+-----------------+
+| 1     | zh_words    | chinese words   |
+| 2     | en_word     | english word    |
+| 3     | numeric     | numeric data    |
+| 4     | alnum       | alnum string    |
+| 5     | grapsymbol  | graphic symbol  |
+| 6     | multisymbol | multiple symbol |
++-------+-------------+-----------------+
+--查看pound解析器的oid
+select oid from PG_TS_PARSER where prsname = 'pound';
++------+
+| oid  |
++------+
+| 3801 |
++------+
+SELECT ts_token_type(3801);
++-----------------------------------+
+| ts_token_type                     |
++-----------------------------------+
+| (1,zh_words,"chinese words")      |
+| (2,en_word,"english word")        |
+| (3,numeric,"numeric data")        |
+| (4,alnum,"alnum string")          |
+| (5,grapsymbol,"graphic symbol")   |
+| (6,multisymbol,"multiple symbol") |
++-----------------------------------+
+SELECT * from ts_token_type(3801);
++-------+-------------+-----------------+
+| tokid | alias       | description     |
++-------+-------------+-----------------+
+| 1     | zh_words    | chinese words   |
+| 2     | en_word     | english word    |
+| 3     | numeric     | numeric data    |
+| 4     | alnum       | alnum string    |
+| 5     | grapsymbol  | graphic symbol  |
+| 6     | multisymbol | multiple symbol |
++-------+-------------+-----------------+

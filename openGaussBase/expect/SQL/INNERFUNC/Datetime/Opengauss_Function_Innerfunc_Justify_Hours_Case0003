@@ -1,0 +1,21 @@
+--  @testpoint: justify_days 分钟超过60
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (clo1 interval );
+SQL SUCCESS
+insert into test_date01 values ('1 year 33 months 30 days 55 hours 70 m 4 s');
+SQL SUCCESS
+select justify_days(clo1) from test_date01;
++---------------------------------------------------+
+| justify_days                                      |
++---------------------------------------------------+
+| 3 years 10 mons 0 days 56 hours 10 mins 4.00 secs |
++---------------------------------------------------+
+SELECT justify_days(interval  '1 year 33 months 30 days 55 hours 70 m 4 s');
++---------------------------------------------------+
+| justify_days                                      |
++---------------------------------------------------+
+| 3 years 10 mons 0 days 56 hours 10 mins 4.00 secs |
++---------------------------------------------------+
+drop table if exists test_date01;
+SQL SUCCESS

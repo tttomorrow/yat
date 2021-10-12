@@ -1,0 +1,39 @@
+-- @testpoint: 关键字volatile,用作字符串
+drop table if exists volatile_test cascade;
+SQL SUCCESS
+create table volatile_test(id int,name varchar(20));
+SQL SUCCESS
+create or replace procedure volatile_insert
+as
+begin
+ for i in 1..10 loop
+    insert into volatile_test values(i,'volatile'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call volatile_insert();
++-----------------+
+| volatile_insert |
++-----------------+
+|                 |
++-----------------+
+select * from volatile_test;
++----+------------+
+| id | name       |
++----+------------+
+| 1  | volatile1  |
+| 2  | volatile2  |
+| 3  | volatile3  |
+| 4  | volatile4  |
+| 5  | volatile5  |
+| 6  | volatile6  |
+| 7  | volatile7  |
+| 8  | volatile8  |
+| 9  | volatile9  |
+| 10 | volatile10 |
++----+------------+
+drop table if exists volatile_test cascade;
+SQL SUCCESS
+drop procedure volatile_insert;
+SQL SUCCESS

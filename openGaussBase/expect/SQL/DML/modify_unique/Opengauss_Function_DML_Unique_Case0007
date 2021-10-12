@@ -1,0 +1,14 @@
+-- @testpoint: 在表中插入相同的数据，然后修改约束为unique，合理报错
+drop table if exists t1;
+SQL SUCCESS
+create table t1(a int);
+SQL SUCCESS
+insert into t1 values(1);
+SQL SUCCESS
+insert into t1 values(1);
+SQL SUCCESS
+alter table t1  add constraint ua unique (a);
+?.*ERROR: could not create unique index "ua".*
+  Detail: Key (a)=(1) is duplicated.
+drop table if exists t1;
+SQL SUCCESS

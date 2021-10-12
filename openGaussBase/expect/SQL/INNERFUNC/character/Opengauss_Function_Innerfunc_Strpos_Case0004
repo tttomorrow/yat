@@ -1,0 +1,21 @@
+-- @testpoint: 检索字为空格、为空
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('sourcercRC');
+SQL SUCCESS
+SELECT strpos(string1,'') from type_char;
++--------+
+| strpos |
++--------+
+|        |
++--------+
+SELECT strpos(string1,' ') from type_char;
++--------+
+| strpos |
++--------+
+| 0      |
++--------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

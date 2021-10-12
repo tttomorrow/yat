@@ -1,0 +1,26 @@
+-- @testpoint:正常临时表（行存表）及数据插入；
+drop table if exists object_identifier_012;
+SQL SUCCESS
+CREATE TEMPORARY TABLE object_identifier_012(
+	c1 OID,
+	c2 CID,
+	c3 XID,
+	c4 TID,
+	c5 REGCONFIG,
+	c6 REGDICTIONARY,
+	c7 REGOPER,
+	c8 REGOPERATOR,
+	c9 REGPROC,
+	c10 REGPROCEDURE,
+	c11 REGCLASS,
+	c12 REGTYPE
+)
+WITH (orientation=row, compression=no);
+SQL SUCCESS
+select * from object_identifier_012;
++----+----+----+----+----+----+----+----+----+-----+-----+-----+
+| c1 | c2 | c3 | c4 | c5 | c6 | c7 | c8 | c9 | c10 | c11 | c12 |
++----+----+----+----+----+----+----+----+----+-----+-----+-----+
++----+----+----+----+----+----+----+----+----+-----+-----+-----+
+drop table if exists object_identifier_012;
+SQL SUCCESS

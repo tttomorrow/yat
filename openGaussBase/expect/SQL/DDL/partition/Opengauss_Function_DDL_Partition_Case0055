@@ -1,0 +1,46 @@
+-- @testpoint: 范围分区表，分区键为数值(varchar)，测试analyze收集统计信息功能
+drop table if exists partition_range00011;
+SQL SUCCESS
+create table partition_range00011(
+field1   integer,
+field2   bigint,
+field3   real,
+field4   decimal(10,2),
+field5   number(38),
+field6   char(10),
+field7   varchar(2000),
+field8   varchar2(20),
+field9   CLOB,
+field10  BLOB,
+field11  varchar2(1024),
+field12 date,
+field13 timestamp,
+field14 INTERVAL DAY(3) TO SECOND(4),
+field15 timestamp with time zone,
+field16 timestamp,
+field17 boolean,
+field18  varchar(1024),
+field19  raw(1027)
+)partition by range(field7)
+  (
+partition part01 values less than ('a'),
+partition part02 values less than ('d'),
+partition part14 values less than (maxvalue)
+ );
+SQL SUCCESS
+declare
+i int:=0;
+begin
+  loop
+    i:=i+1;
+'2012-11-11 00:00:00',interval '2' day,'2016-12-11 00:00:00','2011-12-11 00:00:00','true',null,null);
+exit when i= 1000;
+  end loop;
+  raise info'111';
+end;
+/
+SQL SUCCESS
+analyze verbose  partition_range00011 ;
+SQL SUCCESS
+drop table if exists partition_range00011;
+SQL SUCCESS

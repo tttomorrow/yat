@@ -1,0 +1,14 @@
+-- @testpoint: 增加字段用默认值，defaul值超过定义长度，合理报错
+DROP TABLE IF EXISTS META_ENUM;
+SQL SUCCESS
+CREATE TABLE IF NOT EXISTS META_ENUM(ID BIGINT NOT NULL,
+ ATTR_ID BIGINT NULL,
+ NAME VARCHAR(60) NOT NULL,
+   VALUE_LIST VARCHAR(1000),
+   I18N_LIST VARCHAR(2000),
+   PRIMARY KEY (ID));
+SQL SUCCESS
+ALTER TABLE META_ENUM ADD COLUMN location8 VARCHAR(20) NULL DEFAULT 'commoncommoncommoncommoncommoncommoncommoncommoncommoncommoncommoncommoncommoncommon';
+?.*ERROR: value too long for type character varying\(20\)
+DROP TABLE META_ENUM;
+SQL SUCCESS

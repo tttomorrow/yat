@@ -1,0 +1,21 @@
+-- @testpoint: round函数入参超出范围，合理报错
+drop table if exists tb;
+SQL SUCCESS
+create table tb (dp1 double precision);
+SQL SUCCESS
+insert into tb values (9.8);
+SQL SUCCESS
+insert into tb values (round(cast(12.3 as double precision) ,cast(123.5 as double precision),cast(123.65 as double precision)));
+?.*ERROR: function round\(double precision, double precision, double precision\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+update tb set dp1=round(cast(12.3 as numeric),cast(123.5 as nemeric),cast(123.65 as numeric)) where dp1=9.8;
+?.*ERROR: type "nemeric" does not exist
+?.*
+  Where: referenced column: dp1
+select round(cast(12.3 as double precision) ,cast(123.5 as nemeric),cast(123.65 as numeric)) as result;
+?.*ERROR: type "nemeric" does not exist
+?.*
+  Where: referenced column: result
+drop table tb;
+SQL SUCCESS

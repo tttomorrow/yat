@@ -1,0 +1,46 @@
+--  @testpoint:修改行访问控制策略表达式
+--创建用户alice
+drop user if exists alice cascade;
+SQL SUCCESS
+CREATE user alice PASSWORD 'Gauss@123';
+SQL SUCCESS
+--创建用户bob
+drop user if exists bob cascade;
+SQL SUCCESS
+CREATE user bob PASSWORD 'Gauss@123';
+SQL SUCCESS
+--创建数据表all_data
+drop table if exists all_data cascade;
+SQL SUCCESS
+CREATE TABLE all_data(id int, role varchar(100), data varchar(100));
+SQL SUCCESS
+--插入数据
+INSERT INTO all_data VALUES(100, 'alice', 'alice data');
+SQL SUCCESS
+INSERT INTO all_data VALUES(200, 'bob', 'bob data');
+SQL SUCCESS
+INSERT INTO all_data VALUES(300, 'peter', 'peter data');
+SQL SUCCESS
+--创建行访问控制策略，当前用户只能查看用户自身的数据
+drop ROW LEVEL SECURITY POLICY if exists all_data_rls ON all_data;
+SQL SUCCESS
+CREATE ROW LEVEL SECURITY POLICY all_data_rls ON all_data USING(role = CURRENT_USER);
+SQL SUCCESS
+--修改行访问控制策略表达式,分别指定用户为alice、public、alice and bob
+ALTER ROW LEVEL SECURITY POLICY all_data_rls ON all_data to alice USING (id > 100 AND role = current_user);
+SQL SUCCESS
+ALTER ROW LEVEL SECURITY POLICY all_data_rls ON all_data to public USING (id > 200 AND role = current_user);
+SQL SUCCESS
+ALTER ROW LEVEL SECURITY POLICY all_data_rls ON all_data to alice,bob USING (id >= 200 AND role = current_user);
+SQL SUCCESS
+--删除行访问控制策略
+drop ROW LEVEL SECURITY POLICY if exists all_data_rls ON all_data;
+SQL SUCCESS
+--删除表
+drop table all_data cascade;
+SQL SUCCESS
+--删除用户
+drop user alice cascade;
+SQL SUCCESS
+drop user bob cascade;
+SQL SUCCESS

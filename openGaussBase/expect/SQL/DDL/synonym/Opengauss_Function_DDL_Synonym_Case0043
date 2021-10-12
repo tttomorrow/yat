@@ -1,0 +1,48 @@
+-- @testpoint: 创建表时，使用自定义函数的同义词设置检查约束
+-- @modify at: 2020-11-25
+--创建函数
+drop function if exists SYN_FUN_001(a varchar) cascade;
+SQL SUCCESS
+create or replace function SYN_FUN_001 (a varchar) return int
+as
+b int;
+begin
+	b:=length(a);
+	return b;
+end;
+/
+SQL SUCCESS
+--创建同义词
+drop synonym if exists SYN_FUN_SYN_001;
+SQL SUCCESS
+create or replace  synonym  SYN_FUN_SYN_001 for SYN_FUN_001;
+SQL SUCCESS
+--建表
+drop table if exists SYN_TAB_004;
+SQL SUCCESS
+create table SYN_TAB_004
+(
+	a int  check (a <SYN_FUN_SYN_001('uyfuigilhlgig')),
+	b varchar(1024) check (SYN_FUN_SYN_001(b)<SYN_FUN_SYN_001('uyfuigilhlgig'))
+);
+SQL SUCCESS
+--插入数据
+insert into SYN_TAB_004 values(12,'a');
+SQL SUCCESS
+insert into SYN_TAB_004 values(1,'ahikhbojpg');
+SQL SUCCESS
+--查询
+select * from SYN_TAB_004;
++----+------------+
+| a  | b          |
++----+------------+
+| 12 | a          |
+| 1  | ahikhbojpg |
++----+------------+
+--清理环境
+drop function if exists SYN_FUN_001(a varchar) cascade;
+SQL SUCCESS
+drop table if exists SYN_TAB_004 cascade;
+SQL SUCCESS
+drop synonym if exists SYN_FUN_SYN_001;
+SQL SUCCESS

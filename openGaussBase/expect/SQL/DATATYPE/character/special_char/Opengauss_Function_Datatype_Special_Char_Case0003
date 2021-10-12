@@ -1,0 +1,50 @@
+-- @testpoint: 创建表，将“char”数据类型转换至VARCHAR2,char
+-- @modified at: 2020-11-16
+drop table if exists special_char_03;
+SQL SUCCESS
+CREATE  TABLE special_char_03 (id "char");
+SQL SUCCESS
+insert into special_char_03 values ('t');
+SQL SUCCESS
+alter table special_char_03 alter column id TYPE VARCHAR2(200);
+SQL SUCCESS
+--查询字段信息是否修改成功
+SELECT format_type(a.atttypid,a.atttypmod) as type
+FROM pg_class as c,pg_attribute as a
+where c.relname = 'special_char_03' and a.attrelid = c.oid and a.attnum>0;
++------------------------+
+| type                   |
++------------------------+
+| character varying(200) |
++------------------------+
+select * from special_char_03;
++----+
+| id |
++----+
+| t  |
++----+
+drop table if exists special_char_03;
+SQL SUCCESS
+CREATE  TABLE special_char_03 (id "char");
+SQL SUCCESS
+insert into special_char_03 values ('t');
+SQL SUCCESS
+alter table special_char_03 alter column id TYPE char(10);
+SQL SUCCESS
+--查询字段信息是否修改成功
+SELECT format_type(a.atttypid,a.atttypmod) as type
+FROM pg_class as c,pg_attribute as a
+where c.relname = 'special_char_03' and a.attrelid = c.oid and a.attnum>0;
++---------------+
+| type          |
++---------------+
+| character(10) |
++---------------+
+select * from special_char_03;
++------------+
+| id         |
++------------+
+| t          |
++------------+
+drop table special_char_03;
+SQL SUCCESS

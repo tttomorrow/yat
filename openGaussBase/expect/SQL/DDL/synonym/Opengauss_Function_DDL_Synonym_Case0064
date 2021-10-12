@@ -1,0 +1,26 @@
+-- @testpoint: 使用explain语句，查询同义词
+-- @modify at: 2020-11-26
+--建表
+drop table if EXISTS test_SYN_064 cascade;
+SQL SUCCESS
+create table test_SYN_064(a int,b varchar);
+SQL SUCCESS
+insert into test_SYN_064 values(1,'a');
+SQL SUCCESS
+--创建表的同义词
+drop synonym if EXISTS SYN_064 cascade;
+SQL SUCCESS
+create synonym SYN_064 for test_SYN_064;
+SQL SUCCESS
+--查询
+explain select * from SYN_064;
++-------------------------------------------------------------------------+
+| QUERY PLAN                                                              |
++-------------------------------------------------------------------------+
+| Seq Scan on test_syn_064 syn_064  (cost=0.00..22.38 rows=1238 width=36) |
++-------------------------------------------------------------------------+
+--清理环境
+drop table if EXISTS test_SYN_064 cascade;
+SQL SUCCESS
+drop synonym if EXISTS SYN_064 cascade;
+SQL SUCCESS

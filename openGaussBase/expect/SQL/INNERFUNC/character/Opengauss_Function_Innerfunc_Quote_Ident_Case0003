@@ -1,0 +1,15 @@
+-- @testpoint: 中文
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('我是');
+SQL SUCCESS
+SELECT quote_ident(string1) from type_char;
++-------------+
+| quote_ident |
++-------------+
+| "我是"        |
++-------------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

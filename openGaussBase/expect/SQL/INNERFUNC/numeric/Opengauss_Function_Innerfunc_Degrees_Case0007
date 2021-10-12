@@ -1,0 +1,15 @@
+-- @testpoint: degrees函数入参个数及类型校验，合理报错
+select degrees('hello你好');
+?.*ERROR: invalid input syntax for type double precision: "hello你好"
+?.*
+  Where: referenced column: degrees
+select degrees();
+?.*ERROR: function degrees\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: degrees
+select degrees(1,99);
+?.*ERROR: function degrees\(integer, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: degrees

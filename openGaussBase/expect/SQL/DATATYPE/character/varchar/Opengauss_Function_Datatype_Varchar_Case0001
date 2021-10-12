@@ -1,0 +1,15 @@
+-- @testpoint: 插入空值
+drop table if exists test_varchar_01;
+SQL SUCCESS
+create table test_varchar_01 (name varchar(5));
+SQL SUCCESS
+insert into test_varchar_01 values ('');
+SQL SUCCESS
+select * from test_varchar_01;
++------+
+| name |
++------+
+|      |
++------+
+drop table test_varchar_01;
+SQL SUCCESS

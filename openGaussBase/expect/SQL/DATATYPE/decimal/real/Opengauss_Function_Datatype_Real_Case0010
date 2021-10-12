@@ -1,0 +1,18 @@
+-- @testpoint: 插入空值
+drop table if exists real_10;
+SQL SUCCESS
+create table real_10 (id int,name real);
+SQL SUCCESS
+insert into real_10 values (1,null);
+SQL SUCCESS
+insert into real_10 values (2,'');
+SQL SUCCESS
+select * from real_10;
++----+------+
+| id | name |
++----+------+
+| 1  |      |
+| 2  |      |
++----+------+
+drop table real_10;
+SQL SUCCESS

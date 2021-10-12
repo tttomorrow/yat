@@ -1,0 +1,19 @@
+-- @testpoint: 插入正常值，超出字节长度设定，合理报错
+-- @modify at: 2020-11-05
+DECLARE
+  V_C char(801);
+BEGIN
+  DROP TABLE IF EXISTS test_char_05;
+  CREATE TABLE test_char_05 (stringv char(800));
+  FOR I IN 1 .. 801 LOOP
+    V_C := V_C || 'x';
+  END LOOP;
+  insert into test_char_05 values (V_C);
+END;
+/
+?.*ERROR: value too long for type character\(800\)
+  Where: referenced column: stringv
+SQL statement "insert into test_char_05 values (V_C)"
+PL/pgSQL function inline_code_block line 8 at SQL statement
+drop table test_char_05;
+?.*ERROR: table "test_char_05" does not exist

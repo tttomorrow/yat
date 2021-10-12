@@ -1,0 +1,38 @@
+-- @testpoint: [A-z的使用]
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('fooBarbequebazilbarfbonk');
+SQL SUCCESS
+SELECT regexp_matches(string1,'[A-z]','g') from type_char;
++----------------+
+| regexp_matches |
++----------------+
+| {f}            |
+| {o}            |
+| {o}            |
+| {B}            |
+| {a}            |
+| {r}            |
+| {b}            |
+| {e}            |
+| {q}            |
+| {u}            |
+| {e}            |
+| {b}            |
+| {a}            |
+| {z}            |
+| {i}            |
+| {l}            |
+| {b}            |
+| {a}            |
+| {r}            |
+| {f}            |
+| {b}            |
+| {o}            |
+| {n}            |
+| {k}            |
++----------------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

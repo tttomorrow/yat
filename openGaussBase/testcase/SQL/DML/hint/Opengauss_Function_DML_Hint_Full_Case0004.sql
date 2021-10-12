@@ -1,0 +1,1 @@
+-- @testpoint: INSERT语句后带优化器full,不存在的表名   --error

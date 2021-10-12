@@ -1,0 +1,49 @@
+-- @testpoint: 根据用户名创建模式，合理报错
+--1.create user:success
+create user user_schema with password "mima@123";
+SQL SUCCESS
+--2.create schema with exists user:success
+CREATE SCHEMA schema_1 AUTHORIZATION user_schema;
+SQL SUCCESS
+--3.create schema with user which is not exists:fail
+CREATE SCHEMA test AUTHORIZATION user_schema1;
+?.*ERROR: role "user_schema1" does not exist
+CREATE SCHEMA AUTHORIZATION  user_schema1;
+?.*ERROR: role "user_schema1" does not exist
+--4.create schema:success
+create schema schema_2;
+SQL SUCCESS
+--5.create user:fail
+create user schema_2 with password "mima@123";
+?.*ERROR: schema "schema_2" already exists
+--6.rename user_schema:success
+alter schema user_schema rename to user_schema1;
+SQL SUCCESS
+--7.create schema without schema name:success
+CREATE SCHEMA AUTHORIZATION  user_schema;
+SQL SUCCESS
+--8.create role:success
+CREATE ROLE  role1_schema IDENTIFIED BY'test@1234567';
+SQL SUCCESS
+--9.create schema without schema name:success
+CREATE SCHEMA AUTHORIZATION  role1_schema;
+SQL SUCCESS
+--10.create user named pg_xxx
+create user pg_test with password "test@1234567";
+?.*ERROR: unacceptable user name: fail to create same name schema for user "pg_test"
+  Detail: The prefix "pg_" is reserved for system schemas.
+--tearDown
+drop schema if exists schema_2;
+SQL SUCCESS
+drop schema if exists schema_1;
+SQL SUCCESS
+drop schema if exists user_schema;
+SQL SUCCESS
+drop schema if exists role1_schema;
+SQL SUCCESS
+drop schema user_schema1;
+SQL SUCCESS
+drop user if exists user_schema;
+SQL SUCCESS
+drop role if exists role1_schema;
+SQL SUCCESS

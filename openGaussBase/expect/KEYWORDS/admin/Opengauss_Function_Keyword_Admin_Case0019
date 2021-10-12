@@ -1,0 +1,25 @@
+--  @testpoint:opengauss关键字admin(非保留)，作为外部数据源名
+--关键字不带引号-成功
+drop data source if exists admin;
+SQL SUCCESS
+create data source admin;
+SQL SUCCESS
+--清理环境
+drop data source admin;
+SQL SUCCESS
+--关键字带双引号-成功
+drop data source if exists "admin";
+SQL SUCCESS
+create data source "admin";
+SQL SUCCESS
+--清理环境
+drop data source "admin";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop data source if exists 'admin';
+?.*ERROR: syntax error at or near "'admin'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop data source if exists `admin`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

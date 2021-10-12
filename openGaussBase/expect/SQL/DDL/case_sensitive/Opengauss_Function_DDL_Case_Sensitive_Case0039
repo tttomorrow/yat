@@ -1,0 +1,9 @@
+--  @testpoint: 删除 NOT NULL约束，区别大小写
+alter table false_2 drop constraint cc;
+SQL SUCCESS
+alter table false_2 drop constraint CC;
+?.*ERROR: constraint "cc" of relation "false_2" does not exist
+alter table false_2 drop constraint dd;
+SQL SUCCESS
+alter table false_2 drop constraint DD;
+?.*ERROR: constraint "dd" of relation "false_2" does not exist

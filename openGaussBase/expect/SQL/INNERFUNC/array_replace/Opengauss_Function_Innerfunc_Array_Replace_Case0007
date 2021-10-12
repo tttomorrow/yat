@@ -1,0 +1,169 @@
+-- @testpoint: 替换数组array中所有的anyelement元素时,对于大小写null，空字符串的测试
+select array_replace(array[1,2,2,3,null],NULL,4);
++---------------+
+| array_replace |
++---------------+
+| {1,2,2,3,4}   |
++---------------+
+select array_replace(array[1,2,2,3,null],'',5);
++---------------+
+| array_replace |
++---------------+
+| {1,2,2,3,5}   |
++---------------+
+select array_replace(array[1,2,2,3,null],null,5);
++---------------+
+| array_replace |
++---------------+
+| {1,2,2,3,5}   |
++---------------+
+select array_replace(array[1.223,2,3.145,NULL],null,4.5);
++---------------------+
+| array_replace       |
++---------------------+
+| {1.223,2,3.145,4.5} |
++---------------------+
+select array_replace(array[1.223,2,3.145,NULL],NULL,66.0);
++----------------------+
+| array_replace        |
++----------------------+
+| {1.223,2,3.145,66.0} |
++----------------------+
+select array_replace(array[1.223,2,3.145,NULL],'',83.0);
++----------------------+
+| array_replace        |
++----------------------+
+| {1.223,2,3.145,83.0} |
++----------------------+
+select array_replace(array[1.223,2,3.145,''],NULL,'83');
++--------------------+
+| array_replace      |
++--------------------+
+| {1.223,2,3.145,83} |
++--------------------+
+select array_replace(array[-1.223,'',-3.145], null,89.0);
++----------------------+
+| array_replace        |
++----------------------+
+| {-1.223,89.0,-3.145} |
++----------------------+
+select array_replace(array[-1.223,'',-3.145],'','17.2');
++----------------------+
+| array_replace        |
++----------------------+
+| {-1.223,17.2,-3.145} |
++----------------------+
+select array_replace(array[true,false,null], null,'t');
++-------------------+
+| array_replace     |
++-------------------+
+| {true,false,true} |
++-------------------+
+select array_replace(array[true,false,null], NULL,'no');
++--------------------+
+| array_replace      |
++--------------------+
+| {true,false,false} |
++--------------------+
+select array_replace(array[true,false,NULL], NULL,'yes');
++-------------------+
+| array_replace     |
++-------------------+
+| {true,false,true} |
++-------------------+
+select array_replace(array[true,false,NULL], null,'1');
++-------------------+
+| array_replace     |
++-------------------+
+| {true,false,true} |
++-------------------+
+select array_replace(array['abc','efg',null], null,'table');
++-----------------+
+| array_replace   |
++-----------------+
+| {abc,efg,table} |
++-----------------+
+select array_replace(array['abc','efg',null], NULL,'schema');
++------------------+
+| array_replace    |
++------------------+
+| {abc,efg,schema} |
++------------------+
+select array_replace(array['abc','efg',null], '','view');
++----------------+
+| array_replace  |
++----------------+
+| {abc,efg,view} |
++----------------+
+select array_replace(array['abc','efg',NULL], NULL,'source');
++------------------+
+| array_replace    |
++------------------+
+| {abc,efg,source} |
++------------------+
+select array_replace(array['abc','efg',NULL],null,'index');
++-----------------+
+| array_replace   |
++-----------------+
+| {abc,efg,index} |
++-----------------+
+select array_replace(array['abc','efg',NULL], '','type');
++----------------+
+| array_replace  |
++----------------+
+| {abc,efg,type} |
++----------------+
+select array_replace(array['abc','efg',''], NULL,'role');
++----------------+
+| array_replace  |
++----------------+
+| {abc,efg,role} |
++----------------+
+select array_replace(array['abc','efg',''], null,'user');
++----------------+
+| array_replace  |
++----------------+
+| {abc,efg,user} |
++----------------+
+select array_replace(array['abc','efg',''], '','data');
++----------------+
+| array_replace  |
++----------------+
+| {abc,efg,data} |
++----------------+
+select array_replace(array['abc','efg','null'], 'null','replace');
++-------------------+
+| array_replace     |
++-------------------+
+| {abc,efg,replace} |
++-------------------+
+select array_replace(array['abc','efg','NULL'], 'NULL','replace');
++-------------------+
+| array_replace     |
++-------------------+
+| {abc,efg,replace} |
++-------------------+
+select array_replace(array['abc','efg','null'], '','replace');
++----------------+
+| array_replace  |
++----------------+
+| {abc,efg,null} |
++----------------+
+select array_replace(array['abc','efg','NULL'], '','replace');
++----------------+
+| array_replace  |
++----------------+
+| {abc,efg,NULL} |
++----------------+
+select array_replace(array['abc','efg','null'], 'NULL','replace');
++----------------+
+| array_replace  |
++----------------+
+| {abc,efg,null} |
++----------------+
+select array_replace(array['abc','efg','NULL'], 'null','replace');
++----------------+
+| array_replace  |
++----------------+
+| {abc,efg,NULL} |
++----------------+

@@ -1,0 +1,43 @@
+-- @testpoint: 检查rownum的执行计划是否最优 合理报错
+drop table if exists teacher;
+SQL SUCCESS
+create table teacher
+(
+    id int PRIMARY key,
+    name varchar(10) not null
+);
+SQL SUCCESS
+create or replace procedure insert_data(id_begin in int, name in varchar(10))
+as
+begin
+forall i in 1..10000
+insert into teacher values (i + id_begin, name);
+end;
+/
+SQL SUCCESS
+call insert_data(0, 'aaa');
++-------------+
+| insert_data |
++-------------+
+|             |
++-------------+
+EXPLAIN analyse select * from teacher;
+?.*
+?.*QUERY PLAN?.*
+?.*
+?.*Seq Scan on teacher?.*actual time?.*rows=10000 loops=1?.*
+?.*Total runtime:?.*
+?.*
+EXPLAIN analyse select * from teacher where rownum < 10;
+?.*
+?.*QUERY PLAN?.*
+?.*
+?.*Limit?.*actual time?.*rows=9 loops=1?.*
+?.*Seq Scan on teacher?.*actual time?.*rows=9 loops=1?.*
+?.*Total runtime:?.*
+?.*
+drop procedure if exists insert_data;
+SQL SUCCESS
+--清理环境
+drop table if exists teacher;
+SQL SUCCESS

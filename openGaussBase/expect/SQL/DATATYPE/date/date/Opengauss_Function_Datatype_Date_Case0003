@@ -1,0 +1,17 @@
+-- @testpoint: 结合case when
+drop table if exists test_date03;
+SQL SUCCESS
+create table test_date03 (name date);
+SQL SUCCESS
+insert into test_date03 values ('2018-09-18');
+SQL SUCCESS
+insert into test_date03 values ('2018-09-15');
+SQL SUCCESS
+select case when date '2018-09-17' > date '2018-09-16' then 'A' else 'B' end;
++------+
+| case |
++------+
+| A    |
++------+
+drop table test_date03;
+SQL SUCCESS

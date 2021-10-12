@@ -1,0 +1,10 @@
+-- @testpoint: SESSION_USER无效性测试,合理报错
+--session_user(),合理报错
+select session_user();
+?.*ERROR: syntax error at or near "\("
+?.*
+--session_users,合理报错
+select session_users;
+?.*ERROR: column "session_users" does not exist
+?.*
+  Where: referenced column: session_users

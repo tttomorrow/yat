@@ -1,0 +1,6 @@
+-- @testpoint: 使用ALTER SYSTEM SET 方法设置参数dynamic_library_path，合理报错
+ALTER SYSTEM SET dynamic_library_path = '/home';
+?.*ERROR: unsupport parameter: dynamic_library_path
+ALTER SYSTEM SET only support POSTMASTER-level, SIGHUP-level and BACKEND-level guc variable,
+and it must be allowed to set in postgresql.conf.
+--no need to clean

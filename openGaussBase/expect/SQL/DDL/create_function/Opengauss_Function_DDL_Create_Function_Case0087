@@ -1,0 +1,16 @@
+--  @testpoint:返回一个包含多个输出参数的记录
+drop FUNCTION if EXISTS func_dup_sql;
+SQL SUCCESS
+CREATE FUNCTION func_dup_sql(in int, out f1 int, out f2 text)
+    AS $$ SELECT $1, CAST($1 AS text) || ' is text' $$
+    LANGUAGE SQL;
+/
+SQL SUCCESS
+SELECT * FROM func_dup_sql(42);
++----+------------+
+| f1 | f2         |
++----+------------+
+| 42 | 42 is text |
++----+------------+
+drop FUNCTION func_dup_sql;
+SQL SUCCESS

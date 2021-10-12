@@ -1,0 +1,24 @@
+-- @testpoint: 插入浮点数，四舍五入
+drop table if exists binary_integer12;
+SQL SUCCESS
+create table binary_integer12 (name binary_integer);
+SQL SUCCESS
+insert into binary_integer12 values (122.3340);
+SQL SUCCESS
+insert into binary_integer12 values (0.0000123);
+SQL SUCCESS
+insert into binary_integer12 values (-122.3340);
+SQL SUCCESS
+insert into binary_integer12 values (-0.0000123);
+SQL SUCCESS
+select * from binary_integer12;
++------+
+| name |
++------+
+| 122  |
+| 0    |
+| -122 |
+| 0    |
++------+
+drop table binary_integer12;
+SQL SUCCESS

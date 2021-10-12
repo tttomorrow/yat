@@ -1,0 +1,37 @@
+
+
+--  @testpoint:部分关键字的结合使用
+
+drop table if exists acos_test_03;
+SQL SUCCESS
+create table acos_test_03(a decimal(10,2));
+SQL SUCCESS
+insert into acos_test_03 values(1);
+SQL SUCCESS
+insert into acos_test_03 values(-1);
+SQL SUCCESS
+insert into acos_test_03 values(0.5);
+SQL SUCCESS
+insert into acos_test_03 values(0.8);
+SQL SUCCESS
+select acos(a) t1 from acos_test_03 union all select acos(a) t1 from acos_test_03 order by t1;
++--------------------+
+| t1                 |
++--------------------+
+| 0.0                |
+| 0.0                |
++--------------------+
+select acos(a) t1 from acos_test_03 union select acos(a) t1 from acos_test_03 order by t1;
++--------------------+
+| t1                 |
++--------------------+
+| 0.0                |
++--------------------+
+select count(acos(a)) from acos_test_03;
++-------+
+| count |
++-------+
+| 4     |
++-------+
+drop table if exists acos_test_03;
+SQL SUCCESS

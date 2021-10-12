@@ -1,0 +1,19 @@
+--  @testpoint:创建函数加SHIPPABLE参数
+drop FUNCTION if exists func_add_sql008;
+SQL SUCCESS
+CREATE FUNCTION func_add_sql008(integer, integer) RETURNS integer
+    AS 'select $1 + $2;'
+    LANGUAGE SQL
+    VOLATILE
+    SHIPPABLE
+    RETURNS NULL ON NULL INPUT;
+/
+SQL SUCCESS
+call func_add_sql008(999,1);
++-----------------+
+| func_add_sql008 |
++-----------------+
+| 1000            |
++-----------------+
+drop FUNCTION func_add_sql008;
+SQL SUCCESS

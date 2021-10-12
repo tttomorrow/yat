@@ -1,0 +1,11 @@
+-- @testpoint:  hll_hash_smallint(smallint, int32), 入参为其他类型时，合理报错
+select hll_hash_smallint(-32769, 10);
+?.*ERROR: smallint out of range.*
+  Where: referenced column: hll_hash_smallint
+?.*ERROR: function hll_hash_smallint\(integer, bigint\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: hll_hash_smallint
+?.*ERROR: invalid input syntax for integer: "a".*
+?.*
+  Where: referenced column: hll_hash_smallint

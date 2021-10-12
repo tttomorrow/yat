@@ -1,0 +1,80 @@
+-- @testpoint: alter table 修改默认空的列的唯一属性，在有重复值时合理报错
+--参数
+drop table if exists alter_table_tb002;
+SQL SUCCESS
+create table alter_table_tb002
+(
+c1 varchar(20) default '',
+c2 varchar(20) default '',
+c3 varchar(20) default ''
+);
+SQL SUCCESS
+insert into alter_table_tb002 values('11',null,'sss');
+SQL SUCCESS
+insert into alter_table_tb002 values('21','','sss');
+SQL SUCCESS
+insert into alter_table_tb002 values('31',66,'');
+SQL SUCCESS
+insert into alter_table_tb002 values('41',66,null);
+SQL SUCCESS
+ALTER TABLE alter_table_tb002 add constraint con_al_table_3_3 unique(c3);
+?.*ERROR: could not create unique index "con_al_table_3_3".*
+  Detail: Key (c3)=(sss) is duplicated.
+ALTER TABLE alter_table_tb002 add constraint con_al_table_3_1 unique(c1);
+SQL SUCCESS
+--insert into alter_table_tb002 values('41',66,null);
+alter table alter_table_tb002 modify c1 not null;
+SQL SUCCESS
+--default null
+drop table if exists alter_table_tb002;
+SQL SUCCESS
+create table alter_table_tb002
+(
+c1 int default null,
+c2 bigint default null,
+c3 varchar(20) default null
+);
+SQL SUCCESS
+insert into alter_table_tb002 values('11',null,'sss');
+SQL SUCCESS
+insert into alter_table_tb002 values('21','','sss');
+SQL SUCCESS
+insert into alter_table_tb002 values('31',66,'');
+SQL SUCCESS
+insert into alter_table_tb002 values('41',66,null);
+SQL SUCCESS
+ALTER TABLE alter_table_tb002 add constraint con_al_table_3_3 unique(c3);
+?.*ERROR: could not create unique index "con_al_table_3_3".*
+  Detail: Key (c3)=(sss) is duplicated.
+ALTER TABLE alter_table_tb002 add constraint con_al_table_3_1 unique(c1);
+SQL SUCCESS
+--insert into alter_table_tb002 values('41',66,null);
+alter table alter_table_tb002 modify c1 not null;
+SQL SUCCESS
+drop table if exists alter_table_tb002;
+SQL SUCCESS
+create table alter_table_tb002
+(
+c1 int default null,
+c2 bigint default null,
+c3 varchar(20) default null
+);
+SQL SUCCESS
+insert into alter_table_tb002 values('11',null,'sss');
+SQL SUCCESS
+insert into alter_table_tb002 values('21','','sss');
+SQL SUCCESS
+insert into alter_table_tb002 values('31',66,'');
+SQL SUCCESS
+insert into alter_table_tb002 values('41',66,null);
+SQL SUCCESS
+ALTER TABLE alter_table_tb002 add constraint con_al_table_3_3 unique(c3);
+?.*ERROR: could not create unique index "con_al_table_3_3".*
+  Detail: Key (c3)=(sss) is duplicated.
+ALTER TABLE alter_table_tb002 add constraint con_al_table_3_1 unique(c1);
+SQL SUCCESS
+--insert into alter_table_tb002 values('41',66,null);
+alter table alter_table_tb002 modify c1 not null;
+SQL SUCCESS
+drop table if exists alter_table_tb002;
+SQL SUCCESS

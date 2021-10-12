@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字savepoint(非保留)，作为外部数据源名
+--关键字不带引号-成功
+drop data source if exists savepoint;
+SQL SUCCESS
+create data source savepoint;
+SQL SUCCESS
+drop data source savepoint;
+SQL SUCCESS
+--关键字带双引号-成功
+drop data source if exists "savepoint";
+SQL SUCCESS
+create data source "savepoint";
+SQL SUCCESS
+drop data source "savepoint";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop data source if exists 'savepoint';
+?.*ERROR: syntax error at or near "'savepoint'".*
+?.*Position: .*
+create data source 'savepoint';
+?.*ERROR: syntax error at or near "'savepoint'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop data source if exists `savepoint`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create data source `savepoint`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

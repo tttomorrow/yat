@@ -1,0 +1,26 @@
+-- @testpoint: 时间/日期函数age入参只含有年月
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (col1 timestamp with time zone,clo2 timestamp with time zone);
+SQL SUCCESS
+insert into test_date01 values ('2003-04-12','2050-04-16');
+SQL SUCCESS
+select age(clo2,col1) from test_date01;
++-------------------------------------------------+
+| age                                             |
++-------------------------------------------------+
+| 47 years 0 mons 4 days 0 hours 0 mins 0.00 secs |
++-------------------------------------------------+
+SELECT age(timestamp '2001-04-10', timestamp '1957-06-13');
++--------------------------------------------------+
+| age                                              |
++--------------------------------------------------+
+| 43 years 9 mons 27 days 0 hours 0 mins 0.00 secs |
++--------------------------------------------------+
+select * from test_date01;
++-------------------------------+-------------------------------+
+| col1                          | clo2                          |
++-------------------------------+-------------------------------+
++-------------------------------+-------------------------------+
+drop table if exists test_date01;
+SQL SUCCESS

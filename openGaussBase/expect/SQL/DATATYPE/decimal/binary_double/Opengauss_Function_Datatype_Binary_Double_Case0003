@@ -1,0 +1,24 @@
+-- @testpoint: 插入浮点数
+drop table if exists binary_double03;
+SQL SUCCESS
+create table binary_double03 (name binary_double);
+SQL SUCCESS
+insert into binary_double03 values (12122.3340);
+SQL SUCCESS
+insert into binary_double03 values (0.000002);
+SQL SUCCESS
+insert into binary_double03 values (-3333.2222);
+SQL SUCCESS
+insert into binary_double03 values (-0.003);
+SQL SUCCESS
+select * from binary_double03;
++------------+
+| name       |
++------------+
+| 12122.334  |
+| 2.0E-6     |
+| -3333.2222 |
+| -0.003     |
++------------+
+drop table binary_double03;
+SQL SUCCESS

@@ -1,0 +1,178 @@
+-- @testpoint: 行存表创建btree索引,合理报错
+--1.创建表
+create table normal_tb(i int, name varchar);
+SQL SUCCESS
+--2.插入数据
+insert into normal_tb values(generate_series(1,1000), 'test');
+SQL SUCCESS
+insert into normal_tb values(generate_series(9999,10530), 'ytest');
+SQL SUCCESS
+--3.创建索引
+create index exp_idx on normal_tb using btree(upper(name));
+SQL SUCCESS
+--4.查询索引
+SET ENABLE_SEQSCAN=off;
+SQL SUCCESS
+explain select * from normal_tb where upper(name)='TEST';
+?.*
+?.*
+?.*
+?.*Bitmap Heap Scan on normal_tb.*
+?.*Recheck Cond: (upper((name)::text) = 'TEST'::text)?.*
+?.*Bitmap Index Scan on exp_idx.*
+?.*Index Cond: (upper((name)::text) = 'TEST'::text)?.*
+?.*
+--5.查询数据
+select count(*) from normal_tb where upper(name)='TEST';
++-------+
+| count |
++-------+
+| 1000  |
++-------+
+--6.创建临时表
+create local temp table tmp_tb(i int, name varchar);
+SQL SUCCESS
+create global temp table global_tmp_tb(i int, name varchar);
+SQL SUCCESS
+--7.插入数据
+insert into tmp_tb values(generate_series(1,1000), 'test');
+SQL SUCCESS
+insert into global_tmp_tb values(generate_series(9999,10530), 'ytest');
+SQL SUCCESS
+--8.创建索引
+create index part_idx_tmp on tmp_tb using btree(i) where i>100;
+SQL SUCCESS
+create index exp_idx_tmp on tmp_tb using btree(upper(name));
+SQL SUCCESS
+create index team_idx_tmp_gloabl on global_tmp_tb using btree(i,name) ;
+SQL SUCCESS
+create index part_idx_tmp_gloabl on global_tmp_tb using btree(i) where i>100;
+SQL SUCCESS
+create index exp_idx_tmp_gloabl on global_tmp_tb using btree(upper(name));
+SQL SUCCESS
+--9.查询索引
+SET ENABLE_SEQSCAN=off;
+SQL SUCCESS
+explain select * from tmp_tb where i> 500;
+?.*
+?.*
+?.*
+?.*Bitmap Heap Scan on tmp_tb.*
+?.*Recheck Cond: (i > 500)?.*
+?.*Bitmap Index Scan on part_idx_tmp.*
+?.*Index Cond: (i > 500)?.*
+?.*
+explain select * from tmp_tb where upper(name)='TEST';
+?.*
+?.*
+?.*
+?.*Bitmap Heap Scan on tmp_tb.*
+?.*Recheck Cond: (upper((name)::text) = 'TEST'::text)?.*
+?.*Bitmap Index Scan on exp_idx_tmp.*
+?.*Index Cond: (upper((name)::text) = 'TEST'::text)?.*
+?.*
+explain select * from global_tmp_tb where i> 500;
+?.*
+?.*
+?.*
+?.*Bitmap Heap Scan on global_tmp_tb.*
+?.*Recheck Cond: (i > 500)?.*
+?.*Bitmap Index Scan on part_idx_tmp_gloabl?.*
+?.*Index Cond: (i > 500)?.*
+?.*
+explain select * from global_tmp_tb where upper(name)='TEST';
+?.*
+?.*
+?.*
+?.*Bitmap Heap Scan on global_tmp_tb.*
+?.*Recheck Cond: (upper((name)::text) = 'TEST'::text)?.*
+?.*Bitmap Index Scan on exp_idx_tmp_gloabl.*
+?.*Index Cond: (upper((name)::text) = 'TEST'::text)?.*
+?.*
+explain select * from global_tmp_tb where upper(name)='TEST' and i <300;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*Bitmap Heap Scan on global_tmp_tb.*
+?.*Recheck Cond: (upper((name)::text) = 'TEST'::text)?.*
+?.*Filter: (i < 300)?.*
+?.*Bitmap Index Scan on exp_idx_tmp_gloabl.*
+?.*Index Cond: (upper((name)::text) = 'TEST'::text)?.*
+?.*
+--10.查询表
+select count(*) from tmp_tb where i> 500;
++-------+
+| count |
++-------+
+| 500   |
++-------+
+select count(*) from tmp_tb where upper(name)='TEST';
++-------+
+| count |
++-------+
+| 1000  |
++-------+
+select count(*) from tmp_tb where i>300 and name='test';
++-------+
+| count |
++-------+
+| 700   |
++-------+
+select count(*) from global_tmp_tb where i> 500;
++-------+
+| count |
++-------+
+| 532   |
++-------+
+select count(*) from global_tmp_tb where upper(name)='TEST';
++-------+
+| count |
++-------+
+| 0     |
++-------+
+select count(*) from global_tmp_tb where name='TEST' and i <300;
++-------+
+| count |
++-------+
+| 0     |
++-------+
+--11.创建分区表
+create table tb_btree_partition(id int,name varchar)
+PARTITION BY RANGE(id)(
+        PARTITION P1 VALUES LESS THAN(100),
+        PARTITION P2 VALUES LESS THAN(1000),
+        PARTITION P3 VALUES LESS THAN(MAXVALUE))
+;
+SQL SUCCESS
+--12.插入数据
+insert into tb_btree_partition values(generate_series(1,1000), 'testd');
+SQL SUCCESS
+--13.创建索引
+create index part_idx on tb_btree_partition using btree(id) local (partition p1, partition p2, partition p3) where id>500;
+?.*ERROR: syntax error at or near "where"
+?.*
+create index team_idx_global on tb_btree_partition using btree(id, name) global;
+SQL SUCCESS
+--14.查询索引
+SET ENABLE_SEQSCAN=off;
+SQL SUCCESS
+explain select * from tb_btree_partition where i> 500;
+?.*ERROR: column "i" does not exist
+?.*
+explain select * from tb_btree_partition where upper(name)='TEST';
+?.*
+?.*
+?.*
+?.*Bitmap Heap Scan on tb_btree_partition.*
+?.*Filter: (upper((name)::text) = 'TEST'::text)?.*
+?.*Bitmap Index Scan on team_idx_global.*
+?.*
+--tearDown
+drop table if exists normal_tb cascade;
+SQL SUCCESS
+drop table if exists tmp_tb cascade;
+SQL SUCCESS
+drop table if exists tb_btree_partition cascade;
+SQL SUCCESS
+drop table if exists global_tmp_tb cascade;
+SQL SUCCESS

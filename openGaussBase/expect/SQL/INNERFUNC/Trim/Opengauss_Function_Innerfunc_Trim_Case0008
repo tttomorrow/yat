@@ -1,0 +1,30 @@
+-- @testpoint: 字符处理函数trim，函数作为order by条件项
+drop table if exists t2;
+SQL SUCCESS
+create table t2 (a int,b char(10));
+SQL SUCCESS
+insert into t2 values(10,'abc');
+SQL SUCCESS
+insert into t2 values(20,'abc');
+SQL SUCCESS
+insert into t2 values(20,'abc');
+SQL SUCCESS
+insert into t2 values(82,'cd');
+SQL SUCCESS
+insert into t2 values(43,'cd');
+SQL SUCCESS
+insert into t2 values(89,'abc');
+SQL SUCCESS
+select a,b,trim('2' from '2342') from t2 order by trim('2' from '2342'),a;
++----+------------+-------+
+| a  | b          | btrim |
++----+------------+-------+
+| 10 | abc        | 34    |
+| 20 | abc        | 34    |
+| 20 | abc        | 34    |
+| 43 | cd         | 34    |
+| 82 | cd         | 34    |
+| 89 | abc        | 34    |
++----+------------+-------+
+drop table t2;
+SQL SUCCESS

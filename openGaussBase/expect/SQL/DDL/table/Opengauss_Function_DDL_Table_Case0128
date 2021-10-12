@@ -1,0 +1,42 @@
+-- @testpoint: 创建列类型为字符类型VARCHAR(n)、CHARACTER VARYING(n)的表，插入数据超过n时合理报错
+drop table if exists table_1;
+SQL SUCCESS
+create table table_1(a varchar(20));
+SQL SUCCESS
+insert into table_1 values('zhangxiaox');
+SQL SUCCESS
+insert into table_1 values('张三');
+SQL SUCCESS
+insert into table_1 values('qwertyuiopqwe');
+SQL SUCCESS
+select * from table_1;
++---------------+
+| a             |
++---------------+
+| zhangxiaox    |
+| 张三            |
+| qwertyuiopqwe |
++---------------+
+drop table if exists table_1;
+SQL SUCCESS
+drop table if exists table_2;
+SQL SUCCESS
+create table table_2(a character varying(10));
+SQL SUCCESS
+insert into table_2 values('zhangxiaox');
+SQL SUCCESS
+insert into table_2 values('张三');
+SQL SUCCESS
+--ERROR:  value too long for type character(10)
+insert into table_2 values('qwertyuiopqwe');
+?.*ERROR: value too long for type character.*
+  Where: referenced column: a
+select * from table_2;
++------------+
+| a          |
++------------+
+| zhangxiaox |
+| 张三         |
++------------+
+drop table if exists table_2;
+SQL SUCCESS

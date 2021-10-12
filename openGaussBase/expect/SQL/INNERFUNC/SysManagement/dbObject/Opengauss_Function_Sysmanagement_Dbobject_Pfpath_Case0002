@@ -1,0 +1,36 @@
+-- @testpoint: pg_partition_filepath(partition_oid)函数的异常校验，合理报错
+-- 测试多参 少参 空值 特殊字符等
+drop table if exists test;
+SQL SUCCESS
+CREATE TABLE test
+ (
+     sk            INTEGER               NOT NULL,
+     id            CHAR(16)              NOT NULL,
+     name          VARCHAR(20)                   ,
+     grade              DECIMAL(5,2)
+ ) WITH (ORIENTATION = COLUMN, COMPRESSION=HIGH);
+SQL SUCCESS
+insert into test values(10,'kk','mmmm','5.21');
+SQL SUCCESS
+select pg_partition_filepath(a.oid::regclass,'test'::regclass) from pg_class a where a.relname='test';
+?.*ERROR: function pg_partition_filepath\(regclass, regclass\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_partition_filepath
+select pg_partition_filepath();
+?.*ERROR: function pg_partition_filepath\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_partition_filepath
+select pg_partition_filepath('') from pg_class a where a.relname='test';
++-----------------------+
+| pg_partition_filepath |
++-----------------------+
+|                       |
++-----------------------+
+select pg_partition_filepath('*&^%%'::regclass);
+?.*ERROR: relation \"\*\&\^\%\%\" does not exist
+?.*
+  Where: referenced column: pg_partition_filepath
+drop table test;
+SQL SUCCESS

@@ -1,0 +1,65 @@
+-- @testpoint: opengauss关键字comments(非保留)，作为同义词对象名，部分测试点合理报错
+--前置条件
+drop table if exists comments_test;
+SQL SUCCESS
+create table comments_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists comments;
+SQL SUCCESS
+create synonym comments for comments_test;
+SQL SUCCESS
+insert into comments values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update comments set comments.name='cici' where comments.id=2;
+SQL SUCCESS
+select * from comments;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+drop synonym if exists comments;
+SQL SUCCESS
+--关键字带双引号-成功
+drop synonym if exists "comments";
+SQL SUCCESS
+create synonym "comments" for comments_test;
+SQL SUCCESS
+drop synonym if exists "comments";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'comments';
+?.*ERROR: syntax error at or near "'comments'"
+?.*
+create synonym 'comments' for comments_test;
+?.*ERROR: syntax error at or near "'comments'"
+?.*
+insert into 'comments' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'comments'"
+?.*
+update 'comments' set 'comments'.name='cici' where 'comments'.id=2;
+?.*ERROR: syntax error at or near "'comments'"
+?.*
+select * from 'comments';
+?.*ERROR: syntax error at or near "'comments'"
+?.*
+--关键字带反引号-合理报错
+drop synonym if exists `comments`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create synonym `comments` for comments_test;
+?.*ERROR: syntax error at or near "`"
+?.*
+insert into `comments` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`"
+?.*
+update `comments` set `comments`.name='cici' where `comments`.id=2;
+?.*ERROR: syntax error at or near "`"
+?.*
+select * from `comments`;
+?.*ERROR: syntax error at or near "`"
+?.*
+drop table if exists comments_test;
+SQL SUCCESS

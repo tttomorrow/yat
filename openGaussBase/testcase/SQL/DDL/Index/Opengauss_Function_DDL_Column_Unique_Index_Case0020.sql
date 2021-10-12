@@ -1,0 +1,18 @@
+-- @testpoint: 列存范围分区表，创建非分区唯一索引，合理报错
+
+--创建列存范围分区表
+drop table if exists column_part_tab20;
+create table column_part_tab20(id int,name char) with(orientation=column)
+partition by range(id)
+(partition part_1 values less than(100),
+ partition part_2 values less than(200),
+ partition part_3 values less than(300),
+ partition part_4 values less than(400),
+ partition part_5 values less than(maxvalue));
+
+--创建非分区唯一索引，合理报错
+create unique index column_index20 on column_part_tab20 using btree(name) local;
+
+--删除表
+drop table column_part_tab20 cascade;
+

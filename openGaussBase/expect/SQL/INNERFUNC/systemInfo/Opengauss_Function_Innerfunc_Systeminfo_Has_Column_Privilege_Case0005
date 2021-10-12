@@ -1,0 +1,27 @@
+-- @testpoint: 表参数为表oid时有权限和没有权限返回值校验
+DROP USER IF EXISTS joe CASCADE;
+SQL SUCCESS
+CREATE USER joe PASSWORD 'Bigdata@123';
+SQL SUCCESS
+DROP table IF EXISTS table_test001;
+SQL SUCCESS
+create table table_test001(c int,d int);
+SQL SUCCESS
+GRANT select (c),update (d) ON table_test001 TO joe;
+SQL SUCCESS
+select has_column_privilege('joe', oid, 'c','select') from PG_CLASS where relname = 'table_test001' ;
++----------------------+
+| has_column_privilege |
++----------------------+
+| true                 |
++----------------------+
+select has_column_privilege('joe', oid,'c','insert') from PG_CLASS where relname = 'table_test001' ;
++----------------------+
+| has_column_privilege |
++----------------------+
+| false                |
++----------------------+
+DROP USER IF EXISTS joe CASCADE;
+SQL SUCCESS
+DROP table IF EXISTS table_test001;
+SQL SUCCESS

@@ -1,0 +1,6 @@
+-- @testpoint: 数字操作符@(绝对值)，入参为空值
+drop table if exists data_01;
+create table data_01 (clo1 int,clo2 int);
+select @clo1 from data_01;
+SELECT @ null AS RESULT;
+drop table if exists data_01;

@@ -1,0 +1,73 @@
+-- @testpoint: pg_stat_get_db_stat_reset_time(oid)上次重置数据库统计信息的时间。
+alter system set autovacuum to off;
+SQL SUCCESS
+drop table if exists test;
+SQL SUCCESS
+CREATE TABLE test
+     (
+         sk            INTEGER               NOT NULL,
+         grade              DECIMAL(5,2)
+     );
+SQL SUCCESS
+create index test_index on test (sk);
+SQL SUCCESS
+--    1.调用函数pg_stat_reset
+select pg_stat_reset();
++---------------+
+| pg_stat_reset |
++---------------+
+|               |
++---------------+
+SELECT pg_sleep(1);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+select  pg_stat_get_db_stat_reset_time(a.oid)  between current_timestamp-0.00002 and current_timestamp from PG_DATABASE a where a.datname = CURRENT_CATALOG;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+--    2.对表或索引操作pg_stat_reset_single_table_counters
+select  pg_stat_reset_single_table_counters(a.oid) from PG_CLASS a where a.relname = 'test_index';
++-------------------------------------+
+| pg_stat_reset_single_table_counters |
++-------------------------------------+
+|                                     |
++-------------------------------------+
+SELECT pg_sleep(1);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+select  pg_stat_get_db_stat_reset_time(a.oid)  between current_timestamp-0.00002 and current_timestamp from PG_DATABASE a where a.datname = CURRENT_CATALOG;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select  pg_stat_reset_single_table_counters(a.oid)from PG_CLASS a where a.relname = 'test';
++-------------------------------------+
+| pg_stat_reset_single_table_counters |
++-------------------------------------+
+|                                     |
++-------------------------------------+
+SELECT pg_sleep(1);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+select  pg_stat_get_db_stat_reset_time(a.oid)  between current_timestamp-0.00002 and current_timestamp from PG_DATABASE a where a.datname = CURRENT_CATALOG;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+drop table if exists test;
+SQL SUCCESS
+alter system set autovacuum to on;
+SQL SUCCESS

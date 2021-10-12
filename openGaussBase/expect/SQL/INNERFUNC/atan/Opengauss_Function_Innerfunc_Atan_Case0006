@@ -1,0 +1,34 @@
+-- @testpoint: 无输入，无效参数，合理报错
+
+select atan('') from sys_dummy;
++------+
+| atan |
++------+
+|      |
++------+
+select atan(null) from sys_dummy;
++------+
+| atan |
++------+
+|      |
++------+
+select atan() from sys_dummy;
+?.*ERROR: function atan\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: atan
+select atan('11+11') from sys_dummy;
+?.*ERROR: invalid input syntax for type double precision: \"11\+11\"
+?.*
+  Where: referenced column: atan
+select atan(11 11) from sys_dummy;
+?.*ERROR: syntax error at or near \"11\"
+?.*
+select atan(11,11) from sys_dummy;
+?.*ERROR: function atan\(integer, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: atan
+select atan(,) from sys_dummy;
+?.*ERROR: syntax error at or near \"\,\"
+?.*

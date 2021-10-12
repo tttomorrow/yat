@@ -1,0 +1,25 @@
+-- @testpoint: nvl函数参数1为null，参数2不为null
+select nvl(null,1);
++-----+
+| nvl |
++-----+
+| 1   |
++-----+
+select nvl(null,'string');
++--------+
+| nvl    |
++--------+
+| string |
++--------+
+select length(nvl(null,to_date('2018','yyyy')));
++--------+
+| length |
++--------+
+| 19     |
++--------+
+select length(to_date('2018','yyyy'));
++--------+
+| length |
++--------+
+| 19     |
++--------+

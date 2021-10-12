@@ -1,0 +1,45 @@
+--  @testpoint:创建枚举类型，结合表使用查询
+--创建枚举类型
+drop type if exists  week cascade;
+SQL SUCCESS
+create type week as enum('Sun','Mon','Tues','Wed','Thur','Fri','Sat');
+SQL SUCCESS
+--建表
+drop table if exists duty;
+SQL SUCCESS
+create table duty(person text,weekday week);
+SQL SUCCESS
+--插入数据，输入值在枚举类型中
+insert into duty values('April','Sun');
+SQL SUCCESS
+insert into duty values('Harris','Mon');
+SQL SUCCESS
+insert into duty values('Dave','Wed');
+SQL SUCCESS
+--插入数据，输入值不在枚举类型中，合理报错
+insert into duty values('Dave','Wed1');
+?.*ERROR: invalid input value for enum week: "Wed1"
+?.*
+  Where: referenced column: weekday
+--查询
+select * from duty;
++--------+---------+
+| person | weekday |
++--------+---------+
+| April  | Sun     |
+| Harris | Mon     |
+| Dave   | Wed     |
++--------+---------+
+--结合聚集函数查询
+select min(weekday),max(weekday) from duty;
++-----+-----+
+| min | max |
++-----+-----+
+| Sun | Wed |
++-----+-----+
+--删除表
+drop table if exists duty;
+SQL SUCCESS
+--删除类型
+drop type if exists  week;
+SQL SUCCESS

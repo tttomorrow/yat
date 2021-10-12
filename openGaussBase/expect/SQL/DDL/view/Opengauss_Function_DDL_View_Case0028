@@ -1,0 +1,22 @@
+-- @testpoint: 设置视图的选项,非法选项，合理报错
+--建表
+drop table if exists table_view_028;
+SQL SUCCESS
+create table table_view_028(id int,name varchar(20));
+SQL SUCCESS
+--插入数据
+insert into table_view_028 values(1,'hello'),(2,'world');
+SQL SUCCESS
+--创建视图
+drop view if exists temp_view_028 cascade;
+SQL SUCCESS
+create view temp_view_028 as select * from table_view_028;
+SQL SUCCESS
+--设置视图选项，报错
+alter view temp_view_028 set (security435_barrier = true);
+?.*ERROR: unrecognized parameter "security435_barrier"
+alter view temp_view_028 set (参数security_barrier = false);
+?.*ERROR: unrecognized parameter "参数security_barrier"
+--删表
+drop table table_view_028 cascade;
+SQL SUCCESS

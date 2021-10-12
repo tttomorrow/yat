@@ -1,0 +1,30 @@
+--  @testpoint:openGauss保留关键字from作为作为表空间名，
+--不带引号，合理报错
+drop tablespace if exists from;
+?.*ERROR: syntax error at or near "from".*
+?.*Position.*
+CREATE TABLESPACE from RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+?.*ERROR: syntax error at or near "from".*
+?.*Position.*
+--加双引号，创建成功
+drop tablespace if exists "from";
+SQL SUCCESS
+CREATE TABLESPACE "from" RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+SQL SUCCESS
+--清理环境
+drop tablespace "from";
+SQL SUCCESS
+--加单引号，合理报错
+drop tablespace if exists 'from';
+?.*ERROR: syntax error at or near "'from'".*
+?.*Position.*
+CREATE TABLESPACE 'from' RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+?.*ERROR: syntax error at or near "'from'".*
+?.*Position.*
+--加反引号，合理报错
+drop tablespace if exists `from`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+CREATE TABLESPACE `from` RELATIVE LOCATION 'hdfs_tablespace/hdfs_tablespace_1';
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*

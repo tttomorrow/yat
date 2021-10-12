@@ -1,0 +1,53 @@
+-- @testpoint:删除匿名块中的update目标表
+DROP table if exists  Proc_Syntax_048;
+SQL SUCCESS
+create table Proc_Syntax_048(id int,name varchar2(20));
+SQL SUCCESS
+begin
+ for v_i in 1..9 loop
+  insert into Proc_Syntax_048 values(v_i,'Xiaxia');
+ end loop;
+end;
+/
+SQL SUCCESS
+select name,count(1) from Proc_Syntax_048 group by name order by name;
++--------+-------+
+| name   | count |
++--------+-------+
+| Xiaxia | 9     |
++--------+-------+
+declare
+  v_id      int;
+  v_name    varchar2(200):='isoftstone';
+  v_sql VARCHAR2(2000);
+BEGIN
+  v_id :=4;
+  update Proc_Syntax_048 set name=v_name where id=v_id;
+END;
+/
+SQL SUCCESS
+select name,count(1) from Proc_Syntax_048 group by name order by name;
++------------+-------+
+| name       | count |
++------------+-------+
+| Xiaxia     | 8     |
+| isoftstone | 1     |
++------------+-------+
+drop table Proc_Syntax_048;
+SQL SUCCESS
+declare
+  v_id      int;
+  v_name    varchar2(200):='chinasoft';
+  v_sql VARCHAR2(2000);
+BEGIN
+   v_id :=4;
+  update Proc_Syntax_048 set name=v_name where id=v_id;
+END;
+/
+?.*ERROR: relation "proc_syntax_048" does not exist.*
+  Where: PL/pgSQL function inline_code_block line 6 at SQL statement
+select name,count(1) from Proc_Syntax_048 group by name order by name;
+?.*ERROR: relation "proc_syntax_048" does not exist.*
+?.*Position.*
+DROP table   Proc_Syntax_048;
+?.*ERROR: table "proc_syntax_048" does not exist

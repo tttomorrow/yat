@@ -1,0 +1,56 @@
+--  @testpoint:创建序列，步长测试
+--testpoint1:创建序列，指定步长为正数
+drop SEQUENCE if exists test_seq1;
+SQL SUCCESS
+create SEQUENCE test_seq1 INCREMENT 2;
+SQL SUCCESS
+--查看步长信息
+select sequence_name,increment_by from test_seq1 where sequence_name = 'test_seq1';
++---------------+--------------+
+| sequence_name | increment_by |
++---------------+--------------+
+| test_seq1     | 2            |
++---------------+--------------+
+--调用函数一次（1）
+select nextval('test_seq1');
++---------+
+| nextval |
++---------+
+| 1       |
++---------+
+--调用函数两次（3）
+select nextval('test_seq1');
++---------+
+| nextval |
++---------+
+| 3       |
++---------+
+--testpoint2:创建序列，指定步长为负数
+drop SEQUENCE if exists test_seq2;
+SQL SUCCESS
+create SEQUENCE test_seq2 INCREMENT by -2;
+SQL SUCCESS
+--调用函数一次（-1）
+select nextval('test_seq2');
++---------+
+| nextval |
++---------+
+| -1      |
++---------+
+--调用函数两次（-3）
+select nextval('test_seq2');
++---------+
+| nextval |
++---------+
+| -3      |
++---------+
+--testpoint3:创建序列，指定步长为0，合理报错
+drop SEQUENCE if exists test_seq3;
+SQL SUCCESS
+create SEQUENCE test_seq3 INCREMENT by 0;
+?.*ERROR: INCREMENT must not be zero
+--删除序列
+drop SEQUENCE test_seq1;
+SQL SUCCESS
+drop SEQUENCE test_seq2;
+SQL SUCCESS

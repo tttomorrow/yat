@@ -1,0 +1,16 @@
+-- @testpoint: 插入空值
+-- @modified at: 2020-11-13
+drop table if exists name_05;
+SQL SUCCESS
+CREATE TABLE name_05 (id name);
+SQL SUCCESS
+insert into name_05 values ('');
+SQL SUCCESS
+select * from name_05;
++----+
+| id |
++----+
+|    |
++----+
+drop table name_05;
+SQL SUCCESS

@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字committed(非保留)，作为模式名
+--关键字不带引号-成功
+drop schema if exists committed;
+SQL SUCCESS
+create schema committed;
+SQL SUCCESS
+drop schema committed;
+SQL SUCCESS
+--关键字带双引号-成功
+drop schema if exists "committed";
+SQL SUCCESS
+create schema "committed";
+SQL SUCCESS
+drop schema "committed";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop schema if exists 'committed';
+?.*ERROR: syntax error at or near "'committed'"
+?.*
+create schema 'committed';
+?.*ERROR: syntax error at or near "'committed'"
+?.*
+--关键字带反引号-合理报错
+drop schema if exists `committed`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create schema `committed`;
+?.*ERROR: syntax error at or near "`"
+?.*

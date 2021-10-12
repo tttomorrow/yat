@@ -1,0 +1,19 @@
+-- @testpoint: 指定精度在合理范围值内，插入数据超出精度设定值，合理报错
+drop table if exists decimal_16;
+SQL SUCCESS
+create table decimal_16 (name decimal(6,2));
+SQL SUCCESS
+insert into decimal_16 values (123456.123456);
+?.*ERROR: numeric field overflow
+  Detail: A field with precision 6, scale 2 must round to an absolute value less than 10^4.
+  Where: referenced column: name
+insert into decimal_16 values (99999.99);
+?.*ERROR: numeric field overflow
+  Detail: A field with precision 6, scale 2 must round to an absolute value less than 10^4.
+  Where: referenced column: name
+insert into decimal_16 values (100000);
+?.*ERROR: numeric field overflow
+  Detail: A field with precision 6, scale 2 must round to an absolute value less than 10^4.
+  Where: referenced column: name
+drop table decimal_16;
+SQL SUCCESS

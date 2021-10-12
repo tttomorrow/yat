@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字operator(非保留)，作为数据库名
+--关键字不带引号-成功
+drop database if exists operator;
+SQL SUCCESS
+create database operator;
+SQL SUCCESS
+drop database operator;
+SQL SUCCESS
+--关键字带双引号-成功
+drop database if exists "operator";
+SQL SUCCESS
+create database "operator";
+SQL SUCCESS
+drop database "operator";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop database if exists 'operator';
+?.*ERROR: syntax error at or near "'operator'".*
+?.*Position: .*
+create database 'operator';
+?.*ERROR: syntax error at or near "'operator'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop database if exists `operator`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create database `operator`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

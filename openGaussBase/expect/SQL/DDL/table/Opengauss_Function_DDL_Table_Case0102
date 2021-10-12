@@ -1,0 +1,21 @@
+-- @testpoint: 测试列名长度超过63字节，实际列名为前63字节
+drop table if exists table_1;
+SQL SUCCESS
+create table table_1(qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq int);
+SQL SUCCESS
+insert into table_1 values(1);
+SQL SUCCESS
+insert into table_1 values(2);
+SQL SUCCESS
+insert into table_1 values(3);
+SQL SUCCESS
+select * from table_1;
++-----------------------------------------------------------------+
+| qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq |
++-----------------------------------------------------------------+
+| 1                                                               |
+| 2                                                               |
+| 3                                                               |
++-----------------------------------------------------------------+
+drop table if exists table_1;
+SQL SUCCESS

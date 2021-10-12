@@ -1,0 +1,20 @@
+--  @testpoint: numtodsinterval interval_unit为 ’MINUTE‘小数
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (clo1 date);
+SQL SUCCESS
+insert into test_date01 values ('2001-02-16');
+SQL SUCCESS
+select to_date(clo1) + numtodsinterval(100.001, 'MINUTE') from test_date01;
++-------------------------------+
+| ?column?                      |
++-------------------------------+
++-------------------------------+
+SELECT numtodsinterval(100.00000001, 'MINUTE');
++-----------------------------------------------------+
+| numtodsinterval                                     |
++-----------------------------------------------------+
+| 0 years 0 mons 0 days 1 hours 40 mins 0.000001 secs |
++-----------------------------------------------------+
+drop table if exists test_date01;
+SQL SUCCESS

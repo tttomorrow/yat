@@ -1,0 +1,39 @@
+-- @testpoint: 插入合理范围值
+drop table if exists dec_08;
+SQL SUCCESS
+create table dec_08 (id dec(5,2));
+SQL SUCCESS
+insert into dec_08 values (1);
+SQL SUCCESS
+insert into dec_08 values (11);
+SQL SUCCESS
+insert into dec_08 values (1.1);
+SQL SUCCESS
+insert into dec_08 values (0.11);
+SQL SUCCESS
+insert into dec_08 values (111);
+SQL SUCCESS
+insert into dec_08 values (11.1);
+SQL SUCCESS
+insert into dec_08 values (1.11);
+SQL SUCCESS
+insert into dec_08 values (111.1);
+SQL SUCCESS
+insert into dec_08 values (11.11);
+SQL SUCCESS
+select * from dec_08;
++--------+
+| id     |
++--------+
+| 1.00   |
+| 11.00  |
+| 1.10   |
+| 0.11   |
+| 111.00 |
+| 11.10  |
+| 1.11   |
+| 111.10 |
+| 11.11  |
++--------+
+drop table dec_08;
+SQL SUCCESS

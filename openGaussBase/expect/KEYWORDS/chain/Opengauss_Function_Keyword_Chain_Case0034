@@ -1,0 +1,49 @@
+--  @testpoint:opengauss关键字chain(非保留)，作为游标名
+--前置条件
+drop table if exists chain_test cascade;
+SQL SUCCESS
+create table chain_test(cid int,fid int);
+SQL SUCCESS
+--关键字不带引号-成功
+start transaction;
+SQL SUCCESS
+cursor chain for select * from chain_test order by 1;
+SQL SUCCESS
+close chain;
+SQL SUCCESS
+end;
+SQL SUCCESS
+--关键字带双引号-成功
+start transaction;
+SQL SUCCESS
+cursor "chain" for select * from chain_test order by 1;
+SQL SUCCESS
+close "chain";
+SQL SUCCESS
+end;
+SQL SUCCESS
+--关键字带单引号-合理报错
+start transaction;
+SQL SUCCESS
+cursor 'chain' for select * from chain_test order by 1;
+?.*ERROR: syntax error at or near "'chain'".*
+?.*Position: .*
+close 'chain';
+?.*ERROR: syntax error at or near "'chain'".*
+?.*Position: .*
+end;
+SQL SUCCESS
+--关键字带反引号-合理报错
+start transaction;
+SQL SUCCESS
+cursor `chain` for select * from chain_test order by 1;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+close `chain`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+end;
+SQL SUCCESS
+--清理环境
+drop table chain_test;
+SQL SUCCESS

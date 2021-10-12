@@ -1,0 +1,34 @@
+-- @testpoint: opengauss关键字equals(非保留)，作为同义词对象名，部分测试点合理报错
+
+
+--前置条件
+drop table if exists equals_test;
+create table equals_test(id int,name varchar(10));
+
+--关键字不带引号-成功
+drop synonym if exists equals;
+create synonym equals for equals_test;
+insert into equals values (1,'ada'),(2, 'bob');
+update equals set equals.name='cici' where equals.id=2;
+select * from equals;
+drop synonym if exists equals;
+
+--关键字带双引号-成功
+drop synonym if exists "equals";
+create synonym "equals" for equals_test;
+drop synonym if exists "equals";
+
+--关键字带单引号-合理报错
+drop synonym if exists 'equals';
+create synonym 'equals' for equals_test;
+insert into 'equals' values (1,'ada'),(2, 'bob');
+update 'equals' set 'equals'.name='cici' where 'equals'.id=2;
+select * from 'equals';
+
+--关键字带反引号-合理报错
+drop synonym if exists `equals`;
+create synonym `equals` for equals_test;
+insert into `equals` values (1,'ada'),(2, 'bob');
+update `equals` set `equals`.name='cici' where `equals`.id=2;
+select * from `equals`;
+drop table if exists equals_test;

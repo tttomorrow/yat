@@ -1,0 +1,96 @@
+#!/usr/bin/env python
+# coding=utf-8
+from __future__ import division
+from optparse import OptionParser
+import sys
+
+
+num_to_hex = '0123456789abcdef'
+
+
+def decimal2hex(decimal):
+    ln = len(decimal)
+    i = 0
+    res = []
+    while i < ln:
+        k = 0
+        j = i
+        while j < ln:
+            v = decimal[j] + k * 10
+            t = v % 16
+            decimal[j] = v//16
+            k = t
+            j += 1
+        res.append(k)
+        while i < ln and decimal[i] == 0:
+            i += 1
+
+    i = 16 - len(res)
+    while i > 0:
+        res.append(0)
+        i -= 1
+
+    res.reverse()
+    return ''.join([num_to_hex[x] for x in res])
+
+
+def str_decimal2hex(decimal):
+    v = []
+    for x in decimal:
+        v.append(int(x))
+
+    return decimal2hex(v)
+
+
+def decimal2hex_local(decimal):
+    v = hex(decimal).strip('l').strip('L')[2:]
+    i = 16 - len(v)
+    return '0' * i + v
+
+
+def parse_command(args):
+    parser = OptionParser()
+    parser.add_option('-e', '--entry', dest='entry', help='Set the entry to decode')
+    parser.add_option('-f', '--field', dest='field', default='all', type='str', help='Decode the specific field[all|page_id|file_id|hex]')
+    parser.add_option('--hex', dest='hex', action='store_true', help='Print with hex format')
+    return parser.parse_args(args)
+
+
+def decode_entry(entry):
+    return int(entry[-12:-8], 16), int(entry[-8:], 16)
+
+
+def main():
+    opts, _ = parse_command(sys.argv)
+    if opts.entry:
+        entry = opts.entry
+    else:
+        entry = None
+        print('-e/--entry must be set')
+        exit(1)
+
+    field = opts.field
+    hex_val = decimal2hex_local(int(entry))
+    file_id, page_id = decode_entry(hex_val)
+    if opts.hex:
+        file_id = hex(file_id)
+        page_id = hex(page_id)
+    else:
+        file_id = str(file_id)
+        page_id = str(page_id)
+
+    if field == 'page_id':
+        print(page_id)
+    elif field == 'file_id':
+        print(file_id)
+    elif field == 'all':
+        print('%s-%s' % (file_id, page_id))
+    elif field == 'hex':
+        print('0x' + hex_val)
+    else:
+        print('Unknown -f param %s found' % field)
+
+
+if __name__ == '__main__':
+    main()
+

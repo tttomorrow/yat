@@ -1,0 +1,7 @@
+-- @testpoint: drop sequence if exists serial;
+drop sequence if exists serial;
+SQL SUCCESS
+CREATE SEQUENCE serial START 101 CACHE 20;
+SQL SUCCESS
+drop sequence serial;
+SQL SUCCESS

@@ -1,0 +1,20 @@
+-- @testpoint: 创建列类型是字符类型的列存表
+drop table if exists table_2;
+SQL SUCCESS
+create table table_2(a character(10),b  varchar(20))with (ORIENTATION=COLUMN);
+SQL SUCCESS
+insert into table_2 values('zhangxiao'),('zhulin');
+SQL SUCCESS
+insert into table_2 values('张三'),('李四');
+SQL SUCCESS
+select * from table_2;
++------------+---+
+| a          | b |
++------------+---+
+| zhangxiao  |   |
+| zhulin     |   |
+| 张三         |   |
+| 李四         |   |
++------------+---+
+drop table if exists table_2;
+SQL SUCCESS

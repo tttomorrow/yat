@@ -1,0 +1,32 @@
+--  @testpoint:opengauss关键字end-exec(非保留)，作为序列名
+--关键字不带引号-成功
+drop sequence if exists end-exec;
+?.*ERROR: syntax error at or near "end"
+?.*Position: .*
+create sequence end-exec start 100 cache 50;
+?.*ERROR: syntax error at or near "end"
+?.*Position: .*
+drop sequence end-exec;
+?.*ERROR: syntax error at or near "end"
+?.*Position: .*
+--关键字带双引号-成功
+drop sequence if exists "end-exec";
+SQL SUCCESS
+create sequence "end-exec" start 100 cache 50;
+SQL SUCCESS
+drop sequence "end-exec";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'end-exec';
+?.*ERROR: syntax error at or near "'end-exec'"
+?.*Position: .*
+create sequence 'end-exec' start 100 cache 50;
+?.*ERROR: syntax error at or near "'end-exec'"
+?.*Position: .*
+--关键字带反引号-合理报错
+drop sequence if exists `end-exec`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+create sequence `end-exec` start 100 cache 50;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*

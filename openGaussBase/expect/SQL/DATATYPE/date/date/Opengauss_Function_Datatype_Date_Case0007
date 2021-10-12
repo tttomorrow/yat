@@ -1,0 +1,15 @@
+-- @testpoint: 日期型数据与数值相减，更新新的日期
+DROP TABLE IF EXISTS test_date07;
+SQL SUCCESS
+CREATE TABLE test_date07 (name date);
+SQL SUCCESS
+INSERT INTO test_date07 VALUES ( DATE '2018-09-17'- 1/24);
+SQL SUCCESS
+select * from test_date07;
++-------------------------------+
+| name                          |
++-------------------------------+
+?.*2018-09-16 23:00:00.*
++-------------------------------+
+DROP TABLE test_date07;
+SQL SUCCESS

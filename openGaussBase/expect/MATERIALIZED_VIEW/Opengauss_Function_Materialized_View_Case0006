@@ -1,0 +1,125 @@
+-- @testpoint: 测试更新物化视图，合理报错
+--更新物化视图
+drop table if exists student cascade;
+SQL SUCCESS
+create table student
+(
+    id int primary key,
+    name varchar(10) not null
+);
+SQL SUCCESS
+insert into student values (1, 'aaa');
+SQL SUCCESS
+insert into student values (2, 'bbb');
+SQL SUCCESS
+insert into student values (3, 'ccc');
+SQL SUCCESS
+insert into student values (4, 'ddd');
+SQL SUCCESS
+insert into student values (5, 'eee');
+SQL SUCCESS
+insert into student values (6, 'fff');
+SQL SUCCESS
+create materialized view student_mv (id, name) as select * from student;
+SQL SUCCESS
+select * from student_mv;
++----+------+
+| id | name |
++----+------+
+| 1  | aaa  |
+| 2  | bbb  |
+| 3  | ccc  |
+| 4  | ddd  |
+| 5  | eee  |
+| 6  | fff  |
++----+------+
+--物化视图结果不会实时更新
+insert into student values (7, 'ggg');
+SQL SUCCESS
+select * from student_mv;
++----+------+
+| id | name |
++----+------+
+| 1  | aaa  |
+| 2  | bbb  |
+| 3  | ccc  |
+| 4  | ddd  |
+| 5  | eee  |
+| 6  | fff  |
++----+------+
+--更新物化视图结果，默认
+refresh materialized view student_mv;
+SQL SUCCESS
+select * from student_mv;
++----+------+
+| id | name |
++----+------+
+| 1  | aaa  |
+| 2  | bbb  |
+| 3  | ccc  |
+| 4  | ddd  |
+| 5  | eee  |
+| 6  | fff  |
+| 7  | ggg  |
++----+------+
+--更新物化视图结果，with no data
+refresh materialized view student_mv with no data;
+SQL SUCCESS
+select * from student_mv;
++----+------+
+| id | name |
++----+------+
++----+------+
+--更新物化视图结果，with data
+refresh materialized view student_mv with data;
+SQL SUCCESS
+select * from student_mv;
++----+------+
+| id | name |
++----+------+
+| 1  | aaa  |
+| 2  | bbb  |
+| 3  | ccc  |
+| 4  | ddd  |
+| 5  | eee  |
+| 6  | fff  |
+| 7  | ggg  |
++----+------+
+--更新物化视图，增量刷新
+insert into student values (8, 'hhh');
+SQL SUCCESS
+insert into student values (9, 'iii');
+SQL SUCCESS
+refresh materialized view concurrently student_mv;
+?.*ERROR: syntax error at or near "concurrently"
+?.*Position?.*
+--error
+select relispopulated from pg_class where relname = 'student_mv';
+?.*ERROR: column "relispopulated" does not exist
+?.*Position:?.*
+  Where: referenced column: relispopulated
+--error
+--查看执行计划
+create or replace procedure mv_proc(loopnum in integer)
+is
+insertid integer;
+startid integer;
+begin
+select max(id) from student into startid;
+for i in 1..loopnum
+loop
+insertid := i+startid;
+insert into student values (insertid, 'ooo');
+end loop;
+end;
+/
+SQL SUCCESS
+call mv_proc(10000);
++---------+
+| mv_proc |
++---------+
+|         |
++---------+
+explain (analyze on, costs off) refresh materialized view student_mv;
+?.*ERROR: syntax error at or near "refresh"
+?.*Position:?.*

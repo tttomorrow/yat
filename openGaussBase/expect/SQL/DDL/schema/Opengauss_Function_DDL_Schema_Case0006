@@ -1,0 +1,136 @@
+-- @testpoint: 修改模式后检查数据
+set enable_bitmapscan to off;
+SQL SUCCESS
+set enable_seqscan to off;
+SQL SUCCESS
+--1.create schema
+create schema schema_test_006;
+SQL SUCCESS
+--2.create table
+create table schema_test_006.i_table(i int,x char(10));
+SQL SUCCESS
+--3.insert data
+insert into schema_test_006.i_table values(generate_series(1,20000),'你tes');
+SQL SUCCESS
+--4.create index
+create index schema_test_006.i_idx on schema_test_006.i_table(i);
+SQL SUCCESS
+create index x_idx on schema_test_006.i_table(x);
+SQL SUCCESS
+--5.create view
+create view my_view as select i from schema_test_006.i_table;
+SQL SUCCESS
+--6.create materialized
+CREATE MATERIALIZED VIEW schema_test_006.i_all AS SELECT * FROM schema_test_006.i_table;
+SQL SUCCESS
+--query data
+select count(*) from schema_test_006.i_table where x='你tes';
++-------+
+| count |
++-------+
+| 20000 |
++-------+
+explain select * from schema_test_006.i_table where i<12580;
+?.*
+?.*QUERY PLAN?.*
+?.*
+?.*[Bypass]?.*
+?.*Index Scan using i_idx on i_table  (cost=0.00..632.92 rows=6667 width=18)?.*
+?.*Index Cond: (i < 12580)?.*
+?.*
+explain select * from schema_test_006.i_table where x='hula';
+?.*
+?.*QUERY PLAN?.*
+?.*
+?.*[Bypass].*
+?.*Index Scan using x_idx on i_table  (cost=0.00..282.00 rows=100 width=18)?.*
+?.*Index Cond: (x = 'hula'::bpchar)?.*
+?.*
+select count(*) from my_view;
++-------+
+| count |
++-------+
+| 20000 |
++-------+
+select count(*) from schema_test_006.i_all;
++-------+
+| count |
++-------+
+| 20000 |
++-------+
+--7.create function
+CREATE FUNCTION schema_test_006.func_add_sql(integer, integer) RETURNS integer
+    AS 'select $1 + $2;'
+    LANGUAGE SQL
+    IMMUTABLE
+    RETURNS NULL ON NULL INPUT;
+/
+SQL SUCCESS
+select schema_test_006.func_add_sql(1,3);
++--------------+
+| func_add_sql |
++--------------+
+| 4            |
++--------------+
+--8.create user
+create user user_case006 with password 'test@12345';
+SQL SUCCESS
+--9.alter schema
+alter schema schema_test_006 rename to schema_test_006_new;
+SQL SUCCESS
+alter schema schema_test_006_new owner to user_case006;
+SQL SUCCESS
+--10.check data
+select count(*) from schema_test_006_new.i_table where x='你tes';
++-------+
+| count |
++-------+
+| 20000 |
++-------+
+explain select * from schema_test_006_new.i_table where i<12580;
+?.*
+?.*QUERY PLAN?.*
+?.*
+?.*[Bypass]?.*
+?.*Index Scan using i_idx on i_table  (cost=0.00..632.92 rows=6667 width=18)?.*
+?.*Index Cond: (i < 12580)?.*
+?.*
+explain select * from schema_test_006_new.i_table where x='hula';
+?.*
+?.*QUERY PLAN?.*
+?.*
+?.*[Bypass]?.*
+?.*Index Scan using x_idx on i_table  (cost=0.00..282.00 rows=100 width=18)?.*
+?.*Index Cond: (x = 'hula'::bpchar)?.*
+?.*
+select count(*) from my_view;
++-------+
+| count |
++-------+
+| 20000 |
++-------+
+select count(*) from schema_test_006_new.i_all;
++-------+
+| count |
++-------+
+| 20000 |
++-------+
+select schema_test_006_new.func_add_sql(1,3);
++--------------+
+| func_add_sql |
++--------------+
+| 4            |
++--------------+
+--tearDown
+drop view if exists my_view;
+SQL SUCCESS
+drop MATERIALIZED VIEW if exists schema_test_006_new.i_all;
+SQL SUCCESS
+drop table if exists schema_test_006_new.i_table;
+SQL SUCCESS
+drop schema if exists schema_test_006 cascade;
+SQL SUCCESS
+drop schema if exists schema_test_006_new cascade;
+SQL SUCCESS
+drop user if exists user_case006 cascade;
+SQL SUCCESS

@@ -1,0 +1,18 @@
+--  @testpoint:创建函数指定参数IMMUTABLE
+drop FUNCTION if exists func_add_sql005;
+SQL SUCCESS
+CREATE FUNCTION func_add_sql005(integer, integer) RETURNS integer
+    AS 'select $1 + $2;'
+    LANGUAGE SQL
+    IMMUTABLE
+    RETURNS NULL ON NULL INPUT;
+    /
+SQL SUCCESS
+call func_add_sql005(999,1);
++-----------------+
+| func_add_sql005 |
++-----------------+
+| 1000            |
++-----------------+
+drop FUNCTION func_add_sql005;
+SQL SUCCESS

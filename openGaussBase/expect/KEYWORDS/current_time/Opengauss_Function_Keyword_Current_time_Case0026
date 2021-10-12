@@ -1,0 +1,30 @@
+--  @testpoint:opengauss关键字current_time(保留)，作为模式名
+--关键字不带引号-合理报错
+drop schema if exists current_time;
+?.*ERROR: syntax error at or near "current_time".*
+?.*Position.*
+create schema current_time;
+?.*ERROR: syntax error at or near "current_time".*
+?.*Position.*
+--关键字带双引号-成功
+drop schema if exists "current_time";
+SQL SUCCESS
+create schema "current_time";
+SQL SUCCESS
+--清理环境
+drop schema "current_time";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop schema if exists 'current_time';
+?.*ERROR: syntax error at or near "'current_time'".*
+?.*Position.*
+create schema 'current_time';
+?.*ERROR: syntax error at or near "'current_time'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop schema if exists `current_time`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create schema `current_time`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*

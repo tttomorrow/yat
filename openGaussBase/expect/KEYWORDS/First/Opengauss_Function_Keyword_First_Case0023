@@ -1,0 +1,36 @@
+-- @testpoint: opengauss关键字first(非保留)，作为索引名，部分测试点合理报错
+--前置条件，创建一个表
+drop table if exists first_test;
+SQL SUCCESS
+create table first_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop index if exists first;
+SQL SUCCESS
+create index first on first_test(id);
+SQL SUCCESS
+drop index first;
+SQL SUCCESS
+--关键字带双引号-成功
+drop index if exists "first";
+SQL SUCCESS
+create index "first" on first_test(id);
+SQL SUCCESS
+drop index "first";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop index if exists 'first';
+?.*ERROR: syntax error at or near "'first'"
+?.*Position: .*
+create index 'first' on first_test(id);
+?.*ERROR: syntax error at or near "'first'"
+?.*Position: .*
+--关键字带反引号-合理报错
+drop index if exists `first`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+create index `first` on first_test(id);
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+drop table if exists first_test;
+SQL SUCCESS

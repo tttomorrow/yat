@@ -1,0 +1,40 @@
+-- @testpoint: 创建存储过程并测试execute immediate 动态非查询语句select子句套select
+
+drop table if exists t_cust;
+
+create table t_cust(
+  cust_id int,
+  name varchar2(200),
+  user_id int
+);
+
+insert into t_cust values(1,'rt',1);
+insert into t_cust values(1,'rt',2);
+insert into t_cust values(1,'rt',3);
+insert into t_cust values(2,'hw',1);
+insert into t_cust values(3,'zr',2);
+insert into t_cust values(4,'zr',5);
+
+create or replace procedure p003(v_id int) is
+  v_cust_id int;
+  v_cnt     int;
+  v_sum     int;
+begin
+  execute immediate 'select cust_id, count(1), sum(user_id)
+    from (select t.cust_id, user_id
+            from (select cust_id, user_id from t_cust t where cust_id < 3 minus select cust_id, user_id from t_cust t where user_id = 1 minus
+            select 1, 2 from sys_dummy) t union select cust_id, user_id from t_cust t where cust_id < 3) t group by cust_id having cust_id = :1 order by cust_id' into v_cust_id, v_cnt, v_sum using v_id;
+  execute immediate 'select cust_id, count(1), sum(user_id)
+  from (select t.cust_id, user_id from (select cust_id, user_id from t_cust t where cust_id < 3 minus
+       select cust_id, user_id from t_cust t where user_id = 1 minus select 1, 2 from sys_dummy) t union all
+        select cust_id, user_id from t_cust t where cust_id < 3) t group by cust_id having cust_id=' || v_id || ' order by cust_id'
+    into v_cust_id, v_cnt, v_sum;
+end;
+/
+
+call p003(1);
+call p003(2);
+
+drop table if exists t_cust;
+drop procedure p003;
+  

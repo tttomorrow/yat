@@ -1,0 +1,21 @@
+-- @testpoint:  创建索引时使用to_clob类型转换函数
+drop table if exists test2;
+SQL SUCCESS
+drop index if exists test1_index;
+SQL SUCCESS
+create table test2(riqi int);
+SQL SUCCESS
+insert into test2 values(10);
+SQL SUCCESS
+create index test1_index on test2(riqi);
+SQL SUCCESS
+select * from test2 where riqi<to_clob(12);
++------+
+| riqi |
++------+
+| 10   |
++------+
+drop index if exists test1_index;
+SQL SUCCESS
+drop table if exists test2;
+SQL SUCCESS

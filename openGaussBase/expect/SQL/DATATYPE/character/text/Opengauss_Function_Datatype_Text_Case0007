@@ -1,0 +1,15 @@
+-- @testpoint: 插入特殊字符
+drop table if exists test_text_07;
+SQL SUCCESS
+create table test_text_07(c_text text);
+SQL SUCCESS
+insert into test_text_07 values('$@#%……&*（)');
+SQL SUCCESS
+select * from test_text_07;
++------------+
+| c_text     |
++------------+
+| $@#%……&*（) |
++------------+
+drop table test_text_07;
+SQL SUCCESS

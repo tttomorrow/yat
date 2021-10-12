@@ -1,0 +1,17 @@
+-- @testpoint: 将表中字段的插入权限赋予指定的用户或角色
+drop user if exists user_008 cascade;
+SQL SUCCESS
+create user user_008 identified by 'Gauss_234';
+SQL SUCCESS
+drop table if exists t8;
+SQL SUCCESS
+create table t8(id int ,name char(255),age int ,city varchar (255));
+SQL SUCCESS
+grant insert on t8 to user_008;
+SQL SUCCESS
+revoke insert on t8 from user_008;
+SQL SUCCESS
+drop table if exists t8;
+SQL SUCCESS
+drop user if exists user_008;
+SQL SUCCESS

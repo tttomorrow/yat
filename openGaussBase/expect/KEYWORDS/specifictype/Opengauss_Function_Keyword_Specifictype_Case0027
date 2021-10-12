@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字specifictype非保留)，作为序列名
+--关键字不带引号-成功
+drop sequence if exists specifictype;
+SQL SUCCESS
+create sequence specifictype start 100 cache 50;
+SQL SUCCESS
+drop sequence specifictype;
+SQL SUCCESS
+--关键字带双引号-成功
+drop sequence if exists "specifictype";
+SQL SUCCESS
+create sequence "specifictype" start 100 cache 50;
+SQL SUCCESS
+drop sequence "specifictype";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'specifictype';
+?.*ERROR: syntax error at or near "'specifictype'".*
+?.*Position: .*
+create sequence 'specifictype' start 100 cache 50;
+?.*ERROR: syntax error at or near "'specifictype'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop sequence if exists `specifictype`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create sequence `specifictype` start 100 cache 50;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

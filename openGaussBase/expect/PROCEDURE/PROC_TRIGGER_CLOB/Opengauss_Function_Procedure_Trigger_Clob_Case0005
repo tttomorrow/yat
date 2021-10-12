@@ -1,0 +1,25 @@
+-- @testpoint: 验证匿名块是否支持查询clob类型
+--创建测试表
+drop table if exists temp;
+SQL SUCCESS
+create table temp
+(
+  name      varchar2(200),
+  age       number,
+  temp_clob clob
+);
+SQL SUCCESS
+--创建匿名块
+declare
+       v_lang clob := '待插入的海量字符串';
+       v_temp_clob temp.temp_clob%type;
+begin
+insert into temp values ('grand.jon', 22, v_lang);
+select temp_clob into v_temp_clob from temp where age=22;
+raise info ':%',v_temp_clob;
+end;
+/
+SQL SUCCESS
+--清理环境
+drop table temp;
+SQL SUCCESS

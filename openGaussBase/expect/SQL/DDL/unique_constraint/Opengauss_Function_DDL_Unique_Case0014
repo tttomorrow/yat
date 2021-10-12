@@ -1,0 +1,24 @@
+-- @testpoint: 建表后，使用alter增加单列约束，分别不带约束名和带约束名
+-- @modify at: 2020-11-23
+--建表
+drop table if exists test_unique_constraint014;
+SQL SUCCESS
+create table test_unique_constraint014 (id_p int not null, lastname varchar(255) not null, firstname varchar(255), address varchar(255), city varchar(255));
+SQL SUCCESS
+--增加列约束
+alter table test_unique_constraint014 add unique (id_p);
+SQL SUCCESS
+--指定约束名，增加列约束
+alter table test_unique_constraint014 add constraint uc_personid unique (id_p);
+SQL SUCCESS
+--通过系统表查询约束信息
+select conname,contype from pg_constraint where conrelid = (select oid from pg_class where relname = 'test_unique_constraint014') order by conname;
++------------------------------------+---------+
+| conname                            | contype |
++------------------------------------+---------+
+| test_unique_constraint014_id_p_key | u       |
+| uc_personid                        | u       |
++------------------------------------+---------+
+--删表
+drop table if exists test_unique_constraint014;
+SQL SUCCESS

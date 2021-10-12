@@ -1,0 +1,11 @@
+-- @testpoint: hextoraw函数和rawtohex结合使用
+select hextoraw(rawtohex('125abc578')) from sys_dummy;
++--------------------+
+| hextoraw           |
++--------------------+
++--------------------+
+select rawtohex(hextoraw(rawtohex('125abc578'))) from sys_dummy;
++--------------------+
+| rawtohex           |
++--------------------+
++--------------------+

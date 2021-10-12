@@ -1,0 +1,23 @@
+-- @testpoint: fetch抓取最后一行数据
+drop TABLE if EXISTS test_2;
+SQL SUCCESS
+CREATE TABLE test_2(ID INT,NAME CHAR(20));
+SQL SUCCESS
+INSERT INTO test_2 VALUES(1,'Lily'),(2,'Tom'),(3,'Maria');
+SQL SUCCESS
+START TRANSACTION;
+SQL SUCCESS
+CURSOR cursor1 FOR SELECT * FROM test_2 ORDER by name;
+SQL SUCCESS
+FETCH  LAST from CURSOR1;
++----+----------------------+
+| id | name                 |
++----+----------------------+
+| 2  | Tom                  |
++----+----------------------+
+CLOSE cursor1;
+SQL SUCCESS
+end;
+SQL SUCCESS
+drop TABLE test_2;
+SQL SUCCESS

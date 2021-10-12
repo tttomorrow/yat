@@ -1,0 +1,193 @@
+--  @testpoint: 比较表达式null操作符
+--expression IS NULL
+select NULL IS NULL AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select 'NULL' IS NULL AS RESULT;
++--------+
+| result |
++--------+
+| false  |
++--------+
+select '' IS NULL AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select ' ' IS NULL AS RESULT;
++--------+
+| result |
++--------+
+| false  |
++--------+
+select 'TEST' IS NULL AS RESULT;
++--------+
+| result |
++--------+
+| false  |
++--------+
+--expression IS NOT NULL
+select NULL IS NOT NULL AS RESULT;
++--------+
+| result |
++--------+
+| false  |
++--------+
+select 'NULL' IS NOT NULL AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select '' IS NOT NULL AS RESULT;
++--------+
+| result |
++--------+
+| false  |
++--------+
+select ' ' IS NOT NULL AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select 'TEST' IS NOT NULL AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+--expression  ISNULL
+select NULL ISNULL AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select 'NULL' ISNULL AS RESULT;
++--------+
+| result |
++--------+
+| false  |
++--------+
+select '' ISNULL AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select ' ' ISNULL AS RESULT;
++--------+
+| result |
++--------+
+| false  |
++--------+
+select 'TEST' ISNULL AS RESULT;
++--------+
+| result |
++--------+
+| false  |
++--------+
+--expression NOTNULL
+select NULL NOTNULL AS RESULT;
++--------+
+| result |
++--------+
+| false  |
++--------+
+select 'NULL' NOTNULL AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select '' NOTNULL AS RESULT;
++--------+
+| result |
++--------+
+| false  |
++--------+
+select ' ' NOTNULL AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+select 'TEST' NOTNULL AS RESULT;
++--------+
+| result |
++--------+
+| true   |
++--------+
+--建表
+drop table if exists test_expression_04 cascade ;
+SQL SUCCESS
+create table test_expression_04(a int, b int);
+SQL SUCCESS
+insert into test_expression_04(a) values(4);
+SQL SUCCESS
+insert into test_expression_04(b) values(4);
+SQL SUCCESS
+select a NOTNULL AS RESULT from test_expression_04;
++--------+
+| result |
++--------+
+| true   |
+| false  |
++--------+
+select a IS NOT NULL AS RESULT from test_expression_04;
++--------+
+| result |
++--------+
+| true   |
+| false  |
++--------+
+select a ISNULL AS RESULT from test_expression_04;
++--------+
+| result |
++--------+
+| false  |
+| true   |
++--------+
+select a IS NULL AS RESULT from test_expression_04;
++--------+
+| result |
++--------+
+| false  |
+| true   |
++--------+
+select b NOTNULL AS RESULT from test_expression_04;
++--------+
+| result |
++--------+
+| false  |
+| true   |
++--------+
+select b IS NOT NULL AS RESULT from test_expression_04;
++--------+
+| result |
++--------+
+| false  |
+| true   |
++--------+
+select b ISNULL AS RESULT from test_expression_04;
++--------+
+| result |
++--------+
+| true   |
+| false  |
++--------+
+select b IS NULL AS RESULT from test_expression_04;
++--------+
+| result |
++--------+
+| true   |
+| false  |
++--------+
+--清理环境
+drop table if exists test_expression_04 cascade ;
+SQL SUCCESS

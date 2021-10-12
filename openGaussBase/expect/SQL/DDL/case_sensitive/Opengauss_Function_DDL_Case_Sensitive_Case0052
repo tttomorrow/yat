@@ -1,0 +1,17 @@
+--  @testpoint: 创建用户验证大小写
+DROP schema if exists TEST_sensitive_52 cascade;
+SQL SUCCESS
+DROP USER TEST_sensitive_52 cascade;
+?.*ERROR: role "test_sensitive_52" does not exist?.*
+DROP schema if exists TEST_sensitive_52 cascade;
+SQL SUCCESS
+create user TEST_sensitive_52 password '@123456qaz';
+SQL SUCCESS
+create user test_sensitive_52 password '@123456qaz';
+?.*ERROR: role "test_sensitive_52" already exists?.*
+grant all privileges to TeSt_sensitive_52;
+SQL SUCCESS
+DROP USER TEST_sensitive_52 cascade;
+SQL SUCCESS
+DROP USER test_sensitive_52 cascade;
+?.*ERROR: role "test_sensitive_52" does not exist?.*

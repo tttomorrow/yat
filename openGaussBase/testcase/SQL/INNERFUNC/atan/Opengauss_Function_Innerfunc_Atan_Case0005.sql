@@ -1,0 +1,7 @@
+-- @testpoint: 隐含转换
+
+select atan(cast(1 as int)) from sys_dummy;
+select atan(cast(1.00 as decimal(7,2))) from sys_dummy;
+select atan(cast(1 as real)) from sys_dummy;
+select atan(cast(1 as number)) from sys_dummy;
+select atan(cast(1.00 as char(2))) from sys_dummy;

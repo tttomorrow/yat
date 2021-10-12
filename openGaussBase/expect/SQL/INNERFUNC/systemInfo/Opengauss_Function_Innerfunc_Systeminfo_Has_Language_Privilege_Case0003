@@ -1,0 +1,13 @@
+-- @testpoint: language不赋权限查询USAGE权限返回为true（本身带有sql语言权限）
+DROP USER IF EXISTS joe CASCADE;
+SQL SUCCESS
+CREATE USER joe PASSWORD 'Bigdata@123';
+SQL SUCCESS
+select has_language_privilege ('joe', 'sql', 'USAGE');
++------------------------+
+| has_language_privilege |
++------------------------+
+| true                   |
++------------------------+
+DROP USER IF EXISTS joe CASCADE;
+SQL SUCCESS

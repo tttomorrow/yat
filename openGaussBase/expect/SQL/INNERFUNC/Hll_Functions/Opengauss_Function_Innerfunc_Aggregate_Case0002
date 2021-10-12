@@ -1,0 +1,6 @@
+-- @testpoint: hll_add_agg(hll_hashval),把哈希后的数据按照分组放到hll中,当入参为其他类型时,合理报错
+select hll_add_agg(1215);
+?.*ERROR: function hll_add_agg\(integer\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: hll_add_agg

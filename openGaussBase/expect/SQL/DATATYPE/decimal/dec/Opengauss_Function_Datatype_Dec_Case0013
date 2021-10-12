@@ -1,0 +1,21 @@
+-- @testpoint: 创建本地列存临时表，精度在合理范围值内，插入数据
+drop table if exists dec_13;
+SQL SUCCESS
+create temporary table dec_13 (id dec(4,2)) with (orientation=column, compression=no);
+SQL SUCCESS
+insert into dec_13 values (11.11);
+SQL SUCCESS
+insert into dec_13 values (23.00);
+SQL SUCCESS
+insert into dec_13 values (1.1);
+SQL SUCCESS
+select * from dec_13;
++-------+
+| id    |
++-------+
+| 11.11 |
+| 23.00 |
+| 1.10  |
++-------+
+drop table dec_13;
+SQL SUCCESS

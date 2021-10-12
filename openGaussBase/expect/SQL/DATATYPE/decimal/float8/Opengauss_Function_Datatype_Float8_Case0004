@@ -1,0 +1,17 @@
+-- @testpoint: 插入数值超出精度范围，自动截取
+drop table if exists float8_04;
+SQL SUCCESS
+create table float8_04 (name float8);
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+select * from float8_04;
++----------------------+
+| name                 |
++----------------------+
+| -1.4165133E7         |
++----------------------+
+drop table float8_04;
+SQL SUCCESS

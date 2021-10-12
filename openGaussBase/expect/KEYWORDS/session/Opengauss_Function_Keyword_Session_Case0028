@@ -1,0 +1,65 @@
+-- @testpoint: opengauss关键字session(非保留)，作为同义词对象名，部分测试点合理报错
+--前置条件
+drop table if exists explain_test;
+SQL SUCCESS
+create table explain_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists session;
+SQL SUCCESS
+create synonym session for explain_test;
+SQL SUCCESS
+insert into session values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update session set session.name='cici' where session.id=2;
+SQL SUCCESS
+select * from session;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+drop synonym if exists session;
+SQL SUCCESS
+--关键字带双引号-成功
+drop synonym if exists "session";
+SQL SUCCESS
+create synonym "session" for explain_test;
+SQL SUCCESS
+drop synonym if exists "session";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'session';
+?.*ERROR: syntax error at or near "'session'".*
+?.*Position: .*
+create synonym 'session' for explain_test;
+?.*ERROR: syntax error at or near "'session'".*
+?.*Position: .*
+insert into 'session' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'session'".*
+?.*Position: .*
+update 'session' set 'session'.name='cici' where 'session'.id=2;
+?.*ERROR: syntax error at or near "'session'".*
+?.*Position: .*
+select * from 'session';
+?.*ERROR: syntax error at or near "'session'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop synonym if exists `session`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create synonym `session` for explain_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+insert into `session` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+update `session` set `session`.name='cici' where `session`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+select * from `session`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+drop table if exists explain_test;
+SQL SUCCESS

@@ -1,0 +1,21 @@
+-- @testpoint: role存在某项权限返回为true
+DROP USER IF EXISTS senior_manager CASCADE;
+SQL SUCCESS
+DROP ROLE IF EXISTS manager;
+SQL SUCCESS
+CREATE ROLE manager IDENTIFIED BY 'Bigdata@123';
+SQL SUCCESS
+CREATE USER senior_manager PASSWORD 'Bigdata@123';
+SQL SUCCESS
+GRANT manager TO senior_manager;
+SQL SUCCESS
+select pg_has_role('senior_manager', 'manager', 'USAGE');
++-------------+
+| pg_has_role |
++-------------+
+| true        |
++-------------+
+DROP ROLE IF EXISTS manager;
+SQL SUCCESS
+DROP USER IF EXISTS senior_manager CASCADE;
+SQL SUCCESS

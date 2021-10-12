@@ -1,0 +1,50 @@
+-- @testpoint: 测试rownum在group by中的表现，合理报错
+drop table if exists student;
+SQL SUCCESS
+create table student
+(
+    id int primary key,
+    class int,
+    name varchar(10) not null
+);
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+SQL SUCCESS
+--分别测试rownum在where和having中的作用
+select count(id), class from student where rownum < 6 group by class;
++-------+-------+
+| count | class |
++-------+-------+
+| 3     | 1     |
+| 2     | 2     |
++-------+-------+
+select count(id), class from student group by class having rownum < 4;
+?.*ERROR: ROWNUM must appear in the GROUP BY clause or be used in an aggregate function
+?.*Position:?.*
+select count(id), count(class) from student group by rownum having rownum < 4;
++-------+-------+
+| count | count |
++-------+-------+
+| 1     | 1     |
+| 1     | 1     |
+| 1     | 1     |
++-------+-------+
+--ok，在where和having中都出现，各代表了不同的含义
+select count(id), class from student where rownum != 9 group by class having class < 4;
++-------+-------+
+| count | class |
++-------+-------+
+| 3     | 1     |
+| 1     | 3     |
+| 4     | 2     |
++-------+-------+
+drop table if exists student;
+SQL SUCCESS

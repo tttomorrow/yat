@@ -1,0 +1,19 @@
+-- @testpoint: 插入字符串类型,合理报错
+drop table if exists decimal_09;
+SQL SUCCESS
+create table decimal_09 (name decimal);
+SQL SUCCESS
+insert into decimal_09 values ('abc');
+?.*ERROR: invalid input syntax for type numeric: "abc"
+?.*
+  Where: referenced column: name
+insert into decimal_09 values ('1235ss4563');
+?.*ERROR: invalid input syntax for type numeric: "1235ss4563"
+?.*
+  Where: referenced column: name
+insert into decimal_09 values ('abc456');
+?.*ERROR: invalid input syntax for type numeric: "abc456"
+?.*
+  Where: referenced column: name
+drop table decimal_09;
+SQL SUCCESS

@@ -1,0 +1,116 @@
+-- @testpoint: 创建时设置maxvalue 和 minvalue 修改cache 合理报错
+--创建序列
+drop sequence if exists test_seq_009;
+SQL SUCCESS
+CREATE sequence test_seq_009 minvalue 1 maxvalue 10;
+SQL SUCCESS
+drop table if exists table_seq_009 cascade;
+SQL SUCCESS
+create table table_seq_009(id int);
+SQL SUCCESS
+--查询cache值
+select last_value,cache_value from test_seq_009;
++------------+-------------+
+| last_value | cache_value |
++------------+-------------+
+| 1          | 1           |
++------------+-------------+
+--修改cache大于最小值小于最大值 期望：修改成功
+alter sequence test_seq_009 cache 5;
+SQL SUCCESS
+--查询cache值
+select last_value,cache_value from test_seq_009;
++------------+-------------+
+| last_value | cache_value |
++------------+-------------+
+| 1          | 5           |
++------------+-------------+
+select nextval('test_seq_009');
++---------+
+| nextval |
++---------+
+| 1       |
++---------+
+insert into table_seq_009 values(nextval('test_seq_009'));
+SQL SUCCESS
+select last_value,cache_value from test_seq_009;
++------------+-------------+
+| last_value | cache_value |
++------------+-------------+
+| 5          | 5           |
++------------+-------------+
+select nextval('test_seq_009');
++---------+
+| nextval |
++---------+
+| 3       |
++---------+
+--修改cache大于最大值 期望：修改成功 清空cache后调用时合理报错
+alter sequence test_seq_009 cache -10;
+?.*ERROR: CACHE \(-10\) must be greater than zero?.*
+--查询cache值
+select last_value,cache_value from test_seq_009;
++------------+-------------+
+| last_value | cache_value |
++------------+-------------+
+| 5          | 5           |
++------------+-------------+
+alter sequence test_seq_009 maxvalue 50;
+SQL SUCCESS
+select nextval('test_seq_009');
++---------+
+| nextval |
++---------+
+| 6       |
++---------+
+insert into table_seq_009 values(nextval('test_seq_009'));
+SQL SUCCESS
+select last_value,cache_value from test_seq_009;
++------------+-------------+
+| last_value | cache_value |
++------------+-------------+
+| 10         | 5           |
++------------+-------------+
+select nextval('test_seq_009');
++---------+
+| nextval |
++---------+
+| 8       |
++---------+
+--修改cache小于最小值 期望：修改成功 清空cache后调用时合理报错
+alter sequence test_seq_009 cache -20;
+?.*ERROR: CACHE \(-20\) must be greater than zero?.*
+--查询cache值
+select last_value,cache_value from test_seq_009;
++------------+-------------+
+| last_value | cache_value |
++------------+-------------+
+| 10         | 5           |
++------------+-------------+
+alter sequence test_seq_009 maxvalue 50;
+SQL SUCCESS
+select nextval('test_seq_009');
++---------+
+| nextval |
++---------+
+| 11      |
++---------+
+insert into table_seq_009 values(nextval('test_seq_009'));
+SQL SUCCESS
+select last_value,cache_value from test_seq_009;
++------------+-------------+
+| last_value | cache_value |
++------------+-------------+
+| 15         | 5           |
++------------+-------------+
+select nextval('test_seq_009');
++---------+
+| nextval |
++---------+
+| 13      |
++---------+
+--清理环境
+drop table if exists table_seq_009 cascade;
+SQL SUCCESS
+drop sequence if exists test_seq_009;
+SQL SUCCESS

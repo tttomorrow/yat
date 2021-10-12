@@ -1,0 +1,20 @@
+-- @testpoint: 插入指数形式值
+drop table if exists decimal_11;
+SQL SUCCESS
+create table decimal_11 (name decimal);
+SQL SUCCESS
+insert into decimal_11 values (exp(33));
+SQL SUCCESS
+insert into decimal_11 values (exp(12.34));
+SQL SUCCESS
+insert into decimal_11 values (exp(-15));
+SQL SUCCESS
+insert into decimal_11 values (exp(-12.34));
+SQL SUCCESS
+select * from decimal_11;
++-------------------------+
+| name                    |
++-------------------------+
++-------------------------+
+drop table decimal_11;
+SQL SUCCESS

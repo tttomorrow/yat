@@ -1,0 +1,74 @@
+-- @testpoint: 标量类型%rowtype的测试———基本类型测试 合理报错
+drop table if exists FVT_PROC_SCALAR_ROWTYPE_table_006;
+SQL SUCCESS
+CREATE TABLE FVT_PROC_SCALAR_ROWTYPE_table_006(
+  T1 INT NOT NULL,
+  T2 INTEGER,
+  T3 BIGINT,
+  T4 NUMBER DEFAULT 0.2332,
+  T5 NUMBER(12,2),
+  T6 NUMBER(12,6),
+  T7 BINARY_DOUBLE,
+  T8 DECIMAL,
+  T9 DECIMAL(8,2),
+  T10 DECIMAL(8,4),
+  T11 REAL,
+  T12 CHAR(4000),
+  T13 CHAR(100),
+  T14 VARCHAR(4000),
+  T15 VARCHAR(100),
+  T16 VARCHAR2(4000),
+  T17 NUMERIC,
+
+  T19 DATE,
+  T20 TIMESTAMP,
+  T21 TIMESTAMP(6),
+  T22 BOOL
+) ;
+SQL SUCCESS
+create unique index  FVT_PROC_SCALAR_ROWTYPE_table_index_006 on FVT_PROC_SCALAR_ROWTYPE_table_006(T1);
+SQL SUCCESS
+create index FVT_PROC_SCALAR_ROWTYPE_table_index1_006 on FVT_PROC_SCALAR_ROWTYPE_table_006(T2,T17,T20);
+SQL SUCCESS
+--创建存储过程
+CREATE OR REPLACE PROCEDURE FVT_PROC_SCALAR_ROWTYPE_006(P1 INT)  AS
+V1 FVT_PROC_SCALAR_ROWTYPE_table_006%rowtype;
+BEGIN
+select * into V1 from FVT_PROC_SCALAR_ROWTYPE_table_006 where T1=P1;
+raise info 'T13=:%',V1.T13;
+EXCEPTION
+WHEN NO_DATA_FOUND THEN raise info 'NO_DATA_FOUND';
+END;
+/
+SQL SUCCESS
+--修改列属性
+alter table FVT_PROC_SCALAR_ROWTYPE_table_006 modify T13 TIMESTAMP(5);
+SQL SUCCESS
+to_timestamp('2008-08-12 15:13:21.3211','YYYY-MM-DD HH24:MI:SS.FFFF'),'abcdeg','ac','ade',123.46,'2012-08-08','2000-02-01 15:22:21.11','2012-02-01 15:12:11.32',false);
+?.*ERROR: source string too short for "FF" formatting field.*
+  Detail: Field requires 6 characters, but only 4 remain.
+  Hint: If your source string is not fixed-width, try using the "FM" modifier.
+  Where: referenced column: t13
+--重新编译存储过程
+CREATE OR REPLACE PROCEDURE FVT_PROC_SCALAR_ROWTYPE_006(P1 INT)  AS
+V1 FVT_PROC_SCALAR_ROWTYPE_table_006%rowtype;
+BEGIN
+select * into V1 from FVT_PROC_SCALAR_ROWTYPE_table_006 where T1=P1;
+raise info 'T13=:%',V1.T13;
+EXCEPTION
+WHEN NO_DATA_FOUND THEN raise info 'NO_DATA_FOUND';
+END;
+/
+SQL SUCCESS
+--调用存储过程
+CALL FVT_PROC_SCALAR_ROWTYPE_006(14);
++-----------------------------+
+| fvt_proc_scalar_rowtype_006 |
++-----------------------------+
+|                             |
++-----------------------------+
+--恢复环境
+drop table if exists FVT_PROC_SCALAR_ROWTYPE_table_006;
+SQL SUCCESS
+drop procedure if exists FVT_PROC_SCALAR_ROWTYPE_006;
+SQL SUCCESS

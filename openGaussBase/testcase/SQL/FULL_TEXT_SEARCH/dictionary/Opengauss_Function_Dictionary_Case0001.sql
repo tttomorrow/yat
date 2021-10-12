@@ -1,0 +1,7 @@
+--  @testpoint:创建词典权限测试（管理员）
+--预置条件：当前用户为系统管理员
+--sysadmin用户创建词典，成功
+DROP TEXT SEARCH DICTIONARY IF EXISTS pg_dict;
+CREATE TEXT SEARCH DICTIONARY pg_dict (TEMPLATE = Simple);
+--删除词典
+DROP TEXT SEARCH DICTIONARY pg_dict;

@@ -1,0 +1,20 @@
+-- @testpoint: 删除函数，添加模式名删除（模式名已存在）
+drop FUNCTION if EXISTS u_testfun89(c_int int);
+SQL SUCCESS
+CREATE FUNCTION u_testfun89 ( INOUT c_int int) RETURNS int  AS $$
+        BEGIN
+                RETURN (c_int);
+        END;
+$$ LANGUAGE plpgsql;
+/
+SQL SUCCESS
+drop SCHEMA if EXISTS dy;
+SQL SUCCESS
+create SCHEMA dy;
+SQL SUCCESS
+ALTER FUNCTION u_testfun89 ( INOUT c_int int) SET SCHEMA  dy;
+SQL SUCCESS
+drop FUNCTION dy.u_testfun89;
+SQL SUCCESS
+drop SCHEMA dy;
+SQL SUCCESS

@@ -1,0 +1,76 @@
+-- @testpoint: else用于条件表达式中
+--case when之后的条件都为真,返回结果是then之后的值
+drop table if exists case_when_t1;
+SQL SUCCESS
+CREATE TABLE case_when_t1(CW_COL1 INT);
+SQL SUCCESS
+INSERT INTO case_when_t1 VALUES (1), (2), (3);
+SQL SUCCESS
+SELECT * FROM case_when_t1;
++---------+
+| cw_col1 |
++---------+
+| 1       |
+| 2       |
+| 3       |
++---------+
+SELECT CW_COL1, CASE WHEN CW_COL1=1 THEN 'one' WHEN CW_COL1=2 THEN 'two' ELSE 'other' END FROM case_when_t1 ORDER BY 1;
++---------+-------+
+| cw_col1 | case  |
++---------+-------+
+| 1       | one   |
+| 2       | two   |
+| 3       | other |
++---------+-------+
+drop table case_when_t1;
+SQL SUCCESS
+--case when之后的条件第一个为假，返回else后的值other
+drop table if exists case_when_t1;
+SQL SUCCESS
+CREATE TABLE case_when_t1(CW_COL1 INT);
+SQL SUCCESS
+INSERT INTO case_when_t1 VALUES (1), (2), (3);
+SQL SUCCESS
+SELECT * FROM case_when_t1;
++---------+
+| cw_col1 |
++---------+
+| 1       |
+| 2       |
+| 3       |
++---------+
+SELECT CW_COL1, CASE WHEN CW_COL1=4 THEN 'four' WHEN CW_COL1=2 THEN 'two' ELSE 'other' END FROM case_when_t1 ORDER BY 1;
++---------+-------+
+| cw_col1 | case  |
++---------+-------+
+| 1       | other |
+| 2       | two   |
+| 3       | other |
++---------+-------+
+drop table case_when_t1;
+SQL SUCCESS
+--case when之后的条件都为假,返回else后的值other
+drop table if exists case_when_t1;
+SQL SUCCESS
+CREATE TABLE case_when_t1(CW_COL1 INT);
+SQL SUCCESS
+INSERT INTO case_when_t1 VALUES (1), (2), (3);
+SQL SUCCESS
+SELECT * FROM case_when_t1;
++---------+
+| cw_col1 |
++---------+
+| 1       |
+| 2       |
+| 3       |
++---------+
+SELECT CW_COL1, CASE WHEN CW_COL1=5 THEN 'five' WHEN CW_COL1=4 THEN 'two' ELSE 'other' END FROM case_when_t1 ORDER BY 1;
++---------+-------+
+| cw_col1 | case  |
++---------+-------+
+| 1       | other |
+| 2       | other |
+| 3       | other |
++---------+-------+
+drop table if exists case_when_t1;
+SQL SUCCESS

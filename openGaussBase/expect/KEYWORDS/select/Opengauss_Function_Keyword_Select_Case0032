@@ -1,0 +1,21 @@
+--  @testpoint:openGauss保留关键字select作为 用户名，
+--不带引号，合理报错
+CREATE USER select PASSWORD 'Bigdata@123';
+?.*ERROR: syntax error at or near "select".*
+?.*Position.*
+--加双引号，创建成功
+drop user if exists "select";
+SQL SUCCESS
+CREATE USER "select" PASSWORD 'Bigdata@123';
+SQL SUCCESS
+--清理环境
+drop user "select";
+SQL SUCCESS
+--加单引号，合理报错
+CREATE USER 'select' PASSWORD 'Bigdata@123';
+?.*ERROR: syntax error at or near "'select'".*
+?.*Position.*
+--加反引号，合理报错
+CREATE USER `select` PASSWORD 'Bigdata@123';
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*

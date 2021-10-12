@@ -1,0 +1,19 @@
+-- @testpoint: 空,空格，null
+SELECT bit_length('');
++------------+
+| bit_length |
++------------+
+|            |
++------------+
+select bit_length(' ');
++------------+
+| bit_length |
++------------+
+| 8          |
++------------+
+select bit_length(null);
++------------+
+| bit_length |
++------------+
+|            |
++------------+

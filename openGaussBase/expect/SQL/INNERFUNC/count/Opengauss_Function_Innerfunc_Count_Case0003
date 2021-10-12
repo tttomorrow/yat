@@ -1,0 +1,60 @@
+-- @testpoint: 异常校验，合理报错
+drop table if exists tbc;
+SQL SUCCESS
+create table tbc
+(
+id integer,
+name char(10),
+sex char(10)
+);
+SQL SUCCESS
+create index tbc_index on tbc(id);
+SQL SUCCESS
+insert into tbc values(1,'wang','male');
+SQL SUCCESS
+insert into tbc values(2,'zhang','female');
+SQL SUCCESS
+insert into tbc values(5,'sun');
+SQL SUCCESS
+select * from tbc;
++----+------------+------------+
+| id | name       | sex        |
++----+------------+------------+
+| 1  | wang       | male       |
+| 2  | zhang      | female     |
+| 5  | sun        |            |
++----+------------+------------+
+select count() from tbc;
+?.*ERROR: count\(\*\) must be used to call a parameterless aggregate function
+?.*
+  Where: referenced column: count
+select count('') from tbc;
++-------+
+| count |
++-------+
+| 0     |
++-------+
+select count(null) from tbc;
++-------+
+| count |
++-------+
+| 0     |
++-------+
+select count(none) from tbc;
+?.*ERROR: column "none" does not exist
+?.*
+  Where: referenced column: count
+select count('f') from tbc;
++-------+
+| count |
++-------+
+| 3     |
++-------+
+select count('男') from tbc;
++-------+
+| count |
++-------+
+| 3     |
++-------+
+drop table if exists tbc;
+SQL SUCCESS

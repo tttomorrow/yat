@@ -1,0 +1,13 @@
+-- @testpoint:单表不带表名查询该表的字段，默认不走full
+SELECT
+    /*+FULL()*/
+    ROLEID,
+    ROLENAME,
+    OWNER_ID,
+    OWNER_NAME,
+    DECODE(SUM(DECODE(PRIVID,28,1,0)),1,'T','F') AS CANCREATEROLE,
+    DECODE(SUM(DECODE(PRIVID,30,1,0)),1,'T','F') AS CANCREATESESSION
+    FROM SYS.USER_ROLES_PRIVS$
+    GROUP BY ROLEID, ROLENAME, OWNER_ID, OWNER_NAME;
+?.*ERROR: schema "sys" does not exist.*
+?.*Position: .*

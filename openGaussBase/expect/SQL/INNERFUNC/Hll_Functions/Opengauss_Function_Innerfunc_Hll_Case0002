@@ -1,0 +1,16 @@
+-- @testpoint: 函数hll_hash_boolean(bool)，对bool类型数据计算哈希值，入参为其他类型时，合理报错
+select hll_hash_boolean('12');
+?.*ERROR: invalid input syntax for type boolean: "12".*
+?.*
+  Where: referenced column: hll_hash_boolean
+select hll_hash_boolean('nihao');
+?.*ERROR: invalid input syntax for type boolean: "nihao".*
+?.*
+  Where: referenced column: hll_hash_boolean
+select hll_hash_boolean('你好');
+?.*ERROR: invalid input syntax for type boolean: "你好".*
+?.*
+  Where: referenced column: hll_hash_boolean
+select hll_hash_boolean(@);
+?.*ERROR: syntax error at or near "\)".*
+?.*

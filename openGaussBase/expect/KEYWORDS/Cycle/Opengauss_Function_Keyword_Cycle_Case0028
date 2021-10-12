@@ -1,0 +1,65 @@
+-- @testpoint: opengauss关键字cycle(非保留)，作为同义词对象名，部分测试点合理报错
+--前置条件
+drop table if exists cycle_test;
+SQL SUCCESS
+create table cycle_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists cycle;
+SQL SUCCESS
+create synonym cycle for cycle_test;
+SQL SUCCESS
+insert into cycle values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update cycle set cycle.name='cici' where cycle.id=2;
+SQL SUCCESS
+select * from cycle;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+drop synonym if exists cycle;
+SQL SUCCESS
+--关键字带双引号-成功
+drop synonym if exists "cycle";
+SQL SUCCESS
+create synonym "cycle" for cycle_test;
+SQL SUCCESS
+drop synonym if exists "cycle";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'cycle';
+?.*ERROR: syntax error at or near "'cycle'"
+?.*
+create synonym 'cycle' for cycle_test;
+?.*ERROR: syntax error at or near "'cycle'"
+?.*
+insert into 'cycle' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'cycle'"
+?.*
+update 'cycle' set 'cycle'.name='cici' where 'cycle'.id=2;
+?.*ERROR: syntax error at or near "'cycle'"
+?.*
+select * from 'cycle';
+?.*ERROR: syntax error at or near "'cycle'"
+?.*
+--关键字带反引号-合理报错
+drop synonym if exists `cycle`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create synonym `cycle` for cycle_test;
+?.*ERROR: syntax error at or near "`"
+?.*
+insert into `cycle` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`"
+?.*
+update `cycle` set `cycle`.name='cici' where `cycle`.id=2;
+?.*ERROR: syntax error at or near "`"
+?.*
+select * from `cycle`;
+?.*ERROR: syntax error at or near "`"
+?.*
+drop table if exists cycle_test;
+SQL SUCCESS

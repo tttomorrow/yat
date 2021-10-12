@@ -1,0 +1,24 @@
+-- @testpoint: 插入指数形式值
+drop table if exists tinyint12;
+SQL SUCCESS
+create table tinyint12 (name tinyint);
+SQL SUCCESS
+insert into tinyint12 values (exp(3));
+SQL SUCCESS
+insert into tinyint12 values (exp(1.5));
+SQL SUCCESS
+insert into tinyint12 values (exp(-5));
+SQL SUCCESS
+insert into tinyint12 values (exp(-1.5));
+SQL SUCCESS
+select * from tinyint12;
++------+
+| name |
++------+
+| 20   |
+| 4    |
+| 0    |
+| 0    |
++------+
+drop table tinyint12;
+SQL SUCCESS

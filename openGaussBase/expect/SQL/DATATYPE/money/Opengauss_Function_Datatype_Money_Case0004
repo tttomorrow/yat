@@ -1,0 +1,21 @@
+-- @testpoint: 插入0值
+drop table if exists test_money04;
+SQL SUCCESS
+create table test_money04 (name money);
+SQL SUCCESS
+insert into test_money04 values (0);
+SQL SUCCESS
+insert into test_money04 values (0);
+SQL SUCCESS
+insert into test_money04 values (0);
+SQL SUCCESS
+select * from test_money04;
++------+
+| name |
++------+
+| 0.0  |
+| 0.0  |
+| 0.0  |
++------+
+drop table test_money04;
+SQL SUCCESS

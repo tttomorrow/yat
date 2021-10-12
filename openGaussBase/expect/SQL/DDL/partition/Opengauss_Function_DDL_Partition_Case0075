@@ -1,0 +1,69 @@
+-- @testpoint: MERGE PARTITIONS  INTO PARTITION不产生core
+--step1:建表造数据 ; expect:成功
+drop table if exists t_partition_0075;
+SQL SUCCESS
+create table t_partition_0075
+(
+    c_id integer not null,
+    c_date date,
+    c_info varchar(20) not null
+)
+partition by range(c_date)
+interval('2 day')
+(
+    partition p1 values less than ('2021-06-01 00:00:00'),
+    partition p2 values less than ('2021-06-03 00:00:00'),
+    partition p3 values less than ('2021-06-05 00:00:00'),
+    partition p4 values less than ('2021-06-07 00:00:00'),
+    partition p5 values less than ('2021-06-09 00:00:00')
+);
+SQL SUCCESS
+insert into t_partition_0075(c_id, c_date, c_info) values(1, '2021-05-30 00:00:00', '1-1');
+SQL SUCCESS
+insert into t_partition_0075(c_id, c_date, c_info) values(2, '2021-05-31 00:00:00', '1-1');
+SQL SUCCESS
+insert into t_partition_0075(c_id, c_date, c_info) values(3, '2021-06-01 00:00:00', '1-1');
+SQL SUCCESS
+insert into t_partition_0075(c_id, c_date, c_info) values(4, '2021-06-02 00:00:00', '1-2');
+SQL SUCCESS
+insert into t_partition_0075(c_id, c_date, c_info) values(5, '2021-06-03 00:00:00', '1-2');
+SQL SUCCESS
+insert into t_partition_0075(c_id, c_date, c_info) values(6, '2021-06-04 00:00:00', '1-3');
+SQL SUCCESS
+insert into t_partition_0075(c_id, c_date, c_info) values(7, '2021-06-05 00:00:00', '1-3');
+SQL SUCCESS
+insert into t_partition_0075(c_id, c_date, c_info) values(8, '2021-06-06 00:00:00', '1-4');
+SQL SUCCESS
+insert into t_partition_0075(c_id, c_date, c_info) values(9, '2021-06-07 00:00:00', '1-4');
+SQL SUCCESS
+insert into t_partition_0075(c_id, c_date, c_info) values(10, '2021-06-08 00:00:00', '1-5');
+SQL SUCCESS
+--step2:查看分区状态; expect:5个分区
+select t1.relname, partstrategy, boundaries from pg_partition t1, pg_class t2
+where t1.parentid = t2.oid and t2.relname = 't_partition_0075' and t1.parttype = 'p' order by relname;
++---------+--------------+-----------------------+
+| relname | partstrategy | boundaries            |
++---------+--------------+-----------------------+
+| p1      | r            | {2021-06-01 00:00:00} |
+| p2      | r            | {2021-06-03 00:00:00} |
+| p3      | r            | {2021-06-05 00:00:00} |
+| p4      | r            | {2021-06-07 00:00:00} |
+| p5      | r            | {2021-06-09 00:00:00} |
++---------+--------------+-----------------------+
+--step3:merge分区; expect:合并成功
+alter table t_partition_0075 merge partitions p1,p2 into partition p31;
+SQL SUCCESS
+--step4:查看分区状态; expect:分区被合并 剩余4个
+select t1.relname, partstrategy, boundaries from pg_partition t1, pg_class t2
+where t1.parentid = t2.oid and t2.relname = 't_partition_0075' and t1.parttype = 'p' order by relname;
++---------+--------------+-----------------------+
+| relname | partstrategy | boundaries            |
++---------+--------------+-----------------------+
+| p3      | r            | {2021-06-05 00:00:00} |
+| p31     | r            | {2021-06-03 00:00:00} |
+| p4      | r            | {2021-06-07 00:00:00} |
+| p5      | r            | {2021-06-09 00:00:00} |
++---------+--------------+-----------------------+
+--step5:清理环境; expect:成功
+drop table if exists t_partition_0075;
+SQL SUCCESS

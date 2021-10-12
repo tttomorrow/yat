@@ -1,0 +1,8 @@
+-- @testpoint:验证cast函数是否支持视图
+drop table if exists TEST2;   
+create table TEST2 (RIQI int);
+DROP VIEW IF EXISTS TESTS_VIEW;
+CREATE  VIEW TESTS_VIEW AS SELECT * FROM TEST2 WHERE RIQI<CAST('2018-08-30' AS DATE);
+SELECT * FROM TESTS_VIEW;
+DROP VIEW IF EXISTS TESTS_VIEW;
+drop table if exists TEST2;  

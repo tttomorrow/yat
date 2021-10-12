@@ -1,0 +1,33 @@
+--  @testpoint:结合存储过程，定义不同名游标，打开动态游标；
+
+--前置条件
+drop table if exists cur_test_101;
+create table cur_test_101(c_id int,c_num int,c_name varchar(10),c_city varchar(10),c_add varchar(20));
+insert into cur_test_101 values(1,18,'Allen','Beijing','AAAAABAAAAA'),(2,368,'Bob','Shanghai','AAAAACAAAAA'),
+                           (3,59,'Cathy','Shenzhen','AAAAADAAAAA'),(4,96,'David','Suzhou','AAAAAEAAAAA'),
+                           (5,17,'Edrwd','Fenghuang','AAAAAFAAAAA'),(6,253,'Fendi','Changsha','AAAAAGAAAAA');
+
+--创建存储过程，定义不同名动态游标
+drop procedure if exists cursor_ftest_101;
+create or replace procedure cursor_ftest_101()
+as
+declare
+    type cursor_type is ref cursor;
+    c101_1 cursor_type;
+    c101_2 cursor_type;
+    sql_str1 varchar(100);
+    sql_str2 varchar(100);
+begin
+    sql_str1 := 'select c_name from cur_test_101 where c_id <= 5;';
+    sql_str2 := 'select c_city from cur_test_101 where c_num <= 100;';
+    open c101_1 for sql_str1;
+    close c101_1;
+    open c101_2 for sql_str2;
+    close c101_2;
+end;
+/
+
+call cursor_ftest_101();
+drop table cur_test_101;
+drop procedure cursor_ftest_101;
+

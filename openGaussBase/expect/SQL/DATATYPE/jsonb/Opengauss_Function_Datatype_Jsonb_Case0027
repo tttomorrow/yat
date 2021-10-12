@@ -1,0 +1,117 @@
+-- @testpoint: json操作符：#>> 获取在指定路径的JSON对象，路径不存在则返回空，输入不合理时，合理报错
+--合理输入1.左侧输入值为object-json类型，右侧为text[]类型
+select '{"a": {"b":{"c":{"a":"b"}}}}'::json #>> (select '{a,b}'::text[]);
++-----------------+
+| ?column?        |
++-----------------+
+| {"c":{"a":"b"}} |
++-----------------+
+select '{"a": "b","a":{"a":{"b":88}}}'::json #>> '{a}';
++----------------+
+| ?column?       |
++----------------+
+| {"a":{"b":88}} |
++----------------+
+select '{"a": {"b":{"a":{"b":{"a":{"b":88}}}}}}'::json #>> '{b,a}';
++----------+
+| ?column? |
++----------+
+|          |
++----------+
+select '{"a":"b","a":{"a":{"b":88}},"a":{"a":{"b":99}}}'::json #>> '{a}';
++----------------+
+| ?column?       |
++----------------+
+| {"a":{"b":99}} |
++----------------+
+select '{"a":[1,2,3],"b":[4,5,6]}'::json #>> '{a,2}';
++----------+
+| ?column? |
++----------+
+| 3        |
++----------+
+--合理输入2.左侧输入值为array-json类型，右侧为text[]类型
+select '[1, 2, "foo", null]'::json #>> (select '{2}'::text[]);
++----------+
+| ?column? |
++----------+
+| foo      |
++----------+
+select '[null, 2, "foo", {"b":88}]'::json #>> '{3}';
++----------+
+| ?column? |
++----------+
+| {"b":88} |
++----------+
+select '[null, 2, "foo", {"b": ["a","8"]}]'::json #>> '{b,1}';
++----------+
+| ?column? |
++----------+
+|          |
++----------+
+select '["a","foo","b","bar","c","baz"]'::json #>> '{a}';
++----------+
+| ?column? |
++----------+
+|          |
++----------+
+--输入非container-json类型（和PG保持一致）
+select '138'::json #>>  '{138}';
++----------+
+| ?column? |
++----------+
+|          |
++----------+
+select '"ALL"'::json #>>  '{A}';
++----------+
+| ?column? |
++----------+
+|          |
++----------+
+select 'null'::json #>> '{n}';
++----------+
+| ?column? |
++----------+
+|          |
++----------+
+select 'true'::json #>> '{t,f}';
++----------+
+| ?column? |
++----------+
+|          |
++----------+
+--不合理输入1.左侧输入值为非container-json类型，右侧为text[]类型
+select '"a","foo","b","bar","c","baz"'::json #>>  '{b,a}';
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Expected end of input, but found ",".
+?.*
+  Where: JSON data, line 1: "a",...
+select '138,852,1323'::json #>> (select '{a,b}'::text[]);
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Expected end of input, but found ",".
+?.*
+  Where: JSON data, line 1: 138,...
+--不合理输入2.左侧输入值为非container-json类型，右侧为非text[]类型
+select '"a","foo","b","bar","c","baz"'::json #>>  'a';
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Expected end of input, but found ",".
+?.*
+  Where: JSON data, line 1: "a",...
+select '138,852,1323'::json #>> 2;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Expected end of input, but found ",".
+?.*
+  Where: JSON data, line 1: 138,...
+select '138'::json #>>  '8';
+?.*ERROR: array value must start with "\{" or dimension informatio.*
+?.*
+select '"ALL"'::json #>> (select '"all"'::json);
+?.*ERROR: operator does not exist: json #>> json.*
+  Hint: No operator matches the given name and argument type(s). You might need to add explicit type casts.
+?.*
+select 'null'::json #>> '""';
+?.*ERROR: array value must start with "\{" or dimension informatio.*
+?.*
+select 'true'::json #>> '0';
+?.*ERROR: array value must start with "\{" or dimension informatio.*
+?.*

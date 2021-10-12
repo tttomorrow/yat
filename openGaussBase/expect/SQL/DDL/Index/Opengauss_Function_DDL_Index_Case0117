@@ -1,0 +1,59 @@
+--  @testpoint: RENAME TO：修改索引名称为含非法字符
+--创建表
+DROP TABLE if EXISTS test_index_table_117 CASCADE;
+SQL SUCCESS
+create table test_index_table_117(
+c_int int
+) WITH (ORIENTATION = row) ;
+SQL SUCCESS
+--建索引
+drop index if exists index_117_01;
+SQL SUCCESS
+drop index if exists index_117_02;
+SQL SUCCESS
+create index index_117_01 on test_index_table_117(c_int);
+SQL SUCCESS
+create index index_117_02 on test_index_table_117(c_int);
+SQL SUCCESS
+select relname from pg_class where relname like 'index_117%' order by relname;
++--------------+
+| relname      |
++--------------+
+| index_117_01 |
+| index_117_02 |
++--------------+
+--rename
+ALTER index index_117_01 RENAME TO index@@;
+?.*ERROR: syntax error at or near "\@\@"
+?.*
+ALTER index index_117_01 RENAME TO index!!;
+?.*ERROR: syntax error at or near "\!\!"
+?.*
+ALTER index index_117_01 RENAME TO 117index;
+?.*ERROR: syntax error at or near "117"
+?.*
+ALTER index index_117_01 RENAME TO $index;
+?.*ERROR: syntax error at or near "\$"
+?.*
+ALTER index index_117_01 RENAME TO ind ex;
+?.*ERROR: syntax error at or near "ex"
+?.*
+ALTER index index_117_01 RENAME TO index"";
+?.*ERROR: zero-length delimited identifier at or near "\"\""
+?.*
+ALTER index index_117_01 RENAME TO index();
+?.*ERROR: syntax error at or near "\("
+?.*
+ALTER index index_117_01 RENAME TO index==;
+?.*ERROR: syntax error at or near "\=\="
+?.*
+select relname from pg_class where relname like 'index_117%' order by relname;
++--------------+
+| relname      |
++--------------+
+| index_117_01 |
+| index_117_02 |
++--------------+
+--清理环境
+DROP TABLE if EXISTS test_index_table_117 CASCADE;
+SQL SUCCESS

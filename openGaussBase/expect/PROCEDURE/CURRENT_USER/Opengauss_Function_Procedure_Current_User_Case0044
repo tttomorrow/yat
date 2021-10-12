@@ -1,0 +1,55 @@
+-- @testpoint: 有非只读命令（UPDATE … RETURNING）驱动的游标循环中不允许有事务命令
+--创建测试表1
+drop table if exists test1;
+SQL SUCCESS
+create table test1 (a int);
+SQL SUCCESS
+--创建测试表2
+drop table if exists test2;
+SQL SUCCESS
+create table test2(x int);
+SQL SUCCESS
+insert into test2 (x) values (1);
+SQL SUCCESS
+insert into test2 (x) values (2);
+SQL SUCCESS
+insert into test2 (x) values (3);
+SQL SUCCESS
+--创建带有游标的事务管理
+create or replace procedure transaction_test2()
+as
+declare
+    r record;
+begin
+    for r in select * from test2 order by x loop
+        insert into test1 (a) values (r.x);
+        if r.x/1 =2 then
+            commit;
+        else
+            rollback;
+         end if;
+    end loop;
+end;
+/
+SQL SUCCESS
+--调用存储过程
+call transaction_test2();
++-------------------+
+| transaction_test2 |
++-------------------+
+|                   |
++-------------------+
+--查看表test1数据
+select * from test1;
++---+
+| a |
++---+
+| 2 |
++---+
+--清理环境
+drop procedure transaction_test2;
+SQL SUCCESS
+drop table if exists test1;
+SQL SUCCESS
+drop table if exists test2;
+SQL SUCCESS

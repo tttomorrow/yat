@@ -1,0 +1,32 @@
+--  @testpoint:opengauss关键字end(保留)，作为序列名
+--关键字不带引号-失败
+drop sequence if exists end;
+?.*ERROR: syntax error at or near "end"
+?.*Position: .*
+create sequence end start 100 cache 50;
+?.*ERROR: syntax error at or near "end"
+?.*Position: .*
+drop sequence end;
+?.*ERROR: syntax error at or near "end"
+?.*Position: .*
+--关键字带双引号-成功
+drop sequence if exists "end";
+SQL SUCCESS
+create sequence "end" start 100 cache 50;
+SQL SUCCESS
+drop sequence "end";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'end';
+?.*ERROR: syntax error at or near "'end'"
+?.*Position: .*
+create sequence 'end' start 100 cache 50;
+?.*ERROR: syntax error at or near "'end'"
+?.*Position: .*
+--关键字带反引号-合理报错
+drop sequence if exists `end`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+create sequence `end` start 100 cache 50;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*

@@ -1,0 +1,15 @@
+-- @testpoint: EXTRACT函数从TIMESTAMP类型中获取day
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (clo1 TIMESTAMP);
+SQL SUCCESS
+insert into test_date01 values ('2001-02-16 20:38:40');
+SQL SUCCESS
+SELECT EXTRACT(DAY FROM TIMESTAMP '2001-02-16 20:38:40');
++-----------+
+| date_part |
++-----------+
+| 16.0      |
++-----------+
+drop table if exists test_date01;
+SQL SUCCESS

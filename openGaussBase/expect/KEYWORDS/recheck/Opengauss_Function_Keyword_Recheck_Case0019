@@ -1,0 +1,23 @@
+--  @testpoint:opengauss关键字recheck(非保留)，作为外部数据源名
+--关键字不带引号-成功
+drop data source if exists recheck;
+SQL SUCCESS
+create data source recheck;
+SQL SUCCESS
+drop data source recheck;
+SQL SUCCESS
+--关键字带双引号-成功
+drop data source if exists "recheck";
+SQL SUCCESS
+create data source "recheck";
+SQL SUCCESS
+drop data source "recheck";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop data source if exists 'recheck';
+?.*ERROR: syntax error at or near "'recheck'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop data source if exists `recheck`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

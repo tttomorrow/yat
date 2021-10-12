@@ -1,0 +1,9 @@
+-- @testpoint: 用在存储过程中
+declare
+i int;
+begin
+i := 0;
+select 1 into i from sys_dummy where i = 0;
+end;
+/
+SQL SUCCESS

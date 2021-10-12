@@ -1,0 +1,19 @@
+-- @testpoint: 插入有效正整数
+drop table if exists bigint01;
+SQL SUCCESS
+create table bigint01 (name bigint);
+SQL SUCCESS
+insert into bigint01 values (120);
+SQL SUCCESS
+insert into bigint01 values (99999999);
+SQL SUCCESS
+SQL SUCCESS
+select * from bigint01;
++--------------+
+| name         |
++--------------+
+| 120          |
+| 99999999     |
++--------------+
+drop table bigint01;
+SQL SUCCESS

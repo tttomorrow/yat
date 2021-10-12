@@ -1,0 +1,21 @@
+-- @testpoint: 给表的某一列赋予权限查询该列是否有此权限
+DROP USER IF EXISTS joe CASCADE;
+SQL SUCCESS
+CREATE USER joe PASSWORD 'Bigdata@123';
+SQL SUCCESS
+DROP table IF EXISTS table_test001;
+SQL SUCCESS
+create table table_test001(c int,d int);
+SQL SUCCESS
+GRANT select (c),update (d) ON table_test001 TO joe;
+SQL SUCCESS
+SELECT has_column_privilege('joe', 'table_test001','c' ,'select');
++----------------------+
+| has_column_privilege |
++----------------------+
+| true                 |
++----------------------+
+DROP USER IF EXISTS joe CASCADE;
+SQL SUCCESS
+DROP table IF EXISTS table_test001;
+SQL SUCCESS

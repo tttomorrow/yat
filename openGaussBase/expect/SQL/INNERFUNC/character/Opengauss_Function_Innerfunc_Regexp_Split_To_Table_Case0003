@@ -1,0 +1,18 @@
+-- @testpoint: 参数g不支持,合理报错
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('hello world');
+SQL SUCCESS
+SELECT regexp_split_to_table(string1,'wh','g') from type_char;
+?.*ERROR: regexp_split does not support the global option
+  Where: referenced column: regexp_split_to_table
+select * from type_char;
++------------------------------------------------------------------------------------------------------+
+| string1                                                                                              |
++------------------------------------------------------------------------------------------------------+
+| hello world                                                                                          |
++------------------------------------------------------------------------------------------------------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

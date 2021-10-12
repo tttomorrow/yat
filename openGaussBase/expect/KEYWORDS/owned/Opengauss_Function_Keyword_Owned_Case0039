@@ -1,0 +1,9 @@
+--  @testpoint:opengauss关键字owned(非保留)，删除数据库角色所拥有得数据库对象
+Create user ceshi identified by 'Xiaxia@123';
+SQL SUCCESS
+Grant all privileges to ceshi;
+SQL SUCCESS
+DROP OWNED BY  ceshi;
+SQL SUCCESS
+drop user ceshi;
+SQL SUCCESS

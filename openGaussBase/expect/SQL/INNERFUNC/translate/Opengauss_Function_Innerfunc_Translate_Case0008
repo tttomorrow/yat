@@ -1,0 +1,11 @@
+-- @testpoint: 字符处理函数translate，入参参数个数少于3，合理报错
+select translate('ａAbc','一二三四');
+?.*ERROR: function translate\(unknown, unknown\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: translate
+select translate('ａAbc');
+?.*ERROR: function translate\(unknown\) does not exist.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: translate

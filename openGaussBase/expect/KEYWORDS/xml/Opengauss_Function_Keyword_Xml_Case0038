@@ -1,0 +1,23 @@
+-- @testpoint: 关键字xml，用作字段类型(合理报错)
+drop table if exists xml_test cascade;
+SQL SUCCESS
+create table xml_test(id int,name xml(20));
+?.*ERROR: type modifier is not allowed for type "xml"
+?.*
+create or replace procedure xml_insert
+as
+begin
+ for i in 1..10 loop
+    insert into xml_test values(i,'att'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call xml_insert();
+?.*ERROR: relation "xml_test" does not exist?.*
+  Where: PL/pgSQL function xml_insert() line 4 at SQL statement
+select * from xml_test;
+?.*ERROR: relation "xml_test" does not exist?.*
+?.*
+drop procedure xml_insert;
+SQL SUCCESS

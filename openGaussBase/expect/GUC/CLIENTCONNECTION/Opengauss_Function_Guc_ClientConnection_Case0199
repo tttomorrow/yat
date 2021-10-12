@@ -1,0 +1,52 @@
+-- @testpoint: set方法设置参数partition_lock_upgrade_timeout,无效值时，合理报错
+--查看默认
+show partition_lock_upgrade_timeout;
++--------------------------------+
+| partition_lock_upgrade_timeout |
++--------------------------------+
+| 1800                           |
++--------------------------------+
+--设置，成功
+set partition_lock_upgrade_timeout to -1;
+SQL SUCCESS
+show partition_lock_upgrade_timeout;
++--------------------------------+
+| partition_lock_upgrade_timeout |
++--------------------------------+
+| -1                             |
++--------------------------------+
+set partition_lock_upgrade_timeout to 3000;
+SQL SUCCESS
+show partition_lock_upgrade_timeout;
++--------------------------------+
+| partition_lock_upgrade_timeout |
++--------------------------------+
+| 3000                           |
++--------------------------------+
+--设置超临界值，报错
+set partition_lock_upgrade_timeout to -2;
+?.*ERROR: -2 is outside the valid range for parameter "partition_lock_upgrade_timeout" \(-1 .. 3000\)
+set partition_lock_upgrade_timeout to 3001;
+?.*ERROR: 3001 is outside the valid range for parameter "partition_lock_upgrade_timeout" \(-1 .. 3000\)
+--设置浮点型，报错
+set partition_lock_upgrade_timeout to 1582.256;
+?.*ERROR: invalid value for parameter "partition_lock_upgrade_timeout": "1582.256"
+--设置字符型，报错
+set partition_lock_upgrade_timeout to 'test';
+?.*ERROR: invalid value for parameter "partition_lock_upgrade_timeout": "test"
+set partition_lock_upgrade_timeout to '3000%$#';
+?.*ERROR: invalid value for parameter "partition_lock_upgrade_timeout": "3000\%\$\#"
+--设置空值，报错
+set partition_lock_upgrade_timeout to '';
+?.*ERROR: invalid value for parameter "partition_lock_upgrade_timeout": ""
+set partition_lock_upgrade_timeout to 'null';
+?.*ERROR: invalid value for parameter "partition_lock_upgrade_timeout": "null"
+--恢复默认
+set partition_lock_upgrade_timeout to 1800;
+SQL SUCCESS
+show partition_lock_upgrade_timeout;
++--------------------------------+
+| partition_lock_upgrade_timeout |
++--------------------------------+
+| 1800                           |
++--------------------------------+

@@ -1,0 +1,16 @@
+-- @testpoint: 只有一个单词
+-- @modify at: 2020-11-16
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('j');
+SQL SUCCESS
+SELECT initcap(string1) from type_char;
++---------+
+| initcap |
++---------+
+| J       |
++---------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

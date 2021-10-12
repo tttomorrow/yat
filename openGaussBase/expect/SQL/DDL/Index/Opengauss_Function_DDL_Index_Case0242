@@ -1,0 +1,212 @@
+-- @testpoint: 创建 gist索引,合理报错
+--1.创建表
+create table table_gist(p point, c1  point, c2  point, i int);
+SQL SUCCESS
+create table table_gist_exp(c circle, i int);
+SQL SUCCESS
+--2.创建gist索引
+create index part_idx on table_gist using gist(p) where p <^ point(1,2);
+SQL SUCCESS
+create index team_idx on table_gist using gist(p) where c1 <^ point(1,2) and c2 >^ point(3,10);
+SQL SUCCESS
+create index exp_idx on table_gist_exp using gist(point(c));
+SQL SUCCESS
+--3.插入数据
+insert into table_gist values(point(0,0),point(0,0),point(0,0),generate_series(1,20000));
+SQL SUCCESS
+insert into table_gist values(point(2,2),point(0,0),point(4,20), generate_series(20001,40000));
+SQL SUCCESS
+insert into table_gist_exp values(circle'((1,2), 3)', generate_series(1,400));
+SQL SUCCESS
+insert into table_gist_exp values(circle'((1,2), 2)', generate_series(3000,4000));
+SQL SUCCESS
+--4.查看索引
+SET ENABLE_SEQSCAN=off;
+SQL SUCCESS
+explain select * from table_gist where p<^ point(1,2);
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*Bitmap Heap Scan on table_gist.*
+?.*Recheck Cond: (p <^ '(1,2)'::point)?.*
+?.*Bitmap Index Scan on part_idx.*
+?.*Index Cond: (p <^ '(1,2)'::point)?.*
+?.*
+explain select * from table_gist where c1 <^ point(1,2) and c2 >^ point(3,10);
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*Bitmap Heap Scan on table_gist.*
+?.*Recheck Cond: ((c1 <^ '(1,2)'::point) AND (c2 >^ '(3,10)'::point))?.*
+?.*Bitmap Index Scan on team_idx?.*
+?.*
+explain select * from  table_gist_exp where point(c)>^ point(1,1);
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*Bitmap Heap Scan on table_gist_exp.*
+?.*Recheck Cond: (point(c) >^ '(1,1)'::point)?.*
+?.*Bitmap Index Scan on exp_idx.*
+?.*Index Cond: (point(c) >^ '(1,1)'::point)?.*
+?.*
+--5.查看查询结果
+select count(*) from table_gist where p<^ point(1,2);
++-------+
+| count |
++-------+
+| 20000 |
++-------+
+select count(*) from table_gist where c1 <^ point(1,2) and c2 >^ point(3,10);
++-------+
+| count |
++-------+
+| 20000 |
++-------+
+select  count(*) from  table_gist_exp where point(c)>^ point(1,1);
++-------+
+| count |
++-------+
+| 1401  |
++-------+
+--6.创建临时表
+create temp table table_gist_tmp(p point, c1  point, c2  point, i int);
+SQL SUCCESS
+create global temp table table_gist_tmp_global(p point, c1  point, c2  point, i int);
+SQL SUCCESS
+create temp table table_gist_exp_tmp(c circle, i int);
+SQL SUCCESS
+create global temp table table_gist_exp_tmp_global(c circle, i int);
+SQL SUCCESS
+--7.创建gist索引
+create index part_idx_temp on table_gist_tmp using gist(p) where p <^ point(1,2);
+SQL SUCCESS
+create index team_idx_temp on table_gist_tmp using gist(p) where c1 <^ point(1,2) and c2 >^ point(3,10);
+SQL SUCCESS
+create index part_idx_temp_gloabl on table_gist_tmp_global using gist(p) where p <^ point(1,2);
+SQL SUCCESS
+create index team_idx_temp_gloabl on table_gist_tmp_global using gist(p) where c1 <^ point(1,2) and c2 >^ point(3,10);
+SQL SUCCESS
+create index exp_idx_tmp on table_gist_exp_tmp using gist(point(c));
+SQL SUCCESS
+create index exp_idx_tmp_global on table_gist_exp_tmp_global using gist(point(c));
+SQL SUCCESS
+--8.插入数据
+insert into table_gist_tmp values(point(0,0),point(0,0),point(0,0),generate_series(1,20000));
+SQL SUCCESS
+insert into table_gist_tmp values(point(2,2),point(0,0),point(4,20), generate_series(20001,40000));
+SQL SUCCESS
+insert into table_gist_tmp_global values(point(0,0),point(0,0),point(0,0),generate_series(1,20000));
+SQL SUCCESS
+insert into table_gist_tmp_global values(point(2,2),point(0,0),point(4,20), generate_series(20001,40000));
+SQL SUCCESS
+insert into table_gist_exp_tmp values(circle'((1,2), 3)', generate_series(1,400));
+SQL SUCCESS
+insert into table_gist_exp_tmp_global values(circle'((1,2), 3)', generate_series(1,400));
+SQL SUCCESS
+--9.查看索引
+SET ENABLE_SEQSCAN=off;
+SQL SUCCESS
+explain select * from table_gist_tmp where p<^ point(1,2);
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*Bitmap Heap Scan on table_gist_tmp.*
+?.*Recheck Cond: (p <^ '(1,2)'::point)?.*
+?.*Bitmap Index Scan on part_idx_temp.*
+?.*Index Cond: (p <^ '(1,2)'::point)?.*
+?.*
+explain select * from table_gist_tmp where c1 <^ point(1,2) and c2 >^ point(3,10);
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*Bitmap Heap Scan on table_gist_tmp  (cost=18.42..451.38 rows=411 width=52)?.*
+?.*Recheck Cond: ((c1 <^ '(1,2)'::point) AND (c2 >^ '(3,10)'::point))?.*
+?.*Bitmap Index Scan on team_idx_temp  (cost=0.00..18.31 rows=411 width=0)?.*
+?.*
+explain select * from table_gist_tmp_global where p<^ point(1,2);
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*Bitmap Heap Scan on table_gist_tmp_global.*
+?.*Recheck Cond: (p <^ '(1,2)'::point)?.*
+?.*Bitmap Index Scan on part_idx_temp_gloabl.*
+?.*Index Cond: (p <^ '(1,2)'::point)?.*
+?.*
+explain select * from table_gist_tmp_global where c1 <^ point(1,2) and c2 >^ point(3,10);
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*Bitmap Heap Scan on table_gist_tmp_global.*
+?.*Recheck Cond: ((c1 <^ '(1,2)'::point) AND (c2 >^ '(3,10)'::point))?.*
+?.*Bitmap Index Scan on team_idx_temp_gloabl.*
+?.*
+explain select * from  table_gist_exp_tmp where point(c)>^ point(1,1);
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*Bitmap Heap Scan on table_gist_exp_tmp.*
+?.*Recheck Cond: (point(c) >^ '(1,1)'::point)?.*
+?.*Bitmap Index Scan on exp_idx_tmp.*
+?.*Index Cond: (point(c) >^ '(1,1)'::point)?.*
+?.*
+explain select * from  table_gist_exp_tmp_global where point(c)>^ point(1,1);
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*Bitmap Heap Scan on table_gist_exp_tmp_global.*
+?.*Recheck Cond: (point(c) >^ '(1,1)'::point)?.*
+?.*Bitmap Index Scan on exp_idx_tmp_global.*
+?.*Index Cond: (point(c) >^ '(1,1)'::point)?.*
+?.*
+--10.查看查询结果
+select count(*) from table_gist_tmp where p<^ point(1,2);
++-------+
+| count |
++-------+
+| 20000 |
++-------+
+select count(*) from table_gist_tmp where c1 <^ point(1,2) and c2 >^ point(3,10);
++-------+
+| count |
++-------+
+| 20000 |
++-------+
+select count(*) from  table_gist_tmp_global where p<^ point(1,2);
++-------+
+| count |
++-------+
+| 20000 |
++-------+
+select count(*) from  table_gist_tmp_global where c1 <^ point(1,2) and c2 >^ point(3,10);
++-------+
+| count |
++-------+
+| 20000 |
++-------+
+select count(*) from  table_gist_exp_tmp where point(c)>^ point(1,1);
++-------+
+| count |
++-------+
+| 400   |
++-------+
+select count(*) from  table_gist_exp_tmp_global where point(c)>^ point(1,1);
++-------+
+| count |
++-------+
+| 400   |
++-------+
+--tearDown
+drop table if exists table_gist_exp cascade;
+SQL SUCCESS
+drop table if exists table_gist cascade;
+SQL SUCCESS
+drop table if exists table_gist_exp_tmp cascade;
+SQL SUCCESS
+drop table if exists table_gist_exp_tmp_global cascade;
+SQL SUCCESS
+drop table if exists table_gist_tmp_global cascade;
+SQL SUCCESS
+drop table if exists table_gist_tmp cascade;
+SQL SUCCESS
+drop table if exists table_gist_tmp_global cascade;
+SQL SUCCESS

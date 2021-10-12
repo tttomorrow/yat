@@ -1,0 +1,15 @@
+-- @testpoint: 模式匹配操作符SIMILAR TO,使用元字符{m,n} ,重复前面的项m次去匹配
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 varchar(100));
+SQL SUCCESS
+insert into type_char values ('ababbababcd');
+SQL SUCCESS
+SELECT  * from type_char  where string1 SIMILAR TO '(ab){2,5}bababcd';
++-------------+
+| string1     |
++-------------+
+| ababbababcd |
++-------------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

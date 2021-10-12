@@ -1,0 +1,63 @@
+--  @testpoint: EXTRACT 时间格式为date(只有时分秒、有时区无时区、边界值)时取day
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (clo1 date);
+SQL SUCCESS
+insert into test_date01 values ('0001-01-031 00:00:00');
+SQL SUCCESS
+insert into test_date01 values ('2001-02-28 pst');
+SQL SUCCESS
+insert into test_date01 values ('1998-04-30');
+SQL SUCCESS
+insert into test_date01 values ('1830-12-30 23:00:00 pst');
+SQL SUCCESS
+insert into test_date01 values ('2505-01-01 00:00:00+8');
+SQL SUCCESS
+select EXTRACT(DAY FROM clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| 31.0      |
+| 28.0      |
+| 30.0      |
+| 30.0      |
+| 1.0       |
++-----------+
+SELECT EXTRACT(DAY FROM date '0001-01-01 00:00:00');
++-----------+
+| date_part |
++-----------+
+| 1.0       |
++-----------+
+SELECT EXTRACT(DAY FROM date '0101-01-01 00:00:00');
++-----------+
+| date_part |
++-----------+
+| 1.0       |
++-----------+
+SELECT EXTRACT(DAY FROM date '0218-01-01 pst');
++-----------+
+| date_part |
++-----------+
+| 1.0       |
++-----------+
+SELECT EXTRACT(DAY FROM date '1998-01-01');
++-----------+
+| date_part |
++-----------+
+| 1.0       |
++-----------+
+SELECT EXTRACT(DAY FROM date '1830-01-01 23:00:00 pst');
++-----------+
+| date_part |
++-----------+
+| 1.0       |
++-----------+
+SELECT EXTRACT(DAY FROM date '2505-01-01 00:00:00+8');
++-----------+
+| date_part |
++-----------+
+| 1.0       |
++-----------+
+drop table if exists test_date01;
+SQL SUCCESS

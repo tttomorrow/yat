@@ -1,0 +1,21 @@
+--  @testpoint:opengauss关键字public(非保留)，作为用户组名
+--关键字不带引号-合理报错
+drop group if exists public;
+SQL SUCCESS
+create group public with password 'gauss@123';
+?.*ERROR: role name "public" is reserved.*
+drop group public;
+?.*ERROR: role "public" does not exist.*
+--关键字带双引号-合理报错
+drop group if exists "public";
+SQL SUCCESS
+create group "public" with password 'gauss@123';
+?.*ERROR: role name "public" is reserved.*
+--关键字带单引号-合理报错
+drop group if exists 'public';
+?.*ERROR: syntax error at or near "'public'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop group if exists `public`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

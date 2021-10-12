@@ -1,0 +1,55 @@
+-- @testpoint: EXTRACT函数从INTERVAl类型中提取小时
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (clo1 INTERVAL);
+SQL SUCCESS
+insert into test_date01 values ('P0001-02-03T04:05:06');
+SQL SUCCESS
+insert into test_date01 values ('1-4');
+SQL SUCCESS
+select EXTRACT(hour FROM clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| 4.0       |
+| 0.0       |
++-----------+
+SELECT EXTRACT(hour FROM INTERVAL '1-2');
++-----------+
+| date_part |
++-----------+
+| 0.0       |
++-----------+
+SELECT EXTRACT(hour FROM INTERVAL '3 4:05:06');
++-----------+
+| date_part |
++-----------+
+| 4.0       |
++-----------+
+SELECT EXTRACT(hour FROM INTERVAL '1 year 2 months 3 days 4 hours 5 minutes 6 seconds');
++-----------+
+| date_part |
++-----------+
+| 4.0       |
++-----------+
+SELECT EXTRACT(hour FROM INTERVAL 'P1Y2M3DT4H5M6S');
++-----------+
+| date_part |
++-----------+
+| 4.0       |
++-----------+
+SELECT EXTRACT(hour FROM INTERVAL 'P0001-02-03T04:05:06');
++-----------+
+| date_part |
++-----------+
+| 4.0       |
++-----------+
+select EXTRACT(hour FROM clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| 4.0       |
+| 0.0       |
++-----------+
+drop table if exists test_date01;
+SQL SUCCESS

@@ -1,0 +1,19 @@
+-- @testpoint: 数字操作符+，货币类型相加
+drop table if exists data_01;
+SQL SUCCESS
+create table data_01 (clo1 money,clo2 money);
+SQL SUCCESS
+insert into data_01 values (12.34, 0.01);
+SQL SUCCESS
+select clo1 + clo2 from data_01;
++----------+
+| ?column? |
++----------+
+| 12.35    |
++----------+
++-----------------------+
+| result                |
++-----------------------+
++-----------------------+
+drop table if exists data_01;
+SQL SUCCESS

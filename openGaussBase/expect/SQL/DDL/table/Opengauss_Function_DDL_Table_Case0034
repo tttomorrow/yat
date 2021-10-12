@@ -1,0 +1,49 @@
+-- @testpoint: alter table 删除某列，对应索引及约束均被自动删除，再为该列插入数据时合理报错
+drop table if exists table_alter_034;
+SQL SUCCESS
+create table table_alter_034
+(id int primary key,name char(20),class char(10),course char(20)default '数学',score float(1)
+);
+SQL SUCCESS
+insert into table_alter_034 values(4,'小明',1,'数学',87.5);
+SQL SUCCESS
+insert into table_alter_034 values(2,'小红',2,'数学',62);
+SQL SUCCESS
+insert into table_alter_034 (id,name,class,score) values(3,'小黄',2,88);
+SQL SUCCESS
+insert into table_alter_034 (id,name,class,score) values(5,'小紫',1,57);
+SQL SUCCESS
+insert into table_alter_034 (id,name,class,score) values(7,'小白',1,100);
+SQL SUCCESS
+select * from table_alter_034;
++----+------------------+------------+------------------+-------+
+| id | name             | class      | course           | score |
++----+------------------+------------+------------------+-------+
+| 4  | 小明               | 1          | 数学               | 87.5  |
+| 2  | 小红               | 2          | 数学               | 62.0  |
+| 3  | 小黄               | 2          | 数学               | 88.0  |
+| 5  | 小紫               | 1          | 数学               | 57.0  |
+| 7  | 小白               | 1          | 数学               | 100.0 |
++----+------------------+------------+------------------+-------+
+drop index if exists table_alter_034_index;
+SQL SUCCESS
+create index table_alter_034_index on table_alter_034(id);
+SQL SUCCESS
+insert into table_alter_034 values(4,'小明',1,'数学',87.5);
+?.*ERROR: duplicate key value violates unique constraint "table_alter_034_pkey".*
+  Detail: Key (id)=(4) already exists.
+insert into table_alter_034 values(2,'小红',2,'数学',62);
+?.*ERROR: duplicate key value violates unique constraint "table_alter_034_pkey".*
+  Detail: Key (id)=(2) already exists.
+alter table  table_alter_034 DROP column IF EXISTS id  CASCADE ;
+SQL SUCCESS
+insert into table_alter_034 values(4,'小明',1,'数学',87.5);
+?.*ERROR: INSERT has more expressions than target columns.*
+?.*Position:.*
+insert into table_alter_034 values(2,'小红',2,'数学',62);
+?.*ERROR: INSERT has more expressions than target columns.*
+?.*Position:.*
+drop index if exists table_alter_034_index;
+SQL SUCCESS
+drop table if exists table_alter_034;
+SQL SUCCESS

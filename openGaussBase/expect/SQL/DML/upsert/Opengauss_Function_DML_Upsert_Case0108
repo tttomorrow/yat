@@ -1,0 +1,12 @@
+-- @testpoint: 创建列存表指定唯一约束
+drop table if exists mykey_0a;
+SQL SUCCESS
+create table mykey_0a
+(
+   name char(20) ,
+   id int unique ,
+   address char(50)
+) with (ORIENTATION = COLUMN) ;
+SQL SUCCESS
+drop table mykey_0a cascade;
+SQL SUCCESS

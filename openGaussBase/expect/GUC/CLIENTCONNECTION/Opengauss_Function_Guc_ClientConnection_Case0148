@@ -1,0 +1,14 @@
+-- @testpoint: ALTER SYSTEM SET方法设置lc_messages参数，合理报错
+--查询默认
+show lc_messages;
++-------------+
+| lc_messages |
++-------------+
+| C           |
++-------------+
+--设置，报错
+ALTER SYSTEM SET lc_messages to 'C';
+?.*ERROR: unsupport parameter: lc_messages
+ALTER SYSTEM SET only support POSTMASTER-level, SIGHUP-level and BACKEND-level guc variable,
+and it must be allowed to set in postgresql.conf.
+--no need to clean

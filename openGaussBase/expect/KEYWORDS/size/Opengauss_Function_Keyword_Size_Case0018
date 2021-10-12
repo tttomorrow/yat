@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字size(非保留)，作为数据库名
+--关键字不带引号-成功
+drop database if exists size;
+SQL SUCCESS
+create database size;
+SQL SUCCESS
+drop database size;
+SQL SUCCESS
+--关键字带双引号-成功
+drop database if exists "size";
+SQL SUCCESS
+create database "size";
+SQL SUCCESS
+drop database "size";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop database if exists 'size';
+?.*ERROR: syntax error at or near "'size'".*
+?.*Position: .*
+create database 'size';
+?.*ERROR: syntax error at or near "'size'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop database if exists `size`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create database `size`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

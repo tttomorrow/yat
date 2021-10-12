@@ -1,0 +1,22 @@
+-- @testpoint: 插入设定长度边界值
+-- @modify at: 2020-11-04
+--创建表
+DROP TABLE IF EXISTS type_bit05;
+SQL SUCCESS
+CREATE TABLE type_bit05 (name bit(3));
+SQL SUCCESS
+--插入数据
+insert into type_bit05 values (B'101');
+SQL SUCCESS
+insert into type_bit05 values (B'111');
+SQL SUCCESS
+--插入成功，查看数据
+select count(*) from type_bit05;
++-------+
+| count |
++-------+
+| 2     |
++-------+
+--清理环境
+drop table type_bit05;
+SQL SUCCESS

@@ -1,0 +1,31 @@
+-- @testpoint: 使用query子句插入来自查询里的数据行
+--建表1且插入数据
+drop table if exists t_insert02;
+SQL SUCCESS
+create table t_insert02(id int primary key,name varchar(10));
+SQL SUCCESS
+insert into t_insert02 values(1,'Tom'),(2,'lisi');
+SQL SUCCESS
+--建表2
+drop table if exists t_insert02_bak;
+SQL SUCCESS
+create table t_insert02_bak(id int primary key,name varchar(10));
+SQL SUCCESS
+--使用insert..query语句给表t_insert02_bak插入数据
+insert into t_insert02_bak select * from t_insert02;
+SQL SUCCESS
+--插入id大于5的数据，插入0条数据
+insert into t_insert02_bak select * from t_insert02 where id >5;
+SQL SUCCESS
+select * from t_insert02_bak;
++----+------+
+| id | name |
++----+------+
+| 1  | Tom  |
+| 2  | lisi |
++----+------+
+--删表
+drop table if exists t_insert02;
+SQL SUCCESS
+drop table if exists t_insert02_bak;
+SQL SUCCESS

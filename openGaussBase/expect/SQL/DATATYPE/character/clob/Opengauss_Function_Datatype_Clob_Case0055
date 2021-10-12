@@ -1,0 +1,15 @@
+-- @testpoint: 插入特殊字符
+drop table if exists test_clob_055;
+SQL SUCCESS
+create table test_clob_055(c_clob clob);
+SQL SUCCESS
+insert into test_clob_055 values('$@#%……&*（)');
+SQL SUCCESS
+select * from test_clob_055;
++------------+
+| c_clob     |
++------------+
+| $@#%……&*（) |
++------------+
+drop table test_clob_055;
+SQL SUCCESS

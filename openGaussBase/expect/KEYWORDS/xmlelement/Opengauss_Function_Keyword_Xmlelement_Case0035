@@ -1,0 +1,39 @@
+-- @testpoint: 关键字xmlelement，用作表名创建普通表
+drop table if exists xmlelement cascade;
+SQL SUCCESS
+create table xmlelement(id int,name varchar(20));
+SQL SUCCESS
+create or replace procedure xmlelement_insert
+as
+begin
+ for i in 1..10 loop
+    insert into xmlelement values(i,'element+'||i);
+    end loop;
+ end;
+/
+SQL SUCCESS
+call xmlelement_insert();
++-------------------+
+| xmlelement_insert |
++-------------------+
+|                   |
++-------------------+
+select * from xmlelement;
++----+------------+
+| id | name       |
++----+------------+
+| 1  | element+1  |
+| 2  | element+2  |
+| 3  | element+3  |
+| 4  | element+4  |
+| 5  | element+5  |
+| 6  | element+6  |
+| 7  | element+7  |
+| 8  | element+8  |
+| 9  | element+9  |
+| 10 | element+10 |
++----+------------+
+drop table if exists xmlelement cascade;
+SQL SUCCESS
+drop procedure xmlelement_insert;
+SQL SUCCESS

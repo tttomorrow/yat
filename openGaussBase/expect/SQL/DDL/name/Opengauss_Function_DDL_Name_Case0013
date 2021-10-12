@@ -1,0 +1,20 @@
+-- @testpoint: 列名有特殊字符合理报错
+DROP TABLE IF EXISTS AABBB63;
+SQL SUCCESS
+CREATE TABLE AABBB63(BBA@AAAAAAAAAAAAAA！AAAAAAAAAAAAAAAA#AAAAAAAAAAA好AAAAAABBB63 CHAR(20) PRIMARY KEY,ID int);
+?.*ERROR: syntax error at or near "@"
+?.*Position:.*
+INSERT INTO AABBB63 VALUES('2012-07-12',789);
+?.*ERROR: relation "aabbb63" does not exist on .*
+?.*Position:.*
+INSERT INTO AABBB63 VALUES('2013-07-12',852);
+?.*ERROR: relation "aabbb63" does not exist on .*
+?.*Position:.*
+INSERT INTO AABBB63 VALUES('2014-07-12',453);
+?.*ERROR: relation "aabbb63" does not exist on .*
+?.*Position:.*
+SELECT * FROM AABBB63 order by  BBA@AAAAAAAAAAAAAA！AAAAAAAAAAAAAAAA#AAAAAAAAAAA好AAAAAABBB63  DESC;
+?.*ERROR: relation "aabbb63" does not exist on .*
+?.*Position:.*
+DROP TABLE IF EXISTS AABBB63;
+SQL SUCCESS

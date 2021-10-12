@@ -1,0 +1,69 @@
+-- @testpoint: 通过表创建同义词；通过同义词创建视图；再通过视图创建同义词；通过同义词创建视图
+-- @modify at: 2020-11-25
+--创建表
+drop table if exists test_SYN_057 cascade;
+SQL SUCCESS
+create table test_SYN_057(a int);
+SQL SUCCESS
+--插入数据
+insert into test_SYN_057 values(1),(2);
+SQL SUCCESS
+--创建同义词
+drop synonym if exists SYN_057;
+SQL SUCCESS
+create synonym SYN_057 for test_SYN_057;
+SQL SUCCESS
+--查询
+SELECT * from SYN_057;
++---+
+| a |
++---+
+| 1 |
+| 2 |
++---+
+--通过同义词创建视图
+drop view if exists v_SYN_057;
+SQL SUCCESS
+create or replace view v_SYN_057 as select * from SYN_057;
+SQL SUCCESS
+--查询
+select * from v_SYN_057;
++---+
+| a |
++---+
+| 1 |
+| 2 |
++---+
+--给视图创建同义词
+drop synonym if exists v_SYN_057_1;
+SQL SUCCESS
+create synonym v_SYN_057_1 for v_SYN_057;
+SQL SUCCESS
+--查询
+select * from v_SYN_057_1;
++---+
+| a |
++---+
+| 1 |
+| 2 |
++---+
+--在同义词基础上创建视图
+drop view if exists v_SYN_057_2;
+SQL SUCCESS
+create or replace view v_SYN_057_2 as select * from v_SYN_057_1;
+SQL SUCCESS
+--通过视图查询
+select * from v_SYN_057_2;
++---+
+| a |
++---+
+| 1 |
+| 2 |
++---+
+--清理环境
+drop table if exists test_SYN_057 cascade;
+SQL SUCCESS
+drop synonym if exists SYN_057;
+SQL SUCCESS
+drop synonym if exists v_SYN_057_1;
+SQL SUCCESS

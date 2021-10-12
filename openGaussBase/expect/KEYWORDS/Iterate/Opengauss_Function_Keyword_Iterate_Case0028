@@ -1,0 +1,66 @@
+-- @testpoint: opengauss关键字Iterate(非保留)，作为同义词对象名,部分测试点合理报错
+--前置条件
+drop table if exists explain_test;
+SQL SUCCESS
+create table explain_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-成功
+drop synonym if exists Iterate;
+SQL SUCCESS
+create synonym Iterate for explain_test;
+SQL SUCCESS
+insert into Iterate values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update Iterate set Iterate.name='cici' where Iterate.id=2;
+SQL SUCCESS
+select * from Iterate;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--关键字带双引号-成功
+drop synonym if exists "Iterate";
+SQL SUCCESS
+create synonym "Iterate" for explain_test;
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop synonym if exists 'Iterate';
+?.*ERROR: syntax error at or near "'Iterate'".*
+?.*Position: .*
+create synonym 'Iterate' for explain_test;
+?.*ERROR: syntax error at or near "'Iterate'".*
+?.*Position: .*
+insert into 'Iterate' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'Iterate'".*
+?.*Position: .*
+update 'Iterate' set 'Iterate'.name='cici' where 'Iterate'.id=2;
+?.*ERROR: syntax error at or near "'Iterate'".*
+?.*Position: .*
+select * from 'Iterate';
+?.*ERROR: syntax error at or near "'Iterate'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+drop synonym if exists `Iterate`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+create synonym `Iterate` for explain_test;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+insert into `Iterate` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+update `Iterate` set `Iterate`.name='cici' where `Iterate`.id=2;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+select * from `Iterate`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*
+--清理环境
+drop synonym if exists iterate;
+SQL SUCCESS
+drop synonym if exists "Iterate";
+SQL SUCCESS
+drop table if exists explain_test;
+SQL SUCCESS

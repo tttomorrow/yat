@@ -1,0 +1,11 @@
+-- @testpoint: 设置所属的模式
+drop schema if exists dm;
+SQL SUCCESS
+CREATE SCHEMA dm;
+SQL SUCCESS
+ALTER SESSION SET CURRENT_SCHEMA TO dm;
+SQL SUCCESS
+ALTER SESSION SET CURRENT_SCHEMA TO public;
+SQL SUCCESS
+drop schema dm;
+SQL SUCCESS

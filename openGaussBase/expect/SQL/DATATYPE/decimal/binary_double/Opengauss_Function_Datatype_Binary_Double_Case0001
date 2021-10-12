@@ -1,0 +1,19 @@
+-- @testpoint: 插入有效正整数
+drop table if exists binary_double01;
+SQL SUCCESS
+create table binary_double01 (name binary_double);
+SQL SUCCESS
+insert into binary_double01 values (120);
+SQL SUCCESS
+insert into binary_double01 values (000123);
+SQL SUCCESS
+SQL SUCCESS
+select * from binary_double01;
++---------------+
+| name          |
++---------------+
+| 120.0         |
+| 123.0         |
++---------------+
+drop table binary_double01;
+SQL SUCCESS

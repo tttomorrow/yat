@@ -1,0 +1,48 @@
+-- @testpoint: opengauss关键字dispatch(非保留)，作为游标名，部分测试点合理报错
+--前置条件
+drop table if exists dispatch_test cascade;
+SQL SUCCESS
+create table dispatch_test(cid int,fid int);
+SQL SUCCESS
+--关键字不带引号-成功
+start transaction;
+SQL SUCCESS
+cursor dispatch for select * from dispatch_test order by 1;
+SQL SUCCESS
+close dispatch;
+SQL SUCCESS
+end;
+SQL SUCCESS
+--关键字带双引号-成功
+start transaction;
+SQL SUCCESS
+cursor "dispatch" for select * from dispatch_test order by 1;
+SQL SUCCESS
+close "dispatch";
+SQL SUCCESS
+end;
+SQL SUCCESS
+--关键字带单引号-合理报错
+start transaction;
+SQL SUCCESS
+cursor 'dispatch' for select * from dispatch_test order by 1;
+?.*ERROR: syntax error at or near "'dispatch'"
+?.*Position.*
+close 'dispatch';
+?.*ERROR: syntax error at or near "'dispatch'"
+?.*Position.*
+end;
+SQL SUCCESS
+--关键字带反引号-合理报错
+start transaction;
+SQL SUCCESS
+cursor `dispatch` for select * from dispatch_test order by 1;
+?.*ERROR: syntax error at or near "`"
+?.*Position.*
+close `dispatch`;
+?.*ERROR: syntax error at or near "`"
+?.*Position.*
+end;
+SQL SUCCESS
+drop table if exists dispatch_test cascade;
+SQL SUCCESS

@@ -1,0 +1,21 @@
+-- @testpoint: 插入0值
+drop table if exists float4_09;
+SQL SUCCESS
+create table float4_09 (name float4);
+SQL SUCCESS
+insert into float4_09 values (0);
+SQL SUCCESS
+insert into float4_09 values (0);
+SQL SUCCESS
+insert into float4_09 values (0);
+SQL SUCCESS
+select * from float4_09;
++------+
+| name |
++------+
+| 0.0  |
+| 0.0  |
+| 0.0  |
++------+
+drop table float4_09;
+SQL SUCCESS

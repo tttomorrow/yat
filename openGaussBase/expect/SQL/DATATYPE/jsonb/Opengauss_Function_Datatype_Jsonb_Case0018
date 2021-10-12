@@ -1,0 +1,112 @@
+-- @testpoint: jsonb操作符：-> 获得array-jsonb元素，下标不存在返回空，输入不合理时，合理报错
+--合理输入1.左侧输入值为array-jsonb类型，右侧为int类型
+select '[{"a":"foo"},{"b":"bar"},{"c":"baz"}]'::jsonb -> 0;
++--------------+
+| ?column?     |
++--------------+
+| {"a": "foo"} |
++--------------+
+select '["a","foo","b","bar","c","baz"]'::jsonb -> 2.1;
++----------+
+| ?column? |
++----------+
+| "b"      |
++----------+
+select '["a","foo","b","bar","c","baz"]'::jsonb -> 2.7;
++----------+
+| ?column? |
++----------+
+| "bar"    |
++----------+
+select '[null,true,false,"null","true","false"]'::jsonb -> -5.5;
++----------+
+| ?column? |
++----------+
+|          |
++----------+
+select '[138,0.58,-369,1.25e+6]'::jsonb -> 1/3;
++----------+
+| ?column? |
++----------+
+| 138      |
++----------+
+--合理输入2.左侧输入值为空的array-jsonb类型，右侧为int类型
+select '[]'::jsonb -> 0;
++----------+
+| ?column? |
++----------+
+|          |
++----------+
+select '[""]'::jsonb -> 1;
++----------+
+| ?column? |
++----------+
+|          |
++----------+
+select '[null]'::jsonb -> 2;
++----------+
+| ?column? |
++----------+
+|          |
++----------+
+--合理输入3.左侧输入值为array-jsonb类型，右侧为可隐式转换为int类型的类型
+select '[{"a":"foo"},{"b":"bar"},{"c":"baz"}]'::jsonb -> true;
++--------------+
+| ?column?     |
++--------------+
+| {"b": "bar"} |
++--------------+
+select '[{"a":"foo"},{"b":"bar"},{"c":"baz"}]'::jsonb -> false;
++--------------+
+| ?column?     |
++--------------+
+| {"a": "foo"} |
++--------------+
+select '[{"a":"foo"},{"b":"bar"},{"c":"baz"}]'::jsonb -> null;
++----------+
+| ?column? |
++----------+
+|          |
++----------+
+--不合理输入1.左侧输入值为array-jsonb类型，右侧为非int类型
+select '["a","foo","b","bar","c","baz"]'::jsonb -> "b" ;
+?.*ERROR: column "b" does not exis.*
+?.*
+select '[null,true,false,"null","true","false"]'::jsonb -> 2021-05-31 12:59:08;
+?.*ERROR: syntax error at or near "12.*
+?.*
+select '[138,0.58,-369,1.25e+6]'::jsonb -> 192.168.100.128/25;
+?.*ERROR: syntax error at or near ".100.*
+?.*
+--不合理输入2.左侧输入值为非array-jsonb类型，右侧为int类型
+select '138,852,1323'::jsonb -> 1;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Expected end of input, but found ",".
+?.*
+  Where: JSON data, line 1: 138,...
+select '"ALL"'::jsonb -> 0;
+?.*ERROR: cannot call jsonb_array_element \(jsonb -> int operator\) on a scala.*
+select '+100'::jsonb -> -2;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "+" is invalid.
+?.*
+  Where: JSON data, line 1: +...
+--不合理输入3.左侧输入值为非array-jsonb类型，右侧为非int类型
+select 'abcdefg'::jsonb -> 'ab';
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "abcdefg" is invalid.
+?.*
+  Where: JSON data, line 1: abcdefg
+select '''abcdefg'''::jsonb -> 2021-05-31;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "'" is invalid.
+?.*
+  Where: JSON data, line 1: '...
+select '\"$$\"'::jsonb ->192.168.100.128/25;
+?.*ERROR: syntax error at or near ".100.*
+?.*
+select '"["www@13^", 1, {"name": "john"}, "2"]"'::jsonb -> 1/2;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "www" is invalid.
+?.*
+  Where: JSON data, line 1: "["www...

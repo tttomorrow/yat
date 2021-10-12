@@ -1,0 +1,229 @@
+-- @testpoint: Jsonb高级特性：object-jsonb类型:1.长度长的 > 长度短的2.长度相同则依次比较数组里的每个键值对，先比较键，再比较值
+-- = 相等:长度不同
+select '{"a":1, "b":"test", "a":2}'::jsonb = '{"a":2, "b":"test"}'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '{"a":1,"b":2,"c":3}'::jsonb = '{"d":1,"b":2}'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+-- = 相等:长度相同
+select '{"test": "...", "dbf": false}'::jsonb = '{"dbf": false, "test": "..."  }'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '{"a":1, "b":2}'::jsonb = '{"a":1, "b":false}'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '{"a":[1,2,3], "b":null}'::jsonb = '{"a":[1,2,3,4], "b":true}'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '{"a":1, "b":false}'::jsonb = '{"a":1, "b":false}'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+-- <> 不相等:长度不同
+select '{"a":1, "b":"test", "a":2}'::jsonb <> '{"a":2, "b":"test"}'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '{"a":1,"b":2,"c":3}'::jsonb <> '{"d":1,"b":2}'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+-- <> 不相等:长度相同
+select '{"test": "...", "dbf": false}'::jsonb <> '{"dbf": false, "test": "..."  }'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '{"a":1, "b":2}'::jsonb <> '{"a":1, "b":false}'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '{"a":[1,2,3], "b":null}'::jsonb <> '{"a":[1,2,3,4], "b":true}'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '{"a":1, "b":false}'::jsonb <> '{"a":1, "b":false}'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+-- > 大于:长度不同
+select '{"a":1, "b":"test", "a":2}'::jsonb > '{"a":2, "b":"test"}'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '{"a":1,"b":2,"c":3}'::jsonb > '{"d":1,"b":2}'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+-- > 大于:长度相同
+select '{"test": "...", "dbf": false}'::jsonb > '{"dbf": false, "test": "..."  }'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '{"a":1, "b":2}'::jsonb > '{"a":1, "b":false}'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '{"a":[1,2,3], "b":null}'::jsonb > '{"a":[1,2,3,4], "b":true}'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '{"a":1, "b":false}'::jsonb > '{"a":1, "b":false}'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+-- < 小于:长度不同
+select '{"a":1, "b":"test", "a":2}'::jsonb < '{"a":2, "b":"test"}'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '{"a":1,"b":2,"c":3}'::jsonb < '{"d":1,"b":2}'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+-- < 小于:长度相同
+select '{"test": "...", "dbf": false}'::jsonb < '{"dbf": false, "test": "..."  }'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '{"a":1, "b":2}'::jsonb < '{"a":1, "b":false}'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '{"a":[1,2,3], "b":null}'::jsonb < '{"a":[1,2,3,4], "b":true}'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '{"a":1, "b":false}'::jsonb < '{"a":1, "b":false}'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+-- >= 大于等于:长度不同
+select '{"a":1, "b":"test", "a":2}'::jsonb >= '{"a":2, "b":"test"}'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '{"a":1,"b":2,"c":3}'::jsonb >= '{"d":1,"b":2}'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+-- >= 大于等于:长度相同
+select '{"test": "...", "dbf": false}'::jsonb >= '{"dbf": false, "test": "..."  }'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '{"a":1, "b":2}'::jsonb >= '{"a":1, "b":false}'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '{"a":[1,2,3], "b":null}'::jsonb >= '{"a":[1,2,3,4], "b":true}'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '{"a":1, "b":false}'::jsonb >= '{"a":1, "b":false}'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+-- <= 小于等于:长度不同
+select '{"a":1, "b":"test", "a":2}'::jsonb <= '{"a":2, "b":"test"}'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '{"a":1,"b":2,"c":3}'::jsonb <= '{"d":1,"b":2}'::jsonb;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+-- <= 小于等于:长度相同
+select '{"test": "...", "dbf": false}'::jsonb <= '{"dbf": false, "test": "..."  }'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '{"a":1, "b":2}'::jsonb <= '{"a":1, "b":false}'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '{"a":[1,2,3], "b":null}'::jsonb <= '{"a":[1,2,3,4], "b":true}'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '{"a":1, "b":false}'::jsonb <= '{"a":1, "b":false}'::jsonb;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+

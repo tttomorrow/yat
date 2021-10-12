@@ -1,0 +1,81 @@
+-- @testpoint: date_part函数入参给timestamp without time zone
+drop table if exists test_date01;
+SQL SUCCESS
+create table test_date01 (clo1 timestamp without time zone );
+SQL SUCCESS
+insert into test_date01 values ('2013-12-11');
+SQL SUCCESS
+select date_part('m', clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| 0.0       |
++-----------+
+SELECT date_part('m', timestamp without time zone  '2013-12-11');
++-----------+
+| date_part |
++-----------+
+| 0.0       |
++-----------+
+select date_part('s', clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| 0.0       |
++-----------+
+SELECT date_part('s', timestamp without time zone  '2013-12-11');
++-----------+
+| date_part |
++-----------+
+| 0.0       |
++-----------+
+select date_part('hour', clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| 0.0       |
++-----------+
+SELECT date_part('hour', timestamp without time zone  '2018-05-14 14:09:04.127444');
++-----------+
+| date_part |
++-----------+
+| 14.0      |
++-----------+
+select date_part('month', clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| 12.0      |
++-----------+
+SELECT date_part('month', timestamp without time zone '2018-05-14 14:09:04.127444');
++-----------+
+| date_part |
++-----------+
+| 5.0       |
++-----------+
+select date_part('day', clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| 11.0      |
++-----------+
+SELECT date_part('day', timestamp without time zone '2018-05-14 14:09:04.127444');
++-----------+
+| date_part |
++-----------+
+| 14.0      |
++-----------+
+select date_part('year', clo1) from test_date01;
++-----------+
+| date_part |
++-----------+
+| 2013.0    |
++-----------+
+SELECT date_part('year', timestamp without time zone '2018-05-14 14:09:04.127444');
++-----------+
+| date_part |
++-----------+
+| 2018.0    |
++-----------+
+drop table if exists test_date01;
+SQL SUCCESS

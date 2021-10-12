@@ -1,0 +1,24 @@
+-- @testpoint: 不指定精度，插入浮点数
+drop table if exists number_03;
+SQL SUCCESS
+create table number_03 (name number);
+SQL SUCCESS
+insert into number_03 values (12122.12);
+SQL SUCCESS
+insert into number_03 values (0.000001);
+SQL SUCCESS
+insert into number_03 values (-12122.23);
+SQL SUCCESS
+insert into number_03 values (-0.000001);
+SQL SUCCESS
+select * from number_03;
++-----------+
+| name      |
++-----------+
+| 12122.12  |
+| 0.000001  |
+| -12122.23 |
+| -0.000001 |
++-----------+
+drop table number_03;
+SQL SUCCESS

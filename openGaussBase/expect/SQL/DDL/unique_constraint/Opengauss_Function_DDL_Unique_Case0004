@@ -1,0 +1,27 @@
+-- @testpoint: 创建不带约束名字的联合唯一约束，违反联合唯一约束，合理报错
+-- @modify at: 2020-11-23
+--建表成功
+drop table if exists test_unique_constraint004;
+SQL SUCCESS
+create table test_unique_constraint004 (id_p int not null unique, lastname varchar(255) not null, firstname varchar(255), address varchar(255), city varchar(255),unique (id_p,lastname));
+SQL SUCCESS
+--插入数据，成功
+insert into test_unique_constraint004 values(1,'mary','','','');
+SQL SUCCESS
+insert into test_unique_constraint004 values(2,'mary','','','');
+SQL SUCCESS
+--插入数据，失败
+insert into test_unique_constraint004 values(2,'mary','','','');
+?.*ERROR: duplicate key value violates unique constraint "test_unique_constraint004_id_p_key"
+  Detail: Key (id_p)=(2) already exists.
+--通过系统表查询约束信息
+select conname,contype from pg_constraint where conrelid = (select oid from pg_class where relname = 'test_unique_constraint004') order by conname;
++---------------------------------------------+---------+
+| conname                                     | contype |
++---------------------------------------------+---------+
+| test_unique_constraint004_id_p_key          | u       |
+| test_unique_constraint004_id_p_lastname_key | u       |
++---------------------------------------------+---------+
+--删表
+drop table if exists test_unique_constraint004;
+SQL SUCCESS

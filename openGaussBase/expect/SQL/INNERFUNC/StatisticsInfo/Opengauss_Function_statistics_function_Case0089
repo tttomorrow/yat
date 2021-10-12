@@ -1,0 +1,19 @@
+-- @testpoint: gs_wlm_session_respool(bigint)获取当前所有后台线程的session resouce pool相关信息,当入参为无效值（为空、字母、特殊字符、多参）时，合理报错
+select gs_wlm_session_respool();
+?.*ERROR: function gs_wlm_session_respool\(\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: gs_wlm_session_respool
+select gs_wlm_session_respool('a');
+?.*ERROR: invalid input syntax for type bigint: "a.*
+?.*
+  Where: referenced column: gs_wlm_session_respool
+select gs_wlm_session_respool('@#$');
+?.*ERROR: invalid input syntax for type bigint: "\@\#\$.*
+?.*
+  Where: referenced column: gs_wlm_session_respool
+select gs_wlm_session_respool(1,2);
+?.*ERROR: function gs_wlm_session_respool\(integer, integer\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: gs_wlm_session_respool

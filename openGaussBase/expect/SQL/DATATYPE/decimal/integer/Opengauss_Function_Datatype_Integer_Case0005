@@ -1,0 +1,24 @@
+-- @testpoint: 插入字符串类型数值
+drop table if exists integer05;
+SQL SUCCESS
+create table integer05 (name integer);
+SQL SUCCESS
+insert into integer05 values ('123456');
+SQL SUCCESS
+insert into integer05 values ('99999999');
+SQL SUCCESS
+insert into integer05 values ('-12356');
+SQL SUCCESS
+insert into integer05 values ('-99999999');
+SQL SUCCESS
+select * from integer05;
++-----------+
+| name      |
++-----------+
+| 123456    |
+| 99999999  |
+| -12356    |
+| -99999999 |
++-----------+
+drop table integer05;
+SQL SUCCESS

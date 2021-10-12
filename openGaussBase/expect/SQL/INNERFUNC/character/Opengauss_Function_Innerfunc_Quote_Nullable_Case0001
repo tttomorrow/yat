@@ -1,0 +1,15 @@
+-- @testpoint: 参数为null
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('');
+SQL SUCCESS
+SELECT quote_nullable(string1) from type_char;
++----------------+
+| quote_nullable |
++----------------+
+| NULL           |
++----------------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

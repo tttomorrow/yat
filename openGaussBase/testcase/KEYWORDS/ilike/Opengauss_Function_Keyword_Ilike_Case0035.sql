@@ -1,0 +1,2 @@
+--  @testpoint:比较两个字符串，大小写相同，结果为t
+SELECT 'abc' ilike 'abc' AS RESULT;

@@ -1,0 +1,7 @@
+-- @testpoint: varchar定义长度小于default
+drop table if exists tbl_03;
+SQL SUCCESS
+create table tbl_03(
+SQL SUCCESS
+drop table tbl_03;
+SQL SUCCESS

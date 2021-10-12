@@ -1,0 +1,33 @@
+--  @testpoint:opengauss关键字Language(非保留)，定义函数为SQL查询
+drop function  if exists func_add_sql;
+SQL SUCCESS
+CREATE FUNCTION func_add_sql(integer, integer) RETURNS integer
+    AS 'select $1 + $2;'
+    LANGUAGE SQL
+    IMMUTABLE
+    RETURNS NULL ON NULL INPUT;
+/
+SQL SUCCESS
+select * from func_add_sql(1,3);
++--------------+
+| func_add_sql |
++--------------+
+| 4            |
++--------------+
+drop function func_add_sql;
+SQL SUCCESS
+drop function if exists func_dup_sql;
+SQL SUCCESS
+CREATE FUNCTION func_dup_sql(in int, out f1 int, out f2 text)
+    AS $$ SELECT $1, CAST($1 AS text) || ' is text' $$
+    LANGUAGE SQL;
+/
+SQL SUCCESS
+SELECT * FROM func_dup_sql(42);
++----+------------+
+| f1 | f2         |
++----+------------+
+| 42 | 42 is text |
++----+------------+
+drop function func_dup_sql;
+SQL SUCCESS

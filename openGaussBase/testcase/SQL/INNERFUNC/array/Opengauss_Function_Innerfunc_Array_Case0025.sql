@@ -1,0 +1,6 @@
+-- @testpoint: 函数array_upper(anyarray, int)描述：返回指定数组维数的上界。int为指定数组维度。
+
+select array_upper(array[1,8,3,7], 1) as result;
+select array_upper(array[1,8,3,7], 2) as result;
+select array_upper(array[[1,8,3,7]], 2) as result;
+select array_upper(array[[1,8,3,7]], 1) as result;

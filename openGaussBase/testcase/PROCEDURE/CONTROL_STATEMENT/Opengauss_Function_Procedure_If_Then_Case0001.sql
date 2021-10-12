@@ -1,0 +1,40 @@
+-- @testpoint: 条件语句 if ...then
+
+drop table if exists emp;
+create table emp
+       (empno number(4) not null,
+        ename varchar2(10),
+        job varchar2(9),
+        mgr number(4),
+        hiredate date,
+        sal number(7, 2),
+        comm number(7, 2),
+        deptno number(2));
+insert into emp values
+        (7369, 'smith',  'clerk',     7902,
+        to_date('17-dec-1980', 'dd-mon-yyyy'),  800, null, 20);
+insert into emp values
+        (7499, 'allen',  'salesman',  7698,
+        to_date('20-feb-1981', 'dd-mon-yyyy'), 1600,  300, 30);
+insert into emp values
+        (7521, 'ward',   'salesman',  7698,
+        to_date('22-feb-1981', 'dd-mon-yyyy'), 1250,  500, 30);
+
+create or replace procedure proc_if_then_001() as
+declare
+	v_empno number;
+	raise_application_error exception;
+begin
+  select empno into v_empno from emp where empno=7521;
+  if v_empno>0 then
+	raise raise_application_error;
+  end if;
+exception
+	when raise_application_error
+	then
+	 raise info '所输数字不能为正，自定义异常!';
+end;
+/
+
+call proc_if_then_001();
+drop procedure proc_if_then_001;

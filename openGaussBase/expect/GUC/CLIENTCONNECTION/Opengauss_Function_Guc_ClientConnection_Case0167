@@ -1,0 +1,18 @@
+-- @testpoint: set方法设置参数gin_fuzzy_search_limit，无效值时，合理报错
+--查看默认
+show gin_fuzzy_search_limit;
++------------------------+
+| gin_fuzzy_search_limit |
++------------------------+
+| 0                      |
++------------------------+
+--设置，成功
+SQL SUCCESS
+--设置，报错
+set gin_fuzzy_search_limit to 'test';
+?.*ERROR: invalid value for parameter "gin_fuzzy_search_limit": "test"
+set gin_fuzzy_search_limit to '-1';
+  Hint: Value exceeds integer range.
+set gin_fuzzy_search_limit to '';
+?.*ERROR: invalid value for parameter "gin_fuzzy_search_limit": ""
+--no need to clean

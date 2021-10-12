@@ -1,0 +1,15 @@
+-- @testpoint: text类型
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 text);
+SQL SUCCESS
+insert into type_char values ('abcdeF kk');
+SQL SUCCESS
+SELECT repeat(string1,2) from type_char;
++--------------------+
+| repeat             |
++--------------------+
+| abcdeF kkabcdeF kk |
++--------------------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

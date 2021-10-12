@@ -1,0 +1,15 @@
+-- @testpoint: 搜索字符为空
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('sdffxxx1');
+SQL SUCCESS
+SELECT rtrim(string1,'') from type_char;
++-------+
+| rtrim |
++-------+
+|       |
++-------+
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

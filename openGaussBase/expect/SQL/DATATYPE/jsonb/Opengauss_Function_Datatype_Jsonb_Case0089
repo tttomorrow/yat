@@ -1,0 +1,112 @@
+-- @testpoint: jsonb额外支持操作函数：jsonb_contained（判断A的所有元素是否在B的顶层中存在,同操作符 <@,当入参不合理时，合理报错）
+--合理入参：存在
+select jsonb_contained('"ffff"','"ffff"');
++-----------------+
+| jsonb_contained |
++-----------------+
+| true            |
++-----------------+
+select jsonb_contained( '{ "b":    [1,  2,3]}', '{"a":1, "b": [1,2,3]}');
++-----------------+
+| jsonb_contained |
++-----------------+
+| true            |
++-----------------+
+select jsonb_contained( '{"a":1 ,"test":[1,2,3], "a":2}','{"a":2 ,"test":[1,2,3], "a":2}');
++-----------------+
+| jsonb_contained |
++-----------------+
+| true            |
++-----------------+
+select jsonb_contained( 'null','');
++-----------------+
+| jsonb_contained |
++-----------------+
+|                 |
++-----------------+
+select jsonb_contained( '[105.2e3, "test", {"a":1}]','["test", 1.052e5 , {"a":1},   "test"]');
++-----------------+
+| jsonb_contained |
++-----------------+
+| true            |
++-----------------+
+select jsonb_contained( '[null,"test"]','["test"         , false,      null ]');
++-----------------+
+| jsonb_contained |
++-----------------+
+| true            |
++-----------------+
+select jsonb_contained( '{"a":2 ,"test":[1,2,3], "a":2}','{"a":1 ,"test":[1,2,3], "a":2}');
++-----------------+
+| jsonb_contained |
++-----------------+
+| true            |
++-----------------+
+--合理入参：不存在
+select jsonb_contained('"ffff"','"ffff    "');
++-----------------+
+| jsonb_contained |
++-----------------+
+| false           |
++-----------------+
+select jsonb_contained('{"true":1, "false":2, "null":null}','{"true ":1}');
++-----------------+
+| jsonb_contained |
++-----------------+
+| false           |
++-----------------+
+select jsonb_contained('["", -1235e-5]','[-1.235e-2,        null]');
++-----------------+
+| jsonb_contained |
++-----------------+
+| false           |
++-----------------+
+select jsonb_contained('123','123');
++-----------------+
+| jsonb_contained |
++-----------------+
+| true            |
++-----------------+
+select jsonb_contained('true','"true"');
++-----------------+
+| jsonb_contained |
++-----------------+
+| false           |
++-----------------+
+select jsonb_contained('[105.2e-3, true    ]','1.0520e-1');
++-----------------+
+| jsonb_contained |
++-----------------+
+| false           |
++-----------------+
+select jsonb_contained('{"a":1 ,"test":[1,2,3], "a":2}','{"a":2 ,"test":[1,2,3], "a":1}');
++-----------------+
+| jsonb_contained |
++-----------------+
+| false           |
++-----------------+
+--入参不合理：报错
+select jsonb_contained('{a:true}, null]', 'null');
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "a" is invalid.
+?.*
+  Where: JSON data, line 1: {a...
+referenced column: jsonb_contained
+select jsonb_contained('[{a:true}, null,123]', 'null');
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "a" is invalid.
+?.*
+  Where: JSON data, line 1: [{a...
+referenced column: jsonb_contained
+select jsonb_contained('[ abc,  1]','[abcd,11]');
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "abc" is invalid.
+?.*
+  Where: JSON data, line 1: [ abc...
+referenced column: jsonb_contained
+select jsonb_contained('ddd, 1, ddd','ddd');
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "ddd" is invalid.
+?.*
+  Where: JSON data, line 1: ddd...
+referenced column: jsonb_contained

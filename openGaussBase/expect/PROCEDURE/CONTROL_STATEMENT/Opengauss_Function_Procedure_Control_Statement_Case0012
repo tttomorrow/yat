@@ -1,0 +1,44 @@
+-- @testpoint: 存储过程游标使用
+drop table if exists t_cust;
+SQL SUCCESS
+create table t_cust(
+  cust_id int,
+  name varchar2(200),
+  user_id int
+);
+SQL SUCCESS
+insert into t_cust values(1,'rt',1);
+SQL SUCCESS
+insert into t_cust values(1,'rt',2);
+SQL SUCCESS
+insert into t_cust values(2,'hw',1);
+SQL SUCCESS
+insert into t_cust values(3,'zr',3);
+SQL SUCCESS
+create or replace procedure pro1(v_id int) is
+  r_emp t_cust%rowtype;
+  type c_type is ref cursor;
+  c1 c_type;
+begin
+  open c1 for ' 
+ select * from t_cust 
+  where cust_id >=:1'
+    using v_id;
+  loop
+    fetch c1
+      into r_emp;
+    exit when c1%notfound;
+  end loop;
+  close c1;
+end;
+/
+SQL SUCCESS
+begin
+  pro1(2);
+end;
+/
+SQL SUCCESS
+drop table t_cust;
+SQL SUCCESS
+drop procedure pro1;
+SQL SUCCESS

@@ -1,0 +1,37 @@
+-- @testpoint: interval分区,创建分区表索引，在相同属性列上，分区LOCAL索引与GLOBAL索引不能共存。合理报错
+drop index if exists global_idx_3;
+SQL SUCCESS
+drop index if exists global_idx_4;
+SQL SUCCESS
+drop table if exists table1;
+SQL SUCCESS
+create table table1
+(
+    w_warehouse_sq_ft         date                       ,
+    w_street_number           char(10)                   ,
+    w_street_name             varchar(60)                ,
+    w_gmt_offset              decimal(5,2)
+)
+partition by range (w_warehouse_sq_ft)
+interval ('1 month')
+(
+	partition table1_p1 values less than ('2020-03-01'),
+	partition table1_p2 values less than ('2020-04-01'),
+	partition table1_p3 values less than ('2020-05-01')
+);
+SQL SUCCESS
+create index global_idx_3 on table1(w_warehouse_sq_ft) global;
+SQL SUCCESS
+create index global_idx_4 on table1(w_warehouse_sq_ft) local
+(
+    partition col_4_index1,
+    partition col_4_index2,
+    partition col_4_index3
+);
+?.*ERROR: Global and local partition index should not be on same column
+drop index if exists global_idx_3;
+SQL SUCCESS
+drop index if exists global_idx_4;
+SQL SUCCESS
+drop table if exists table1;
+SQL SUCCESS

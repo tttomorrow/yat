@@ -1,0 +1,9 @@
+-- @testpoint: to_date函数入参为表达式，合理报错
+select to_date('2018-01-15',3>2);
+?.*ERROR: function to_date\(unknown, boolean\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position.*
+  Where: referenced column: to_date
+select to_date('2018>2017','yyyy');
+?.*ERROR: invalid data for match  in date string
+  Where: referenced column: to_date

@@ -1,0 +1,15 @@
+-- @testpoint: 插入特殊字符
+drop table if exists test_varchar_12;
+SQL SUCCESS
+create table test_varchar_12 (name varchar(20));
+SQL SUCCESS
+insert into test_varchar_12 values ('$@#%……&*（)');
+SQL SUCCESS
+select * from test_varchar_12;
++------------+
+| name       |
++------------+
+| $@#%……&*（) |
++------------+
+drop table test_varchar_12;
+SQL SUCCESS

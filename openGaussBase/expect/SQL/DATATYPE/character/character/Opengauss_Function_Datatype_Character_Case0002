@@ -1,0 +1,22 @@
+-- @testpoint: 插入正常值
+-- @modify at: 2020-11-05
+drop table if exists test_character_02;
+SQL SUCCESS
+create table test_character_02 (name character(20));
+SQL SUCCESS
+insert into test_character_02 values ('abcdefgh');
+SQL SUCCESS
+insert into test_character_02 values ('测试');
+SQL SUCCESS
+insert into test_character_02 values (123);
+SQL SUCCESS
+select * from test_character_02;
++----------------------+
+| name                 |
++----------------------+
+| abcdefgh             |
+| 测试                   |
+| 123                  |
++----------------------+
+drop table test_character_02;
+SQL SUCCESS

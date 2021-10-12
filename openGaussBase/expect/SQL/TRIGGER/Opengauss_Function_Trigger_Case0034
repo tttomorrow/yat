@@ -1,0 +1,60 @@
+-- @testpoint: 创建触发器带参数INITIALLY DEFERRED,在事务结尾检查
+-- @modified at: 2020-12-17
+--创建源表和触发表
+DROP TABLE IF EXISTS test_trigger_src_tbl0;
+SQL SUCCESS
+DROP TABLE IF EXISTS test_trigger_des_tbl0;
+SQL SUCCESS
+CREATE TABLE test_trigger_src_tbl0(id1 INT, id2 INT, id3 INT);
+SQL SUCCESS
+CREATE TABLE test_trigger_des_tbl0(id1 INT, id2 INT, id3 INT);
+SQL SUCCESS
+--创建触发器函数
+CREATE OR REPLACE FUNCTION tri_insert_func01() RETURNS TRIGGER AS
+$$
+DECLARE
+BEGIN
+	INSERT INTO test_trigger_des_tbl0 VALUES(NEW.id1, NEW.id2, NEW.id3);
+	RETURN NEW;
+END
+$$ LANGUAGE PLPGSQL;
+/
+SQL SUCCESS
+--创建触发器
+CREATE CONSTRAINT TRIGGER insert_trigger01 AFTER INSERT ON test_trigger_src_tbl0  INITIALLY DEFERRED  FOR EACH ROW EXECUTE PROCEDURE tri_insert_func01();
+SQL SUCCESS
+--开启事务，执行INSERT触发事件
+start transaction;
+SQL SUCCESS
+INSERT INTO test_trigger_src_tbl0 VALUES(100,200,300);
+SQL SUCCESS
+SELECT * FROM test_trigger_src_tbl0;
++-----+-----+-----+
+| id1 | id2 | id3 |
++-----+-----+-----+
+| 100 | 200 | 300 |
++-----+-----+-----+
+--检查触发结果，未执行
+SELECT * FROM test_trigger_des_tbl0;
++-----+-----+-----+
+| id1 | id2 | id3 |
++-----+-----+-----+
++-----+-----+-----+
+commit;
+SQL SUCCESS
+--事务提交后执行，查看触发结果
+SELECT * FROM test_trigger_des_tbl0;
++-----+-----+-----+
+| id1 | id2 | id3 |
++-----+-----+-----+
+| 100 | 200 | 300 |
++-----+-----+-----+
+--DROP TRIGGER
+DROP TRIGGER insert_trigger01 ON test_trigger_src_tbl0;
+SQL SUCCESS
+DROP FUNCTION tri_insert_func01() cascade;
+SQL SUCCESS
+DROP TABLE test_trigger_src_tbl0;
+SQL SUCCESS
+DROP TABLE test_trigger_des_tbl0;
+SQL SUCCESS

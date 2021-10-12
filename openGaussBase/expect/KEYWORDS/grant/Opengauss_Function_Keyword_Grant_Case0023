@@ -1,0 +1,38 @@
+-- @testpoint: opengauss关键字grant(保留)，作为索引名，部分测试点合理报错
+--前置条件，创建一个表
+drop table if exists grant_test;
+SQL SUCCESS
+create table grant_test(id int,name varchar(10));
+SQL SUCCESS
+--关键字不带引号-合理报错
+drop index if exists grant;
+?.*ERROR: syntax error at or near "grant".*
+?.*Position.*
+create index grant on grant_test(id);
+?.*ERROR: syntax error at or near "grant".*
+?.*Position.*
+--关键字带双引号-成功
+drop index if exists "grant";
+SQL SUCCESS
+create index "grant" on grant_test(id);
+SQL SUCCESS
+--清理环境
+drop index "grant";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop index if exists 'grant';
+?.*ERROR: syntax error at or near "'grant'".*
+?.*Position.*
+create index 'grant' on grant_test(id);
+?.*ERROR: syntax error at or near "'grant'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop index if exists `grant`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create index `grant` on grant_test(id);
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+--清理环境
+drop table if exists grant_test;
+SQL SUCCESS

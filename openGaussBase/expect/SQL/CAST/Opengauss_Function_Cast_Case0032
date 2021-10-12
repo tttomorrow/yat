@@ -1,0 +1,478 @@
+-- @testpoint: 单目操作符
+-- @testpoint: 合理报错
+CREATE or replace FUNCTION test_cast_fun_0032(integer) RETURNS name
+    AS 'select typname from pg_type where oid = $1;'
+    LANGUAGE SQL
+    IMMUTABLE
+    RETURNS NULL ON NULL INPUT;
+/
+SQL SUCCESS
+--testpoint:单目操作符 - 取反：success
+select oprname,oprkind,test_cast_fun_0032(oprleft::int),test_cast_fun_0032(oprright::int),test_cast_fun_0032(oprresult::int),proname from pg_operator o left join pg_proc p on p.oid=o.oprcode where oprname ='-' and oprkind != 'b';
++---------+---------+--------------------+--------------------+--------------------+----------------+
+| oprname | oprkind | test_cast_fun_0032 | test_cast_fun_0032 | test_cast_fun_0032 | proname        |
++---------+---------+--------------------+--------------------+--------------------+----------------+
+| -       | l       |                    | int8               | int8               | int8um         |
+| -       | l       |                    | int4               | int4               | int4um         |
+| -       | l       |                    | int2               | int2               | int2um         |
+| -       | l       |                    | float4             | float4             | float4um       |
+| -       | l       |                    | float8             | float8             | float8um       |
+| -       | l       |                    | interval           | interval           | interval_um    |
+| -       | l       |                    | numeric            | numeric            | numeric_uminus |
++---------+---------+--------------------+--------------------+--------------------+----------------+
+explain performance select - 32::int8;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: (-32)::bigint                                                            |
+?.*
+?.*
+?.*
+explain performance select - -32::int4;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: 32                                                                       |
+?.*
+?.*
+?.*
+explain performance select - 32::int2;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: (-32)::smallint                                                          |
+?.*
+?.*
+?.*
+explain performance select - -32.32::float4;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*
+?.*
+explain performance select - 32.32::float8;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*
+?.*
+explain performance select - -8::interval;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: '8 days'::interval                                                       |
+?.*
+?.*
+?.*
+explain performance select - 32.32::numeric;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: (-32.32)                                                                 |
+?.*
+?.*
+?.*
+--testpoint:单目操作符 @ 取绝对值：success
+select oprname,oprkind,test_cast_fun_0032(oprleft::int),test_cast_fun_0032(oprright::int),test_cast_fun_0032(oprresult::int),proname from pg_operator o left join pg_proc p on p.oid=o.oprcode where oprname ='@' and oprkind != 'b';
++---------+---------+--------------------+--------------------+--------------------+-------------+
+| oprname | oprkind | test_cast_fun_0032 | test_cast_fun_0032 | test_cast_fun_0032 | proname     |
++---------+---------+--------------------+--------------------+--------------------+-------------+
+| @       | l       |                    | int8               | int8               | int8abs     |
+| @       | l       |                    | float4             | float4             | float4abs   |
+| @       | l       |                    | float8             | float8             | float8abs   |
+| @       | l       |                    | int2               | int2               | int2abs     |
+| @       | l       |                    | int4               | int4               | int4abs     |
+| @       | l       |                    | numeric            | numeric            | numeric_abs |
++---------+---------+--------------------+--------------------+--------------------+-------------+
+explain performance select @ 32::int8;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: 32::bigint                                                               |
+?.*
+?.*
+?.*
+explain performance select @ -32::int4;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: 32                                                                       |
+?.*
+?.*
+?.*
+explain performance select @ 32::int2;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: 32::smallint                                                             |
+?.*
+?.*
+?.*
+explain performance select @ -32.32::float4;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*
+?.*
+explain performance select @ 32.32::float8;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*
+?.*
+explain performance select @ -32.32::numeric;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: 32.32                                                                    |
+?.*
+?.*
+?.*
+--testpoint:单目操作符 @@ 取中心点：success
+select oprname,oprkind,test_cast_fun_0032(oprleft::int),test_cast_fun_0032(oprright::int),test_cast_fun_0032(oprresult::int),proname from pg_operator o left join pg_proc p on p.oid=o.oprcode where oprname ='@@' and oprkind != 'b';
++---------+---------+--------------------+--------------------+--------------------+---------------+
+| oprname | oprkind | test_cast_fun_0032 | test_cast_fun_0032 | test_cast_fun_0032 | proname       |
++---------+---------+--------------------+--------------------+--------------------+---------------+
+| @@      | l       |                    | box                | point              | box_center    |
+| @@      | l       |                    | lseg               | point              | lseg_center   |
+| @@      | l       |                    | path               | point              | path_center   |
+| @@      | l       |                    | polygon            | point              | poly_center   |
+| @@      | l       |                    | circle             | point              | circle_center |
++---------+---------+--------------------+--------------------+--------------------+---------------+
+explain performance select @@ box '(1,1),(2,2)';
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: '(1.5,1.5)'::point                                                       |
+?.*
+?.*
+?.*
+explain performance select @@ lseg '(1,2),(3,2)';
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: '(2,2)'::point                                                           |
+?.*
+?.*
+?.*
+--合理报错:暂未实现path_center函数
+explain performance select @@ path '1,1,2,2,3,3,4,4';
+?.*ERROR: function "path_center" not implemented
+explain performance select @@ polygon '1,1,2,2,3,3,4,4';
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: '(2.5,2.5)'::point                                                       |
+?.*
+?.*
+?.*
+explain performance select @@ circle '((1,1)5)';
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: '(1,1)'::point                                                           |
+?.*
+?.*
+?.*
+--testpoint:单目操作符 !! ：success
+select oprname,oprkind,test_cast_fun_0032(oprleft::int),test_cast_fun_0032(oprright::int),test_cast_fun_0032(oprresult::int),proname from pg_operator o left join pg_proc p on p.oid=o.oprcode where oprname ='!!' and oprkind != 'b';
++---------+---------+--------------------+--------------------+--------------------+-------------+
+| oprname | oprkind | test_cast_fun_0032 | test_cast_fun_0032 | test_cast_fun_0032 | proname     |
++---------+---------+--------------------+--------------------+--------------------+-------------+
+| !!      | l       |                    | int8               | numeric            | numeric_fac |
+| !!      | l       |                    | tsquery            | tsquery            | tsquery_not |
++---------+---------+--------------------+--------------------+--------------------+-------------+
+explain performance select !! 32::int8;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*
+?.*
+explain performance select !! 'fat:ab & cat'::tsquery;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: '!( ''fat'':AB & ''cat'' )'::tsquery                                     |
+?.*
+?.*
+?.*
+--testpoint:单目操作符 ~ “非”操作：success
+select oprname,oprkind,test_cast_fun_0032(oprleft::int),test_cast_fun_0032(oprright::int),test_cast_fun_0032(oprresult::int),proname from pg_operator o left join pg_proc p on p.oid=o.oprcode where oprname ='~' and oprkind != 'b';
++---------+---------+--------------------+--------------------+--------------------+-------------+
+| oprname | oprkind | test_cast_fun_0032 | test_cast_fun_0032 | test_cast_fun_0032 | proname     |
++---------+---------+--------------------+--------------------+--------------------+-------------+
+| ~       | l       |                    | macaddr            | macaddr            | macaddr_not |
+| ~       | l       |                    | inet               | inet               | inetnot     |
+| ~       | l       |                    | bit                | bit                | bitnot      |
+| ~       | l       |                    | int2               | int2               | int2not     |
+| ~       | l       |                    | int4               | int4               | int4not     |
+| ~       | l       |                    | int8               | int8               | int8not     |
++---------+---------+--------------------+--------------------+--------------------+-------------+
+explain performance select ~ '08:00:2b:01:02:03'::macaddr;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: 'f7:ff:d4:fe:fd:fc'::macaddr                                             |
+?.*
+?.*
+?.*
+explain performance select ~ inet '0.0.0.0/24';
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: '255.255.255.255/24'::inet                                               |
+?.*
+?.*
+?.*
+explain performance select ~ inet '2001:4f8:3:ba::/64';
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: 'dffe:fb07:fffc:ff45:ffff:ffff:ffff:ffff/64'::inet                       |
+?.*
+?.*
+?.*
+explain performance select ~ '101'::bit;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: B'0'::"bit"                                                              |
+?.*
+?.*
+?.*
+explain performance select ~ 32::int2;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: (-33)::smallint                                                          |
+?.*
+?.*
+?.*
+explain performance select ~ 32::int4;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: (-33)                                                                    |
+?.*
+?.*
+?.*
+explain performance select ~ 32::int8;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: (-33)::bigint                                                            |
+?.*
+?.*
+?.*
+--testpoint:单目操作符 # ：success
+select oprname,oprkind,test_cast_fun_0032(oprleft::int),test_cast_fun_0032(oprright::int),test_cast_fun_0032(oprresult::int),proname from pg_operator o left join pg_proc p on p.oid=o.oprcode where oprname ='#' and oprkind != 'b';
++---------+---------+--------------------+--------------------+--------------------+-----------------+
+| oprname | oprkind | test_cast_fun_0032 | test_cast_fun_0032 | test_cast_fun_0032 | proname         |
++---------+---------+--------------------+--------------------+--------------------+-----------------+
+| #       | l       |                    | path               | int4               | path_npoints    |
+| #       | l       |                    | polygon            | int4               | poly_npoints    |
+| #       | l       |                    | hll                | float8             | hll_cardinality |
++---------+---------+--------------------+--------------------+--------------------+-----------------+
+explain performance select # path '1,1,2,2,3,3,4,4';
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: 4                                                                        |
+?.*
+?.*
+?.*
+explain performance select # polygon '1,1,2,2,3,3,4,4';
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: 4                                                                        |
+?.*
+?.*
+?.*
+--testpoint:单目操作符 +：success
+select oprname,oprkind,test_cast_fun_0032(oprleft::int),test_cast_fun_0032(oprright::int),test_cast_fun_0032(oprresult::int),proname from pg_operator o left join pg_proc p on p.oid=o.oprcode where oprname ='+' and oprkind != 'b';
++---------+---------+--------------------+--------------------+--------------------+---------------+
+| oprname | oprkind | test_cast_fun_0032 | test_cast_fun_0032 | test_cast_fun_0032 | proname       |
++---------+---------+--------------------+--------------------+--------------------+---------------+
+| +       | l       |                    | int8               | int8               | int8up        |
+| +       | l       |                    | int2               | int2               | int2up        |
+| +       | l       |                    | int4               | int4               | int4up        |
+| +       | l       |                    | float4             | float4             | float4up      |
+| +       | l       |                    | float8             | float8             | float8up      |
+| +       | l       |                    | numeric            | numeric            | numeric_uplus |
++---------+---------+--------------------+--------------------+--------------------+---------------+
+explain performance select + 32::int2;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: 32::smallint                                                             |
+?.*
+?.*
+?.*
+explain performance select + -32::int4;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: (-32)                                                                    |
+?.*
+?.*
+?.*
+explain performance select + 32::int8;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: 32::bigint                                                               |
+?.*
+?.*
+?.*
+explain performance select + -32.32::float4;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: (-32.3199997)::real                                                      |
+?.*
+?.*
+?.*
+explain performance select + 32.32::float8;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*
+?.*
+explain performance select + -32.32::numeric;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: (-32.32)                                                                 |
+?.*
+?.*
+?.*
+--testpoint:单目操作符 | ：success
+select oprname,oprkind,test_cast_fun_0032(oprleft::int),test_cast_fun_0032(oprright::int),test_cast_fun_0032(oprresult::int),proname from pg_operator o left join pg_proc p on p.oid=o.oprcode where oprname ='|' and oprkind != 'b';
++---------+---------+--------------------+--------------------+--------------------+----------------+
+| oprname | oprkind | test_cast_fun_0032 | test_cast_fun_0032 | test_cast_fun_0032 | proname        |
++---------+---------+--------------------+--------------------+--------------------+----------------+
+| |       | l       |                    | tinterval          | abstime            | tintervalstart |
++---------+---------+--------------------+--------------------+--------------------+----------------+
+explain performance select | tinterval(abstime 'May 10, 1947 23:59:12', abstime 'Mon May  1 00:30:30 1995');
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: '1947-05-10 23:59:12+09'::abstime                                        |
+?.*
+?.*
+?.*
+--testpoint:单目操作符 ! ：success
+select oprname,oprkind,test_cast_fun_0032(oprleft::int),test_cast_fun_0032(oprright::int),test_cast_fun_0032(oprresult::int),proname from pg_operator o left join pg_proc p on p.oid=o.oprcode where oprname ='!' and oprkind != 'b';
++---------+---------+--------------------+--------------------+--------------------+-------------+
+| oprname | oprkind | test_cast_fun_0032 | test_cast_fun_0032 | test_cast_fun_0032 | proname     |
++---------+---------+--------------------+--------------------+--------------------+-------------+
+| !       | r       | int8               |                    | numeric            | numeric_fac |
++---------+---------+--------------------+--------------------+--------------------+-------------+
+explain performance select 32::int8 !;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*
+?.*
+--testpoint:单目操作符 |/ ：success
+select oprname,oprkind,test_cast_fun_0032(oprleft::int),test_cast_fun_0032(oprright::int),test_cast_fun_0032(oprresult::int),proname from pg_operator o left join pg_proc p on p.oid=o.oprcode where oprname ='|/' and oprkind != 'b';
++---------+---------+--------------------+--------------------+--------------------+---------+
+| oprname | oprkind | test_cast_fun_0032 | test_cast_fun_0032 | test_cast_fun_0032 | proname |
++---------+---------+--------------------+--------------------+--------------------+---------+
+| |/      | l       |                    | float8             | float8             | dsqrt   |
++---------+---------+--------------------+--------------------+--------------------+---------+
+explain performance select |/ 32.32::float8;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*
+?.*
+--testpoint:单目操作符 ||/ ：success
+select oprname,oprkind,test_cast_fun_0032(oprleft::int),test_cast_fun_0032(oprright::int),test_cast_fun_0032(oprresult::int),proname from pg_operator o left join pg_proc p on p.oid=o.oprcode where oprname ='||/' and oprkind != 'b';
++---------+---------+--------------------+--------------------+--------------------+---------+
+| oprname | oprkind | test_cast_fun_0032 | test_cast_fun_0032 | test_cast_fun_0032 | proname |
++---------+---------+--------------------+--------------------+--------------------+---------+
+| ||/     | l       |                    | float8             | float8             | dcbrt   |
++---------+---------+--------------------+--------------------+--------------------+---------+
+explain performance select ||/ 32.32::float8;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*
+?.*
+--testpoint:单目操作符 @-@ ：success
+select oprname,oprkind,test_cast_fun_0032(oprleft::int),test_cast_fun_0032(oprright::int),test_cast_fun_0032(oprresult::int),proname from pg_operator o left join pg_proc p on p.oid=o.oprcode where oprname ='@-@' and oprkind != 'b';
++---------+---------+--------------------+--------------------+--------------------+-------------+
+| oprname | oprkind | test_cast_fun_0032 | test_cast_fun_0032 | test_cast_fun_0032 | proname     |
++---------+---------+--------------------+--------------------+--------------------+-------------+
+| @-@     | l       |                    | path               | float8             | path_length |
+| @-@     | l       |                    | lseg               | float8             | lseg_length |
++---------+---------+--------------------+--------------------+--------------------+-------------+
+explain performance select @-@ lseg '(1,2),(3,2)';
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+|   Output: 2::double precision                                                      |
+?.*
+?.*
+?.*
+explain performance select @-@ path '1,1,2,2,3,3,4,4';
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*
+?.*
+?.*
+?.*
+--环境清理
+drop function if exists test_cast_fun_0032(integer) cascade;
+SQL SUCCESS

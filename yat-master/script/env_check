@@ -1,0 +1,45 @@
+#!/usr/bin/env python
+import os
+import re
+import click
+
+
+type_checking = ['path', 'number']
+checking = {
+    'path': lambda v: re.match(r'/?((.*/.*)*|.*)/?', v),
+    'integer': lambda v: re.match(r'[0-9]+', v)
+}
+
+
+@click.command()
+@click.option('--exists', is_flag=True, help='Checking the env is exists or not')
+@click.option('--path', is_flag=True, help='Checking the env value is a path or not')
+@click.option('--integer', is_flag=True, help='Checking the env value is a number')
+@click.option('-e', 'envs', multiple=True, help='Env to checking')
+def cli(**attr):
+    envs = attr['envs']
+    exists = attr['exists']
+
+    for env in envs:
+        var = os.environ.get(env)
+        if exists and var is None:
+            print("env %s is not exists" % env)
+            exit(1)
+
+        count = 0
+        for check in type_checking:
+            if check in attr:
+                count += 1
+
+        if count > 1:
+            print("type checking only allow one param")
+            exit(1)
+
+        for check in type_checking:
+            if check in attr:
+                if not checking[check](env):
+                    print("checking failed")
+                    exit(1)
+
+
+cli()

@@ -1,0 +1,31 @@
+--  @testpoint:在线创建索引
+--建普通表
+DROP TABLE if EXISTS test_index_table_178 CASCADE;
+SQL SUCCESS
+create table test_index_table_178(
+c_int int);
+SQL SUCCESS
+drop index if exists index_178_01;
+SQL SUCCESS
+create index concurrently index_178_01 on test_index_table_178(c_int);
+SQL SUCCESS
+select relname from pg_class where relname like 'index_178_%';
++--------------+
+| relname      |
++--------------+
+| index_178_01 |
++--------------+
+explain select c_int from test_index_table_178 where c_int > 50 group by c_int;
++--------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                           |
++--------------------------------------------------------------------------------------+
+?.*
+?.*
+?.*Bitmap.*
+?.*
+?.*Bitmap.*
+?.*
++--------------------------------------------------------------------------------------+
+--清理环境
+DROP TABLE if EXISTS test_index_table_178 CASCADE;
+SQL SUCCESS

@@ -1,0 +1,21 @@
+-- @testpoint: 给模式赋予权限all当权限参数privilege正确的时候查询
+DROP USER IF EXISTS joe CASCADE;
+SQL SUCCESS
+CREATE USER joe PASSWORD 'Bigdata@123';
+SQL SUCCESS
+DROP SCHEMA IF EXISTS schema_test001;
+SQL SUCCESS
+create SCHEMA schema_test001;
+SQL SUCCESS
+GRANT ALL ON SCHEMA  schema_test001 TO joe;
+SQL SUCCESS
+SELECT has_schema_privilege('joe', 'schema_test001','CREATE,USAGE');
++----------------------+
+| has_schema_privilege |
++----------------------+
+| true                 |
++----------------------+
+DROP USER IF EXISTS joe CASCADE;
+SQL SUCCESS
+DROP SCHEMA IF EXISTS schema_test001;
+SQL SUCCESS

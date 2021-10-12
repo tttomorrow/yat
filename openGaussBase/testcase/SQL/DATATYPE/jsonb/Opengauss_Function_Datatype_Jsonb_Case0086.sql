@@ -1,0 +1,22 @@
+-- @testpoint: json额外支持操作函数：json_agg（将值聚集为json类型的数组，当入参不合理时，合理报错）
+
+--合理入参
+drop table if exists classes;
+create table classes(class int,name varchar,score float);
+insert into classes values(1,'xiaoming',87.5),(3,'xiaowang',66),(3,'xiaozhang',90);
+select name,json_agg(score) score from classes group by name order by name;
+select json_agg(score) from (select score from classes);
+select json_agg(name) score from classes;
+select json_agg(name) name from classes;
+select json_agg(score) from classes;
+select json_agg(k) from (values(1,1),(1,2),(2,2)) as xx(k, v) group by k;
+
+--不合理入参：报错
+select name, json_agg(score) score from classes;
+select name,json_agg(score) from classes;
+select json_agg(score) from class;
+select json_agg(id) from classes;
+select json_agg(x) from (values(1,1),(1,2),(2,2)) as xx(k, v) group by k;
+
+--清理数据
+drop table classes;

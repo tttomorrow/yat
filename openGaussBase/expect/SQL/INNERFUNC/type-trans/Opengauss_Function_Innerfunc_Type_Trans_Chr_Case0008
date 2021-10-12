@@ -1,0 +1,59 @@
+-- @testpoint: 类型转换函数to_char (datetime/interval [, fmt])，入参为无效参数时合理报错
+-- date
+select to_char('epoch', 'hh12:mi:ss yyyy-month-dd');
+?.*ERROR: invalid input syntax for type numeric: "epoch".*
+?.*
+  Where: referenced column: to_char
+select to_char(epoch, 'hh12:mi:ss yyyy-month-dd');
+?.*ERROR: column "epoch" does not exist.*
+?.*
+  Where: referenced column: to_char
+select to_char(date 'allballs', 'hh24:mi:ss ms');
+?.*ERROR: invalid input syntax for type timestamp: "allballs".*
+?.*
+  Where: referenced column: to_char
+-- timestamp
+select to_char(timestamp 'yesterdayq', 'mi:ss');
+?.*ERROR: invalid input syntax for type timestamp: "yesterdayq".*
+?.*
+  Where: referenced column: to_char
+-- timestamp with time zone
+select to_char(timestamp with time zone '2015-10-14 11:21:28.317367 america/new_yorkkk', 'hh12:mi:ss');
+?.*ERROR: time zone "america/new_yorkkk" not recognized.*
+?.*
+  Where: referenced column: to_char
+-- interval
+select to_char(interval '1 year 2 months 3 days 4 hours 5 minutes 6 seconds', 'yyyy-mon-dd hh24:mi:ss');
+?.*ERROR: invalid format specification for an interval value.*
+  Hint: Intervals are not tied to specific calendar dates.
+  Where: referenced column: to_char
+select to_char(interval '-14:05:06', 'ss');
++---------+
+| to_char |
++---------+
+| -6      |
++---------+
+-- 不加关键字
+select to_char('2020-08-26 14:57:33','yyyy-mon-dd hh24:mi:ss');
+?.*ERROR: invalid input syntax for type numeric: "2020-08-26 14:57:33".*
+?.*
+  Where: referenced column: to_char
+-- 错格式
+select to_char(current_timestamp, 0x5d);
+?.*ERROR: syntax error at or near "x5d".*
+?.*
+select to_char(pg_systimestamp(), #%&^);
+?.*ERROR: syntax error at or near "\)".*
+?.*
+-- 时间戳错误
+select to_char(timestamp '2020-08-2614:57:33.23813+08','hh12:mi:ss.ms yy-month-dd');
+?.*ERROR: date/time field value out of range: \"2020\-08\-2614\:57\:33.23813\+08\".*
+  Hint: Perhaps you need a different "datestyle" setting.
+?.*
+  Where: referenced column: to_char
+select to_char(timestamp '2020-08-26 14，57，33.23813+08','hh12:mi:ss yy-month-dd');
+?.*ERROR: invalid input syntax for type timestamp: \"2020\-08\-26 14\，57\，33.23813\+08\".*
+?.*
+  Where: referenced column: to_char
+?.*
+  Where: referenced column: to_char

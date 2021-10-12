@@ -1,0 +1,19 @@
+-- @testpoint: 插入布尔值
+-- @modified at: 2020-11-16
+drop table if exists test_nvarchar2_11;
+SQL SUCCESS
+create table test_nvarchar2_11 (name nvarchar2(20));
+SQL SUCCESS
+insert into test_nvarchar2_11 values (true);
+SQL SUCCESS
+insert into test_nvarchar2_11 values (false);
+SQL SUCCESS
+select * from test_nvarchar2_11;
++-------+
+| name  |
++-------+
+| true  |
+| false |
++-------+
+drop table test_nvarchar2_11;
+SQL SUCCESS

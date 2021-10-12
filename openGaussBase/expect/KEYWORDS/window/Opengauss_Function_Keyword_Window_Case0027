@@ -1,0 +1,30 @@
+--  @testpoint:opengauss关键字window(保留)，作为序列名
+--关键字不带引号-合理报错
+drop sequence if exists window;
+?.*ERROR: syntax error at or near "window".*
+?.*Position.*
+create sequence window start 100 cache 50;
+?.*ERROR: syntax error at or near "window".*
+?.*Position.*
+--关键字带双引号-成功
+drop sequence if exists "window";
+SQL SUCCESS
+create sequence "window" start 100 cache 50;
+SQL SUCCESS
+--清理环境
+drop sequence "window";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop sequence if exists 'window';
+?.*ERROR: syntax error at or near "'window'".*
+?.*Position.*
+create sequence 'window' start 100 cache 50;
+?.*ERROR: syntax error at or near "'window'".*
+?.*Position.*
+--关键字带反引号-合理报错
+drop sequence if exists `window`;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*
+create sequence `window` start 100 cache 50;
+?.*ERROR: syntax error at or near "`".*
+?.*Position.*

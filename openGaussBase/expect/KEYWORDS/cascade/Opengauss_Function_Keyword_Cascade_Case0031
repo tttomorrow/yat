@@ -1,0 +1,20 @@
+--  @testpoint:opengauss关键字cascade(非保留)，作为字段数据类型(合理报错)
+--前置条件
+drop table if exists cascade_test cascade;
+SQL SUCCESS
+--关键字不带引号-合理报错
+create table cascade_test(id int,name cascade);
+?.*ERROR: type "cascade" does not exist.*
+?.*Position: .*
+--关键字带双引号-合理报错
+create table cascade_test(id int,name "cascade");
+?.*ERROR: type "cascade" does not exist.*
+?.*Position: .*
+--关键字带单引号-合理报错
+create table cascade_test(id int,name 'cascade');
+?.*ERROR: syntax error at or near "'cascade'".*
+?.*Position: .*
+--关键字带反引号-合理报错
+create table cascade_test(id int,name `cascade`);
+?.*ERROR: syntax error at or near "`".*
+?.*Position: .*

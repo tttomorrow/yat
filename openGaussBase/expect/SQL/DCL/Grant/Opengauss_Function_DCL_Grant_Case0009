@@ -1,0 +1,17 @@
+-- @testpoint: 将表中字段的更新权限赋予指定的用户或角色
+drop user if exists user_009 cascade;
+SQL SUCCESS
+create user user_009 identified by 'Gauss_234';
+SQL SUCCESS
+drop table if exists t9;
+SQL SUCCESS
+create table t9(id int ,name char(255),age int ,city varchar (255));
+SQL SUCCESS
+grant update on t9 to user_009;
+SQL SUCCESS
+revoke update on t9 from user_009;
+SQL SUCCESS
+drop table if exists t9;
+SQL SUCCESS
+drop user if exists user_009;
+SQL SUCCESS

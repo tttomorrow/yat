@@ -1,0 +1,44 @@
+-- @testpoint: opengauss比较操作符!=,布尔类型
+-- 布尔类型,真大于假
+SELECT 'y'::BOOLEAN != 't'::BOOLEAN;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+SELECT 'f'::BOOLEAN != 'n'::BOOLEAN;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+SELECT 'n'::BOOLEAN != 'f'::BOOLEAN;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+SELECT 'yes'::BOOLEAN != 'no'::BOOLEAN;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+SELECT 'yes'::BOOLEAN != 'y'::BOOLEAN;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+SELECT 'yes'::BOOLEAN != 'TRUE'::BOOLEAN;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+SELECT '0'::BOOLEAN != 'false'::BOOLEAN;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+

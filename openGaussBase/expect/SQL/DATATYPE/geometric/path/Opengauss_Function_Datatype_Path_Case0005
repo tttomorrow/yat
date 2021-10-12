@@ -1,0 +1,13 @@
+-- @testpoint: path类型，使用[(x1,y1),...,(xn,yn)]方式插入空坐标值，合理报错
+drop table if exists test_path05;
+SQL SUCCESS
+create table test_path05 (name path);
+SQL SUCCESS
+insert into test_path05 values (path '[(null,null),(null,null),(null,null)]');
+?.*ERROR: invalid input syntax for type path: "\[\(null,null\),\(null,null\),\(null,null\)\]"
+?.*
+insert into test_path05 values (path '[('',''),('',''),('','')]');
+?.*ERROR: invalid input syntax for type path: "\[\(','\),\(','\),\(','\)\]"
+?.*
+drop table test_path05;
+SQL SUCCESS

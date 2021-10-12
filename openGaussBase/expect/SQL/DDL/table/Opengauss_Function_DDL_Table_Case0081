@@ -1,0 +1,24 @@
+-- @testpoint: 创建带唯一约束的表(表级)，违背约束时合理报错
+DROP TABLE IF EXISTS tab_12;
+SQL SUCCESS
+CREATE TABLE tab_12
+(id                      NUMBER(7)UNIQUE,
+ use_filename              VARCHAR2(20),
+ filename                  VARCHAR2(255),
+ text                       VARCHAR2(2000),
+ UNIQUE(id)
+  );
+SQL SUCCESS
+insert into tab_12 values(1,'李','小龙','截拳道大师');
+SQL SUCCESS
+insert into tab_12 values(1,'李','小龙','截拳道大师');
+?.*ERROR: duplicate key value violates unique constraint "tab_12_id_key".*
+  Detail: Key (id)=(1) already exists.
+select * from  tab_12;
++----+--------------+----------+-------+
+| id | use_filename | filename | text  |
++----+--------------+----------+-------+
+| 1  | 李            | 小龙       | 截拳道大师 |
++----+--------------+----------+-------+
+drop table if exists tab_12;
+SQL SUCCESS

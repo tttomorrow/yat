@@ -1,0 +1,11 @@
+-- @testpoint: 插入非法空值,合理报错
+drop table if exists binary_integer08;
+SQL SUCCESS
+create table binary_integer08 (id int,name binary_integer);
+SQL SUCCESS
+insert into binary_integer08 values (1,' ');
+?.*ERROR: invalid input syntax for integer: " "
+?.*
+  Where: referenced column: name
+drop table binary_integer08;
+SQL SUCCESS

@@ -1,0 +1,9 @@
+-- @testpoint: 测试select into语句中给bigint数据类型赋值，测试隐式数据类型转换
+
+declare
+  v_bigint int8;
+begin
+    select 123456.7898765 into v_bigint from sys_dummy;
+    raise info 'result:% ',v_bigint;
+end;
+/

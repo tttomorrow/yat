@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字datetime_interval_code(非保留)，作为数据库名
+--关键字不带引号-成功
+drop database if exists datetime_interval_code;
+SQL SUCCESS
+create database datetime_interval_code;
+SQL SUCCESS
+drop database datetime_interval_code;
+SQL SUCCESS
+--关键字带双引号-成功
+drop database if exists "datetime_interval_code";
+SQL SUCCESS
+create database "datetime_interval_code";
+SQL SUCCESS
+drop database "datetime_interval_code";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop database if exists 'datetime_interval_code';
+?.*ERROR: syntax error at or near "'datetime_interval_code'"
+?.*
+create database 'datetime_interval_code';
+?.*ERROR: syntax error at or near "'datetime_interval_code'"
+?.*
+--关键字带反引号-合理报错
+drop database if exists `datetime_interval_code`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create database `datetime_interval_code`;
+?.*ERROR: syntax error at or near "`"
+?.*

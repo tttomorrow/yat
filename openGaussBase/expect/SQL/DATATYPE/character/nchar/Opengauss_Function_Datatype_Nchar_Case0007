@@ -1,0 +1,19 @@
+-- @testpoint: 插入空值
+-- @modified at: 2020-11-16
+drop table if exists test_nchar_07;
+SQL SUCCESS
+create table test_nchar_07 (id int,name nchar(8));
+SQL SUCCESS
+insert into test_nchar_07 values (1,'');
+SQL SUCCESS
+insert into test_nchar_07 values (1,null);
+SQL SUCCESS
+select * from test_nchar_07;
++----+------+
+| id | name |
++----+------+
+| 1  |      |
+| 1  |      |
++----+------+
+drop table test_nchar_07;
+SQL SUCCESS

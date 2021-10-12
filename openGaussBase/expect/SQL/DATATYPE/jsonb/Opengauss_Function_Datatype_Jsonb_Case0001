@@ -1,0 +1,58 @@
+-- @testpoint: openGauss可否正确判断JSON类型:对象（不符合规范的合理报错）
+--符合规范
+select '{"name": ["john", false],  "age":    18,  "assress":  {"country" :"china", "zip-code": "10000"}, "NULL":null, "true":true}'::JSON;
++----------------------------------------------------------------------------------------------------------------------------+
+| json                                                                                                                       |
++----------------------------------------------------------------------------------------------------------------------------+
+| {"name": ["john", false],  "age":    18,  "assress":  {"country" :"china", "zip-code": "10000"}, "NULL":null, "true":true} |
++----------------------------------------------------------------------------------------------------------------------------+
+select '{"name": ["john",false],"age":18,"assress":{"country" :"china", "zip-code": "10000"}, "NULL":null, "true":true}'::JSON;
++-----------------------------------------------------------------------------------------------------------------+
+| json                                                                                                            |
++-----------------------------------------------------------------------------------------------------------------+
+| {"name": ["john",false],"age":18,"assress":{"country" :"china", "zip-code": "10000"}, "NULL":null, "true":true} |
++-----------------------------------------------------------------------------------------------------------------+
+--不符合规范
+select '{"name": ["john", false],  "age":    18,  "assress":  {"country" :"china", "zip-code": "10000"},true:true}'::JSON;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Expected string, but found "true".
+?.*
+  Where: JSON data, line 1: ...:  {"country" :"china", "zip-code": "10000"},true...
+referenced column: json
+select '{"name": ["john", "Dan"], , "age":    18,  "assress":  {"country" : "china", "zip-code": "10000"}}'::JSON;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Expected string, but found ",".
+?.*
+  Where: JSON data, line 1: {"name": ["john", "Dan"], ,...
+referenced column: json
+select "{"name": ["john", false],  "age":    18,  "assress":  {"country" :"china", "zip-code": "10000"},"true":true}"::JSON;
+?.*ERROR: syntax error at or near "": \[".*
+?.*
+select {"name": ["john", false],  "age":    18,  "assress":  {"country" :"china", "zip-code": "10000"},true:true}::JSON;
+?.*ERROR: syntax error at or near "\{.*
+?.*
+select '{"name","john",  "age"}'::JSON;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Expected ":", but found ",".
+?.*
+  Where: JSON data, line 1: {"name",...
+referenced column: json
+select "{"name","john",  "age"}"::JSON;
+?.*ERROR: syntax error at or near "",".*
+?.*
+select '{name,john, age}'::JSON;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Token "name" is invalid.
+?.*
+  Where: JSON data, line 1: {name...
+referenced column: json
+select "{name,john, age}"::JSON;
+?.*ERROR: column "\{name,john, age\}" does not exis.*
+?.*
+  Where: referenced column: {name,john, age}
+select '"name","john",  "age"'::JSON;
+?.*ERROR: invalid input syntax for type json.*
+  Detail: Expected end of input, but found ",".
+?.*
+  Where: JSON data, line 1: "name",...
+referenced column: json

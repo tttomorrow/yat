@@ -1,0 +1,170 @@
+-- @testpoint: 检测是否支持不同约束等级下的外键操作：合理报错
+--行存
+drop table if exists pstudent_table_02 cascade;
+SQL SUCCESS
+drop table if exists pclass_table_02 cascade;
+SQL SUCCESS
+drop table if exists pteacher_table_02 cascade;
+SQL SUCCESS
+create table pclass_table_02
+(
+    c_date TIMESTAMP primary key,
+    c_name varchar not null
+)partition by range(c_date) interval ('10 day') (
+  partition part1 values less than ('1990-02-02 00:00:00'));
+SQL SUCCESS
+create table pteacher_table_02
+(
+    t_date TIMESTAMP primary key,
+    t_name varchar not null
+)partition by range(t_date) interval ('10 day') (
+  partition part1 values less than ('1990-02-02 00:00:00'));
+SQL SUCCESS
+create table pstudent_table_02
+(
+    s_date TIMESTAMP primary key,
+    s_name varchar not null,
+    c_date TIMESTAMP,
+    t_date TIMESTAMP,
+    foreign key(c_date) references pclass_table_02(c_date)
+)partition by range(s_date) interval ('10 day') (
+  partition part1 values less than ('1990-02-02 00:00:00'));
+SQL SUCCESS
+--添加数据
+insert into pclass_table_02 values (date '2020-09-01', '1年1班');
+SQL SUCCESS
+insert into pclass_table_02 values (date '2020-09-02', '1年2班');
+SQL SUCCESS
+insert into pclass_table_02 values (date '2020-09-03', '1年3班');
+SQL SUCCESS
+insert into pclass_table_02 values (date '2020-09-04', '1年4班');
+SQL SUCCESS
+insert into pteacher_table_02 values (date '2020-09-01', '李老师');
+SQL SUCCESS
+insert into pteacher_table_02 values (date '2020-09-02', '张老师');
+SQL SUCCESS
+insert into pteacher_table_02 values (date '2020-09-03', '陈老师');
+SQL SUCCESS
+insert into pteacher_table_02 values (date '2020-09-04', '杨老师');
+SQL SUCCESS
+insert into pstudent_table_02 values (date '2020-09-01', '张三', date '2020-09-01', date '2020-09-01');
+SQL SUCCESS
+insert into pstudent_table_02 values (date '2020-09-02', '李四', date '2020-09-02', date '2020-09-02');
+SQL SUCCESS
+insert into pstudent_table_02 values (date '2020-09-03', '王二', date '2020-09-03', date '2020-09-03');
+SQL SUCCESS
+insert into pstudent_table_02 values (date '2020-09-04', '李明', date '2020-09-04', date '2020-09-04');
+SQL SUCCESS
+--增加外键约束
+alter table pstudent_table_02 add constraint fk_student_tid foreign key (t_date)
+references pteacher_table_02(t_date) on delete set null on update no action;
+SQL SUCCESS
+alter table pstudent_table_02 add constraint fk_student_cid foreign key (c_date)
+references pclass_table_02(c_date) on delete cascade on update restrict;
+SQL SUCCESS
+--查看PG_CONSTRAINT表中情况
+select conname, convalidated, confupdtype, confdeltype, confmatchtype
+from PG_CONSTRAINT where conname in ('fk_student_tid', 'fk_student_cid');
++----------------+--------------+-------------+-------------+---------------+
+| conname        | convalidated | confupdtype | confdeltype | confmatchtype |
++----------------+--------------+-------------+-------------+---------------+
+| fk_student_tid | true         | a           | n           | u             |
+| fk_student_cid | true         | r           | c           | u             |
++----------------+--------------+-------------+-------------+---------------+
+--测试delete set null
+select * from pstudent_table_02;
++-------------------------------+--------+-------------------------------+-------------------------------+
+| s_date                        | s_name | c_date                        | t_date                        |
++-------------------------------+--------+-------------------------------+-------------------------------+
++-------------------------------+--------+-------------------------------+-------------------------------+
+delete from pteacher_table_02 where t_date = date '2020-09-04';
+SQL SUCCESS
+select * from pstudent_table_02;
++-------------------------------+--------+-------------------------------+-------------------------------+
+| s_date                        | s_name | c_date                        | t_date                        |
++-------------------------------+--------+-------------------------------+-------------------------------+
++-------------------------------+--------+-------------------------------+-------------------------------+
+--测试delete cascade
+delete from pclass_table_02 where c_date = date '2020-09-04';
+?.*ERROR: update or delete on table "pclass_table_02" violates foreign key constraint "pstudent_table_02_c_date_fkey" on table "pstudent_table_02"
+  Detail: Key (c_date)=(2020-09-04 00:00:00) is still referenced from table "pstudent_table_02".
+select * from pstudent_table_02;
++-------------------------------+--------+-------------------------------+-------------------------------+
+| s_date                        | s_name | c_date                        | t_date                        |
++-------------------------------+--------+-------------------------------+-------------------------------+
++-------------------------------+--------+-------------------------------+-------------------------------+
+--测试update & no action
+update pteacher_table_02 set t_date = date '2020-09-09' where t_date = date '2020-09-04';
+SQL SUCCESS
+select * from pstudent_table_02;
++-------------------------------+--------+-------------------------------+-------------------------------+
+| s_date                        | s_name | c_date                        | t_date                        |
++-------------------------------+--------+-------------------------------+-------------------------------+
++-------------------------------+--------+-------------------------------+-------------------------------+
+--测试update & restrict ：合理报错
+update pclass_table_02 set c_date = date '2020-09-09' where c_date = date '2020-09-04';
+?.*ERROR: update or delete on table "pclass_table_02" violates foreign key constraint "pstudent_table_02_c_date_fkey" on table "pstudent_table_02"
+  Detail: Key (c_date)=(2020-09-04 00:00:00) is still referenced from table "pstudent_table_02".
+select * from pstudent_table_02;
++-------------------------------+--------+-------------------------------+-------------------------------+
+| s_date                        | s_name | c_date                        | t_date                        |
++-------------------------------+--------+-------------------------------+-------------------------------+
++-------------------------------+--------+-------------------------------+-------------------------------+
+--外键约束更新
+alter table pstudent_table_02 drop constraint fk_student_cid;
+SQL SUCCESS
+alter table pstudent_table_02 drop constraint fk_student_tid;
+SQL SUCCESS
+alter table pstudent_table_02 add constraint fk_pstudent_table_02_tdate foreign key (t_date) references pteacher_table_02(t_date) on delete no action on update cascade;
+SQL SUCCESS
+alter table pstudent_table_02 add constraint fk_pstudent_table_02_cdate foreign key (c_date) references pclass_table_02(c_date) on delete restrict on update set null;
+SQL SUCCESS
+--测试delete & no action
+delete from pteacher_table_02 where t_date = date '2020-09-04';
+SQL SUCCESS
+select * from pstudent_table_02;
++-------------------------------+--------+-------------------------------+-------------------------------+
+| s_date                        | s_name | c_date                        | t_date                        |
++-------------------------------+--------+-------------------------------+-------------------------------+
++-------------------------------+--------+-------------------------------+-------------------------------+
+--测试delete & restrict ：合理报错
+delete from pclass_table_02 where c_date = date '2020-09-04';
+?.*ERROR: update or delete on table "pclass_table_02" violates foreign key constraint "pstudent_table_02_c_date_fkey" on table "pstudent_table_02"
+  Detail: Key (c_date)=(2020-09-04 00:00:00) is still referenced from table "pstudent_table_02".
+select * from pstudent_table_02;
++-------------------------------+--------+-------------------------------+-------------------------------+
+| s_date                        | s_name | c_date                        | t_date                        |
++-------------------------------+--------+-------------------------------+-------------------------------+
++-------------------------------+--------+-------------------------------+-------------------------------+
+--测试update & cascade
+update pteacher_table_02 set t_date = date '2020-09-04' where t_date = date '2020-09-08';
+SQL SUCCESS
+select * from pstudent_table_02;
++-------------------------------+--------+-------------------------------+-------------------------------+
+| s_date                        | s_name | c_date                        | t_date                        |
++-------------------------------+--------+-------------------------------+-------------------------------+
++-------------------------------+--------+-------------------------------+-------------------------------+
+--测试update & set null
+update pclass_table_02 set c_date = date '2020-09-04' where c_date = date '2020-09-08';
+SQL SUCCESS
+select * from pstudent_table_02;
++-------------------------------+--------+-------------------------------+-------------------------------+
+| s_date                        | s_name | c_date                        | t_date                        |
++-------------------------------+--------+-------------------------------+-------------------------------+
++-------------------------------+--------+-------------------------------+-------------------------------+
+--测试PG_CONSTRAINT表中情况
+select conname, convalidated, confupdtype, confdeltype, confmatchtype
+from PG_CONSTRAINT where conname in ('fk_pstudent_table_02_tdate', 'fk_pstudent_table_02_cdate');
++----------------------------+--------------+-------------+-------------+---------------+
+| conname                    | convalidated | confupdtype | confdeltype | confmatchtype |
++----------------------------+--------------+-------------+-------------+---------------+
+| fk_pstudent_table_02_tdate | true         | c           | a           | u             |
+| fk_pstudent_table_02_cdate | true         | n           | r           | u             |
++----------------------------+--------------+-------------+-------------+---------------+
+--删除外键表
+drop table pclass_table_02 cascade;
+SQL SUCCESS
+drop table pteacher_table_02 cascade;
+SQL SUCCESS
+drop table pstudent_table_02 cascade;
+SQL SUCCESS

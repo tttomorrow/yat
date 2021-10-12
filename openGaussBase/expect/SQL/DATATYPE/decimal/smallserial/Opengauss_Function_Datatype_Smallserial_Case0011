@@ -1,0 +1,24 @@
+-- @testpoint: 插入指数形式值
+drop table if exists smallserial_11;
+SQL SUCCESS
+create table smallserial_11 (name smallserial);
+SQL SUCCESS
+insert into smallserial_11 values (exp(2));
+SQL SUCCESS
+insert into smallserial_11 values (exp(1.23));
+SQL SUCCESS
+insert into smallserial_11 values (exp(-15));
+SQL SUCCESS
+insert into smallserial_11 values (exp(-1.5));
+SQL SUCCESS
+select * from smallserial_11;
++------+
+| name |
++------+
+| 7    |
+| 3    |
+| 0    |
+| 0    |
++------+
+drop table smallserial_11;
+SQL SUCCESS

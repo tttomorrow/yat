@@ -1,0 +1,54 @@
+--  @testpoint:opengauss关键字Least(非保留)，自定义数据类型名为explain
+--关键字explain作为数据类型不带引号，创建成功
+drop type if exists Least;
+SQL SUCCESS
+CREATE TYPE Least AS (f1 int, f2 text);
+SQL SUCCESS
+select typname from pg_type where typname ='Least';
++---------+
+| typname |
++---------+
++---------+
+drop type Least;
+SQL SUCCESS
+--关键字explain作为数据类型加双引号，创建成功
+drop type if exists "Least";
+SQL SUCCESS
+CREATE TYPE "Least" AS (f1 int, f2 text);
+SQL SUCCESS
+select typname from pg_type where typname ='Least';
++---------+
+| typname |
++---------+
+| Least   |
++---------+
+drop type "Least";
+SQL SUCCESS
+--关键字explain作为数据类型加单引号，合理报错
+drop type if exists 'Least';
+?.*ERROR: syntax error at or near "'Least'"
+?.*Position: .*
+CREATE TYPE 'Least' AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "'Least'"
+?.*Position: .*
+select * from pg_type where typname ='Least';
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+----------+-----------+------------+---------+----------+-----------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
+| typname | typnamespace | typowner | typlen | typbyval | typtype | typcategory | typispreferred | typisdefined | typdelim | typrelid | typelem | typarray | typinput | typoutput | typreceive | typsend | typmodin | typmodout | typanalyze | typalign | typstorage | typnotnull | typbasetype | typtypmod | typndims | typcollation | typdefaultbin | typdefault | typacl |
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+----------+-----------+------------+---------+----------+-----------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
++---------+--------------+----------+--------+----------+---------+-------------+----------------+--------------+----------+----------+---------+----------+----------+-----------+------------+---------+----------+-----------+------------+----------+------------+------------+-------------+-----------+----------+--------------+---------------+------------+--------+
+drop type 'Least';
+?.*ERROR: syntax error at or near "'Least'"
+?.*Position: .*
+--关键字explain作为数据类型加反引号，合理报错
+drop type if exists `Least`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+CREATE TYPE `Least` AS (f1 int, f2 text);
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*
+select * from pg_type where typname =`Least`;
+?.*ERROR: column "least" does not exist
+?.*Position: .*
+drop type `Least`;
+?.*ERROR: syntax error at or near "`"
+?.*Position: .*

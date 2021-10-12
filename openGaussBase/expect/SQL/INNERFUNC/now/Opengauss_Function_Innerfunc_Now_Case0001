@@ -1,0 +1,56 @@
+-- @testpoint: now()函数用于where条件
+select 1 from sys_dummy where now()<>now();
++----------+
+| ?column? |
++----------+
++----------+
+select 1 from sys_dummy where now()!=now();
++----------+
+| ?column? |
++----------+
++----------+
+select 1 from sys_dummy where now()=now();
++----------+
+| ?column? |
++----------+
+| 1        |
++----------+
+select 1 from sys_dummy where now() > CURRENT_TIMESTAMP;
++----------+
+| ?column? |
++----------+
++----------+
+select 1 from sys_dummy where now()<CURRENT_TIMESTAMP;
++----------+
+| ?column? |
++----------+
+| 1        |
++----------+
+select 1 from sys_dummy where now()<>CURRENT_TIMESTAMP;
++----------+
+| ?column? |
++----------+
+| 1        |
++----------+
+select 1 from sys_dummy where now()!=CURRENT_TIMESTAMP;
++----------+
+| ?column? |
++----------+
+| 1        |
++----------+
+select 1 from sys_dummy where now()=CURRENT_TIMESTAMP;
++----------+
+| ?column? |
++----------+
++----------+
+select 1 from sys_dummy where now()<=CURRENT_TIMESTAMP;
++----------+
+| ?column? |
++----------+
+| 1        |
++----------+
+select 1 from sys_dummy where now()>=CURRENT_TIMESTAMP;
++----------+
+| ?column? |
++----------+
++----------+

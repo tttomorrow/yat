@@ -1,0 +1,18 @@
+-- @testpoint: 结合时间日期函数，在DATE增加/减少月份更新新的日期
+DROP TABLE IF EXISTS test_smalldatetime10;
+SQL SUCCESS
+CREATE TABLE test_smalldatetime10 (name smalldatetime);
+SQL SUCCESS
+INSERT INTO test_smalldatetime10 VALUES (ADD_MONTHS(smalldatetime '2018-09-18 11:22:33.456', +1));
+SQL SUCCESS
+INSERT INTO test_smalldatetime10 VALUES (ADD_MONTHS(smalldatetime '2018-09-18 11:22:33.456', -1));
+SQL SUCCESS
+select * from test_smalldatetime10;
++-------------------------------+
+| name                          |
++-------------------------------+
+?.*2018-10-18 11:23:00.*
+?.*2018-08-18 11:23:00.*
++-------------------------------+
+DROP TABLE test_smalldatetime10;
+SQL SUCCESS

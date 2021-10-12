@@ -1,0 +1,22 @@
+--  @testpoint:开启事务提取数据，结果集为空时，提取下一行数据，提取到空数据；
+--前置条件
+drop table if exists cur_test_95;
+SQL SUCCESS
+create table cur_test_95(c_id int,c_num int,c_name varchar(10),c_city varchar(10),c_add varchar(20));
+SQL SUCCESS
+--初始位置
+start transaction;
+SQL SUCCESS
+cursor cursor95 for select * from cur_test_95;
+SQL SUCCESS
+fetch next from cursor95;
++------+-------+--------+--------+-------+
+| c_id | c_num | c_name | c_city | c_add |
++------+-------+--------+--------+-------+
++------+-------+--------+--------+-------+
+close cursor95;
+SQL SUCCESS
+end;
+SQL SUCCESS
+drop table cur_test_95;
+SQL SUCCESS

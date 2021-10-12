@@ -1,0 +1,21 @@
+--  @testpoint: --创建视图验证视图名大小写
+drop table if exists false_2 cascade;
+SQL SUCCESS
+drop table if exists false_3 cascade;
+SQL SUCCESS
+create table false_2 (A int,b int);
+SQL SUCCESS
+create table false_3(A INT,b int);
+SQL SUCCESS
+create or replace view view_2 as select * from FALSE_2;
+SQL SUCCESS
+CREATE OR REPLACE VIEW view_2 as select * from false_2;
+SQL SUCCESS
+create or replace view VIEW_3 as select * from FALSE_3;
+SQL SUCCESS
+create or replace view VIEW_2 as select * from false_3;
+SQL SUCCESS
+create view tabl_1 as select a,B from false_2;
+SQL SUCCESS
+create view tabl_2 as select B from false_3;
+SQL SUCCESS

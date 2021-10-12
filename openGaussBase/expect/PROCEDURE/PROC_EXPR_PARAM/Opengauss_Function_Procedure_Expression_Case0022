@@ -1,0 +1,26 @@
+-- @testpoint: 表达式做为参数的存储过程测试--类型转换-IF(,,) 合理报错
+--创建存储过程
+CREATE OR REPLACE PROCEDURE FVT_PROC_EXPR_PARAM_022(T1 CHAR)  AS
+BEGIN
+raise info 'T1=:%',T1;
+EXCEPTION
+WHEN NO_DATA_FOUND THEN raise info'NO_DATA_FOUND';
+END;
+/
+SQL SUCCESS
+--调用存储过程
+CALL FVT_PROC_EXPR_PARAM_022(IF(2>1,'a','b'));
+?.*ERROR: function if\(boolean, unknown, unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position.*
+CALL FVT_PROC_EXPR_PARAM_022(IFNULL('a','b'));
+?.*ERROR: function ifnull\(unknown, unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position.*
+CALL FVT_PROC_EXPR_PARAM_022(IFNULL(NULL,'b'));
+?.*ERROR: function ifnull\(unknown, unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position.*
+--清理环境
+drop PROCEDURE FVT_PROC_EXPR_PARAM_022;
+SQL SUCCESS

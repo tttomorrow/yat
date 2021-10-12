@@ -1,0 +1,35 @@
+-- @testpoint: 函数嵌套使用
+select sin(null) from sys_dummy;
++-----+
+| sin |
++-----+
+|     |
++-----+
+select sin(sin(1)) from sys_dummy;
++--------------------+
+| sin                |
++--------------------+
++--------------------+
+select cos(sin(1)) from sys_dummy;
++--------------------+
+| cos                |
++--------------------+
++--------------------+
+select asin(sin(1)) from sys_dummy;
++------+
+| asin |
++------+
+| 1.0  |
++------+
+select sin(asin(1)) from sys_dummy;
++-----+
+| sin |
++-----+
+| 1.0 |
++-----+
+select sin(asin(sin(asin(sin(asin(sin(asin(sin(asin(1)))))))))) from sys_dummy;
++-----+
+| sin |
++-----+
+| 1.0 |
++-----+

@@ -1,0 +1,15 @@
+-- @testpoint: opengauss比较操作符<,比较类型:INTEGER
+drop table if exists ts_zhparser;
+SQL SUCCESS
+CREATE TABLE ts_zhparser(id INTEGER, index INTEGER);
+SQL SUCCESS
+INSERT INTO ts_zhparser VALUES(2, 7671);
+SQL SUCCESS
+select * from ts_zhparser where id < index;
++----+-------+
+| id | index |
++----+-------+
+| 2  | 7671  |
++----+-------+
+drop table if exists ts_zhparser;
+SQL SUCCESS

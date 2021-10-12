@@ -1,0 +1,7 @@
+-- @testpoint: justify_days(interval)函数传入只含有天数部分的interval
+SELECT justify_days(interval '35 days') from sys_dummy;
++------------------------------------------------+
+| justify_days                                   |
++------------------------------------------------+
+| 0 years 1 mons 5 days 0 hours 0 mins 0.00 secs |
++------------------------------------------------+

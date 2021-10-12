@@ -1,0 +1,44 @@
+-- @testpoint: drop index concurrently 不支持列存表分区表 合理报错
+-- create COLUMN table
+DROP TABLE IF EXISTS ddl_index_case0226;
+SQL SUCCESS
+CREATE TABLE ddl_index_case0226(id INT, first_name text, last_name text) WITH (ORIENTATION = COLUMN);
+SQL SUCCESS
+--create  index
+create  index  ddl_index_case0226_idx on ddl_index_case0226(id);
+SQL SUCCESS
+--drop index concurrently fail
+drop index concurrently ddl_index_case0226_idx;
+?.*ERROR: column store table does not support concurrent INDEX yet
+  Detail: The feature is not currently supported
+-- create partition table
+DROP TABLE IF EXISTS ddl_index_case0226_par;
+SQL SUCCESS
+CREATE TABLE ddl_index_case0226_par(
+    WR_RETURNED_DATE_SK       INTEGER                       ,
+    WR_RETURNED_TIME_SK       INTEGER                       ,
+    WR_NET_LOSS               DECIMAL(7,2)
+)
+PARTITION BY RANGE(WR_RETURNED_DATE_SK)
+(
+        PARTITION P1 VALUES LESS THAN(2450815),
+        PARTITION P2 VALUES LESS THAN(2451179),
+        PARTITION P3 VALUES LESS THAN(2451544),
+        PARTITION P4 VALUES LESS THAN(2451910),
+        PARTITION P5 VALUES LESS THAN(2452275),
+        PARTITION P6 VALUES LESS THAN(2452640),
+        PARTITION P7 VALUES LESS THAN(2453005),
+        PARTITION P8 VALUES LESS THAN(MAXVALUE)
+);
+SQL SUCCESS
+--create index
+create index ddl_index_case0226_par_idx on ddl_index_case0226_par(WR_RETURNED_DATE_SK);
+SQL SUCCESS
+--drop index success
+drop index concurrently ddl_index_case0226_par_idx;
+SQL SUCCESS
+--tearDown drop table
+DROP TABLE IF EXISTS ddl_index_case0226;
+SQL SUCCESS
+DROP TABLE IF EXISTS ddl_index_case0226_par;
+SQL SUCCESS

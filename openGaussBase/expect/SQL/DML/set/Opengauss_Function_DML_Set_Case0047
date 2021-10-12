@@ -1,0 +1,23 @@
+--  @testpoint:使用explain语法，对参数中的取值进行无效值测试，合理报错
+--建表
+drop table if exists student;
+SQL SUCCESS
+create table student(id int, name char(20));
+SQL SUCCESS
+--analyze参数取值为null,合理报错
+explain (analyze null) insert into student values(5,'a'),(6,'b');
+?.*ERROR: syntax error at or near "null"
+?.*
+--analyze参数取值为10，合理报错
+explain (analyze 10) insert into student values(5,'a'),(6,'b');
+?.*ERROR: analyze requires a Boolean value
+--plan参数取值为open，合理报错
+explain (plan open) insert into student values(5,'a'),(6,'b');
+?.*ERROR: plan requires a Boolean value
+--plan参数取值为null，合理报错
+explain (plan null) insert into student values(5,'a'),(6,'b');
+?.*ERROR: syntax error at or near "null"
+?.*
+--删除表
+drop table student;
+SQL SUCCESS

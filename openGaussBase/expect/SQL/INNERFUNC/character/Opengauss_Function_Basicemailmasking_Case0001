@@ -1,0 +1,58 @@
+-- @testpoint: 函数basicemailmasking，对出现第一个'@'之前的email文本进行脱敏
+--@之前是英文
+select basicemailmasking('abcd@gmail.com') as result;
++----------------+
+| result         |
++----------------+
+| xxxx@gmail.com |
++----------------+
+--@之前是数字
+select basicemailmasking('1122356@gmail.com') as result;
++-------------------+
+| result            |
++-------------------+
+| xxxxxxx@gmail.com |
++-------------------+
+--@之前为中文
+select basicemailmasking('你好@gmail.com') as result;
++------------------+
+| result           |
++------------------+
+| xxxxxx@gmail.com |
++------------------+
+--@之前为特殊字符
+select basicemailmasking('#￥%&&*@gmail.com') as result;
++--------------------+
+| result             |
++--------------------+
+| xxxxxxxx@gmail.com |
++--------------------+
+--当文本中含有两个@时
+select basicemailmasking('#￥%&&*@gmail.@com') as result;
++---------------------+
+| result              |
++---------------------+
+| xxxxxxxx@gmail.@com |
++---------------------+
+--当文本中不含@符号时
+select basicemailmasking('abcdgmail.com') as result;
++---------------+
+| result        |
++---------------+
+| abcdgmail.com |
++---------------+
+--参数为变量
+drop table if exists test_01;
+SQL SUCCESS
+create table test_01 (col1 varchar2(20),col2 integer,col3 varchar2(20));
+SQL SUCCESS
+insert into test_01 values('你好@qaz.com', 10, 'abc');
+SQL SUCCESS
+select basicemailmasking(col1)from test_01;
++-------------------+
+| basicemailmasking |
++-------------------+
+| xxxxxx@qaz.com    |
++-------------------+
+drop table if exists test_01;
+SQL SUCCESS

@@ -1,0 +1,18 @@
+
+
+-- @testpoint:where条件
+
+drop table if exists t_concat;
+SQL SUCCESS
+create table t_concat(id int,v_char varchar(10));
+SQL SUCCESS
+insert into t_concat values(1,'a');
+SQL SUCCESS
+select id,concat(0,id) from t_concat where ascii(v_char) in (97,98) order by id;
++----+--------+
+| id | concat |
++----+--------+
+| 1  | 01     |
++----+--------+
+drop table if exists t_concat;
+SQL SUCCESS

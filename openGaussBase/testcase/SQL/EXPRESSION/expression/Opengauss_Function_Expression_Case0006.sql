@@ -1,0 +1,34 @@
+--  @testpoint: CASE
+--CASE子句可以用于合法的表达式中。condition是一个返回BOOLEAN数据类型的表达式：
+--◾如果结果为真，CASE表达式的结果就是符合该条件所对应的result。
+--◾如果结果为假，则以相同方式处理随后的WHEN或ELSE子句。
+--◾如果各WHEN condition都不为真，表达式的结果就是在ELSE子句执行的result。如果省略了ELSE子句且没有匹配的条件，结果为NULL。
+
+--建表
+DROP TABLE if exists test_expression_06 cascade;
+CREATE TABLE test_expression_06(CW_COL1 INT);
+
+INSERT INTO test_expression_06 VALUES (1), (2), (3);
+
+SELECT * FROM test_expression_06;
+
+--case when then end
+SELECT CW_COL1, CASE WHEN CW_COL1=1 THEN 'one' END FROM test_expression_06 ORDER BY 1;
+--case when then else end
+SELECT CW_COL1, CASE WHEN CW_COL1=1 THEN 'one'  ELSE 'other' END FROM test_expression_06 ORDER BY 1;
+--case when then when then end
+SELECT CW_COL1, CASE WHEN CW_COL1=1 THEN 'one' WHEN CW_COL1=2 THEN 'two' END FROM test_expression_06 ORDER BY 1;
+--case when then when then else end
+SELECT CW_COL1, CASE WHEN CW_COL1=1 THEN 'one' WHEN CW_COL1=2 THEN 'two' ELSE 'other' END FROM test_expression_06 ORDER BY 1;
+
+--case when then end
+SELECT CW_COL1, CASE WHEN CW_COL1=11 THEN 'one' END FROM test_expression_06 ORDER BY 1;
+--case when then else end
+SELECT CW_COL1, CASE WHEN CW_COL1=11 THEN 'one'  ELSE 'other' END FROM test_expression_06 ORDER BY 1;
+--case when then when then end
+SELECT CW_COL1, CASE WHEN CW_COL1=11 THEN 'one' WHEN CW_COL1=2 THEN 'two' END FROM test_expression_06 ORDER BY 1;
+--case when then when then else end
+SELECT CW_COL1, CASE WHEN CW_COL1=11 THEN 'one' WHEN CW_COL1=2 THEN 'two' ELSE 'other' END FROM test_expression_06 ORDER BY 1;
+
+--清理环境
+DROP TABLE if exists test_expression_06 cascade;

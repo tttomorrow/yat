@@ -1,0 +1,15 @@
+-- @testpoint: radians函数入参类型及个数校验，合理报错
+select radians('你好HELLO');
+?.*ERROR: invalid input syntax for type double precision: "你好HELLO"
+?.*
+  Where: referenced column: radians
+select radians(90,90);
+?.*ERROR: function radians\(integer, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: radians
+select radians();
+?.*ERROR: function radians\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: radians

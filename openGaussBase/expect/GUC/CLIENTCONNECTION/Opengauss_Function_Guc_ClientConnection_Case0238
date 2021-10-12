@@ -1,0 +1,16 @@
+-- @testpoint: set方法设置参数DateStyle为无效值，合理报错
+--查看默认值
+show DateStyle;
++-----------+
+| DateStyle |
++-----------+
+| ISO, MDY  |
++-----------+
+--设置，报错
+set DateStyle to 123;
+?.*ERROR: invalid value for parameter "DateStyle": "123"
+  Detail: Unrecognized key word: "123".
+set DateStyle to Postgres,YMD$#;
+?.*ERROR: invalid value for parameter "DateStyle": "postgres, ymd\$\#"
+  Detail: Unrecognized key word: "ymd$#".
+--no need to clean

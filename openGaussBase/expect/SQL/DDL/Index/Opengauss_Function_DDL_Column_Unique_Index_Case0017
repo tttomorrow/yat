@@ -1,0 +1,90 @@
+-- @testpoint: 列存本地临时表，创建(单字段)唯一索引，部分测试点合理报错
+--测试点1：创建列存本地临时表，表中存在数据，数据为唯一且非空
+drop table if exists columns_local_tab17;
+SQL SUCCESS
+create local temp table columns_local_tab17(id1 int,id2 int) with(orientation=column);
+SQL SUCCESS
+insert into columns_local_tab17 values(generate_series(1,1000));
+SQL SUCCESS
+--创建唯一索引
+create unique index column_index17 on columns_local_tab17 using btree(id1);
+SQL SUCCESS
+--删除表
+drop table columns_local_tab17 cascade;
+SQL SUCCESS
+--测试点2：创建列存本地临时表，表中存在数据，数据为唯一且有空值
+drop table if exists columns_local_tab17;
+SQL SUCCESS
+create local temp table columns_local_tab17(id1 int,id2 int) with(orientation=column);
+SQL SUCCESS
+insert into columns_local_tab17 values(generate_series(1,1000));
+SQL SUCCESS
+insert into columns_local_tab17 values(null),(null),(null);
+SQL SUCCESS
+--创建唯一索引
+create unique index column_index17 on columns_local_tab17 using btree(id1);
+SQL SUCCESS
+--删除表
+drop table columns_local_tab17 cascade;
+SQL SUCCESS
+--测试点3：创建列存本地临时表，表中存在数据，数据不唯一且非空
+drop table if exists columns_local_tab17;
+SQL SUCCESS
+create local temp table columns_local_tab17(id1 int,id2 int) with(orientation=column);
+SQL SUCCESS
+insert into columns_local_tab17 values(generate_series(1,100));
+SQL SUCCESS
+insert into columns_local_tab17 values(generate_series(1,100));
+SQL SUCCESS
+insert into columns_local_tab17 values(generate_series(1,100));
+SQL SUCCESS
+--创建唯一索引，合理报错
+create unique index column_index17 on columns_local_tab17 using btree(id1);
+?.*ERROR: could not create unique index "column_index17"
+  Detail: Key (id1)=(51) is duplicated.
+--删除表
+drop table columns_local_tab17 cascade;
+SQL SUCCESS
+--测试点4：创建列存本地临时表，表中存在数据，数据不唯一且有空值
+drop table if exists columns_local_tab17;
+SQL SUCCESS
+create local temp table columns_local_tab17(id1 int,id2 int) with(orientation=column);
+SQL SUCCESS
+insert into columns_local_tab17 values(generate_series(1,100));
+SQL SUCCESS
+insert into columns_local_tab17 values(null),(null),(null);
+SQL SUCCESS
+insert into columns_local_tab17 values(generate_series(1,100));
+SQL SUCCESS
+--创建唯一索引，合理报错
+create unique index column_index17 on columns_local_tab17 using btree(id1);
+?.*ERROR: could not create unique index "column_index17"
+  Detail: Key (id1)=(75) is duplicated.
+--删除表
+drop table columns_local_tab17 cascade;
+SQL SUCCESS
+--测试点5：创建列存本地临时表，表中不存在数据，添加唯一索引，插入数据
+drop table if exists columns_local_tab17;
+SQL SUCCESS
+create local temp table columns_local_tab17(id1 int,id2 int) with(orientation=column);
+SQL SUCCESS
+--创建唯一索引
+create unique index column_index17 on columns_local_tab17 using btree(id1);
+SQL SUCCESS
+--插入正常数据
+insert into columns_local_tab17 values(generate_series(1,1000));
+SQL SUCCESS
+--再次插入已存在的数据，合理报错
+insert into columns_local_tab17 values(generate_series(1,1000));
+?.*ERROR: duplicate key value violates unique constraint "column_index17"
+  Detail: Key (id1)=(1) already exists.
+--查看数据
+select count(*) from columns_local_tab17 where id1=1;
++-------+
+| count |
++-------+
+| 1     |
++-------+
+--删除表
+drop table columns_local_tab17 cascade;
+SQL SUCCESS

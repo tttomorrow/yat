@@ -1,0 +1,14 @@
+-- @testpoint: 起始位和取字符长度都缺省
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS
+CREATE TABLE type_char (string1 char(100));
+SQL SUCCESS
+insert into type_char values ('abcd');
+SQL SUCCESS
+SELECT substrb(string1) from type_char;
+?.*ERROR: function substrb\(character\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: substrb
+DROP TABLE IF EXISTS type_char;
+SQL SUCCESS

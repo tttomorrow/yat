@@ -1,0 +1,57 @@
+--  @testpoint: 事务外使用concurrently创建索引
+SET ENABLE_SEQSCAN=off;
+SQL SUCCESS
+RESET ENABLE_INDEXSCAN;
+SQL SUCCESS
+RESET ENABLE_BITMAPSCAN;
+SQL SUCCESS
+show ENABLE_SEQSCAN;
++----------------+
+| enable_seqscan |
++----------------+
+| off            |
++----------------+
+show ENABLE_INDEXSCAN;
++------------------+
+| enable_indexscan |
++------------------+
+| on               |
++------------------+
+show ENABLE_BITMAPSCAN;
++-------------------+
+| enable_bitmapscan |
++-------------------+
+| on                |
++-------------------+
+-- create table
+DROP TABLE IF EXISTS ddl_index_case0204;
+SQL SUCCESS
+CREATE TABLE ddl_index_case0204(id INT, first_name text, last_name text);
+SQL SUCCESS
+--insert data
+INSERT INTO ddl_index_case0204 SELECT id, md5(random()::text), md5(random()::text) FROM (SELECT * FROM generate_series(1,2000000) AS id) AS x;
+SQL SUCCESS
+update ddl_index_case0204 set first_name='+dw', last_name='dw_rt' where id = 698;
+SQL SUCCESS
+--create  index
+create UNIQUE index CONCURRENTLY ddl_index_case0204_idx on ddl_index_case0204 USING btree(id);
+SQL SUCCESS
+--explain
+explain select * from ddl_index_case0204 where id=698;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*[Bypass].*
+?.*Index Scan using ddl_index_case0204_idx on ddl_index_case0204.*
+?.*Index Cond: \(id = 698\)?.*
+?.*
+--select
+select * from ddl_index_case0204 where id=698;
++-----+------------+-----------+
+| id  | first_name | last_name |
++-----+------------+-----------+
+| 698 | +dw        | dw_rt     |
++-----+------------+-----------+
+--tearDown drop table
+DROP TABLE IF EXISTS ddl_index_case0204;
+SQL SUCCESS

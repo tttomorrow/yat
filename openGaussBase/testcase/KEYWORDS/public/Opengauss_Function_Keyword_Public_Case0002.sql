@@ -1,0 +1,36 @@
+--  @testpoint:openGauss关键字public(非保留,作为列名带双引号，public大小写混合，建表成功
+
+drop table if exists public_test;
+create table public_test(
+	c_id int, c_int int, c_integer integer, c_bool int, c_boolean int, c_bigint integer,
+	c_real real, c_double real,
+	c_decimal decimal(38), c_number number(38), c_numeric numeric(38),
+	c_char char(50) default null, c_varchar varchar(20), c_varchar2 varchar2(4000),
+	c_date date, c_datetime date, c_timestamp timestamp,
+	"Public" char(50)
+)
+PARTITION BY RANGE (c_integer)
+(
+	partition P_max values less than (maxvalue)
+);
+
+select * from public_test;
+drop table public_test;
+
+--openGauss关键字public(非保留,作为列名带双引号，public大小写匹配，建表成功
+drop table if exists public_test;
+create table public_test(
+	c_id int, c_int int, c_integer integer, c_bool int, c_boolean int, c_bigint integer,
+	c_real real, c_double real,
+	c_decimal decimal(38), c_number number(38), c_numeric numeric(38),
+	c_char char(50) default null, c_varchar varchar(20), c_varchar2 varchar2(4000),
+	c_date date, c_datetime date, c_timestamp timestamp,
+	"public" char(50)
+)
+PARTITION BY RANGE (c_integer)
+(
+	partition P_max values less than (maxvalue)
+);
+
+select * from public_test;
+drop table public_test;

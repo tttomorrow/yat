@@ -1,0 +1,21 @@
+-- @testpoint: 给数据库的任意一项权限时查询该权限是否存在
+DROP USER IF EXISTS joe CASCADE;
+SQL SUCCESS
+CREATE USER joe PASSWORD 'Bigdata@123';
+SQL SUCCESS
+DROP database IF EXISTS dbtest_001;
+SQL SUCCESS
+create database dbtest_001;
+SQL SUCCESS
+GRANT create,connect on database dbtest_001 TO joe ;
+SQL SUCCESS
+SELECT has_database_privilege('joe', 'dbtest_001','connect');
++------------------------+
+| has_database_privilege |
++------------------------+
+| true                   |
++------------------------+
+DROP USER IF EXISTS joe CASCADE;
+SQL SUCCESS
+DROP database IF EXISTS dbtest_001;
+SQL SUCCESS

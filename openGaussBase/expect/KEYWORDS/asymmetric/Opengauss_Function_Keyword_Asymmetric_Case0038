@@ -1,0 +1,2 @@
+--  @testpoint:定义asymmetric为函数名,应该报错
+Sql parse error: [10:24] expect token, EOF found

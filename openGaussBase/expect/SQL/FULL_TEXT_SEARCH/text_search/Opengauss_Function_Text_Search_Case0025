@@ -1,0 +1,53 @@
+--  @testpoint:函数ts_lexize测试（无效性测试）
+--指定字典名为dutch_stem,不支持，合理报错
+SELECT ts_lexize('dutch_stem', 'stars');
+?.*ERROR: Text search for Dutch is not supported!
+  Where: referenced column: ts_lexize
+--指定字典名为finnish_stem,不支持，合理报错
+SELECT ts_lexize('finnish_stem', 'stars');
+?.*ERROR: Text search for Finnish is not supported!
+  Where: referenced column: ts_lexize
+--指定字典名为french_stem,不支持，合理报错
+SELECT ts_lexize('french_stem', 'stars');
+?.*ERROR: Text search for French is not supported!
+  Where: referenced column: ts_lexize
+--指定字典名为german_stem,不支持，合理报错
+SELECT ts_lexize('german_stem', 'stars');
+?.*ERROR: Text search for German is not supported!
+  Where: referenced column: ts_lexize
+--指定字典名为hungarian_stem,不支持，合理报错
+SELECT ts_lexize('hungarian_stem', 'stars');
+?.*ERROR: Text search for Hungarian is not supported!
+  Where: referenced column: ts_lexize
+--指定字典名为italian_stem,不支持，合理报错
+SELECT ts_lexize('italian_stem', 'stars');
+?.*ERROR: Text search for Italian is not supported!
+  Where: referenced column: ts_lexize
+--指定字典名为norwegian_stem,不支持，合理报错
+SELECT ts_lexize('norwegian_stem', 'stars');
+?.*ERROR: Text search for Norwegian is not supported!
+  Where: referenced column: ts_lexize
+--指定字典名为portuguese_stem,不支持，合理报错
+SELECT ts_lexize('portuguese_stem', 'stars');
+?.*ERROR: Text search for Portuguese is not supported!
+  Where: referenced column: ts_lexize
+--指定字典名为romanian_stem,不支持，合理报错
+SELECT ts_lexize('romanian_stem', 'stars');
+?.*ERROR: Text search for Romanian is not supported!
+  Where: referenced column: ts_lexize
+--指定字典名为russian_stem,不支持，合理报错
+SELECT ts_lexize('russian_stem', 'stars');
+?.*ERROR: Text search for Russian is not supported!
+  Where: referenced column: ts_lexize
+--指定字典名为spanish_stem,不支持，合理报错
+SELECT ts_lexize('spanish_stem', 'stars');
+?.*ERROR: Text search for Spanish is not supported!
+  Where: referenced column: ts_lexize
+--指定字典名为swedish_stem,不支持，合理报错
+SELECT ts_lexize('swedish_stem', 'stars');
+?.*ERROR: Text search for Swedish is not supported!
+  Where: referenced column: ts_lexize
+--指定字典名为turkish_stem,不支持，合理报错
+SELECT ts_lexize('turkish_stem', 'stars');
+?.*ERROR: Text search for Turkish is not supported!
+  Where: referenced column: ts_lexize

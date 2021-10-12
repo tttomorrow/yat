@@ -1,0 +1,45 @@
+--  @testpoint: --创建视图对象为同名的大写视图
+select * from view_2;
++---+---+
+| a | b |
++---+---+
++---+---+
+select * from VIEW_2;
++---+---+
+| a | b |
++---+---+
++---+---+
+create or replace view view_2 as select * from VIEW_2;
+SQL SUCCESS
+--报错，检测到无限递归
+select * from view_2;
+?.*ERROR: infinite recursion detected in rules for relation "view_2"
+drop view if exists view_2 cascade;
+SQL SUCCESS
+--大小写创建与表名相同的view名:报错
+create or replace view FALSE_3 AS SELECT * FROM false_3;
+?.*ERROR: "false_3" is not a view
+select * from FALSE_3;
++---+---+
+| a | b |
++---+---+
++---+---+
+--报错，提示cannot drop column i of table t because other objects depend on it
+ALTER TABLE false_3 drop column a;
+?.*ERROR: cannot drop table false_3 column a because other objects depend on it
+  Detail: view view_3 depends on table false_3 column a
+  Hint: Use DROP ... CASCADE to drop the dependent objects too.
+select * from false_3;
++---+---+
+| a | b |
++---+---+
++---+---+
+select * from FALSE_3;
++---+---+
+| a | b |
++---+---+
++---+---+
+drop view if exists view_1;
+SQL SUCCESS
+--DROP VIEW if exists VIEW_2;
+--DROP VIEW if exists FALSE_3;

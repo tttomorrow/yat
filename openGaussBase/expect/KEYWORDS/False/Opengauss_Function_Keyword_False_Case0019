@@ -1,0 +1,29 @@
+--  @testpoint:opengauss关键字false(保留)，作为外部数据源名
+--关键字不带引号-失败
+drop data source if exists false;
+?.*ERROR: syntax error at or near "false"
+?.*Position.*
+create data source false;
+?.*ERROR: syntax error at or near "false"
+?.*Position.*
+--关键字带双引号-成功
+drop data source if exists "false";
+SQL SUCCESS
+create data source "false";
+SQL SUCCESS
+drop data source "false";
+SQL SUCCESS
+--关键字带单引号-合理报错
+drop data source if exists 'false';
+?.*ERROR: syntax error at or near "'false'"
+?.*Position.*
+create data source 'false';
+?.*ERROR: syntax error at or near "'false'"
+?.*Position.*
+--关键字带反引号-合理报错
+drop data source if exists `false`;
+?.*ERROR: syntax error at or near "`"
+?.*Position.*
+create data source `false`;
+?.*ERROR: syntax error at or near "`"
+?.*Position.*
