@@ -128,15 +128,45 @@ drop table if exists table01;
 create table table01(id1 varchar,id2 int);
 ```
 
-上面我们创建了1个用例在testcase目录下，下一步是编写调度文件。
+上面我们创建了1个用例在testcase目录下，下一步是设置用例期待值。
+
+## 设置用例期待值
+
+指定的测试套目录下会有`expect`目录,在`expect`目录下常见和用例相同名称的文件
+
+```bash
+cd exp-imp-lob
+touch expect/create_user
+touch expect/create_table
+```
+
+每个文件内容如下：
+
+create_user:
+
+```sql
+CREATE USER yat CREATEDB PASSWORD '';
+SQL SUCCESS
+grant all privileges to yat;
+SQL SUCCESS
+```
+
+create_table:
+
+```sql
+drop table if exists table01;
+SQL SUCCESS
+create table table01(id1 varchar,id2 int);
+SQL SUCCESS
+```
 
 ## 创建调度文件
 
-执行完`yat init`命令后，指定的测试套目录下会有`conf`目录，创建`conf/schedule.schd`文件指定调度顺序，写法与`gs_regress`和`sqlc`相同.
+执行完`yat init`命令后，指定的测试套目录下会有`schedule`目录，创建`schedule/schedule.schd`文件指定调度顺序，写法与`gs_regress`和`sqlc`相同.
 
 按文件举例修改调入文件如下：
 
-**conf/schedule.schd**:
+**schedule/schedule.schd**:
 
 ```text
 test: create_user
@@ -185,9 +215,9 @@ sys:
 
 ## 安装JDBC驱动
 
-以在`postgresql`数据库上执行为例，需要安装`postgresql`的`JDBC`驱动，提供驱动局部安装方式。
+以在`postgresql`数据库上执行为例，需要安装`postgresql`的`JDBC`驱动，提供两种驱动安装方式。
 
-### 局部安装
+### 方式一：局部安装
 
 适用场景，只有一个测试套需要运行
 
@@ -197,6 +227,20 @@ sys:
 mkdir –p lib
 cp /path/to/postgresql.jar lib
 chmod a+r lib/*.jar
+```
+
+### 方式二：全局安装
+
+适用场景，有多个测试套需要在同一个环境的同一个用户下运行
+
+修改用户.bashrc文件，通过环境变量指定驱动搜索路径
+
+```bash
+mkdir –p ~/lib
+cp /path/to/postgresql.jar ~/lib
+chmod a+r ~/lib/*.jar
+echo `export YAT_LIB_PATH=$HOME/LIB` >> ~/.bashrc
+source ~/.bashrc
 ```
 
 ## 执行测试套
