@@ -73,6 +73,17 @@ yat suite init -d exp-imp-lob
 
 此命令会在当前目录创建一个`exp-imp-lob`的目录，目录中已经存在若干目录和文件，此目录就是我们生成的测试套。
 
+!!! Note
+
+执行yat时，默认需要检查core路径是否设置且有权限，通过后才开始执行yat.举例设置unlimite和core路径为/home/core
+
+```bash
+mkdir /home/core
+chmod -R 777 /home/core
+echo "/home/core/core-%e-%u-%s-%t-%h">/proc/sys/kernel/core_pattern
+ulimit -c unlimited
+```
+
 ## 编写用例
 
 执行完`yat init`命令后，指定的测试套目录下会有`testcase`目录，所有的测试用例都放在此目录下，支持的用例类型有：
