@@ -41,7 +41,9 @@ class _DiffCollectHandler:
             self.output.write(self.DIFF_SEPARATOR)
             self.output.write(content)
             self.output.flush()
-            self.output.close()
+    
+    def close(self):
+        self.output.close()
 
 
 def collect_diff_file(suite_dir):
@@ -54,4 +56,7 @@ def collect_diff_file(suite_dir):
 
     if os.path.exists(result_dir):
         handler = _DiffCollectHandler(os.path.join(log_dir, YAT_DIFF))
-        scan_path(result_dir, handler)
+        try:
+            scan_path(result_dir, handler)
+        finally:
+            handler.close()
