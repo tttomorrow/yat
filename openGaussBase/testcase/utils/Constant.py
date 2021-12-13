@@ -320,6 +320,7 @@ class Constant:
     
     @property
     def FUZZY_SEARCH_LIMIT_MSG(self):
+        return '\"gin_fuzzy_search_limit\" (0 .. 2147483647)'
     
     @property
     def CREATE_INDEX_SUCCESS_MSG(self):
