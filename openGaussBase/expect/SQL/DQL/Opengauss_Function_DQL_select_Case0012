@@ -11,7 +11,9 @@ insert into all_datatype_tbl01(c_id) values(123),(456),(789),(654),(321);
 SQL SUCCESS
 insert into all_datatype_tbl01(c_boolean) values(true),(false),(10),(0),(null);
 SQL SUCCESS
+insert into all_datatype_tbl01(c_integer) values(-100),(100),(-2147483648),(2147483647),(null);
 SQL SUCCESS
+insert into all_datatype_tbl01(c_bigint) values(-100),(100),(-9223372036854775808),(9223372036854775807),(null);
 SQL SUCCESS
 insert into all_datatype_tbl02(c_id) values(1234),(456),(789),(654),(4321);
 SQL SUCCESS
@@ -39,12 +41,14 @@ select * from  datatype_tbl1 order by 1,2;
 | 789  |             |           |
 | 1234 |             |           |
 | 4321 |             |           |
+|      | -2147483648 |           |
 |      | -214        |           |
 |      | -100        |           |
 |      | -100        |           |
 |      | 100         |           |
 |      | 100         |           |
 |      | 214         |           |
+|      | 2147483647  |           |
 |      |             |           |
 |      |             |           |
 |      |             |           |

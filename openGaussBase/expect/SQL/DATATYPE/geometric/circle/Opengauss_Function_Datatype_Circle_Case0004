@@ -3,6 +3,7 @@ drop table if exists test_circle04;
 SQL SUCCESS
 create table test_circle04 (name circle);
 SQL SUCCESS
+insert into test_circle04 values (circle '<(99999999999999999999999999999,99999999999999999999999999999999),2>');
 SQL SUCCESS
 select * from test_circle04;
 +-----------------------+

@@ -1,5 +1,4 @@
 -- @testpoint: 插入数据，数据类型不兼容，合理报错
--- @modify at: 2020-11-16
 --建表
 drop table if exists zsharding_tbl;
 create table zsharding_tbl(
@@ -11,6 +10,9 @@ c_date date, c_datetime date, c_timestamp timestamp
 )
 PARTITION BY RANGE (c_integer)
 (
+partition P_20180121 values less than (0),
+partition P_20190122 values less than (50000),
+partition P_20200123 values less than (100000)
 );
 --插入数据，合理报错
 insert into zsharding_tbl(c_id,c_integer) values(2,123),(3,'abc');

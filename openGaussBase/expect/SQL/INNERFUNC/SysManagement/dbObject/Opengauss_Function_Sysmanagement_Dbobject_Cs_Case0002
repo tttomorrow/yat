@@ -31,6 +31,7 @@ SELECT pg_column_size(32768::SMALLINT);
 ?.*ERROR: smallint out of range
   Where: referenced column: pg_column_size
 -- INTEGER
+SELECT pg_column_size(-2147483648::INTEGER);
 ?.*ERROR: integer out of range
   Where: referenced column: pg_column_size
 SELECT pg_column_size('hijk'::clob);
@@ -39,15 +40,18 @@ SELECT pg_column_size('hijk'::clob);
 +----------------+
 | 8              |
 +----------------+
+SELECT pg_column_size(2147483648::INTEGER);
 ?.*ERROR: integer out of range
   Where: referenced column: pg_column_size
 -- BINARY_INTEGER
+SELECT pg_column_size(-2147483648::BINARY_INTEGER);
 ?.*ERROR: integer out of range
   Where: referenced column: pg_column_size
 SELECT pg_column_size(高斯);
 ?.*ERROR: column \"高斯\" does not exist
 ?.*
   Where: referenced column: pg_column_size
+SELECT pg_column_size(2147483648::BINARY_INTEGER);
 ?.*ERROR: integer out of range
   Where: referenced column: pg_column_size
 -- BIGINT

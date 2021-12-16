@@ -3,6 +3,7 @@
 declare
   v_real real;
 begin
+    select 9.22337203685478e-308 into v_real from sys_dummy;
     raise info 'result:% ',v_real;
 end;
 /

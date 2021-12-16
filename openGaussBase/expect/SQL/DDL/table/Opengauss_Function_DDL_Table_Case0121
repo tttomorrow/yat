@@ -4,11 +4,13 @@ drop table if exists table_1;
 SQL SUCCESS
 create table table_1(a FLOAT);
 SQL SUCCESS
+insert into table_1 values(12345646842225.1787902566223456);
 SQL SUCCESS
 select * from table_1;
 +----------------------+
 | a                    |
 +----------------------+
+| 1.234564684222518E13 |
 +----------------------+
 drop table if exists table_1;
 SQL SUCCESS
@@ -16,6 +18,7 @@ drop table if exists table_2;
 SQL SUCCESS
 create table table_2(a FLOAT(20));
 SQL SUCCESS
+insert into table_2 values(123456467891011127.1787902566223457866);
 SQL SUCCESS
 select * from table_2;
 +---------------+
@@ -29,11 +32,13 @@ drop table if exists table_3;
 SQL SUCCESS
 create table table_3(a FLOAT(53));
 SQL SUCCESS
+insert into table_3 values(123456467891011127.1787902566223457866);
 SQL SUCCESS
 select * from table_3;
 +-----------------------+
 | a                     |
 +-----------------------+
+| 1.2345646789101112E17 |
 +-----------------------+
 drop table if exists table_3;
 SQL SUCCESS

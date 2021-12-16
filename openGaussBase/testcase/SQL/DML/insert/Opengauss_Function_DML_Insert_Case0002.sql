@@ -1,5 +1,4 @@
 -- @testpoint: insert组合数据类型,二进制，布尔，日期型等数据，违法唯一约束，合理报错
--- @modify at: 2020-11-16
 --建表，包含基本数据类型
 drop table if exists tbl_hash;
 create table tbl_hash(
@@ -47,8 +46,10 @@ col_interval2 INTERVAL DAY TO SECOND
 drop index if exists idx_tbl_hash_2;
 create unique index idx_tbl_hash_2 on tbl_hash(col_raw1,col_timestamp1,col_timestamp2,col_bool,col_interval1,col_interval2,col_nvarchar2_1,col_real,col_bigint);
 --唯一约束字段插入数据
+insert into tbl_hash(col_raw1,col_timestamp1,col_timestamp2,col_bool,col_interval1,col_interval2,col_nvarchar2_1,col_real,col_bigint)values('1001111111111111111111111111111','2018-01-07 08:08:08','2018-01-07 08:08:08',100,'1-1',
 '1 2:2:2',100,100,100);
 --再次插入相同数据，合理报错
+insert into tbl_hash(col_raw1,col_timestamp1,col_timestamp2,col_bool,col_interval1,col_interval2,col_nvarchar2_1,col_real,col_bigint)values('1001111111111111111111111111111','2018-01-07 08:08:08','2018-01-07 08:08:08',100,'1-1',
 '1 2:2:2',100,100,100);
 --删除表
 drop table if exists tbl_hash cascade;

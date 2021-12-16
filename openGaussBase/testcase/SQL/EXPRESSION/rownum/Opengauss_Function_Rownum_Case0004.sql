@@ -14,6 +14,16 @@ create table student_bk
     name_bk varchar(10) not null,
     class_bk int
 );
+insert into student values (2017100001, 'aaa', 100);
+insert into student values (2017100002, 'bbb', 100);
+insert into student values (2017100003, 'ccc', 101);
+insert into student values (2017100004, 'ddd', 101);
+insert into student values (2017100005, 'eee', 101);
+insert into student values (2017100006, 'fff', 102);
+insert into student_bk values (2017100007, 'ggg', 101);
+insert into student_bk values (2017100008, 'hhh', 102);
+insert into student_bk values (2017100009, 'iii', 103);
+insert into student_bk values (2017100010, 'jjj', 103);
 --测试点1：left join
 select rownum, * from student left join student_bk on class = class_bk;
 select rownum, * from student left join student_bk on class = class_bk where rownum != 4;

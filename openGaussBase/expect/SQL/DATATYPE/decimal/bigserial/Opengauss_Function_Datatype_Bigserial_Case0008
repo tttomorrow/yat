@@ -3,11 +3,13 @@ drop table if exists bigserial_08;
 SQL SUCCESS
 create table bigserial_08 (name bigserial);
 SQL SUCCESS
+insert into bigserial_08 values (9223372036854775807);
 SQL SUCCESS
 select * from bigserial_08;
 +---------------------+
 | name                |
 +---------------------+
+| 9223372036854775807 |
 +---------------------+
 drop table bigserial_08;
 SQL SUCCESS

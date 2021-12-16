@@ -11,6 +11,7 @@ select hll_hashval_eq(hll_hash_text('天天开心', 10),hll_hash_text('天天开
 +----------------+
 | true           |
 +----------------+
+select hll_hashval_eq(hll_hash_text('ab', 214748367),hll_hash_bigint(0));
 +----------------+
 | hll_hashval_eq |
 +----------------+

@@ -1,5 +1,4 @@
 -- @testpoint: 删除表数据后使用alter table语句修改列名，数据类型，无法转换的类型间合理报错
--- @modify at: 2020-11-23
 --建表
 drop table if exists temp_table_alter_015;
 create global temporary table temp_table_alter_015(
@@ -12,6 +11,7 @@ c_blob blob,
 c_date date
 )on commit preserve rows;
 --插入数据
+insert into temp_table_alter_015 values(1,1.0002,'dghg','jjjsdfghjhjui','0101','010101101',date_trunc('hour', timestamp  '2001-02-16 20:38:40'));
 insert into temp_table_alter_015 select * from temp_table_alter_015;
 --查询表
 select * from temp_table_alter_015;

@@ -4,6 +4,7 @@ select char_length(to_char(lpad('abccc',1024*1024*10,'x')::char(10485761)));
 ?.*ERROR: length for type char cannot exceed 10485760.*
 ?.*
   Where: referenced column: char_length
+select to_char('123456789'::char(77),'999','99999');
 ?.*ERROR: function to\_char\(character, unknown, unknown\) does not exist.*
   Hint: No function matches the given name and argument types. You might need to add explicit type casts.
 ?.*

@@ -15,6 +15,8 @@ select to_char(-1239.456::numeric(8,3),'9999D999s');
 
 -- 指定长度不足
 select to_char(32767::SMALLINT, '999');
+select to_char(-2147483647::INT4, '999999');
+select to_char(9223372036854775807::BIGINT, '99999999');
 
 -- 指定格式错误
 select to_char(-1239.456::numeric(7,3),'*&……%￥','999');

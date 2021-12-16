@@ -14,6 +14,7 @@ CREATE  TABLE object_identifier_008(
 	c11 REGCLASS,
 	c12 REGTYPE
 );
+insert into object_identifier_008 values(564182564182564182,null,null,null,'english','simple',null,'*(integer,integer)',null,'sum(int4)','pg_type','integer');
 drop table if exists object_identifier_008;
 CREATE  TABLE object_identifier_008(
 	c1 OID,

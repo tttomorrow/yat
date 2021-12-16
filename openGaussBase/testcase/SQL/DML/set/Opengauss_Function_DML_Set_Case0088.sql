@@ -5,6 +5,8 @@ create table t4 (id int primary key DEFERRABLE,name varchar(40) unique DEFERRABL
 --查看约束名字
 select conname,condeferrable,condeferred from pg_constraint where conrelid = (select oid from pg_class where relname='t4');
 --插入数据
+insert into t4 values(1,'1111111111111111');
+insert into t4 values(2,'2222222222222222');
 --修改数据，成功
 update t4 set id=id+1;
 select * from t4;
@@ -13,11 +15,15 @@ select * from t4;
  --设置约束检查条件为IMMEDIATE
  SET CONSTRAINTS all IMMEDIATE;
  --修改数据,合理报错（立即检查）
+ update t4 set id=3 where name='1111111111111111';
+ update t4 set name='2222222222222222' where id=2;
  --结束事务
  end;
 
 truncate table t4;
  --插入数据
+insert into t4 values(1,'1111111111111111');
+insert into t4 values(2,'2222222222222222');
 --开启事务
  start transaction;
  --设置约束检查条件为DEFERRED

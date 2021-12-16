@@ -1,5 +1,4 @@
 -- @testpoint: 给表中插入数据，再创建视图
--- @modified at: 2020-11-18
 --建表
 drop table if exists table_view_002 cascade ;
 create table table_view_002(
@@ -12,6 +11,8 @@ c_raw raw(20),c_blob blob,
 c_timestamp timestamp
 );
 --插入数据
+insert into table_view_002 values(1,0,3.14,1.0002,3.55555,5,7887.656,0,0.111111,3.1415926,'dghg','jjj','pokj99','ywgdghghhgghe','deadbeef','010101101',to_timestamp('2019-01-03 14:58:54.000000','yyyy-mm-dd hh24:mi:ss.ffffff'));
+insert into table_view_002 values(10,0,3.14,1.0002,3.55555,5,78847.656,0,0.111111,3.1415926,'dtgfghg','jjj','pok测试j99','ywgdghghhgghe','deadbeef','010101101',to_timestamp('2019-01-03 14:58:54.000000','yyyy-mm-dd hh24:mi:ss.ffffff'));
 --查询
 select count(*)from table_view_002;
 --创建视图

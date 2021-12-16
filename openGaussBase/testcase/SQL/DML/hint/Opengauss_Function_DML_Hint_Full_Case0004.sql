@@ -1,1 +1,2 @@
 -- @testpoint: INSERT语句后带优化器full,不存在的表名   --error
+INSERT /*+FULL(hint_index_000)*/ INTO hint_index_00000 VALUES ( 20, 0, 10, 1, 0, -1088618496, 500000, 5, 8, 'a', 'def', '2003-02-28', TO_DATE('2002-03-18', 'YYYY-MM-DD') );

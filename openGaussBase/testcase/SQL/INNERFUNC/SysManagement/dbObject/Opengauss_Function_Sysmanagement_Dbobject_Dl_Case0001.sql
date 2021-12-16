@@ -9,7 +9,9 @@
        -- INTEGER
              SELECT datalength(99999::INTEGER);
        -- BINARY_INTEGER
+             SELECT datalength(2147483647::BINARY_INTEGER);
        -- BIGINT
+             SELECT datalength(9999999999999999::BIGINT);
 
      -- 任意精度
         -- DECIMAL[(p[,s])]

@@ -9,6 +9,8 @@ c_clob clob,
 c_blob blob,
 c_date date
 );
+insert into table_alter_019 values(1,1.0002,'dghg','jjjsdfghjhjui','010101101',date_trunc('hour', timestamp  '2001-02-16 20:38:40'));
+insert into table_alter_019 values(2,1.0002,'dghg','jjjsdfghjhjui','010101101',date_trunc('hour', timestamp  '2001-02-16 20:38:40'));
 insert into table_alter_019 select * from table_alter_019;
 insert into table_alter_019 select * from table_alter_019;
 insert into table_alter_019 select * from table_alter_019;

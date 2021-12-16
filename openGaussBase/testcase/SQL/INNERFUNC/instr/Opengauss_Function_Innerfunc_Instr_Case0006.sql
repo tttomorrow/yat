@@ -1,2 +1,3 @@
 -- @testpoint: instr函数参数中包含数字,合理报错
+SELECT instr(3544651313，3，2，2) from sys_dummy;
 

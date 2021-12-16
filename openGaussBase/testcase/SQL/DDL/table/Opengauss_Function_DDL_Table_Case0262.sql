@@ -27,6 +27,7 @@ where c.relname = 'test_modify' and a.attrelid = c.oid and a.attnum>0;
 
 
 alter table test_modify MODIFY (c_raw raw(0));
+alter table test_modify MODIFY (c_raw raw(199733621));
 
 alter table test_modify MODIFY (c_char char(0));
 alter table test_modify MODIFY (c_char char(-1));

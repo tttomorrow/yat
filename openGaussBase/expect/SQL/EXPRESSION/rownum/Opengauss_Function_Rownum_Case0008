@@ -7,49 +7,83 @@ create table student
     s_name varchar(10) not null
 );
 SQL SUCCESS
+insert into student values (2017100001, 'aaa');
 SQL SUCCESS
+insert into student values (2017100002, 'bbb');
 SQL SUCCESS
+insert into student values (2017100003, 'ccc');
 SQL SUCCESS
+insert into student values (2017100004, 'ddd');
 SQL SUCCESS
+insert into student values (2017100005, 'eee');
 SQL SUCCESS
+insert into student values (2017100006, 'fff');
 SQL SUCCESS
 --测试点1：测试排序和rownum生效先后关系
 select * from student where rownum <= 4 order by 1 desc;
 +------------+--------+
 | s_id       | s_name |
 +------------+--------+
+| 2017100004 | ddd    |
+| 2017100003 | ccc    |
+| 2017100002 | bbb    |
+| 2017100001 | aaa    |
 +------------+--------+
 select * from student where rownum != 5 order by 1 asc;
 +------------+--------+
 | s_id       | s_name |
 +------------+--------+
+| 2017100001 | aaa    |
+| 2017100002 | bbb    |
+| 2017100003 | ccc    |
+| 2017100004 | ddd    |
 +------------+--------+
 --测试点2：子查询中包含排序
 select * from (select * from student order by 1 desc) where rownum <= 4;
 +------------+--------+
 | s_id       | s_name |
 +------------+--------+
+| 2017100006 | fff    |
+| 2017100005 | eee    |
+| 2017100004 | ddd    |
+| 2017100003 | ccc    |
 +------------+--------+
 select * from (select * from student order by 1 asc) where rownum != 5;
 +------------+--------+
 | s_id       | s_name |
 +------------+--------+
+| 2017100001 | aaa    |
+| 2017100002 | bbb    |
+| 2017100003 | ccc    |
+| 2017100004 | ddd    |
 +------------+--------+
 --测试点3：对rownum进行排序
 select rownum, * from student where rownum < 5 order by 1 desc;
 +--------+------------+--------+
 | rownum | s_id       | s_name |
 +--------+------------+--------+
+| 4      | 2017100004 | ddd    |
+| 3      | 2017100003 | ccc    |
+| 2      | 2017100002 | bbb    |
+| 1      | 2017100001 | aaa    |
 +--------+------------+--------+
 select rownum rowno, * from student where rownum != 4 order by rowno desc;
 +-------+------------+--------+
 | rowno | s_id       | s_name |
 +-------+------------+--------+
+| 3     | 2017100003 | ccc    |
+| 2     | 2017100002 | bbb    |
+| 1     | 2017100001 | aaa    |
 +-------+------------+--------+
 select * from (select rownum rowno, * from student) where rowno != 4 order by rowno desc;
 +-------+------------+--------+
 | rowno | s_id       | s_name |
 +-------+------------+--------+
+| 6     | 2017100006 | fff    |
+| 5     | 2017100005 | eee    |
+| 3     | 2017100003 | ccc    |
+| 2     | 2017100002 | bbb    |
+| 1     | 2017100001 | aaa    |
 +-------+------------+--------+
 drop table if exists student;
 SQL SUCCESS

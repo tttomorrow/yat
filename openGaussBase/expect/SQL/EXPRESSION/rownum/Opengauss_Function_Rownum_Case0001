@@ -8,23 +8,39 @@ create table student
     s_name varchar(10) not null
 );
 SQL SUCCESS
+insert into student values (2017100001, 'aaa');
 SQL SUCCESS
+insert into student values (2017100002, 'bbb');
 SQL SUCCESS
+insert into student values (2017100003, 'ccc');
 SQL SUCCESS
+insert into student values (2017100004, 'ddd');
 SQL SUCCESS
+insert into student values (2017100005, 'eee');
 SQL SUCCESS
+insert into student values (2017100006, 'fff');
 SQL SUCCESS
 --测试点1：单层select中使用别名
 select rownum rowno, * from student;
 +-------+------------+--------+
 | rowno | s_id       | s_name |
 +-------+------------+--------+
+| 1     | 2017100001 | aaa    |
+| 2     | 2017100002 | bbb    |
+| 3     | 2017100003 | ccc    |
+| 4     | 2017100004 | ddd    |
+| 5     | 2017100005 | eee    |
+| 6     | 2017100006 | fff    |
 +-------+------------+--------+
 --测试点2：对上一个别名加入where的判断
 select rownum rowno, * from student where rownum < 5;
 +-------+------------+--------+
 | rowno | s_id       | s_name |
 +-------+------------+--------+
+| 1     | 2017100001 | aaa    |
+| 2     | 2017100002 | bbb    |
+| 3     | 2017100003 | ccc    |
+| 4     | 2017100004 | ddd    |
 +-------+------------+--------+
 select rownum rowno, * from student where rowno < 5;
 ?.*ERROR: Alias "rowno" reference with ROWNUM included is invalid.
@@ -34,11 +50,15 @@ select rownum rowno2, * from (select rownum rowno1, * from student) where rowno1
 +--------+--------+------------+--------+
 | rowno2 | rowno1 | s_id       | s_name |
 +--------+--------+------------+--------+
+| 1      | 1      | 2017100001 | aaa    |
+| 2      | 2      | 2017100002 | bbb    |
 +--------+--------+------------+--------+
 select rownum rowno2, * from (select rownum rowno1, * from student where rownum < 5) where rowno1 < 3;
 +--------+--------+------------+--------+
 | rowno2 | rowno1 | s_id       | s_name |
 +--------+--------+------------+--------+
+| 1      | 1      | 2017100001 | aaa    |
+| 2      | 2      | 2017100002 | bbb    |
 +--------+--------+------------+--------+
 --测试点4：多层select中使用别名，最外层在本层中使用
 select rownum rowno2, * from (select rownum rowno1, * from student) where rowno2 < 2;

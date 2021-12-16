@@ -12,6 +12,18 @@ create table teacher
     t_id int primary key,
     t_name varchar(10) not null
 );
+insert into student values (2017100001, 'aaa');
+insert into student values (2017100002, 'bbb');
+insert into student values (2017100003, 'ccc');
+insert into student values (2017100004, 'ddd');
+insert into student values (2017100005, 'eee');
+insert into student values (2017100006, 'fff');
+insert into teacher values (2017100005, 'eee');
+insert into teacher values (2017100006, '222');
+insert into teacher values (2017100007, 'aaa');
+insert into teacher values (2017100008, '444');
+insert into teacher values (2017100009, '555');
+insert into teacher values (2017100010, '666');
 --测试点1：union
 --简单的情况，包含子查询和union all，重复信息能得以保留
 select rownum, * from (select * from student union all select * from teacher) as result where rownum < 8;

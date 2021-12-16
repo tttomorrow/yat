@@ -1,17 +1,24 @@
 -- @testpoint: create index:模式名为64位：success：自动截取为63位
 --创建64位模式
+drop schema if exists testschema01234567890123456789012345678901234567890123456789012 cascade;
 SQL SUCCESS
+drop schema if exists testschema012345678901234567890123456789012345678901234567890123 cascade;
 SQL SUCCESS
+create schema testschema012345678901234567890123456789012345678901234567890123;
 SQL SUCCESS
 --建表
+drop table if exists testschema012345678901234567890123456789012345678901234567890123.test_index_schema_02;
 SQL SUCCESS
+create table testschema012345678901234567890123456789012345678901234567890123.test_index_schema_02(id int);
 SQL SUCCESS
 BEGIN
   for i in 1..10000 LOOP
+    insert into testschema012345678901234567890123456789012345678901234567890123.test_index_schema_02 values(i);
   end LOOP;
 end;
 /
 SQL SUCCESS
+explain select * from testschema012345678901234567890123456789012345678901234567890123.test_index_schema_02 where id = 999;
 ?.*
 ?.*QUERY PLAN.*
 ?.*
@@ -19,9 +26,12 @@ SQL SUCCESS
 ?.*
 ?.*
 --建索引
+drop index if exists testschema012345678901234567890123456789012345678901234567890123.schema_index_02;
 SQL SUCCESS
+create index testschema012345678901234567890123456789012345678901234567890123.schema_index_02 on testschema012345678901234567890123456789012345678901234567890123.test_index_schema_02(id);
 SQL SUCCESS
 --两次引用证明模式被截取位63位
+explain select * from testschema012345678901234567890123456789012345678901234567890123.test_index_schema_02 where id = 999;
 ?.*
 ?.*QUERY PLAN.*
 ?.*
@@ -30,6 +40,7 @@ SQL SUCCESS
 ?.*Bitmap Index Scan on schema_index_02.*
 ?.*
 ?.*
+explain select * from testschema01234567890123456789012345678901234567890123456789012.test_index_schema_02 where id = 999;
 ?.*
 ?.*QUERY PLAN.*
 ?.*
@@ -39,6 +50,9 @@ SQL SUCCESS
 ?.*
 ?.*
 --清理数据
+drop index if exists testschema012345678901234567890123456789012345678901234567890123.schema_index_01;
 SQL SUCCESS
+drop table if exists testschema012345678901234567890123456789012345678901234567890123.test_index_schema_01 cascade;
 SQL SUCCESS
+drop schema if exists testschema012345678901234567890123456789012345678901234567890123 cascade;
 SQL SUCCESS

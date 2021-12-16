@@ -16,8 +16,11 @@ SQL SUCCESS
 alter view if exists temp_view_024 alter column id set default 5;
 SQL SUCCESS
 --取消默认值，视图名不存在，不报错
+alter view if exists temp_view_024345346436 alter column id drop default;
 SQL SUCCESS
 --取消默认值，视图名不存在，合理报错
+alter view temp_view_024345346436 alter column id drop default;
+?.*ERROR: relation "temp_view_024345346436" does not exist
 --删表
 drop table table_view_024 cascade;
 SQL SUCCESS

@@ -7,6 +7,8 @@ create table all_datatype_tbl02(c_id integer,c_boolean boolean,c_integer integer
 
 insert into all_datatype_tbl01(c_id) values(123),(456),(789),(654),(321);
 insert into all_datatype_tbl01(c_boolean) values(true),(false),(10),(0),(null);
+insert into all_datatype_tbl01(c_integer) values(-100),(100),(-2147483648),(2147483647),(null);
+insert into all_datatype_tbl01(c_bigint) values(-100),(100),(-9223372036854775808),(9223372036854775807),(null);
 
 insert into all_datatype_tbl02(c_id) values(1234),(456),(789),(654),(4321);
 insert into all_datatype_tbl02(c_boolean) values(true),(false),('yes'),('no'),(null);

@@ -6,6 +6,12 @@ create table student
     s_id int primary key,
     s_name varchar(10) not null
 );
+insert into student values (2017100001, 'aaa');
+insert into student values (2017100002, 'bbb');
+insert into student values (2017100003, 'ccc');
+insert into student values (2017100004, 'ddd');
+insert into student values (2017100005, 'eee');
+insert into student values (2017100006, 'fff');
 --测试点1：insert
 insert into student values ((select s_id from student where rownum <= 1) + 6, 'ggg');
 select * from student;

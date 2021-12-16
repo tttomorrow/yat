@@ -3,6 +3,7 @@ drop table if exists data_01;
 SQL SUCCESS
 create table data_01 (clo1 BIGINT,clo2 BIGINT);
 SQL SUCCESS
+insert into data_01 values (922337203685477580.6, 2);
 SQL SUCCESS
 select clo1 * 0 from data_01;
 +----------+
@@ -10,6 +11,7 @@ select clo1 * 0 from data_01;
 +----------+
 | 0        |
 +----------+
+SELECT -9223372036854775806 * 0 AS RESULT;
 +--------+
 | result |
 +--------+

@@ -2,5 +2,6 @@
 
 drop table if exists bigint06;
 create table bigint06 (name bigint);
+insert into bigint06 values (9223372036854775808);
 select * from bigint06;
 drop table bigint06;

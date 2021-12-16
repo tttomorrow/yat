@@ -1,17 +1,3 @@
-"""
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
-
-openGauss is licensed under Mulan PSL v2.
-You can use this software according to the terms and conditions of the Mulan PSL v2.
-You may obtain a copy of Mulan PSL v2 at:
-
-          http://license.coscl.org.cn/MulanPSL2
-
-THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-See the Mulan PSL v2 for more details.
-"""
 '''
 
 Case Type： 功能测试
@@ -61,6 +47,7 @@ class Bit_string_function(unittest.TestCase):
         Normal_SqlMdg = self.commonsh.execut_db_sql("""SELECT octet_length(lpad('open', 5000, 'gauss'));""")
         logger.info(Normal_SqlMdg)
         self.assertTrue(Normal_SqlMdg.splitlines()[2].strip(' ') == '5000')
+        Normal_SqlMdg = self.commonsh.execut_db_sql("""SELECT octet_length(rawcat(left('ABCDEFGHIJK', 6)::RAW,'0123456789'::RAW));""")
         logger.info(Normal_SqlMdg)
         self.assertTrue(Normal_SqlMdg.splitlines()[2].strip(' ') == '16')
 
@@ -68,6 +55,7 @@ class Bit_string_function(unittest.TestCase):
         Normal_SqlMdg = self.commonsh.execut_db_sql("""SELECT octet_length(E'josejosejose'::bytea) AS RESULT;""")
         logger.info(Normal_SqlMdg)
         self.assertTrue(Normal_SqlMdg.splitlines()[2].strip(' ') == '12')
+        Normal_SqlMdg = self.commonsh.execut_db_sql("""SELECT octet_length(E'\\x5402036d6173') AS RESULT;""")
         logger.info(Normal_SqlMdg)
         self.assertTrue(Normal_SqlMdg.splitlines()[2].strip(' ') == '11')
         Normal_SqlMdg = self.commonsh.execut_db_sql("""SELECT octet_length(E'jose\\\\\\000\\\\\\000\\\\\\0000jose\\\\\\00000\\\\\\000000jose'::bytea) AS RESULT;""")

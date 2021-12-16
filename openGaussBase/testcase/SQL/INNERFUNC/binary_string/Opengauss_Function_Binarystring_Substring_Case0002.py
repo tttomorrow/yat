@@ -1,17 +1,3 @@
-"""
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
-
-openGauss is licensed under Mulan PSL v2.
-You can use this software according to the terms and conditions of the Mulan PSL v2.
-You may obtain a copy of Mulan PSL v2 at:
-
-          http://license.coscl.org.cn/MulanPSL2
-
-THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-See the Mulan PSL v2 for more details.
-"""
 '''
 
 Case Type： 功能测试
@@ -52,10 +38,12 @@ class byte_string_function(unittest.TestCase):
         self.assertTrue('ERROR:  function pg_catalog.substring(blob, integer, integer) does not exist' in Normal_SqlMdg2)
 
         logger.info("----------from超范围-----------")
+        Normal_SqlMdg4 = self.commonsh.execut_db_sql("""SELECT substring(E'Th\\\\\\000omas'::bytea from -8888888899999999 for 3) AS RESULT;""")
         logger.info(Normal_SqlMdg4)
         self.assertTrue('ERROR:  function pg_catalog.substring(bytea, bigint, integer) does not exist' in Normal_SqlMdg4)
 
         logger.info("-----------for超范围-----------")
+        Normal_SqlMdg5 = self.commonsh.execut_db_sql("""SELECT substring(E'Th\\\\\\000omas'::bytea from 3 for 99999999999999999) AS RESULT;""")
         logger.info(Normal_SqlMdg5)
         self.assertTrue('ERROR:  function pg_catalog.substring(bytea, integer, bigint) does not exist' in Normal_SqlMdg5)
 

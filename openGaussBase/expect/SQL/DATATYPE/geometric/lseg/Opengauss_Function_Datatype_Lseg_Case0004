@@ -3,7 +3,9 @@ drop table if exists test_lseg04;
 SQL SUCCESS
 create table test_lseg04 (name lseg);
 SQL SUCCESS
+insert into test_lseg04 values (lseg '[(99999999999999999999999999999,99999999999999999999999999999999),(99999999999999999999999999999,99999999999999999999999999999999)]');
 SQL SUCCESS
+insert into test_lseg04 values (lseg '[(0,0),(99999999999999999999999999999,99999999999999999999999999999999)]');
 SQL SUCCESS
 select * from test_lseg04;
 +-----------------------------------+

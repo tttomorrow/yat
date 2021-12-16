@@ -3,6 +3,7 @@ drop table if exists int02;
 SQL SUCCESS
 create table int02 (name int);
 SQL SUCCESS
+insert into int02 values (-2147483649);
 ?.*ERROR: integer out of range
   Where: referenced column: name
 drop table int02;

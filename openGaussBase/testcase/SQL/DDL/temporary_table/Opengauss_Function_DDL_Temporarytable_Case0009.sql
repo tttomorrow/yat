@@ -1,5 +1,4 @@
 -- @testpoint: 无法进行隐式转换的类型间互相修改类型，合理报错
--- @modify at: 2020-11-23
 --创建全局临时表
 drop table if exists temp_table_alter_009;
 create global temporary table temp_table_alter_009(
@@ -30,6 +29,7 @@ alter table temp_table_alter_009 modify(c_number char(60));
 alter table temp_table_alter_009 modify(c_date real);
 --插入数据
 insert into temp_table_alter_009 values(1,0,3.14,1.0002,3.55555,5,7887.656,0,0.111111,3.1415926,'dghg','jjj','pokj99',
+'ywgdghghhgghe',hextoraw('101a1101'),'010101101',date_trunc('hour', timestamp  '2001-02-16 20:38:40'),to_timestamp('2019-01-03 14:58:54.000000','yyyy-mm-dd hh24:mi:ss.ffffff'));
 --查询表
 select * from temp_table_alter_009;
 --删表

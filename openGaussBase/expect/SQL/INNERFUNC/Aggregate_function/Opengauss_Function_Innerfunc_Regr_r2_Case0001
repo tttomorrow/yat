@@ -9,21 +9,28 @@ hobbies text,
 tel bigint
 );
 SQL SUCCESS
+insert into table_test values(1, '张三', 12, 156.23, 'sings', 12355551895),
+(7, '李四', 15, 146.45, 'read books', 12866661265),
+(3, '李华', 18, 160.55, 'Dancing', 11822220366),
+(5, '赵六', 18, 170.55, 'Playing games', 13344443322);
 SQL SUCCESS
 select regr_r2(tel, height)from  table_test;
 +---------------------+
 | regr_r2             |
 +---------------------+
+| 0.05754612930203301 |
 +---------------------+
 select regr_r2(height, id)from  table_test where id <5;
 +-------------------+
 | regr_r2           |
 +-------------------+
+| 0.999999999999186 |
 +-------------------+
 select regr_r2(age, id)from  table_test where id <9;
 +---------------------+
 | regr_r2             |
 +---------------------+
+| 0.16363636363636364 |
 +---------------------+
 drop table table_test;
 SQL SUCCESS

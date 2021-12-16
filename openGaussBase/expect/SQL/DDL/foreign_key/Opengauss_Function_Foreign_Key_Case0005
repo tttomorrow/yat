@@ -18,20 +18,25 @@ create table student
 );
 SQL SUCCESS
 --添加数据
+INSERT INTO teacher VALUES (2017100001, '李老师');
 SQL SUCCESS
+INSERT INTO student VALUES (2017200001, '张三', 2017100001);
 SQL SUCCESS
 --测试推迟检查约束，应当在commit时报错
 START TRANSACTION;
 SQL SUCCESS
+INSERT INTO student VALUES (2018200002, '李四', 2017100005);
 SQL SUCCESS
 update student set s_id = s_id + 1;
 SQL SUCCESS
 COMMIT;
 ?.*ERROR: insert or update on table "student" violates foreign key constraint "student_t_id_fkey"
+  Detail: Key (t_id)=(2017100005) is not present in table "teacher".
 select * from student;
 +------------+--------+------------+
 | s_id       | s_name | t_id       |
 +------------+--------+------------+
+| 2017200001 | 张三     | 2017100001 |
 +------------+--------+------------+
 drop table if exists student;
 SQL SUCCESS

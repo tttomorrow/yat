@@ -27,6 +27,15 @@ insert into class values (101, '1年1班');
 insert into class values (102, '1年2班');
 insert into class values (103, '1年3班');
 insert into class values (104, '1年4班');
+insert into teacher values (2017100001, '李老师');
+insert into teacher values (2017100002, '张老师');
+insert into teacher values (2017100003, '陈老师');
+insert into teacher values (2017100004, '杨老师');
+insert into student values (2017200001, '张三', 101, 2017100001);
+insert into student values (2017200002, '李四', 101, 2017100001);
+insert into student values (2017200003, '王二', 102, 2017100002);
+insert into student values (2017200004, '李明', 103, 2017100003);
+insert into student values (2017200005, '吴天', 104, 2017100004);
 select * from student;
 --增加外键约束
 alter table student add constraint fk_student_tid foreign key (t_id) references teacher(t_id) on delete set null on update no action;
@@ -34,11 +43,13 @@ alter table student add constraint fk_student_cid foreign key (c_id) references 
 --测试点1：测试PG_CONSTRAINT表中情况
 select conname, convalidated, confupdtype, confdeltype, confmatchtype from PG_CONSTRAINT where confrelid in (select oid from pg_class where relname in ('teacher', 'class')) order by conname;
 --测试点2：delete在set null下的情况
+delete from teacher where t_id = 2017100002;
 select * from student;
 --测试点3：delete在cascade下的情况
 delete from class where c_id = 102;
 select * from student;
 --测试点4：update在no action下的情况
+update teacher set t_id = 2018100003 where t_id = 2017100003;
 select * from student;
 --测试点5：update在restrict下的情况
 update class set c_id = 203 where c_id = 103;
@@ -49,11 +60,13 @@ alter table student drop constraint fk_student_cid;
 alter table student add constraint fk_student_tid foreign key (t_id) references teacher(t_id) on delete no action on update cascade;
 alter table student add constraint fk_student_cid foreign key (c_id) references class(c_id) on delete restrict on update set null;
 --测试点6：delete在no action的情况
+delete from teacher where t_id = 2017100004;
 select * from student;
 --测试点7：delete在restrict的情况
 delete from class where c_id = 104;
 select * from student;
 --测试点8：update在cascade的情况
+update teacher set t_id = 2018100001 where t_id = 2017100001;
 select * from student;
 --测试点9：update在set null的情况
 update class set c_id = 201 where c_id = 101;
@@ -76,10 +89,16 @@ create table student
     s_name varchar not null,
     t_id int default 0 references teacher(t_id) on update set default on delete set default
 );
+insert into teacher values (2017100001, '李老师');
+insert into teacher values (2017100002, '张老师');
 insert into teacher values (0, '000');
+insert into student values (2017200001, '李四', 2017100001);
+insert into student values (2017200002, '王二', 2017100002);
 select * from student;
+update teacher set t_id = 2018100001 where t_id = 2017100001;
 select * from student;
 --测试点10：测试delete在set default下的情况
+delete from teacher where t_id = 2017100002;
 select * from student;
 drop table if exists student cascade;
 drop table if exists teacher cascade;

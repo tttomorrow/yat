@@ -1,18 +1,4 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
-
-openGauss is licensed under Mulan PSL v2.
-You can use this software according to the terms and conditions of the Mulan PSL v2.
-You may obtain a copy of Mulan PSL v2 at:
-
-          http://license.coscl.org.cn/MulanPSL2
-
-THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-See the Mulan PSL v2 for more details.
-"""
-"""
 Case Type   : 数据库系统
 Case Name   : LocalDateTime类型setObject并发用例
 Description :
@@ -145,6 +131,7 @@ class Jdbcisreadonly(unittest.TestCase):
             for i in range(9):
                 insert_thread[i].join(30)
                 select_result = insert_thread[i].get_result()
+                self.assertIn(f"+999999999-12-31T23:59:59.999999999-18:00",
                               select_result)
                 self.assertIn(f"第1行结果：2020-03-01T08:59:59Z", select_result)
                 self.assertTrue((select_result.count(now[0]) +

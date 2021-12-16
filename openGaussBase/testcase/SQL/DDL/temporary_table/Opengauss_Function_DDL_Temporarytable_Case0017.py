@@ -1,18 +1,4 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
-
-openGauss is licensed under Mulan PSL v2.
-You can use this software according to the terms and conditions of the Mulan PSL v2.
-You may obtain a copy of Mulan PSL v2 at:
-
-          http://license.coscl.org.cn/MulanPSL2
-
-THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-See the Mulan PSL v2 for more details.
-"""
-"""
 Case Type   : 临时表
 Case Name   : 建表添加参数on commit preserve rows,退出会话，表数据不存在
 Description :
@@ -64,6 +50,8 @@ class Temporarytable(unittest.TestCase):
         logger.info(sql_cmd1)
         self.assertIn(constant.TABLE_CREATE_SUCCESS, sql_cmd1)
         sql_cmd2 = commonsh.execut_db_sql('''
+        insert into temp_table_alter_017 values(1,1.0002,'dghg','jjjsdfghjhjui','010111100','010101101',date_trunc('hour', timestamp  '2001-02-16 20:38:40'));
+        insert into temp_table_alter_017 values(2,1.0002,'dghg','jjjsdfghjhjui','010111100','010101101',date_trunc('hour', timestamp  '2001-02-16 20:38:40'));
         insert into temp_table_alter_017 select * from temp_table_alter_017;
         insert into temp_table_alter_017 select * from temp_table_alter_017;
         select count(*) from temp_table_alter_017;

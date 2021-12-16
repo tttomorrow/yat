@@ -3,11 +3,13 @@ drop table if exists serial_08;
 SQL SUCCESS
 create table serial_08 (name serial);
 SQL SUCCESS
+insert into serial_08 values (2147483647);
 SQL SUCCESS
 select * from serial_08;
 +------------+
 | name       |
 +------------+
+| 2147483647 |
 +------------+
 drop table serial_08;
 SQL SUCCESS

@@ -1,4 +1,6 @@
 -- @testpoint: 自然对数ln(x)入参为合法值
 SELECT LN(1);
 SELECT LN(3);
+SELECT LN(999999999999);
+SELECT LN(987654321);
 SELECT LN(3.1415926);

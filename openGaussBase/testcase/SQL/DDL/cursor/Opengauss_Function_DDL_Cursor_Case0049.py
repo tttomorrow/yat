@@ -1,21 +1,6 @@
-"""
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
-
-openGauss is licensed under Mulan PSL v2.
-You can use this software according to the terms and conditions of the Mulan PSL v2.
-You may obtain a copy of Mulan PSL v2 at:
-
-          http://license.coscl.org.cn/MulanPSL2
-
-THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-See the Mulan PSL v2 for more details.
-"""
 '''
 --  Case Type:Cursor
 --  testpoint:declare声明游标，使用value子句，子句类型为数值类型；
---  date:2020-11-03
 '''
 
 import unittest
@@ -39,6 +24,7 @@ class CURSOR_TEST(unittest.TestCase):
         logger.info("======结合value子句，子句类型为数值类型======")
         sql_cmd = f'''
                     start transaction;
+                    declare cursor49 cursor for values(1, -32768,2147483647,-2147483648,9223372036854775807);
                     fetch forward 3 from cursor49;
                     close cursor49;
                     end;

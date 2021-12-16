@@ -8,15 +8,25 @@ create table student
     name varchar(10) not null
 );
 SQL SUCCESS
+insert into student values (2017100001, 1, 'aaa');
 SQL SUCCESS
+insert into student values (2017100002, 1, 'bbb');
 SQL SUCCESS
+insert into student values (2017100003, 1, 'ccc');
 SQL SUCCESS
+insert into student values (2017100004, 2, 'ddd');
 SQL SUCCESS
+insert into student values (2017100005, 2, 'eee');
 SQL SUCCESS
+insert into student values (2017100006, 2, 'fff');
 SQL SUCCESS
+insert into student values (2017100007, 2, 'ggg');
 SQL SUCCESS
+insert into student values (2017100008, 3, 'hhh');
 SQL SUCCESS
+insert into student values (2017100009, 3, 'iii');
 SQL SUCCESS
+insert into student values (2017100010, 4, 'jjj');
 SQL SUCCESS
 --分别测试rownum在where和having中的作用
 select count(id), class from student where rownum < 6 group by class;

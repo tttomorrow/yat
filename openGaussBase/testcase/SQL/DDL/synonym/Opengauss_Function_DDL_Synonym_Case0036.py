@@ -1,18 +1,4 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
-
-openGauss is licensed under Mulan PSL v2.
-You can use this software according to the terms and conditions of the Mulan PSL v2.
-You may obtain a copy of Mulan PSL v2 at:
-
-          http://license.coscl.org.cn/MulanPSL2
-
-THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-See the Mulan PSL v2 for more details.
-"""
-"""
 Case Type   : 同义词
 Case Name   : 查询语句中结合order by使用函数同义词
 Description :
@@ -74,6 +60,7 @@ class Synonym(unittest.TestCase):
         sql_cmd = self.commonsh.execut_db_sql('''
     begin
 	   for i in 1..1000 loop
+		   insert into SYN_TAB_036_02 values (i,i+1,'acdfbgkhbjklhlljnnohgjjgtvvdesaafgaeagacdtbfacdfbgkhbjklhlljnnohgjjgtvvdesaafgaeagacdtbfacdfbgkhbjklhlljnnohgjjgtvvdesaafgaeagacdtbfacdfbgkhbjklhlljnnohgjjgtvvdesaafgaeagacdtbf','16166316161a131661131311ada');
 	   end loop;
     end;''')
         self.log.info(sql_cmd)

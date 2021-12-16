@@ -3,11 +3,13 @@ drop table if exists table_1;
 SQL SUCCESS
 create table table_1(a DOUBLE PRECISION);
 SQL SUCCESS
+insert into table_1 values(123456478685686786.12689852536453563456);
 SQL SUCCESS
 select * from table_1;
 +------------------------+
 | a                      |
 +------------------------+
+| 1.23456478685686784E17 |
 +------------------------+
 drop table if exists table_1;
 SQL SUCCESS
@@ -15,11 +17,13 @@ drop table if exists table_2;
 SQL SUCCESS
 create table table_2(a FLOAT8);
 SQL SUCCESS
+insert into table_2 values(123456467891011127.1787902566223457866);
 SQL SUCCESS
 select * from table_2;
 +-----------------------+
 | a                     |
 +-----------------------+
+| 1.2345646789101112E17 |
 +-----------------------+
 drop table if exists table_2;
 SQL SUCCESS

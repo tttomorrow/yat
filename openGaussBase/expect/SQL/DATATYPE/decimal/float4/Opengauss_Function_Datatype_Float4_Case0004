@@ -1,12 +1,15 @@
 -- @testpoint: 插入数值超出精度范围，自动截取
--- @modified at:2020-11-23
 drop table if exists float4_04;
 SQL SUCCESS
 create table float4_04 (name float4);
 SQL SUCCESS
+insert into float4_04 values (14165132.9999999999999999999999);
 SQL SUCCESS
+insert into float4_04 values (-14165132.999999999999999999999);
 SQL SUCCESS
+insert into float4_04 values (123.456789123);
 SQL SUCCESS
+insert into float4_04 values (-123.456123789);
 SQL SUCCESS
 select * from float4_04;
 +--------------+

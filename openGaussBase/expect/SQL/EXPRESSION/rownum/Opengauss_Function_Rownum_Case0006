@@ -7,23 +7,39 @@ create table student
     s_name varchar(10) not null
 );
 SQL SUCCESS
+insert into student values (2017100001, 'aaa');
 SQL SUCCESS
+insert into student values (2017100002, 'bbb');
 SQL SUCCESS
+insert into student values (2017100003, 'ccc');
 SQL SUCCESS
+insert into student values (2017100004, 'ddd');
 SQL SUCCESS
+insert into student values (2017100005, 'eee');
 SQL SUCCESS
+insert into student values (2017100006, 'fff');
 SQL SUCCESS
 --测试点1：两层子链接
 select * from student where s_id in (select s_id from student where rownum < 3 union select s_id from student where rownum != 5);
 +------------+--------+
 | s_id       | s_name |
 +------------+--------+
+| 2017100001 | aaa    |
+| 2017100003 | ccc    |
+| 2017100002 | bbb    |
+| 2017100004 | ddd    |
 +------------+--------+
 --测试点2：三层子查询/子链接混用
 select * from student where s_id in (select s_id from student where rownum < 3 union select * from (select s_id from student order by 1 desc) as result where rownum != 5);
 +------------+--------+
 | s_id       | s_name |
 +------------+--------+
+| 2017100001 | aaa    |
+| 2017100005 | eee    |
+| 2017100003 | ccc    |
+| 2017100002 | bbb    |
+| 2017100004 | ddd    |
+| 2017100006 | fff    |
 +------------+--------+
 drop table if exists student;
 SQL SUCCESS

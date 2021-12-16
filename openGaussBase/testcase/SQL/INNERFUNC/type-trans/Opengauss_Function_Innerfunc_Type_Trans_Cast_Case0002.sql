@@ -14,6 +14,7 @@ select cast('h'::raw as char);
 select cast('32.5' as tinyint);
 select cast('32.0' as smallint);
 select cast('-32769' as tinyint);
+select cast('2147483649' as smallint);
 select cast('hjk' as decimal);
 select cast('999.8788' as decimal(3,1));
 

@@ -5,13 +5,17 @@ create table tan_T1(f1 int,f2 bigint,f3 integer,f4 binary_integer,f5 bigint);
 SQL SUCCESS
 insert into tan_T1(f1,f2,f3,f4,f5) values(0,22,33,44,55);
 SQL SUCCESS
+select tan(cast(-9223372036854775808 as bigint)),tan(cast(9223372036854775807 as bigint)) from sys_dummy;
 +--------------------+-------------------+
 | tan                | tan               |
 +--------------------+-------------------+
+| -84.73931296875567 | 84.73931296875567 |
 +--------------------+-------------------+
+select tan(cast(-2147483648 as integer)),tan(cast(2147483647 as integer)) from sys_dummy;
 +-------------------+--------------------+
 | tan               | tan                |
 +-------------------+--------------------+
+| 4.084289455298593 | 1.0523779637351338 |
 +-------------------+--------------------+
 select tan(cast(1.0E-127 as decimal)),tan(cast(1.0E-128 as decimal)) from sys_dummy;
 +----------+----------+

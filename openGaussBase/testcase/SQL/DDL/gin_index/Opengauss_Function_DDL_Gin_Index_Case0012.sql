@@ -62,19 +62,23 @@ CREATE INDEX test_gin_student_index_row2 ON test_gin_student_row USING GIN(to_ts
     PARTITION data2_index_2,
     PARTITION data2_index_3 
 ) with (FASTUPDATE=on,GIN_PENDING_LIST_LIMIT=63) ;
+CREATE INDEX test_gin_student_index_column1 ON test_gin_student_column USING GIN(to_tsvector('english', data1)) LOCAL with (FASTUPDATE=on,GIN_PENDING_LIST_LIMIT=2147483648) ;
 --refer to special partition
 CREATE INDEX test_gin_student_index_column2 ON test_gin_student_column USING GIN(to_tsvector('english', data2))  LOCAL
 (
     PARTITION data2_index_1,
     PARTITION data2_index_2,
     PARTITION data2_index_3 
+) with (FASTUPDATE=on,GIN_PENDING_LIST_LIMIT=2147483648);
 --didn't refer to special partition 
+CREATE INDEX test_gin_student_index_row1 ON test_gin_student_row USING GIN(to_tsvector('english', data1)) LOCAL with (FASTUPDATE=on,GIN_PENDING_LIST_LIMIT=2147483648) ;
 --refer to special partition
 CREATE INDEX test_gin_student_index_row2 ON test_gin_student_row USING GIN(to_tsvector('english', data2)) LOCAL
 (
     PARTITION data2_index_1,
     PARTITION data2_index_2,
     PARTITION data2_index_3 
+) with (FASTUPDATE=on,GIN_PENDING_LIST_LIMIT=2147483648) ;
 --successfully
 --refer to special partition
 CREATE INDEX test_gin_student_index_column1 ON test_gin_student_column USING GIN(to_tsvector('english', data1)) LOCAL with (FASTUPDATE=on,GIN_PENDING_LIST_LIMIT=64) ;

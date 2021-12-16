@@ -3,6 +3,7 @@ drop table if exists serial_07;
 SQL SUCCESS
 create table serial_07 (name serial);
 SQL SUCCESS
+insert into serial_07 values (2147483648);
 ?.*ERROR: integer out of range
   Where: referenced column: name
 drop table serial_07;

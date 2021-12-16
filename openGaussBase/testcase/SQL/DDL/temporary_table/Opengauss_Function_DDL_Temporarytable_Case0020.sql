@@ -1,5 +1,4 @@
 -- @testpoint: 修改表数据，同一字段，执行多次alter操作
--- @modify at: 2020-11-23
 --建表
 drop table if exists temp_table_alter_020;
 create global temporary table temp_table_alter_020(
@@ -17,6 +16,8 @@ create index temp_table_alter_020_idx1 on temp_table_alter_020(c_id);
 drop index if exists temp_table_alter_020_idx2 cascade;
 create index temp_table_alter_020_idx2 on temp_table_alter_020(c_raw);
 --插入数据
+insert into temp_table_alter_020 values(1,1.0002,'dghg','jjjsdfghjhjui','010111100','010101101',date_trunc('hour', timestamp  '2001-02-16 20:38:40'));
+insert into temp_table_alter_020 values(2,1.0002,'dghg','jjjsdfghjhjui','010111100','010101101',date_trunc('hour', timestamp  '2001-02-16 20:38:40'));
 insert into temp_table_alter_020 select * from temp_table_alter_020;
 insert into temp_table_alter_020 select * from temp_table_alter_020;
 insert into temp_table_alter_020 select * from temp_table_alter_020;

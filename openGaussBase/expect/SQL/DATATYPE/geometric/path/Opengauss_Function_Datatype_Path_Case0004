@@ -3,6 +3,7 @@ drop table if exists test_path04;
 SQL SUCCESS
 create table test_path04 (name path);
 SQL SUCCESS
+insert into test_path04 values (path '[(99999999999999999999999999999,99999999999999999999999999999999),(99999999999999999999999999999,99999999999999999999999999999999),(99999999999999999999999999999,99999999999999999999999999999999)]');
 SQL SUCCESS
 select * from test_path04;
 +---------------------------------------------------+

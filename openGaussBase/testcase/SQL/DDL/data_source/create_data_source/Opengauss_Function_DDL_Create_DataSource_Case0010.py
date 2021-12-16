@@ -1,18 +1,4 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
-
-openGauss is licensed under Mulan PSL v2.
-You can use this software according to the terms and conditions of the Mulan PSL v2.
-You may obtain a copy of Mulan PSL v2 at:
-
-          http://license.coscl.org.cn/MulanPSL2
-
-THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-See the Mulan PSL v2 for more details.
-"""
-"""
 Case Type   : 功能测试
 Case Name   : 创建一个Data Source对象，username/password包含'encryptOpt'前缀
 Description :
@@ -30,7 +16,7 @@ Expect      :
         在用户名或密码超过'encryptOpt'长度+16时用户名密码默认被加密过
     4.删除数据源对象成功
     5.文件删除成功
-History     : 
+History     :
 """
 import os
 import unittest
@@ -75,7 +61,7 @@ class Function(unittest.TestCase):
         self.log.info('''---创建data source，用户名或者密码前缀包含encryptOpt
             此时用户名秘密长度超过26时，默认是已经加密过的，不再加密---''')
         self.data_source = ['ds1', 'ds2', 'ds3', 'ds4']
-        user = ['encryptOptdp', 'encryptOptencryptOpt123456',
+        user = ['encryptOptdpdpdpdpdpdpdpd', 'encryptOptencryptOpt123456',
                 'encryptOptencryptOpt1234567',
                 'encryptOptdppppppppppppppppppppppppppppppppp']
         pswd = user

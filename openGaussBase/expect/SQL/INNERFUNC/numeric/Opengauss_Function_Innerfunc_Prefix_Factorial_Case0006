@@ -3,6 +3,7 @@ drop table if exists data_01;
 SQL SUCCESS
 create table data_01 (clo1 BIGINT,clo2 BIGINT);
 SQL SUCCESS
+insert into data_01 values (922337036854775807, 9223372036854775807);
 SQL SUCCESS
 select  !!clo1 from data_01;
 ?.*ERROR: value overflows numeric format

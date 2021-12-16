@@ -13,15 +13,23 @@
          SELECT pg_column_size(9::SMALLINT);
          SELECT pg_column_size(32767::SMALLINT);
    -- INTEGER
+         SELECT pg_column_size(-2147483647::INTEGER);
          SELECT pg_column_size(-88888::INTEGER);
          SELECT pg_column_size(0::INTEGER);
          SELECT pg_column_size(99999::INTEGER);
+         SELECT pg_column_size(2147483647::INTEGER);
    -- BINARY_INTEGER
+         SELECT pg_column_size(-2147483647::BINARY_INTEGER);
          SELECT pg_column_size(-8::BINARY_INTEGER);
          SELECT pg_column_size(0::BINARY_INTEGER);
          SELECT pg_column_size(9::BINARY_INTEGER);
+         SELECT pg_column_size(2147483647::BINARY_INTEGER);
    -- BIGINT
+         SELECT pg_column_size(-9223372036854775807::BIGINT);
+         SELECT pg_column_size(-888888888888888::BIGINT);
          SELECT pg_column_size(0::BIGINT);
+         SELECT pg_column_size(9999999999999999::BIGINT);
+         SELECT pg_column_size(9223372036854775807::BIGINT);
  -- 任意精度
     -- DECIMAL[(p[,s])]
          SELECT pg_column_size(123456.122331::DECIMAL(10,4));

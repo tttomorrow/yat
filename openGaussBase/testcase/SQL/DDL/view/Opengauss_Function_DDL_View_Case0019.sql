@@ -11,6 +11,7 @@ create schema schema_view_019;
 drop view if exists temp_view_019 cascade;
 create view temp_view_019 as select * from table_view_019;
 --修改视图所属模式,添加if exists选项，视图名不存在
+alter view if exists temp_view_0192342343 set schema schema_view_019;
 --通过系统表查询视图信息，模式不变
 select schemaname,viewname from pg_views where viewname = 'temp_view_019';
 --删除表

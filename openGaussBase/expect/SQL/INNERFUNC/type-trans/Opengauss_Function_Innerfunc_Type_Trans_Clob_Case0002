@@ -3,8 +3,10 @@
 SELECT to_clob('hello111'::CHAR(h));
 ?.*ERROR: syntax error at or near \"h\"
 ?.*Position: .*
+SELECT to_clob('123456789'::char(%%));
 ?.*ERROR: syntax error at or near \"\%\%\"
 ?.*Position: .*
+SELECT char_length(to_clob(lpad('abcCC',1073733621,'a')::char(1073733621)));
 ?.*ERROR: length for type char cannot exceed 10485760
 ?.*Position: .*
   Where: referenced column: char_length
@@ -52,6 +54,7 @@ SELECT to_clob(0x5d::RAW(10));
 SELECT char_length(to_clob(lpad('a',12,'x')::RAW));
 ?.*ERROR: invalid hexadecimal digit: \"x\"
   Where: referenced column: char_length
+SELECT char_length(to_clob(lpad('abcCC',1073733621,'a')::char(1073733622)));
 ?.*ERROR: length for type char cannot exceed 10485760
 ?.*Position: .*
   Where: referenced column: char_length

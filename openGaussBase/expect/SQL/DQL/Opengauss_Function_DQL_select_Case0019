@@ -19,13 +19,21 @@ insert into all_datatype_tbl(c_id) values(123),(456),(789),(654),(321);
 SQL SUCCESS
 insert into all_datatype_tbl(c_boolean) values(true),(false),(10),(0),(null);
 SQL SUCCESS
+insert into all_datatype_tbl(c_integer) values(-100),(100),(-2147483648),(2147483647),(null);
 SQL SUCCESS
+insert into all_datatype_tbl(c_bigint) values(-100),(100),(-9223372036854775808),(9223372036854775807),(null);
 SQL SUCCESS
+insert into all_datatype_tbl(c_real) values(-10.01),(10.01),(-9223372036854.775808),(9223372036.854775807),(null);
 SQL SUCCESS
+insert into all_datatype_tbl(c_decimal) values(-10.01),(10.01),(-9223372036854.775808),(9223372036.854775807),(null);
 SQL SUCCESS
+insert into all_datatype_tbl(c_char) values('abc123456789abc123456789abc123456789abc123456789'),('abc123456789abc123456789abc123456789a'),(null);
 SQL SUCCESS
+insert into all_datatype_tbl(c_varchar) values('abc123456789abc123456789abc123456789abc123456789'),('abc123456789abc123456789abc123456789a'),(null);
 SQL SUCCESS
+insert into all_datatype_tbl(c_clob) values('abc123456789abc123456789abc123456789abc123456789'),('abc123456789abc123456789abc123456789a'),(null);
 SQL SUCCESS
+insert into all_datatype_tbl(c_blob) values('1010101111111111111111111111111111111111111111'),('10101011111111111111111111111111111111111111'),(null);
 SQL SUCCESS
 insert into all_datatype_tbl(c_timestamp) values(TO_DATE('2018-06-28 13:14:15', 'YYYY-MM-DD HH24:MI:SS')),(TO_DATE('2018-JUN-28 01:14:15', 'YYYY-MON-DD HH:MI:SS')),(null);
 SQL SUCCESS

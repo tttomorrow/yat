@@ -10,33 +10,43 @@ SQL SUCCESS
 create synonym syn_a for syn_tab_003;
 SQL SUCCESS
 --建表，表名63位
+drop table if EXISTS a23456789123456789123456789132456789123456789123456789123456789 cascade;
 SQL SUCCESS
+create table a23456789123456789123456789132456789123456789123456789123456789(a int,b varchar);
 SQL SUCCESS
 --建同义词
 drop synonym if exists syn_a63;
 SQL SUCCESS
+create synonym syn_a63 for a23456789123456789123456789132456789123456789123456789123456789;
 SQL SUCCESS
 select synobjname from pg_synonym WHERE synname='syn_a63';
 +-----------------------------------------------------------------+
 | synobjname                                                      |
 +-----------------------------------------------------------------+
+| a23456789123456789123456789132456789123456789123456789123456789 |
 +-----------------------------------------------------------------+
 --建表，表名64位
+drop table if EXISTS a123456789123456789123456789132456789123456789123456789123456789 cascade;
 SQL SUCCESS
+create table a123456789123456789123456789132456789123456789123456789123456789(a int,b varchar);
 SQL SUCCESS
 --建同义词
 drop synonym if exists syn_a64;
 SQL SUCCESS
+create synonym syn_a64 for a123456789123456789123456789132456789123456789123456789123456789;
 SQL SUCCESS
 select synobjname from pg_synonym WHERE synname='syn_a64';
 +-----------------------------------------------------------------+
 | synobjname                                                      |
 +-----------------------------------------------------------------+
+| a12345678912345678912345678913245678912345678912345678912345678 |
 +-----------------------------------------------------------------+
 --清理环境
 drop table if EXISTS syn_tab_003 cascade;
 SQL SUCCESS
+drop table if EXISTS a23456789123456789123456789132456789123456789123456789123456789 cascade;
 SQL SUCCESS
+drop table if EXISTS a123456789123456789123456789132456789123456789123456789123456789 cascade;
 SQL SUCCESS
 drop synonym if exists syn_a;
 SQL SUCCESS

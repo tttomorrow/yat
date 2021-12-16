@@ -1,1 +1,2 @@
 -- @testpoint: INSERT语句后带优化器index，不存在的索引   error
+INSERT /*+INDEX(hint_index_000,hint_index_00000_id)*/ INTO hint_index_00000 VALUES ( 21, 30000, 20000, 0, 1, 30000, 294453248, 2, -110231552, 9, 'ghi', '2004-05-24', 'kbvumx', TO_DATE('2010-08-08', 'YYYY-MM-DD') );

@@ -1,5 +1,4 @@
 -- @testpoint: 修改表数据，同一个命令执行多次
--- @modify at: 2020-11-23
 --建表
 drop table if exists temp_table_alter_019;
 create global temporary table temp_table_alter_019(
@@ -17,6 +16,8 @@ alter table temp_table_alter_019 modify (c_raw raw(20));
 alter table temp_table_alter_019 modify (c_raw varchar(200));
 alter table temp_table_alter_019 modify (c_raw raw(20));
 --插入数据
+insert into temp_table_alter_019 values(1,1.0002,'dghg','jjjsdfghjhjui','010111100','010101101',date_trunc('hour', timestamp  '2001-02-16 20:38:40'));
+insert into temp_table_alter_019 values(2,1.0002,'dghg','jjjsdfghjhjui','010111100','010101101',date_trunc('hour', timestamp  '2001-02-16 20:38:40'));
 insert into temp_table_alter_019 select * from temp_table_alter_019;
 insert into temp_table_alter_019 select * from temp_table_alter_019;
 insert into temp_table_alter_019 select * from temp_table_alter_019;

@@ -2,6 +2,8 @@
 
 -- char
 SELECT to_clob('hello111'::CHAR(h));
+SELECT to_clob('123456789'::char(%%));
+SELECT char_length(to_clob(lpad('abcCC',1073733621,'a')::char(1073733621)));
 
 -- NCHAR
 SELECT to_clob('gauss123'::NCHAR(*));
@@ -25,3 +27,4 @@ SELECT to_clob('World222!'::TEXT(ni));
 SELECT to_clob('ABCDEFg'::RAW(10));
 SELECT to_clob(0x5d::RAW(10));
 SELECT char_length(to_clob(lpad('a',12,'x')::RAW));
+SELECT char_length(to_clob(lpad('abcCC',1073733621,'a')::char(1073733622)));

@@ -8,6 +8,9 @@ create table ct_tbl_as(
 )
 PARTITION BY RANGE (c_integer)
 (
+        partition P_20180121 values less than (0),
+        partition P_20190122 values less than (10),
+        partition P_20200123 values less than (20)
 );
 insert into ct_tbl_as  values(1,12,-2,123.63,563.893,852.33,'qwe','ugfd','weewvbgfyui');
 insert into ct_tbl_as  values(2,22,8,123.63,563.893,852.33,'qedc','kjjhbn','rtygftyui');

@@ -7,17 +7,29 @@ create table student
     s_name varchar(10) not null
 );
 SQL SUCCESS
+insert into student values (2017100001, 'aaa');
 SQL SUCCESS
+insert into student values (2017100002, 'bbb');
 SQL SUCCESS
+insert into student values (2017100003, 'ccc');
 SQL SUCCESS
+insert into student values (2017100004, 'ddd');
 SQL SUCCESS
+insert into student values (2017100005, 'eee');
 SQL SUCCESS
+insert into student values (2017100006, 'fff');
 SQL SUCCESS
+insert into student values (2017100007, 'ggg');
 SQL SUCCESS
+insert into student values (2017100008, 'hhh');
 SQL SUCCESS
+insert into student values (2017100009, 'iii');
 SQL SUCCESS
+insert into student values (2017100010, 'jjj');
 SQL SUCCESS
+insert into student values (2017100011, 'kkk');
 SQL SUCCESS
+insert into student values (2017100012, 'lll');
 SQL SUCCESS
 --测试点1：rownum在 < 下的表现
 select * from student where rownum < 1;
@@ -29,23 +41,46 @@ select * from student where rownum < 10;
 +------------+--------+
 | s_id       | s_name |
 +------------+--------+
+| 2017100001 | aaa    |
+| 2017100002 | bbb    |
+| 2017100003 | ccc    |
+| 2017100004 | ddd    |
+| 2017100005 | eee    |
+| 2017100006 | fff    |
+| 2017100007 | ggg    |
+| 2017100008 | hhh    |
+| 2017100009 | iii    |
 +------------+--------+
 --测试点2：rownum在 <= 下的表现
 select * from student where rownum <= 1;
 +------------+--------+
 | s_id       | s_name |
 +------------+--------+
+| 2017100001 | aaa    |
 +------------+--------+
 select * from student where rownum <= 20;
 +------------+--------+
 | s_id       | s_name |
 +------------+--------+
+| 2017100001 | aaa    |
+| 2017100002 | bbb    |
+| 2017100003 | ccc    |
+| 2017100004 | ddd    |
+| 2017100005 | eee    |
+| 2017100006 | fff    |
+| 2017100007 | ggg    |
+| 2017100008 | hhh    |
+| 2017100009 | iii    |
+| 2017100010 | jjj    |
+| 2017100011 | kkk    |
+| 2017100012 | lll    |
 +------------+--------+
 --测试点3：rownum在 = 下的表现
 select * from student where rownum = 1;
 +------------+--------+
 | s_id       | s_name |
 +------------+--------+
+| 2017100001 | aaa    |
 +------------+--------+
 select * from student where rownum = 5;
 +------+--------+
@@ -62,12 +97,30 @@ select * from student where rownum != 7;
 +------------+--------+
 | s_id       | s_name |
 +------------+--------+
+| 2017100001 | aaa    |
+| 2017100002 | bbb    |
+| 2017100003 | ccc    |
+| 2017100004 | ddd    |
+| 2017100005 | eee    |
+| 2017100006 | fff    |
 +------------+--------+
 --测试点5：rownum在 > 下的表现
 select * from student where rownum > 0;
 +------------+--------+
 | s_id       | s_name |
 +------------+--------+
+| 2017100001 | aaa    |
+| 2017100002 | bbb    |
+| 2017100003 | ccc    |
+| 2017100004 | ddd    |
+| 2017100005 | eee    |
+| 2017100006 | fff    |
+| 2017100007 | ggg    |
+| 2017100008 | hhh    |
+| 2017100009 | iii    |
+| 2017100010 | jjj    |
+| 2017100011 | kkk    |
+| 2017100012 | lll    |
 +------------+--------+
 select * from student where rownum > 5;
 +------+--------+
@@ -79,6 +132,18 @@ select * from student where rownum >= 1;
 +------------+--------+
 | s_id       | s_name |
 +------------+--------+
+| 2017100001 | aaa    |
+| 2017100002 | bbb    |
+| 2017100003 | ccc    |
+| 2017100004 | ddd    |
+| 2017100005 | eee    |
+| 2017100006 | fff    |
+| 2017100007 | ggg    |
+| 2017100008 | hhh    |
+| 2017100009 | iii    |
+| 2017100010 | jjj    |
+| 2017100011 | kkk    |
+| 2017100012 | lll    |
 +------------+--------+
 select * from student where rownum >= 4;
 +------+--------+
@@ -90,6 +155,11 @@ select * from student where rownum between 1 and 5;
 +------------+--------+
 | s_id       | s_name |
 +------------+--------+
+| 2017100001 | aaa    |
+| 2017100002 | bbb    |
+| 2017100003 | ccc    |
+| 2017100004 | ddd    |
+| 2017100005 | eee    |
 +------------+--------+
 select * from student where rownum between 3 and 12;
 +------+--------+
@@ -101,27 +171,58 @@ select * from student where rownum < 8 and rownum <= 6 and rownum != 7;
 +------------+--------+
 | s_id       | s_name |
 +------------+--------+
+| 2017100001 | aaa    |
+| 2017100002 | bbb    |
+| 2017100003 | ccc    |
+| 2017100004 | ddd    |
+| 2017100005 | eee    |
+| 2017100006 | fff    |
 +------------+--------+
 select * from student where rownum != 5 or rownum < 8;
 +------------+--------+
 | s_id       | s_name |
 +------------+--------+
+| 2017100001 | aaa    |
+| 2017100002 | bbb    |
+| 2017100003 | ccc    |
+| 2017100004 | ddd    |
+| 2017100005 | eee    |
+| 2017100006 | fff    |
+| 2017100007 | ggg    |
+| 2017100008 | hhh    |
+| 2017100009 | iii    |
+| 2017100010 | jjj    |
+| 2017100011 | kkk    |
+| 2017100012 | lll    |
 +------------+--------+
 select * from student where rownum <= 9 and rownum != 5 or rownum < 7;
 +------------+--------+
 | s_id       | s_name |
 +------------+--------+
+| 2017100001 | aaa    |
+| 2017100002 | bbb    |
+| 2017100003 | ccc    |
+| 2017100004 | ddd    |
+| 2017100005 | eee    |
+| 2017100006 | fff    |
+| 2017100007 | ggg    |
+| 2017100008 | hhh    |
+| 2017100009 | iii    |
 +------------+--------+
 --测试点9：rownum在表达式中包含运算表达式
 select * from student where rownum < 7 + 9 - 13;
 +------------+--------+
 | s_id       | s_name |
 +------------+--------+
+| 2017100001 | aaa    |
+| 2017100002 | bbb    |
 +------------+--------+
 select * from student where rownum <= 2 * 3 - 2 / 2 + -3;
 +------------+--------+
 | s_id       | s_name |
 +------------+--------+
+| 2017100001 | aaa    |
+| 2017100002 | bbb    |
 +------------+--------+
 select to_hex(rownum + 1) from sys_dummy;
 +--------+
@@ -145,34 +246,113 @@ select * from student where rownum > -2;
 +------------+--------+
 | s_id       | s_name |
 +------------+--------+
+| 2017100001 | aaa    |
+| 2017100002 | bbb    |
+| 2017100003 | ccc    |
+| 2017100004 | ddd    |
+| 2017100005 | eee    |
+| 2017100006 | fff    |
+| 2017100007 | ggg    |
+| 2017100008 | hhh    |
+| 2017100009 | iii    |
+| 2017100010 | jjj    |
+| 2017100011 | kkk    |
+| 2017100012 | lll    |
 +------------+--------+
 select * from student where rownum != -5;
 +------------+--------+
 | s_id       | s_name |
 +------------+--------+
+| 2017100001 | aaa    |
+| 2017100002 | bbb    |
+| 2017100003 | ccc    |
+| 2017100004 | ddd    |
+| 2017100005 | eee    |
+| 2017100006 | fff    |
+| 2017100007 | ggg    |
+| 2017100008 | hhh    |
+| 2017100009 | iii    |
+| 2017100010 | jjj    |
+| 2017100011 | kkk    |
+| 2017100012 | lll    |
 +------------+--------+
 select * from student where rownum < 5.2;
 +------------+--------+
 | s_id       | s_name |
 +------------+--------+
+| 2017100001 | aaa    |
+| 2017100002 | bbb    |
+| 2017100003 | ccc    |
+| 2017100004 | ddd    |
+| 2017100005 | eee    |
 +------------+--------+
 select * from student where rownum != 7.23333333;
 +------------+--------+
 | s_id       | s_name |
 +------------+--------+
+| 2017100001 | aaa    |
+| 2017100002 | bbb    |
+| 2017100003 | ccc    |
+| 2017100004 | ddd    |
+| 2017100005 | eee    |
+| 2017100006 | fff    |
+| 2017100007 | ggg    |
+| 2017100008 | hhh    |
+| 2017100009 | iii    |
+| 2017100010 | jjj    |
+| 2017100011 | kkk    |
+| 2017100012 | lll    |
 +------------+--------+
+select * from student where rownum < 9223372036854775806;
 +------------+--------+
 | s_id       | s_name |
 +------------+--------+
+| 2017100001 | aaa    |
+| 2017100002 | bbb    |
+| 2017100003 | ccc    |
+| 2017100004 | ddd    |
+| 2017100005 | eee    |
+| 2017100006 | fff    |
+| 2017100007 | ggg    |
+| 2017100008 | hhh    |
+| 2017100009 | iii    |
+| 2017100010 | jjj    |
+| 2017100011 | kkk    |
+| 2017100012 | lll    |
 +------------+--------+
+select * from student where rownum < 2147483646;
 +------------+--------+
 | s_id       | s_name |
 +------------+--------+
+| 2017100001 | aaa    |
+| 2017100002 | bbb    |
+| 2017100003 | ccc    |
+| 2017100004 | ddd    |
+| 2017100005 | eee    |
+| 2017100006 | fff    |
+| 2017100007 | ggg    |
+| 2017100008 | hhh    |
+| 2017100009 | iii    |
+| 2017100010 | jjj    |
+| 2017100011 | kkk    |
+| 2017100012 | lll    |
 +------------+--------+
 select * from student where rownum < 32766;
 +------------+--------+
 | s_id       | s_name |
 +------------+--------+
+| 2017100001 | aaa    |
+| 2017100002 | bbb    |
+| 2017100003 | ccc    |
+| 2017100004 | ddd    |
+| 2017100005 | eee    |
+| 2017100006 | fff    |
+| 2017100007 | ggg    |
+| 2017100008 | hhh    |
+| 2017100009 | iii    |
+| 2017100010 | jjj    |
+| 2017100011 | kkk    |
+| 2017100012 | lll    |
 +------------+--------+
 --测试点11：rownum与其它数据类型比较
 select * from student where rownum < false;
@@ -192,6 +372,18 @@ select * from student where rownum < HEXTORAW('EEEEEFFF');
 +------------+--------+
 | s_id       | s_name |
 +------------+--------+
+| 2017100001 | aaa    |
+| 2017100002 | bbb    |
+| 2017100003 | ccc    |
+| 2017100004 | ddd    |
+| 2017100005 | eee    |
+| 2017100006 | fff    |
+| 2017100007 | ggg    |
+| 2017100008 | hhh    |
+| 2017100009 | iii    |
+| 2017100010 | jjj    |
+| 2017100011 | kkk    |
+| 2017100012 | lll    |
 +------------+--------+
 select * from student where rownum < '12-10-2010';
 ?.*ERROR: invalid input syntax for type bigint: "12-10-2010"
@@ -208,6 +400,18 @@ select rownum, * from student;
 +--------+------------+--------+
 | rownum | s_id       | s_name |
 +--------+------------+--------+
+| 1      | 2017100003 | ccc    |
+| 2      | 2017100004 | ddd    |
+| 3      | 2017100005 | eee    |
+| 4      | 2017100006 | fff    |
+| 5      | 2017100007 | ggg    |
+| 6      | 2017100008 | hhh    |
+| 7      | 2017100009 | iii    |
+| 8      | 2017100010 | jjj    |
+| 9      | 2017100011 | kkk    |
+| 10     | 2017100012 | lll    |
+| 11     | 2017100001 | zzz    |
+| 12     | 2017100002 | zzz    |
 +--------+------------+--------+
 drop table if exists student;
 SQL SUCCESS

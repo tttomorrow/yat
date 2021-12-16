@@ -1,17 +1,3 @@
-"""
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
-
-openGauss is licensed under Mulan PSL v2.
-You can use this software according to the terms and conditions of the Mulan PSL v2.
-You may obtain a copy of Mulan PSL v2 at:
-
-          http://license.coscl.org.cn/MulanPSL2
-
-THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-See the Mulan PSL v2 for more details.
-"""
 '''
 
 Case Type： 功能测试
@@ -57,6 +43,7 @@ class byte_string_function(unittest.TestCase):
         self.assertTrue(Normal_SqlMdg4.find("ERROR:  index 999999 out of valid range, 0..6") > -1)
 
         logger.info("-----------newvalue非int4-----------")
+        Normal_SqlMdg5 = self.commonsh.execut_db_sql("""SELECT set_byte('young man', 4, 9999999999999) AS RESULT;""")
         logger.info(Normal_SqlMdg5)
         self.assertTrue(Normal_SqlMdg5.find("ERROR:  function set_byte(unknown, integer, bigint) does not exist") > -1)
 

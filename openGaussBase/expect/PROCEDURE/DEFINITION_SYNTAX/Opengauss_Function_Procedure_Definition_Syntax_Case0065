@@ -2,6 +2,7 @@
 declare
   v_bigint int8;
 begin
+    select 9223372036854775807.7898765 into v_bigint from sys_dummy;
     raise info 'result:% ',v_bigint;
 end;
 /

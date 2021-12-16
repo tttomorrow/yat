@@ -53,6 +53,7 @@ SQL SUCCESS
 insert into table_view_001 values(1,10,2,5,20,123456.122331,123456.12233,default,default,default,10.365456,123456.1234,321.321,10.365456,123.123654,123.1236547,25.98,
 'yes','数据库','学习数据库','设计','工程师','测试','测试呀','视图','a',empty_blob(),'deadbeef','11-20-2020','21:21:21','21:21:21 pst',
 '2010-12-12','2013-12-11 pst',interval '3' day,interval '2' year, point '(2.0,0)',box '((0,0),(1,1))',path'((1,0),(0,1),(-1,0))',circle '((0,0),10)',
+'192.168.1.14',b'1011111100',to_tsvector('english', 'the fat rats'),to_tsquery('fat:ab & cats'),'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11','{"f1":1,"f2":true,"f3":"hi"}');
 SQL SUCCESS
 --创建视图，添加or replace选项
 create or replace view temp_view_001 as select c_integer,c_numeric, c_text from table_view_001;

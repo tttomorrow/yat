@@ -3,4 +3,5 @@
 
 select pg_tablespace_size();
 select pg_tablespace_size('*&^%$$%^^&');
+select pg_tablespace_size(988765431234579868) from PG_TABLESPACE a where a.spcname='ds_location333';
 select pg_tablespace_size(a.oid,a.oid,a.oid) from PG_TABLESPACE a where a.spcname='ds_location333';

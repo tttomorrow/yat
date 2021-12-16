@@ -3,8 +3,11 @@ drop table if exists table_2;
 SQL SUCCESS
 create table table_2(id int,sname char(20),city varchar(20),number number);
 SQL SUCCESS
+insert into table_2 values(1,'joe','a',12323455646);
 SQL SUCCESS
+insert into table_2 values(2,'jojo','b',124232345456);
 SQL SUCCESS
+insert into table_2 values(3,'jane','c',12557676878);
 SQL SUCCESS
 START TRANSACTION;
 SQL SUCCESS
@@ -14,6 +17,9 @@ select * from table_2;
 +----+----------------------+------+--------------+
 | id | sname                | city | number       |
 +----+----------------------+------+--------------+
+| 1  | joe                  | a    | 12323455646  |
+| 2  | jojo                 | b    | 124232345456 |
+| 3  | jane                 | c    | 12557676878  |
 +----+----------------------+------+--------------+
 DELETE FROM table_2;
 SQL SUCCESS

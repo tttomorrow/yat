@@ -2,4 +2,5 @@
 
 drop table if exists serial_07;
 create table serial_07 (name serial);
+insert into serial_07 values (2147483648);
 drop table serial_07;

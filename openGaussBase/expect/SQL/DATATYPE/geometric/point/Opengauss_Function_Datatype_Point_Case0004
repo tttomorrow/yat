@@ -3,6 +3,7 @@ drop table if exists test_point04;
 SQL SUCCESS
 create table test_point04 (name point);
 SQL SUCCESS
+insert into test_point04 values (point'(99999999999999999999999999999,99999999999999999999999999999999)');
 SQL SUCCESS
 select * from test_point04;
 +-----------------+

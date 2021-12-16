@@ -3,13 +3,16 @@ drop table if exists LOG_003;
 SQL SUCCESS
 create table LOG_003(COL_LOG double precision);
 SQL SUCCESS
+insert into LOG_003 values(100.0000000000004);
 SQL SUCCESS
+insert into LOG_003 values(99.99999999999999);
 SQL SUCCESS
 select log(COL_LOG) as RESULT from LOG_003 order by COL_LOG;
 +--------------------+
 | result             |
 +--------------------+
 | 2.0                |
+| 2.0000000000000018 |
 +--------------------+
 drop table if exists LOG_003;
 SQL SUCCESS

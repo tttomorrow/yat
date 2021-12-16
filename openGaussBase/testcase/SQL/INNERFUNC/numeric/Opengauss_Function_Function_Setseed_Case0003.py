@@ -1,20 +1,7 @@
-"""
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
-
-openGauss is licensed under Mulan PSL v2.
-You can use this software according to the terms and conditions of the Mulan PSL v2.
-You may obtain a copy of Mulan PSL v2 at:
-
-          http://license.coscl.org.cn/MulanPSL2
-
-THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-See the Mulan PSL v2 for more details.
-"""
 '''
 
 Case Type： 功能测试
+Case Name： seed边界值为-1或者1/0/0.1111111111111时与random连用
 Descption:
 
 步骤 1.查看数据库状态，如果数据库没有启动则执行启动，如果已经启动则无操作
@@ -55,6 +42,7 @@ class Setseed_001(unittest.TestCase):
 
     def test_setseed_001(self):
 
+        alist = [-1,1,0,0.1111111111111]
         for i in alist:
             SqlMdg = commonsh.execut_db_sql(f'SELECT setseed({i});SELECT random();').splitlines()
             try:

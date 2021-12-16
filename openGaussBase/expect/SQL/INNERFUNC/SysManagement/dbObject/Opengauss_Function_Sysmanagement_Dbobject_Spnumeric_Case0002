@@ -1,6 +1,7 @@
 -- @testpoint: pg_size_pretty(numeric)函数的异常校验，合理报错
 --numeric(p [,s])，p:[1,1000], [s>=0]
 --整数位 >p-s，溢出
+SELECT pg_size_pretty(123456789.1234::NUMERIC(10,4));
 ?.*ERROR: numeric field overflow
   Detail: A field with precision 10, scale 4 must round to an absolute value less than 10^6.
   Where: referenced column: pg_size_pretty

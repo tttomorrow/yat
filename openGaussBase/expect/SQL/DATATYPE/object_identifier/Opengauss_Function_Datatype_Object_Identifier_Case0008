@@ -16,6 +16,7 @@ CREATE  TABLE object_identifier_008(
 	c12 REGTYPE
 );
 SQL SUCCESS
+insert into object_identifier_008 values(564182564182564182,null,null,null,'english','simple',null,'*(integer,integer)',null,'sum(int4)','pg_type','integer');
 ?.*ERROR: OID out of range.*
   Where: referenced column: c1
 drop table if exists object_identifier_008;

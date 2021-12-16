@@ -2,6 +2,7 @@
 
 -- char转换为varchar
 select char_length(to_char(lpad('abccc',1024*1024*10,'x')::char(10485761)));
+select to_char('123456789'::char(77),'999','99999');
 
 -- varchar2转换为varchar
 select char_length(to_char(lpad('abccc',1024*1024*11,'x')::varchar2(10485761)));

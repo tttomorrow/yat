@@ -7,6 +7,12 @@ create table student
     s_id int primary key,
     s_name varchar(10) not null
 );
+insert into student values (2017100001, 'aaa');
+insert into student values (2017100002, 'bbb');
+insert into student values (2017100003, 'ccc');
+insert into student values (2017100004, 'ddd');
+insert into student values (2017100005, 'eee');
+insert into student values (2017100006, 'fff');
 --测试点1：单层select中使用别名
 select rownum rowno, * from student;
 --测试点2：对上一个别名加入where的判断

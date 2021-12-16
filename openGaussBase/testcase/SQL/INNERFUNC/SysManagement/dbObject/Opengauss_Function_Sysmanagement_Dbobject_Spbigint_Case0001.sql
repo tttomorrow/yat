@@ -5,3 +5,5 @@
      SELECT pg_size_pretty(0::BIGINT);
      SELECT pg_size_pretty(1024::BIGINT);
      SELECT pg_size_pretty(32767::BIGINT);
+     SELECT pg_size_pretty(2147483648::BIGINT);
+     SELECT pg_size_pretty(9223372036854775807::BIGINT);

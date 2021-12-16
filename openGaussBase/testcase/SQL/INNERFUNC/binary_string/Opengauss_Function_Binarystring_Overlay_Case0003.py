@@ -1,17 +1,3 @@
-"""
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
-
-openGauss is licensed under Mulan PSL v2.
-You can use this software according to the terms and conditions of the Mulan PSL v2.
-You may obtain a copy of Mulan PSL v2 at:
-
-          http://license.coscl.org.cn/MulanPSL2
-
-THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-See the Mulan PSL v2 for more details.
-"""
 '''
 
 Case Type： 功能测试
@@ -51,6 +37,7 @@ class Bit_string_function(unittest.TestCase):
         logger.info("-----------数字-----------")
         Normal_SqlMdg1 = self.commonsh.execut_db_sql("""SELECT overlay(12345 placing 6789 from to_number('6') for 5%5) AS RESULT;""")
         logger.info(Normal_SqlMdg1)
+        self.assertTrue(Normal_SqlMdg1.splitlines()[2].strip(' ') == '123456789')
 
         logger.info("-----------汉字-----------")
         Normal_SqlMdg0 = self.commonsh.execut_db_sql("""SELECT overlay('hello ' placing ' 中国 ' from 1 for 20) AS RESULT;""")
@@ -62,6 +49,7 @@ class Bit_string_function(unittest.TestCase):
 
         logger.info("-----------十六进制格式+十六进制格式-----------")
         Normal_SqlMdg3 = self.commonsh.execut_db_sql("""set bytea_output to escape;
+        SELECT overlay(E'\\x5402036d6173'::bytea placing E'\\x5402036d6173'::bytea from 2 for 3) AS RESULT;""")
         logger.info(Normal_SqlMdg3)
         self.assertTrue(Normal_SqlMdg3.splitlines()[3].strip() == 'TT02036d617336d6173')
 
@@ -73,9 +61,11 @@ class Bit_string_function(unittest.TestCase):
 
         logger.info("-----------逃逸格式+十六进制格式-----------")
         Normal_SqlMdg5 = self.commonsh.execut_db_sql("""set bytea_output to escape;
+        SELECT overlay(E'\\x5402036d6173'::bytea placing E'Th\\\\\\000omas'::bytea from 2 for 3) AS RESULT;""")
         logger.info(Normal_SqlMdg5)
         self.assertTrue(Normal_SqlMdg5.splitlines()[3].strip(' ') == 'TTh\\000omas36d6173')
         Normal_SqlMdg6 = self.commonsh.execut_db_sql("""set bytea_output to escape;
+        SELECT overlay(E'Th\\\\\\000omas'::bytea placing E'\\x5402036d6173'::bytea from 2 for 3) AS RESULT;""")
         logger.info(Normal_SqlMdg6)
         self.assertTrue(Normal_SqlMdg6.splitlines()[3].strip(' ') == 'TT02036d6173mas')
 

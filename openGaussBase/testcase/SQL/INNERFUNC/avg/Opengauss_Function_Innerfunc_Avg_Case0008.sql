@@ -2,6 +2,7 @@
 
 drop table if exists test_avg_004;
 create table test_avg_004(f0 number(10,6), f1 int, f3 char(10), f4 varchar(10), f5 number(10,6));
+insert into test_avg_004(f0, f1, f3, f4, f5) values(500.5, 1, '4', '5asdf', 6.666666666);
 insert into test_avg_004(f0, f1, f3, f4, f5) values(500.5, 2, '5', 'test', 87.223);
 insert into test_avg_004(f0, f1, f3, f4, f5) values(500.5,1.112233,'3','nebulaisok',998.22222);
 
@@ -18,6 +19,7 @@ COL_17 int ,
 COL_42 number(6,2),
 COL_44 varchar2(50),
 COL_58 number(12,6));
+insert into test_avg_001 values(12245451212554514,'2010-12-12',true,3.1415926,'ghfhdfghfghf',
 1,'@dfsgdf',8,32.23,'gfhgfh',122);
 
 commit;

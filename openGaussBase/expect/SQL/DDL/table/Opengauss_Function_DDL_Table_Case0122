@@ -3,11 +3,13 @@ drop table if exists table_2;
 SQL SUCCESS
 create table table_2(a BINARY_DOUBLE);
 SQL SUCCESS
+insert into table_2 values(12345646842225156526.1787536902566223456);
 SQL SUCCESS
 select * from table_2;
 +-----------------------+
 | a                     |
 +-----------------------+
+| 1.2345646842225156E19 |
 +-----------------------+
 drop table if exists table_2;
 SQL SUCCESS
