@@ -3,6 +3,7 @@ drop table if exists binary_integer03;
 SQL SUCCESS
 create table binary_integer03 (name binary_integer);
 SQL SUCCESS
+insert into binary_integer03 values (2147483648);
 ?.*ERROR: integer out of range
   Where: referenced column: name
 drop table binary_integer03;

@@ -1,12 +1,13 @@
 -- @testpoint: hll_hash_text(text, int32),入参为其他类型，合理报错
-?.*ERROR: function hll_hash_text\(unknown, bigint\) does not exist.*
+select hll_hash_text('ab', 2147483648);
+?.*ERROR: function hll_hash_text\(unknown, bigint\) does not exist
   Hint: No function matches the given name and argument types. You might need to add explicit type casts.
 ?.*
   Where: referenced column: hll_hash_text
 select hll_hash_text('ab', -1);
-?.*ERROR: negative seed values not compatible.*
+?.*ERROR: negative seed value is invalid
   Where: referenced column: hll_hash_text
 select hll_hash_text(天天开心, 10);
-?.*ERROR: column "天天开心" does not exist.*
+?.*ERROR: column "天天开心" does not exist
 ?.*
   Where: referenced column: hll_hash_text

@@ -1,5 +1,4 @@
 -- @testpoint: 同时新增多列，数据类型包含blob、clob类型
--- @modify at: 2020-11-23
 --建表
 drop table if exists temp_table_alter_011;
 create global temporary table temp_table_alter_011(c_id int, c_integer integer,c_real real,c_float float, c_double binary_double
@@ -10,6 +9,7 @@ c_char char(50) default null, c_varchar varchar(20), c_varchar2 varchar2(4000),c
 alter table temp_table_alter_011 add(c_raw raw(20),c_blob blob,c_date date,c_timestamp timestamp);
 --插入数据
 insert into temp_table_alter_011 values(1,0,3.14,1.0002,3.55555,5,7887.656,0,0.111111,3.1415926,'dghg','jjj','pokj99',
+'ywgdghghhgghe',hextoraw('101a1101'),'010101101',date_trunc('hour', timestamp  '2001-02-16 20:38:40'),
 to_timestamp('2019-01-03 14:58:54.000000','yyyy-mm-dd hh24:mi:ss.ffffff'));
 insert into temp_table_alter_011 select * from temp_table_alter_011;
 insert into temp_table_alter_011 select * from temp_table_alter_011;

@@ -1,18 +1,4 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
-
-openGauss is licensed under Mulan PSL v2.
-You can use this software according to the terms and conditions of the Mulan PSL v2.
-You may obtain a copy of Mulan PSL v2 at:
-
-          http://license.coscl.org.cn/MulanPSL2
-
-THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-See the Mulan PSL v2 for more details.
-"""
-"""
 Case Type   : 功能测试
 Case Name   : cast函数将字符串类型转换为二进制类型
 Description :
@@ -51,6 +37,7 @@ class Cast_function(unittest.TestCase):
                     r"""SELECT CAST('x5ff' as RAW);""",
                     r"""SELECT CAST(lpad('1','101') as BLOB);"""]
 
+        result_list = ['\\xdeadbeef', '05FF', '101101101101101101101101']
         for i in range(6):
             msg = self.commonsh.execut_db_sql(sql_list[i])
             logger.info(msg)

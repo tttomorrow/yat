@@ -5,11 +5,14 @@ create table table_1(a SERIAL);
 SQL SUCCESS
 insert into table_1 values(1);
 SQL SUCCESS
+insert into table_1 values(1252345656);
 SQL SUCCESS
+insert into table_1 values(2147483647);
 SQL SUCCESS
 --ERROR:  integer out of range
 insert into table_1 values(0);
 SQL SUCCESS
+insert into table_1 values(2147483648);
 ?.*ERROR: integer out of range.*
   Where: referenced column: a
 select * from table_1;
@@ -17,6 +20,8 @@ select * from table_1;
 | a          |
 +------------+
 | 1          |
+| 1252345656 |
+| 2147483647 |
 | 0          |
 +------------+
 drop table if exists table_1;

@@ -18,11 +18,13 @@ SELECT pg_size_pretty(32767::BIGINT);
 +----------------+
 | 32 kB          |
 +----------------+
+SELECT pg_size_pretty(2147483648::BIGINT);
 +----------------+
 | pg_size_pretty |
 +----------------+
 | 2048 MB        |
 +----------------+
+SELECT pg_size_pretty(9223372036854775807::BIGINT);
 +----------------+
 | pg_size_pretty |
 +----------------+

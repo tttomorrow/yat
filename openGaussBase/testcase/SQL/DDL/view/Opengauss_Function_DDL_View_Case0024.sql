@@ -10,6 +10,8 @@ create view temp_view_024 as select * from table_view_024;
 --给视图id列设置默认值
 alter view if exists temp_view_024 alter column id set default 5;
 --取消默认值，视图名不存在，不报错
+alter view if exists temp_view_024345346436 alter column id drop default;
 --取消默认值，视图名不存在，合理报错
+alter view temp_view_024345346436 alter column id drop default;
 --删表
 drop table table_view_024 cascade;

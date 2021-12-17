@@ -1,18 +1,4 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
-
-openGauss is licensed under Mulan PSL v2.
-You can use this software according to the terms and conditions of the Mulan PSL v2.
-You may obtain a copy of Mulan PSL v2 at:
-
-          http://license.coscl.org.cn/MulanPSL2
-
-THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-See the Mulan PSL v2 for more details.
-"""
-"""
 Case Type   : 功能测试
 Case Name   : 使用convert_to_nocase(text, text)函数将字符串转换为指定的编码类型
 Description : 
@@ -62,7 +48,13 @@ class Function(unittest.TestCase):
                    "select convert_to_nocase('你好123098*&^', 'gbk');",
                    "select convert_to_nocase('你好123098*&^opengauss', 'gbk');"]
         result = [[r'\x6162', r'\x6162', r'\x6162', r'\x6162', r'\x6162',
+                   r'\xe4bda0e5a5bd', r'\xe4bda0e5a5bd', r'\xe4bda0e5a5bd', r'\xe4bda0e5a5bd', r'\x313233303938',
+                   r'\x2a265e', r'\xe4bda0e5a5bd3132333039382a265e', r'\xe4bda0e5a5bd3132333039382a265e',
+                   r'\xe4bda0e5a5bd3132333039382a265e', r'\xe4bda0e5a5bd3132333039382a265e6f70656e6761757373'],
                   [r'\x6162', r'\x6162', r'\x6162', r'\x6162', r'\x6162',
+                   r'\xe4bda0e5a5bd', r'\xe4bda0e5a5bd', r'\xe4bda0e5a5bd', r'\xc4e3bac3', r'\x313233303938',
+                   r'\x2a265e', r'\xe4bda0e5a5bd3132333039382a265e', r'\xe4bda0e5a5bd3132333039382a265e',
+                   r'\xc4e3bac33132333039382a265e', r'\xc4e3bac33132333039382a265e6f70656e6761757373']]
 
         for i in range(2):
             # 创建数据库

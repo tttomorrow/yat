@@ -16,11 +16,13 @@ partition by list(p_id)
 drop table if exists partition_list_tab_int4;
 create table partition_list_tab_int4(p_id int4,p_name varchar,p_age int)
 partition by list(p_id)
+(partition part_1 values(2147483647));
 
 --支持的数值类型int8
 drop table if exists partition_list_tab_int8;
 create table partition_list_tab_int8(p_id int8,p_name varchar,p_age int)
 partition by list(p_id)
+(partition part_1 values(9223372036854775807));
 
 --支持的数值类型numeric
 drop table if exists partition_list_tab_numeric;

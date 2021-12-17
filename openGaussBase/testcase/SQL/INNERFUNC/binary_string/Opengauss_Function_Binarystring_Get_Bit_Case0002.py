@@ -1,17 +1,3 @@
-"""
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
-
-openGauss is licensed under Mulan PSL v2.
-You can use this software according to the terms and conditions of the Mulan PSL v2.
-You may obtain a copy of Mulan PSL v2 at:
-
-          http://license.coscl.org.cn/MulanPSL2
-
-THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-See the Mulan PSL v2 for more details.
-"""
 '''
 
 Case Type： 功能测试
@@ -57,6 +43,7 @@ class Bit_string_function(unittest.TestCase):
         Normal_SqlMdg2 = self.commonsh.execut_db_sql("""SELECT get_bit(right('*&^%$%&^*', 100), 70)  AS RESULT;""")
         logger.info(Normal_SqlMdg2)
         self.assertIn('does not exist', Normal_SqlMdg2)
+        Normal_SqlMdg3 = self.commonsh.execut_db_sql("""SELECT get_bit(rawcat(left('ABCDEFGHIJK', 6)::RAW,'0123456789'::RAW), 70)  AS RESULT;""")
         logger.info(Normal_SqlMdg3)
         self.assertIn('does not exist', Normal_SqlMdg3)
 

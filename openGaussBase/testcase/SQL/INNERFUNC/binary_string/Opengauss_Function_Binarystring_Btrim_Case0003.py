@@ -1,17 +1,3 @@
-"""
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
-
-openGauss is licensed under Mulan PSL v2.
-You can use this software according to the terms and conditions of the Mulan PSL v2.
-You may obtain a copy of Mulan PSL v2 at:
-
-          http://license.coscl.org.cn/MulanPSL2
-
-THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-See the Mulan PSL v2 for more details.
-"""
 '''
 
 Case Type： 功能测试
@@ -51,10 +37,13 @@ class Bit_string_function(unittest.TestCase):
         logger.info("-----------------------------与函数交互-------------------------------")
         Normal_SqlMdg1 = self.commonsh.execut_db_sql("""SELECT btrim(E'0134\\\\\\000Tom\\\\\\000'::bytea, left(E'\\\\\\000', 6)::bytea) AS RESULT;""")
         logger.info(Normal_SqlMdg1)
+        self.assertTrue(Normal_SqlMdg1.splitlines()[2].strip(' ') == '\\x3031333400546f6d')
         Normal_SqlMdg2 = self.commonsh.execut_db_sql("""SELECT btrim(lpad(E'0134\\\\\\000Tom\\\\\\000',19,'F')::bytea,left(E'\\\\\\000', 6)::bytea) AS RESULT;""")
         logger.info(Normal_SqlMdg2)
+        self.assertTrue(Normal_SqlMdg2.splitlines()[2].strip(' ') == '\\x464646463031333400546f6d')
         Normal_SqlMdg3 = self.commonsh.execut_db_sql("""SELECT btrim(set_byte(overlay(E'Th\\\\\\000omas'::bytea placing E'\\\\\\002\\\\\\003'::bytea from 2 for 3), 4, 64),E'\\\\\\000'::bytea) AS RESULT;""")
         logger.info(Normal_SqlMdg3)
+        self.assertTrue(Normal_SqlMdg3.splitlines()[2].strip(' ') == '\\x5402036d4073')
 
         logger.info("--------------------------------参数是列-------------------------------")
         sql_cmd1 = '''drop table if exists test;
@@ -62,6 +51,7 @@ class Bit_string_function(unittest.TestCase):
                         declare
                         begin
                             for i in 1..5 loop
+                                insert into test values('opengauss', E'\\x5402036d6173', E'Th\\\\\\000omasffdfdfdfdfd');
                             end loop;
                         end;
             '''
@@ -76,6 +66,7 @@ class Bit_string_function(unittest.TestCase):
         self.assertTrue(Normal_SqlMdg4.count('\\x68006f6d6173') == 5)
         Normal_SqlMdg5 = self.commonsh.execut_db_sql("""SELECT btrim(c3,E'df' ) from test;""")
         logger.info(Normal_SqlMdg5)
+        self.assertTrue(Normal_SqlMdg5.count('\\x5468006f6d6173') == 5)
         Normal_SqlMdg7 = self.commonsh.execut_db_sql("""drop table test cascade;""")
         logger.info(Normal_SqlMdg7)
         self.assertTrue('DROP TABLE' in Normal_SqlMdg7)

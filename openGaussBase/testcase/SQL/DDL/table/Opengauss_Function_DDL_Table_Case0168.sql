@@ -3,6 +3,9 @@ drop table if exists table_1;
 drop table if exists table_2;
 DROP INDEX if exists table_index;
 create table table_1(id int,sname char(20),city varchar(20),number number)with (ORIENTATION=COLUMN);
+insert into table_1 values(1,'joe','a',12323455646);
+insert into table_1 values(2,'jojo','b',124232345456);
+insert into table_1 values(3,'jane','c',12557676878);
 select * from table_1;
 
 create table table_2(id int,sname char(20),course varchar(20),score number)with (ORIENTATION=COLUMN);

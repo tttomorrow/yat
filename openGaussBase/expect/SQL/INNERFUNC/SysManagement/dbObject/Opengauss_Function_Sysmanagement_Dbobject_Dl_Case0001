@@ -23,12 +23,14 @@ SELECT datalength(99999::INTEGER);
 | 4          |
 +------------+
 -- BINARY_INTEGER
+SELECT datalength(2147483647::BINARY_INTEGER);
 +------------+
 | datalength |
 +------------+
 | 4          |
 +------------+
 -- BIGINT
+SELECT datalength(9999999999999999::BIGINT);
 +------------+
 | datalength |
 +------------+

@@ -32,12 +32,23 @@ insert into class values (101, '1年1班');
 insert into class values (102, '1年2班');
 insert into class values (103, '1年3班');
 insert into class values (104, '1年4班');
+insert into teacher values (2017100001, '李老师');
+insert into teacher values (2017100002, '张老师');
+insert into teacher values (2017100003, '陈老师');
+insert into teacher values (2017100004, '杨老师');
+insert into student values (2017200001, '张三', 101, 2017100001);
+insert into student values (2017200002, '李四', 101, 2017100001);
+insert into student values (2017200003, '王二', 102, 2017100002);
+insert into student values (2017200004, '李明', 103, 2017100003);
+insert into student values (2017200005, '吴天', 104, 2017100004);
 --2.1 修改父表表名
 select * from student;
 alter table teacher rename to teacher1;
+delete from teacher1 where t_id = 2017100004;
 select * from student;
 --2.2 修改父表被参照列名
 alter table teacher1 rename t_id to t_id1;
+update teacher1 set t_id1 = 2018100003 where t_id1 = 2017100003;
 select * from student;
 --2.3 修改子表表名
 alter table student rename to student1;
@@ -57,9 +68,11 @@ delete from class where c_id = '202';
 select * from student1;
 --2.7 修改子表被参照列数据类型（同类型）
 alter table student1 alter column t_id type bigint;
+update teacher1 set t_id1 = 2018100001 where t_id1 = 2017100001;
 select * from student1;
 --2.8 修改子表被参照类数据类型（不同类型）
 alter table student1 alter column t_id type varchar(10);
+delete from teacher1 where t_id1 = 2018100001; 
 select * from student1;
 drop table if exists student;
 drop table if exists student1;

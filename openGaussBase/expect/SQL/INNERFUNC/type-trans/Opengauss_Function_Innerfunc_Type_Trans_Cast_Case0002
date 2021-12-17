@@ -38,6 +38,8 @@ select cast('-32769' as tinyint);
 ?.*ERROR: value "-32769" is out of range for 8-bit integer.*
 ?.*
   Where: referenced column: int1
+select cast('2147483649' as smallint);
+?.*ERROR: value "2147483649" is out of range for type smallint.*
 ?.*
   Where: referenced column: int2
 select cast('hjk' as decimal);

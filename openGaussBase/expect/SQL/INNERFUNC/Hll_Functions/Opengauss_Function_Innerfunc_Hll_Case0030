@@ -4,6 +4,7 @@ select hll_hashval_eq(hll_hash_integer(1),basicemailmasking('abcd@gmail.com'));
   Hint: No function matches the given name and argument types. You might need to add explicit type casts.
 ?.*
   Where: referenced column: hll_hashval_eq
+select hll_hashval_eq(hll_hash_integer(1),-8604791237420463362);
 ?.*ERROR: function hll_hashval_eq\(hll_hashval, bigint\) does not exist.*
   Hint: No function matches the given name and argument types. You might need to add explicit type casts.
 ?.*

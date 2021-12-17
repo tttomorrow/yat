@@ -10,5 +10,7 @@ col_6 nchar(30),
 col_7 float
 )partition by range (col_4)
 interval ('1 month')
+(partition partition_name_1234567890123456789012345678901234567890nnn
 start ('2018-11-01') end ('2019-02-06 00:00:00') every ('1 month'));
+select char_length('partition_name_1234567890123456789012345678901234567890nn');
 drop table if exists partition_table_001;

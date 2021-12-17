@@ -1,5 +1,7 @@
 -- @testpoint:  hll_hash_any(anytype, int32) 对任意类型数据计算哈希值，并设置hashseed（即改变哈希策略）
 
+select hll_hash_any(1223265, 2147483647);
+select hll_hash_any('08:00:2b:01:02:03'::macaddr, 2147483647);
 select hll_hash_any ('clusterName'::text, 0);
 SELECT hll_hash_any ('12.34'::float8::numeric::money,100);
 select hll_hash_any ('clusterName'::char, 1);

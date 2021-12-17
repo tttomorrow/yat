@@ -1,5 +1,4 @@
 -- @testpoint: 修改数据类型，修改不存在的列合理报错；修改的列类型与插入数据类型不符，合理报错
--- @modify at: 2020-11-23
 --建表1
 DROP TABLE IF EXISTS temp_table_alter_012;
 create global TEMPORARY table temp_table_alter_012(
@@ -41,6 +40,7 @@ alter table temp_table_alter_012  alter c_char set default 50;
 alter table temp_table_alter_012 MODIFY (c_varchar char(80),C_NUMBER4 DATE);
 --插入数据
 insert into temp_table_alter_012 values('1',0,3.14,1.0002,3.55555,5,7887.656,0,0.111111,3.1415926,'dghg','jjj','pokj99',
+'ywgdghghhgghe',hextoraw('101A1101'),'010101101',date_trunc('hour', timestamp  '2001-02-16 20:38:40'),to_timestamp('2019-01-03 14:58:54.000000','YYYY-MM-DD HH24:MI:SS.FFFFFF'));
 --修改类型
 alter table temp_table_alter_012 MODIFY (c_id int);
 --修改类型，报错

@@ -1,5 +1,4 @@
 -- @testpoint: 表中插入数据前后，执行列的添加、删除操作
--- @modify at: 2020-11-23
 --建表
 drop table if exists temp_table_alter_010;
 SQL SUCCESS
@@ -26,6 +25,7 @@ SQL SUCCESS
 --增加列
 alter table temp_table_alter_010 add(c_1 int);
 SQL SUCCESS
+alter table temp_table_alter_010 add(c_2 blob default '0101010101111100001110');
 SQL SUCCESS
 alter table temp_table_alter_010 add(c_3 varchar(200));
 SQL SUCCESS
@@ -53,6 +53,7 @@ select * from temp_table_alter_010;
 +------+-----------+--------+---------+----------+-----------+----------+-----------+-----------+-----------+--------+-----------+------------+--------+-------+--------+--------+-------------+-----+
 --插入数据
 insert into temp_table_alter_010 values(1,0,3.14,1.0002,3.55555,5,7887.656,0,0.111111,3.1415926,'dghg','jjj','pokj99','
+ywgdghghhgghe',hextoraw('101a1101'),'010101101',date_trunc('hour', timestamp  '2001-02-16 20:38:40'),
 to_timestamp('2019-01-03 14:58:54.000000','yyyy-mm-dd hh24:mi:ss.ffffff'),'汉字的环境ihhivhkhv&*&%^&^555');
 SQL SUCCESS
 insert into temp_table_alter_010 select * from temp_table_alter_010;

@@ -3,11 +3,13 @@ drop table if exists tb1;
 SQL SUCCESS
 create table tb1 (clo1 bigint,clo2 bigint);
 SQL SUCCESS
+insert into tb1 values (9223372036854775807,-9223372036854775808);
 SQL SUCCESS
 select degrees(clo1),degrees(clo2) from tb1;
 +-----------------------+------------------------+
 | degrees               | degrees                |
 +-----------------------+------------------------+
+| 5.2846029059076024E20 | -5.2846029059076024E20 |
 +-----------------------+------------------------+
 drop table if exists tb1;
 SQL SUCCESS

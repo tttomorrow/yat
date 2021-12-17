@@ -3,8 +3,11 @@ drop table if exists test_money05;
 SQL SUCCESS
 create table test_money05 (name money);
 SQL SUCCESS
+insert into test_money05 values (12.1234567899);
 SQL SUCCESS
+insert into test_money05 values (0.999999999999999);
 SQL SUCCESS
+insert into test_money05 values (12.350000000);
 SQL SUCCESS
 select * from test_money05;
 +-------+

@@ -29,6 +29,8 @@ alter table table_alter_020 MODIFY (c_raw varchar(10));alter table table_alter_0
 alter table table_alter_020 MODIFY (c_raw varchar(10));alter table table_alter_020 MODIFY (c_raw raw(20));
 alter table table_alter_020 MODIFY (c_raw varchar(10));alter table table_alter_020 MODIFY (c_raw raw(20));
 
+insert into table_alter_020 values(1,1.0002,'dghg','jjjsdfghjhjui','010111100','010101101',date_trunc('hour', timestamp  '2001-02-16 20:38:40'));
+insert into table_alter_020 values(2,1.0002,'dghg','jjjsdfghjhjui','010111100','010101101',date_trunc('hour', timestamp  '2001-02-16 20:38:40'));
 insert into table_alter_020 select * from table_alter_020;
 insert into table_alter_020 select * from table_alter_020;
 insert into table_alter_020 select * from table_alter_020;

@@ -2,4 +2,5 @@
 
 drop table if exists integer02;
 create table integer02 (name integer);
+insert into integer02 values (-2147483649);
 drop table integer02;

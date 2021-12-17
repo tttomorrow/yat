@@ -7,6 +7,7 @@ SELECT * FROM SAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBB63;
 +-----------------------------------------------------------------+------------+-------------+--------------+---------------------+-----------+-------------+---------+-----------+-----------+------+
 | sequence_name                                                   | last_value | start_value | increment_by | max_value           | min_value | cache_value | log_cnt | is_cycled | is_called | uuid |
 +-----------------------------------------------------------------+------------+-------------+--------------+---------------------+-----------+-------------+---------+-----------+-----------+------+
+| saaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbb63 | 10         | 10          | 1            | 9223372036854775807 | 1         | 1           | 0       | false     | false     | 0    |
 +-----------------------------------------------------------------+------------+-------------+--------------+---------------------+-----------+-------------+---------+-----------+-----------+------+
 DROP SEQUENCE if exists  SAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBB63;
 SQL SUCCESS

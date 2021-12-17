@@ -3,14 +3,20 @@ drop table if exists table_1;
 SQL SUCCESS
 create table table_1(price money);
 SQL SUCCESS
+insert into table_1 values(-92233720368547758.08);
 SQL SUCCESS
+insert into table_1 values(-92233720368547758.08);
 SQL SUCCESS
+insert into table_1 values(42233720368547758.369);
 SQL SUCCESS
 insert into table_1 values(0.00);
 SQL SUCCESS
+insert into table_1 values(92233720368547758.07);
 SQL SUCCESS
+insert into table_1 values(-92233720368547758.09);
 ?.*ERROR: bigint out of range.*
   Where: referenced column: price
+insert into table_1 values(92233720368547758.08);
 ?.*ERROR: bigint out of range.*
   Where: referenced column: price
 drop table if exists table_1;

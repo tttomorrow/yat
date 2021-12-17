@@ -1,5 +1,4 @@
 -- @testpoint: 删除主外键约束，添加cascade constraints参数
--- @modify at: 2020-11-24
 --创建全局临时表1
 drop table if exists temp_table_030;
 create global temporary table temp_table_030(
@@ -26,8 +25,11 @@ c_timestamp timestamp
 alter table temp_table_030 add  constraint temp_table_030_pk primary key (c_id);
 --插入数据
 insert into temp_table_030 values(1,0,3.14,1.0002,3.55555,5,7887.656,0,0.111111,3.1415926,'dghg','jjj','pokj99',
+'ywgdghghhgghe',hextoraw('deadbeef'),'010101101','2019-01-03 14:14:12',to_timestamp('2019-01-03 14:58:54.000000','yyyy-mm-dd hh24:mi:ss.ffffff'));
 insert into temp_table_030 values(2,0,3.14,1.0002,3.55555,5,7887.656,0,0.111111,3.1415926,'dghg','jjj','pokj99',
+'ywgdghghhgghe',hextoraw('deadbeef'),'010101101','2019-01-03 14:14:12',to_timestamp('2019-01-03 14:58:54.000000','yyyy-mm-dd hh24:mi:ss.ffffff'));
 insert into temp_table_030 values(3,0,3.14,1.0002,3.55555,5,7887.656,0,0.111111,3.1415926,'dghg','jjj','pokj99',
+'ywgdghghhgghe',hextoraw('deadbeef'),'010101101','2019-01-03 14:14:12',to_timestamp('2019-01-03 14:58:54.000000','yyyy-mm-dd hh24:mi:ss.ffffff'));
 --建表2
 drop table if exists temp_table_030_bak;
 create global temporary table temp_table_030_bak(a int);

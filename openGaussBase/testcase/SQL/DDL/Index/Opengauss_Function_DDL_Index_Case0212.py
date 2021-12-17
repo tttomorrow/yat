@@ -1,18 +1,4 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
-
-openGauss is licensed under Mulan PSL v2.
-You can use this software according to the terms and conditions of the Mulan PSL v2.
-You may obtain a copy of Mulan PSL v2 at:
-
-          http://license.coscl.org.cn/MulanPSL2
-
-THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-See the Mulan PSL v2 for more details.
-"""
-"""
 Case Type   : 数据库系统
 Case Name   : 创建索引过程中在事务外对相关表进行update操作
 Description :
@@ -74,6 +60,7 @@ update {self.tblname} set first_name='测试查询不阻塞', last_name='测试%
         self.log.info('----------------- insert table-----------------------------')
         before_time = self.dbPrimaryDbUser.sh("date +'%s'").result()
         result = self.primary_sh.execut_db_sql(
+            f'insert into {self.tblname} values(200000001,\'^c test 号\',\'\\test--\'); ')
         after_time = self.dbPrimaryDbUser.sh("date +'%s'").result()
         self.log.info(result)
         self.assertIn(self.Constant.INSERT_SUCCESS_MSG, result)
@@ -105,11 +92,14 @@ update {self.tblname} set first_name='测试查询不阻塞', last_name='测试%
 
         self.log.info('-----------------show idx-----------------------------')
         result = self.primary_sh.execut_db_sql(
+            f'SET ENABLE_SEQSCAN=off;explain SELECT * FROM {self.tblname} where id=200000001;')
         self.log.info(result)
         self.assertIn(self.idxname, result)
 
         self.log.info('-----------------select new data-----------------------------')
+        result = self.primary_sh.execut_db_sql(f'SET ENABLE_SEQSCAN=off;SELECT * FROM {self.tblname} where id=200000001;')
         self.log.info(result)
+        self.assertIn('200000001', result)
         self.assertIn('^c test 号', result)
         self.assertIn('\\test--', result)
 

@@ -3,6 +3,7 @@
 declare
   v_int int4;
 begin
+    select -9223372036854775807.7898765 into v_int from sys_dummy;
     raise info 'result:% ',v_int;
 end;
 /

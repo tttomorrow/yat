@@ -1,5 +1,4 @@
 -- @testpoint: insert组合数据类型,字符，二进制，布尔型，违法唯一约束，合理报错
--- @modify at: 2020-11-16
 --建表，包含基本数据类型
 drop table if exists tbl_hash;
 create table tbl_hash(
@@ -48,10 +47,12 @@ drop index if exists idx_tbl_hash_3;
 create unique index idx_tbl_hash_3 on tbl_hash(upper(col_nvarchar2_1),col_raw1,col_char1,col_nchar1,col_bool);
 --插入数据
 insert into tbl_hash(col_nvarchar2_1,col_raw1,col_char1,col_nchar1,col_bool)
+values('abccccccccccccccccccccccccccc2018-01-07 08:08:08','1111111111111000000000111','abccccccccccccccccccccccccccc','abccccccccccccccccccccccccccc1-1',100);
 --查询
 select * from tbl_hash;
 --再次插入同样数据，合理报错
 insert into tbl_hash(col_nvarchar2_1,col_raw1,col_char1,col_nchar1,col_bool)
+values('abccccccccccccccccccccccccccc2018-01-07 08:08:08','1111111111111000000000111','abccccccccccccccccccccccccccc','abccccccccccccccccccccccccccc1-1',100);
 --删除表
 drop table if exists tbl_hash cascade;
 

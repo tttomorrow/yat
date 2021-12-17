@@ -3,6 +3,7 @@ DROP TABLE IF EXISTS type_char;
 SQL SUCCESS
 CREATE TABLE type_char (string1 RAW,string2 RAW);
 SQL SUCCESS
+insert into type_char values ('abcdeF','0123456789');
 SQL SUCCESS
 SELECT rawcat() from type_char;
 ?.*ERROR: function rawcat\(\) does not exist

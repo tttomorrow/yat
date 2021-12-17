@@ -3,11 +3,13 @@ drop table if exists int01;
 SQL SUCCESS
 create table int01 (name int);
 SQL SUCCESS
+insert into int01 values (-2147483648);
 SQL SUCCESS
 select * from int01;
 +-------------+
 | name        |
 +-------------+
+| -2147483648 |
 +-------------+
 drop table int01;
 SQL SUCCESS

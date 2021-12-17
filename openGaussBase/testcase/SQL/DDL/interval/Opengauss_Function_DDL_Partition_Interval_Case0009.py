@@ -1,18 +1,4 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
-
-openGauss is licensed under Mulan PSL v2.
-You can use this software according to the terms and conditions of the Mulan PSL v2.
-You may obtain a copy of Mulan PSL v2 at:
-
-          http://license.coscl.org.cn/MulanPSL2
-
-THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-See the Mulan PSL v2 for more details.
-"""
-"""
 Case Type   : 功能测试
 Case Name   : interval分区,interval_expr非法值校验
 Description :
@@ -34,6 +20,7 @@ class Function(unittest.TestCase):
         self.log.info('Opengauss_Function_DDL_Partition_Interval_Case0009开始')
 
     def test_interval(self):
+        data_type = ['decades', '6099999999999999999999999 minutes',
                      '一 hour', 'hour', '两年', 'hihihihi', '*&^%']
         try:
             for i in data_type:

@@ -1,18 +1,4 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
-
-openGauss is licensed under Mulan PSL v2.
-You can use this software according to the terms and conditions of the Mulan PSL v2.
-You may obtain a copy of Mulan PSL v2 at:
-
-          http://license.coscl.org.cn/MulanPSL2
-
-THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-See the Mulan PSL v2 for more details.
-"""
-"""
 Case Type   : 数据库系统
 Case Name   : OffSetDateTime类型setObject插入TIMESTAMPtz类型数据，并使用getObject获取结果
 Description :
@@ -94,7 +80,9 @@ class Jdbcisreadonly(unittest.TestCase):
         self.log.info(cmd)
         result = self.db_primary_root_node.sh(cmd).result()
         self.log.info(result)
+        self.assertIn('第1行结果：+999999999-12-31T23:59:59.999999999-18:00',
                       result)
+        self.assertIn('第2行结果：-999999999-01-01T00:00+18:00', result)
         self.assertIn('第3行结果：null', result)
 
         result_time = self.db_primary_root_node.sh(
@@ -117,7 +105,9 @@ class Jdbcisreadonly(unittest.TestCase):
 
         self.assertIn(f'第6行结果：2020-03-01T08:59:59Z', result)
         self.assertIn(f'第7行结果：2020-02-29T08:59:59Z', result)
+        self.assertIn('第8行结果：+999999999-12-31T23:59:59.999999999-18:00',
                       result)
+        self.assertIn('第9行结果：-999999999-01-01T00:00+18:00', result)
         self.assertIn('第10行结果：1970-01-01T00:00Z', result)
 
         today = []

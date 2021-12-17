@@ -5,11 +5,14 @@ create table table_1(a BIGSERIAL);
 SQL SUCCESS
 insert into table_1 values(1);
 SQL SUCCESS
+insert into table_1 values(1255345657);
 SQL SUCCESS
+insert into table_1 values(9223372036854775807);
 SQL SUCCESS
 
 insert into table_1 values(0);
 SQL SUCCESS
+insert into table_1 values(9223372036854775808);
 ?.*ERROR: bigint out of range.*
   Where: referenced column: a
 select * from table_1;
@@ -17,6 +20,8 @@ select * from table_1;
 | a                   |
 +---------------------+
 | 1                   |
+| 1255345657          |
+| 9223372036854775807 |
 | 0                   |
 +---------------------+
 drop table if exists table_1;

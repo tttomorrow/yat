@@ -3,8 +3,10 @@
 select to_char(-32768::smallint, '9999999');
 ?.*ERROR: smallint out of range.*
   Where: referenced column: to_char
+select to_char(-2147483648::int4, '9999999999999999');
 ?.*ERROR: integer out of range.*
   Where: referenced column: to_char
+select to_char(-9223372036854775808::bigint, '99999999999999999999999');
 ?.*ERROR: bigint out of range.*
   Where: referenced column: to_char
 -- 边界值上下
@@ -14,12 +16,16 @@ select to_char(-32769::smallint, '9999999');
 select to_char(32768::smallint, '9999999');
 ?.*ERROR: smallint out of range.*
   Where: referenced column: to_char
+select to_char(-2147483649::int4, '9999999999999999');
 ?.*ERROR: integer out of range.*
   Where: referenced column: to_char
+select to_char(2147483648::int4, '9999999999999999');
 ?.*ERROR: integer out of range.*
   Where: referenced column: to_char
+select to_char(-9223372036854775809::bigint, '99999999999999999999999');
 ?.*ERROR: bigint out of range.*
   Where: referenced column: to_char
+select to_char(9223372036854775808::bigint, '99999999999999999999999');
 ?.*ERROR: bigint out of range.*
   Where: referenced column: to_char
 -- 指定长度不足
@@ -29,11 +35,13 @@ select to_char(32767::smallint, '999');
 +---------+
 |  ###    |
 +---------+
+select to_char(-2147483647::int4, '999999');
 +---------+
 | to_char |
 +---------+
 | -###### |
 +---------+
+select to_char(9223372036854775807::bigint, '99999999');
 +-----------+
 | to_char   |
 +-----------+

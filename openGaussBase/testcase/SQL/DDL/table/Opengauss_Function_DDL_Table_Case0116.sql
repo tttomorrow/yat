@@ -2,7 +2,10 @@
 drop table if exists table_1;
 create table table_1(a SERIAL);
 insert into table_1 values(1);
+insert into table_1 values(1252345656);
+insert into table_1 values(2147483647);
 --ERROR:  integer out of range
 insert into table_1 values(0);
+insert into table_1 values(2147483648);
 select * from table_1;
 drop table if exists table_1;

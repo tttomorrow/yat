@@ -1,17 +1,3 @@
-"""
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
-
-openGauss is licensed under Mulan PSL v2.
-You can use this software according to the terms and conditions of the Mulan PSL v2.
-You may obtain a copy of Mulan PSL v2 at:
-
-          http://license.coscl.org.cn/MulanPSL2
-
-THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-See the Mulan PSL v2 for more details.
-"""
 '''
 
 Case Type： 功能测试
@@ -62,6 +48,7 @@ class Bit_string_function(unittest.TestCase):
 
         Normal_SqlMdg9 = self.commonsh.execut_db_sql("""
         set bytea_output to 'escape';
+        SELECT set_bit(E'\\x5402036d6173'::bytea, 28,0)  AS RESULT;
         SELECT set_bit(E'jose\\\\\\000\\\\\\000\\\\\\0000jose\\\\\\00000\\\\\\000000jose'::bytea, 58,1) AS RESULT;
         SELECT set_bit(E'josejosejose'::bytea, 94,0) AS RESULT;
         SELECT set_bit(lpad('open', 50, 'gauss')::bytea, 94,0) AS RESULT;

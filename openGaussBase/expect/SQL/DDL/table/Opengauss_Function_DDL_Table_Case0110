@@ -3,18 +3,26 @@ drop table if exists table_1;
 SQL SUCCESS
 create table table_1(a INTEGER);
 SQL SUCCESS
+insert into table_1 values(-2147483648);
 SQL SUCCESS
+insert into table_1 values(1255345657);
 SQL SUCCESS
+insert into table_1 values(2147483647);
 SQL SUCCESS
 --ERROR:  integer out of range
+insert into table_1 values(-2147483649);
 ?.*ERROR: integer out of range.*
   Where: referenced column: a
+insert into table_1 values(2147483648);
 ?.*ERROR: integer out of range.*
   Where: referenced column: a
 select * from table_1;
 +-------------+
 | a           |
 +-------------+
+| -2147483648 |
+| 1255345657  |
+| 2147483647  |
 +-------------+
 drop table if exists table_1;
 SQL SUCCESS

@@ -2,10 +2,12 @@
 select hll_hash_smallint(-32769, 10);
 ?.*ERROR: smallint out of range.*
   Where: referenced column: hll_hash_smallint
+select hll_hash_smallint(-32768, 2147483648);
 ?.*ERROR: function hll_hash_smallint\(integer, bigint\) does not exist.*
   Hint: No function matches the given name and argument types. You might need to add explicit type casts.
 ?.*
   Where: referenced column: hll_hash_smallint
+select hll_hash_smallint('a', '214748364');
 ?.*ERROR: invalid input syntax for integer: "a".*
 ?.*
   Where: referenced column: hll_hash_smallint

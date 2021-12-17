@@ -3,6 +3,8 @@ select numtoday(' ');
 ?.*ERROR: invalid input syntax for type numeric: " ".*
 ?.*
   Where: referenced column: numtoday
+select numtoday(12345678987654321);
+?.*ERROR: interval field value out of range: "12345678987654321 day".*
   Where: referenced column: numtoday
 select numtoday(2f);
 ?.*ERROR: syntax error at or near "f".*

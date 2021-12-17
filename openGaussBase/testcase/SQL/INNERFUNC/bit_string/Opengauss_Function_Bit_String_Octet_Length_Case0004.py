@@ -1,17 +1,3 @@
-"""
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
-
-openGauss is licensed under Mulan PSL v2.
-You can use this software according to the terms and conditions of the Mulan PSL v2.
-You may obtain a copy of Mulan PSL v2 at:
-
-          http://license.coscl.org.cn/MulanPSL2
-
-THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-See the Mulan PSL v2 for more details.
-"""
 '''
 
 Case Type： 功能测试
@@ -49,6 +35,7 @@ class Bit_string_function(unittest.TestCase):
         sql_cmd = '''SELECT octet_length(B'10001' || B'011' || (B'10001' & B'01101'));'''
         Normal_SqlMdg = self.commonsh.execut_db_sql(sql_cmd)
         self.assertTrue(int(Normal_SqlMdg.splitlines()[2]) == 2)
+        sql_cmd = '''SELECT octet_length(B'1000111111' || (B'011' || B'10001' & B'11101101') <<3);'''
         Normal_SqlMdg = self.commonsh.execut_db_sql(sql_cmd)
         self.assertTrue(int(Normal_SqlMdg.splitlines()[2]) == 3)
         sql_cmd = '''SELECT octet_length(substring('10101111'::bit(8), 2));'''

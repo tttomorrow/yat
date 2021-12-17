@@ -17,6 +17,7 @@ drop table if exists table_2;
 SQL SUCCESS
 create table table_2(a FLOAT4);
 SQL SUCCESS
+insert into table_2 values(12345646842225.1787902566223456);
 SQL SUCCESS
 select * from table_2;
 +---------------+

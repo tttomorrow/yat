@@ -18,11 +18,13 @@ SELECT pg_size_pretty(32767::numeric);
 +----------------+
 | 32 kB          |
 +----------------+
+SELECT pg_size_pretty(2147483648::numeric);
 +----------------+
 | pg_size_pretty |
 +----------------+
 | 2048 MB        |
 +----------------+
+SELECT pg_size_pretty(1073733621::numeric);
 +----------------+
 | pg_size_pretty |
 +----------------+
@@ -41,18 +43,21 @@ SELECT pg_size_pretty(123456.1234::NUMERIC(10,4));
 +----------------+
 | 121 kB         |
 +----------------+
+SELECT pg_size_pretty(123456789.1234::NUMERIC(13,4));
 +----------------+
 | pg_size_pretty |
 +----------------+
 | 118 MB         |
 +----------------+
 --缺省的比例是 0，只保留了整数位
+SELECT pg_size_pretty(1073733621.12354::NUMERIC(10));
 +----------------+
 | pg_size_pretty |
 +----------------+
 | 1024 MB        |
 +----------------+
 --s大于指定s，四舍五入,保留小数位到s
+SELECT pg_size_pretty(1024.123548777::NUMERIC(20,4));
 +-----------------+
 | pg_size_pretty  |
 +-----------------+
@@ -65,6 +70,7 @@ SELECT pg_size_pretty(1024.12359::NUMERIC(20,4));
 | 1024.1236 bytes |
 +-----------------+
 -- p-s>整数位,只保留了整数位
+SELECT pg_size_pretty(123456789.1234::NUMERIC(15,4));
 +----------------+
 | pg_size_pretty |
 +----------------+

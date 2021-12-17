@@ -5,7 +5,9 @@ SQL SUCCESS
 create table t4 (id int primary key,name varchar(40) unique);
 SQL SUCCESS
 --插入数据
+insert into t4 values(1,'1111111111111111');
 SQL SUCCESS
+insert into t4 values(2,'2222222222222222');
 SQL SUCCESS
 --查看约束名字
 select conname,condeferrable,condeferred from pg_constraint where conrelid = (select oid from pg_class where relname='t4');

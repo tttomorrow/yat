@@ -2,6 +2,7 @@
 
 select numtoday(' ');
 
+select numtoday(12345678987654321);
 
 select numtoday(2f);
 

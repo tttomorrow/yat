@@ -3,6 +3,7 @@ drop table if exists bigserial_07;
 SQL SUCCESS
 create table bigserial_07 (name bigserial);
 SQL SUCCESS
+insert into bigserial_07 values (9223372036854775808);
 ?.*ERROR: bigint out of range
   Where: referenced column: name
 select * from bigserial_07;

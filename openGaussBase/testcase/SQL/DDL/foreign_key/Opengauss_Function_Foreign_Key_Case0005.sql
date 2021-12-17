@@ -14,8 +14,11 @@ create table student
     t_id int REFERENCES teacher deferrable initially deferred
 );
 --添加数据
+INSERT INTO teacher VALUES (2017100001, '李老师');
+INSERT INTO student VALUES (2017200001, '张三', 2017100001);
 --测试推迟检查约束，应当在commit时报错
 START TRANSACTION;
+INSERT INTO student VALUES (2018200002, '李四', 2017100005);
 update student set s_id = s_id + 1;
 COMMIT;
 select * from student;

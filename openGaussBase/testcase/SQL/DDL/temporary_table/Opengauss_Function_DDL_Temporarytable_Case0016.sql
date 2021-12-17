@@ -1,5 +1,4 @@
 -- @testpoint: 建表添加参数on commit delete rows,修改表属性，无法隐式转换的类型，合理报错
--- @modify at: 2020-11-23
 --开启事务
 start transaction;
 --建表
@@ -14,6 +13,7 @@ c_blob blob,
 c_date date
 )on commit delete rows;
 --插入数据
+insert into temp_table_alter_016 values(1,1.0002,'dghg','jjjsdfghjhjui','010111100','010101101',date_trunc('hour', timestamp  '2001-02-16 20:38:40'));
 --查询表数据，存在
 select * from temp_table_alter_016;
 --提交事务

@@ -3,11 +3,13 @@ drop table if exists bigint09;
 SQL SUCCESS
 create table bigint09 (name bigint);
 SQL SUCCESS
+insert into bigint09 values (9223372036854775807);
 SQL SUCCESS
 select * from bigint09;
 +---------------------+
 | name                |
 +---------------------+
+| 9223372036854775807 |
 +---------------------+
 drop table bigint09;
 SQL SUCCESS

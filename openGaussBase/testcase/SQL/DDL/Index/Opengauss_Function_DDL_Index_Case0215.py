@@ -1,17 +1,3 @@
-"""
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
-
-openGauss is licensed under Mulan PSL v2.
-You can use this software according to the terms and conditions of the Mulan PSL v2.
-You may obtain a copy of Mulan PSL v2 at:
-
-          http://license.coscl.org.cn/MulanPSL2
-
-THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-See the Mulan PSL v2 for more details.
-"""
 '''
 Case Type： 功能
 Case Name： 创建索引过程中在事务内对无关表进行insert操作
@@ -77,6 +63,7 @@ update {self.tblname_no_relevance} set first_name=\'测试查询不阻塞\', las
         self.log.info('-----------------start transaction & insert no relevance table-----------------------------')
         before_time = self.dbPrimaryDbUser.sh("date +'%s'").result()
         result = self.primary_sh.execut_db_sql(
+            f'START TRANSACTION;insert into {self.tblname_no_relevance} values(200000001,\'^c test 号\',\'\\test--\'); END;')
         after_time = self.dbPrimaryDbUser.sh("date +'%s'").result()
         self.log.info(result)
         self.assertIn(self.Constant.INSERT_SUCCESS_MSG, result)
@@ -114,7 +101,9 @@ update {self.tblname_no_relevance} set first_name=\'测试查询不阻塞\', las
 
         self.log.info('-----------------select new data-----------------------------')
         result = self.primary_sh.execut_db_sql(
+            f'SET ENABLE_SEQSCAN=off;SELECT * FROM {self.tblname_no_relevance} where id = 200000001;')
         self.log.info(result)
+        self.assertIn('200000001', result)
         self.assertIn('^c test 号', result)
         self.assertIn('\\test--', result)
 

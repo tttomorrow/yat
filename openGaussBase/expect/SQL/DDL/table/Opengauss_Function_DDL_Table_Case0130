@@ -7,6 +7,7 @@ insert into  table_1 values ('张三');
 SQL SUCCESS
 insert into  table_1 values ('qazw');
 SQL SUCCESS
+insert into  table_1 values (123456677);
 SQL SUCCESS
 select * from table_1;
 +-----------+
@@ -14,6 +15,7 @@ select * from table_1;
 +-----------+
 | 张三        |
 | qazw      |
+| 123456677 |
 +-----------+
 drop table if exists table_1;
 SQL SUCCESS

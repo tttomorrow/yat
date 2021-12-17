@@ -1,18 +1,4 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
-
-openGauss is licensed under Mulan PSL v2.
-You can use this software according to the terms and conditions of the Mulan PSL v2.
-You may obtain a copy of Mulan PSL v2 at:
-
-          http://license.coscl.org.cn/MulanPSL2
-
-THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-See the Mulan PSL v2 for more details.
-"""
-"""
 Case Type   : 功能测试
 Case Name   : cubi函数对于浮点型数据可以开立方开尽和无法开尽的数据进行运算校验
 Description : 描述
@@ -61,6 +47,7 @@ class Cubic_002(unittest.TestCase):
         logger.info(SqlMdg1)
         common.equal_sql_mdg(SqlMdg1, 'CREATE TABLE', 'INSERT 0 1', '?column?', '----------', \
                      '.1', '(1 row)', '', '?column?', '----------', '5', '(1 row)', '', \
+                     'result', '------------------', '4.65873641807426', '(1 row)')
 
     def tearDown(self):
         SqlMdg2 = commonsh.execut_db_sql(clear_sql)

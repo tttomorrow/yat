@@ -18,6 +18,7 @@ create table stddec_tab_002
  c14 number(12,6)
 );
 SQL SUCCESS
+insert into stddec_tab_002 values(1,1.456789445455,3.1415926,1,'1',2.33,6.75844,-0.63,null,'',128.1452415,98*0.99,25563.1415);
 SQL SUCCESS
 select STDDEV_SAMP(c1),STDDEV_SAMP(c2),STDDEV_SAMP(c3),STDDEV_SAMP(c4),STDDEV_SAMP(c5),STDDEV_SAMP(c7),STDDEV_SAMP(c8),STDDEV_SAMP(c9),STDDEV_SAMP(c10),STDDEV_SAMP(c11),STDDEV_SAMP(c12),STDDEV_SAMP(c13),STDDEV_SAMP(c14) from stddec_tab_002;
 +-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+

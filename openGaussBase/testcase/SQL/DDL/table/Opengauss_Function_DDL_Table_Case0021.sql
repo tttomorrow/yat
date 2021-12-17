@@ -13,6 +13,8 @@ c_date date
 create index table_alter_020_idx1 on table_alter_020(c_id);
 create index table_alter_020_idx2 on table_alter_020(c_raw);
 
+insert into table_alter_020 values(1,1.0002,'dghg','jjjsdfghjhjui','010111100','010101101',date_trunc('hour', timestamp  '2001-02-16 20:38:40'));
+insert into table_alter_020 values(2,1.0002,'dghg','jjjsdfghjhjui','010111100','010101101',date_trunc('hour', timestamp  '2001-02-16 20:38:40'));
 insert into table_alter_020 select * from table_alter_020;
 insert into table_alter_020 select * from table_alter_020;
 insert into table_alter_020 select * from table_alter_020;

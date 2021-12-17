@@ -13,7 +13,9 @@ select conname,condeferrable,condeferred from pg_constraint where conrelid = (se
 ?.*t4.*| true          | false       |
 +-------------+---------------+-------------+
 --插入数据
+insert into t4 values(1,'1111111111111111');
 SQL SUCCESS
+insert into t4 values(2,'2222222222222222');
 SQL SUCCESS
 --修改数据，成功
 update t4 set id=id+1;
@@ -22,18 +24,25 @@ select * from t4;
 +----+------------------+
 | id | name             |
 +----+------------------+
+| 2  | 1111111111111111 |
+| 3  | 2222222222222222 |
 +----+------------------+
 --设置约束检查条件为IMMEDIATE
 SET CONSTRAINTS all IMMEDIATE;
 SQL SUCCESS
 --修改数据,合理报错（立即检查）
+update t4 set id=3 where name='1111111111111111';
 ?.*ERROR: duplicate key value violates unique constraint "t4_pkey"
   Detail: Key (id)=(3) already exists.
+update t4 set name='2222222222222222' where id=2;
 ?.*ERROR: duplicate key value violates unique constraint "t4_name_key"
+  Detail: Key (name)=(2222222222222222) already exists.
 truncate table t4;
 SQL SUCCESS
 --插入数据
+insert into t4 values(1,'1111111111111111');
 SQL SUCCESS
+insert into t4 values(2,'2222222222222222');
 SQL SUCCESS
 --设置约束检查条件为DEFERRED
 SET CONSTRAINTS all DEFERRED;
@@ -46,6 +55,8 @@ select * from t4;
 +----+------------------+
 | id | name             |
 +----+------------------+
+| 1  | 1111111111111111 |
+| 2  | 2222222222222222 |
 +----+------------------+
 --删表
 drop table t4;

@@ -38,6 +38,7 @@ begin
   loop
     i:=i+1;
 insert into partition_range036  values(256,10000000,123.3212,123456.123,123456,'dnf','957',
+'简自豪',lpad('345abc',50,'abc'),'153156151515',null,'2008-08-11 00:00:00',
 '2012-11-11 00:00:00',interval '2' day,'2016-12-11 00:00:00','2011-12-11 00:00:00','true',null,null);
 exit when i= 1000;
   end loop;
@@ -51,6 +52,7 @@ begin
   loop
     i:=i+1;
 insert into partition_range036  values(256,10000000,123.3212,123456.123,123456,'dnf','957',
+'简自豪',lpad('345abc',50,'abc'),'4131561511',null,'2008-07-11 00:00:00',
 '2012-11-11 00:00:00',interval '2' day,'2016-12-11 00:00:00','2011-12-11 00:00:00','true',null,null);
 exit when i= 1000;
   end loop;

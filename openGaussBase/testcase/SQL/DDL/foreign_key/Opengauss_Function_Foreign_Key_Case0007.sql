@@ -47,8 +47,12 @@ create temporary table student
     s_id int primary key,
     t_id int references teacher (t_id) on update CASCADE on delete set null
 ) On Commit Delete Rows;
+insert into teacher values (2017100001, '张老师');
+insert into student values (2017200001, 2017100001);
 select * from student;
+update teacher set t_id = 2018100001 where t_id = 2017100001;
 select * from student;
+delete from teacher where t_id = 2018100001;
 select * from student;
 drop table if exists student;
 drop table if exists teacher;
@@ -66,8 +70,12 @@ create temporary table student
     s_id int primary key,
     t_id int references teacher (t_id) on update no action on delete restrict
 ) On Commit Preserve Rows;
+insert into teacher values (2017100001, '张老师');
+insert into student values (2017200001, 2017100001);
 select * from student;
+update teacher set t_id = 2018100001 where t_id = 2017100001;
 select * from student;
+delete from teacher where t_id = 2017100001;
 select * from student;
 drop table if exists student;
 drop table if exists teacher;
@@ -85,8 +93,14 @@ create temporary table student
     s_id int primary key,
     t_id int references teacher (t_id) on update set null on delete no action
 ) On Commit Preserve Rows;
+insert into teacher values (2017100001, '张老师');
+insert into teacher values (2017100002, '李老师');
+insert into student values (2017200001, 2017100001);
+insert into student values (2017200002, 2017100002);
 select * from student;
+update teacher set t_id = 2018100001 where t_id = 2017100001;
 select * from student;
+delete from teacher where t_id = 2017100002;
 select * from student;
 drop table if exists student;
 drop table if exists teacher;
@@ -103,9 +117,17 @@ create temporary table teacher
 create temporary table student
 (
     s_id int primary key,
+    t_id int default 2017100003 references teacher (t_id) on update set default on delete set default
 ) On Commit Delete Rows;
+insert into teacher values (2017100001, '张老师');
+insert into teacher values (2017100002, '李老师');
+insert into teacher values (2017100003, '田老师');
+insert into student values (2017200001, 2017100001);
+insert into student values (2017200002, 2017100002);
 select * from student;
+update teacher set t_id = 2018100001 where t_id = 2017100001;
 select * from student;
+delete from teacher where t_id = 2017100002;
 select * from student;
 drop table if exists student;
 drop table if exists teacher;
@@ -120,8 +142,13 @@ create temporary table student
     s_name varchar not null,
     m_id int references student (s_id) on update cascade on delete set null
 ) On Commit Delete Rows;
+insert into student values (2017200001, '张三', 2017200001);
+insert into student values (2017200002, '李四', 2017200001);
+insert into student values (2017200003, '王二', 2017200002);
 select * from student;
+update student set s_id = 2018200001 where s_id = 2017200001;
 select * from student;
+delete student where s_id = 2017200002;
 select * from student;
 drop table if exists student;
 end;
@@ -133,8 +160,13 @@ create temporary table student
     s_name varchar not null,
     m_id int references student (s_id) on update cascade on delete set null
 ) On Commit Preserve Rows;
+insert into student values (2017200001, '张三', 2017200001);
+insert into student values (2017200002, '李四', 2017200001);
+insert into student values (2017200003, '王二', 2017200002);
 select * from student;
+update student set s_id = 2018200001 where s_id = 2017200001;
 select * from student;
+delete student where s_id = 2017200002;
 select * from student;
 drop table if exists student;
 drop table if exists teacher;

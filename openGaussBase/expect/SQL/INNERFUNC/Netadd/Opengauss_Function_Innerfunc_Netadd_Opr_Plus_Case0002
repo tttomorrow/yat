@@ -7,6 +7,7 @@ SELECT inet '192.168.1.257' + 250 AS RESULT;
 ?.*ERROR: invalid input syntax for type inet: "192.168.1.257"
 ?.*
   Where: referenced column: result
+SELECT inet '192.168.1.6.9' + 250000000 AS RESULT;
 ?.*ERROR: invalid input syntax for type inet: "192.168.1.6.9"
 ?.*
   Where: referenced column: result

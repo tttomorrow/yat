@@ -18,6 +18,8 @@ create table student
     t_id3 int4 references teacher(t_id3) on update cascade on delete set null,
     t_id4 int8 references teacher(t_id4) on update cascade on delete set null
 );
+insert into teacher values (254, 32766, 2147483646, 9223372036854775806);
+insert into student values (1, 254, 32766, 2147483646, 9223372036854775806);
 select * from student;
 update teacher set t_id1 = 253 where t_id1 = 254;
 select * from student;

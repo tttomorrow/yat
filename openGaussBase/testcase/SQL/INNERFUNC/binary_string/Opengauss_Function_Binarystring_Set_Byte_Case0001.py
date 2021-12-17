@@ -1,17 +1,3 @@
-"""
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
-
-openGauss is licensed under Mulan PSL v2.
-You can use this software according to the terms and conditions of the Mulan PSL v2.
-You may obtain a copy of Mulan PSL v2 at:
-
-          http://license.coscl.org.cn/MulanPSL2
-
-THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-See the Mulan PSL v2 for more details.
-"""
 '''
 
 Case Type： 功能测试
@@ -51,6 +37,7 @@ class byte_string_function(unittest.TestCase):
                 SELECT set_byte('young man', 4, 97) AS RESULT;  
                 SELECT set_byte('中国', 2, 97) AS RESULT;
                 SELECT set_byte(E'Th\\\\\\000omas'::bytea, 4, 64) AS RESULT;
+                SELECT set_byte(E'josejosejose'::bytea,11, 2147483647) AS RESULT;
                 SELECT set_byte(E'josejosejose'::bytea,11, 255) AS RESULT;
                 SELECT set_byte(E'josejosejose'::bytea,11, 256) AS RESULT;
                 SELECT set_byte(E'josejosejose'::bytea,11, 511) AS RESULT;

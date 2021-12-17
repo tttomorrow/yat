@@ -1,18 +1,4 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
-
-openGauss is licensed under Mulan PSL v2.
-You can use this software according to the terms and conditions of the Mulan PSL v2.
-You may obtain a copy of Mulan PSL v2 at:
-
-          http://license.coscl.org.cn/MulanPSL2
-
-THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-See the Mulan PSL v2 for more details.
-"""
-"""
 Case Type   : 功能测试
 Case Name   : 数字操作符>>(二进制右移)，0右移或者右移0位
 Description :
@@ -41,12 +27,14 @@ class Function(unittest.TestCase):
         cmd = '''drop table if exists test;
         create table test(c1 float, c2 integer);
         insert into test values(0,-1024);
+        insert into test values(-0.000,1073741824);'''
         msg = self.commonsh.execut_db_sql(cmd)
         LOG.info(msg)
         cmd1 = "select c1 >> 2, c2 >> 0 from test;"
         msg0 = self.commonsh.execut_db_sql(cmd1)
         LOG.info(msg0)
         line1 = '''0 |      -1024'''
+        line2 = '''0 | 1073741824'''
         self.assertTrue(msg0.splitlines()[-3].strip() == line1)
         self.assertTrue(msg0.splitlines()[-2].strip() == line2)
 

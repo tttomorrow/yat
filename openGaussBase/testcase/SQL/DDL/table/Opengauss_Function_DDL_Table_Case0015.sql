@@ -13,6 +13,7 @@ c_date date
 --创建索引
 create index temp_table_alter_015_idx1 on temp_table_alter_015(c_id);
 create index temp_table_alter_015_idx2 on temp_table_alter_015(c_raw);
+insert into temp_table_alter_015 values(1,1.0002,'dghg','jjjsdfghjhjui','010111100','010101101',date_trunc('hour', timestamp  '2001-02-16 20:38:40'));
 insert into temp_table_alter_015 select * from temp_table_alter_015;
 insert into temp_table_alter_015 select * from temp_table_alter_015;
 insert into temp_table_alter_015 select * from temp_table_alter_015;

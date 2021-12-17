@@ -3,6 +3,8 @@
 drop table if exists t4;
 create table t4 (id int primary key,name varchar(40) unique);
 --插入数据
+insert into t4 values(1,'1111111111111111');
+insert into t4 values(2,'2222222222222222');
 --查看约束名字
 select conname,condeferrable,condeferred from pg_constraint where conrelid = (select oid from pg_class where relname='t4');
 --开启事务

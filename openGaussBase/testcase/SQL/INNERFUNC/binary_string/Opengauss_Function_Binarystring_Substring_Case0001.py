@@ -1,17 +1,3 @@
-"""
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
-
-openGauss is licensed under Mulan PSL v2.
-You can use this software according to the terms and conditions of the Mulan PSL v2.
-You may obtain a copy of Mulan PSL v2 at:
-
-          http://license.coscl.org.cn/MulanPSL2
-
-THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-See the Mulan PSL v2 for more details.
-"""
 '''
 
 Case Type： 功能测试
@@ -87,6 +73,7 @@ class byte_string_function(unittest.TestCase):
         logger.info(Normal_SqlMdg51)
         self.assertTrue(Normal_SqlMdg51.splitlines()[3].strip() == '')
         Normal_SqlMdg52 = self.commonsh.execut_db_sql("""set bytea_output to 'escape';
+        SELECT substring(E'\\x5402036d6173' from 2 for 3) AS RESULT;""")
         logger.info(Normal_SqlMdg52)
         self.assertTrue(Normal_SqlMdg52.splitlines()[3].strip(' ') == '020')
         Normal_SqlMdg53 = self.commonsh.execut_db_sql("""set bytea_output to 'escape';

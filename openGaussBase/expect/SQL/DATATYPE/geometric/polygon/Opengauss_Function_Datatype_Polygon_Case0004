@@ -3,6 +3,7 @@ drop table if exists test_polygon04;
 SQL SUCCESS
 create table test_polygon04 (name polygon);
 SQL SUCCESS
+insert into test_polygon04 values (polygon'(99999999999999999999999999999,99999999999999999999999999999999),(99999999999999999999999999999,99999999999999999999999999999999),(99999999999999999999999999999,99999999999999999999999999999999)');
 SQL SUCCESS
 select * from test_polygon04;
 +---------------------------------------------------+

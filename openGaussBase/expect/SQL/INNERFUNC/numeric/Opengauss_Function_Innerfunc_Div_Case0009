@@ -3,12 +3,14 @@ drop table if exists data_01;
 SQL SUCCESS
 create table data_01 (clo1 bigint,clo2 float);
 SQL SUCCESS
+insert into data_01 values (9223372036854775806, 0.02);
 SQL SUCCESS
 select div (clo2) from data_01;
 ?.*ERROR: function div\(double precision\) does not exist
   Hint: No function matches the given name and argument types. You might need to add explicit type casts.
 ?.*
   Where: referenced column: div
+select div (-9223372036854775806, 2, 4) as result;
 ?.*ERROR: function div\(bigint, integer, integer\) does not exist
   Hint: No function matches the given name and argument types. You might need to add explicit type casts.
 ?.*

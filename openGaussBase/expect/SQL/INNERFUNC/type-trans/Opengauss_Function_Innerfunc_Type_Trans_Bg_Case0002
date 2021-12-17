@@ -1,13 +1,21 @@
 -- @testpoint: 类型转换函数to_bigint，入参在边界值上、下、其它类型、其它进制、空值、特殊字符等，合理报错
+select to_bigint('9223372036854775808');
+?.*ERROR: value "9223372036854775808" is out of range for type bigint.*
   Where: referenced column: int8in
 SQL function "to_bigint" statement 1
 referenced column: to_bigint
+select to_bigint('-9223372036854775809');
+?.*ERROR: value "-9223372036854775809" is out of range for type bigint.*
   Where: referenced column: int8in
 SQL function "to_bigint" statement 1
 referenced column: to_bigint
+select to_bigint('9223372036854775808987665');
+?.*ERROR: value "9223372036854775808987665" is out of range for type bigint.*
   Where: referenced column: int8in
 SQL function "to_bigint" statement 1
 referenced column: to_bigint
+select to_bigint('-9223372036854775808987665');
+?.*ERROR: value "-9223372036854775808987665" is out of range for type bigint.*
   Where: referenced column: int8in
 SQL function "to_bigint" statement 1
 referenced column: to_bigint

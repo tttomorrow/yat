@@ -52,6 +52,7 @@ SELECT pg_column_size(32767::SMALLINT);
 | 2              |
 +----------------+
 -- INTEGER
+SELECT pg_column_size(-2147483647::INTEGER);
 +----------------+
 | pg_column_size |
 +----------------+
@@ -75,12 +76,14 @@ SELECT pg_column_size(99999::INTEGER);
 +----------------+
 | 4              |
 +----------------+
+SELECT pg_column_size(2147483647::INTEGER);
 +----------------+
 | pg_column_size |
 +----------------+
 | 4              |
 +----------------+
 -- BINARY_INTEGER
+SELECT pg_column_size(-2147483647::BINARY_INTEGER);
 +----------------+
 | pg_column_size |
 +----------------+
@@ -104,17 +107,20 @@ SELECT pg_column_size(9::BINARY_INTEGER);
 +----------------+
 | 4              |
 +----------------+
+SELECT pg_column_size(2147483647::BINARY_INTEGER);
 +----------------+
 | pg_column_size |
 +----------------+
 | 4              |
 +----------------+
 -- BIGINT
+SELECT pg_column_size(-9223372036854775807::BIGINT);
 +----------------+
 | pg_column_size |
 +----------------+
 | 8              |
 +----------------+
+SELECT pg_column_size(-888888888888888::BIGINT);
 +----------------+
 | pg_column_size |
 +----------------+
@@ -126,11 +132,13 @@ SELECT pg_column_size(0::BIGINT);
 +----------------+
 | 8              |
 +----------------+
+SELECT pg_column_size(9999999999999999::BIGINT);
 +----------------+
 | pg_column_size |
 +----------------+
 | 8              |
 +----------------+
+SELECT pg_column_size(9223372036854775807::BIGINT);
 +----------------+
 | pg_column_size |
 +----------------+

@@ -3,17 +3,25 @@ drop table if exists table_1;
 SQL SUCCESS
 create table table_1(a BIGINT);
 SQL SUCCESS
+insert into table_1 values(-9223372036854775808);
 SQL SUCCESS
+insert into table_1 values(4255345657233445657);
 SQL SUCCESS
+insert into table_1 values(9223372036854775807);
 SQL SUCCESS
+insert into table_1 values(-9223372036854775809);
 ?.*ERROR: bigint out of range
   Where: referenced column: a
+insert into table_1 values(9223372036854775808);
 ?.*ERROR: bigint out of range
   Where: referenced column: a
 select * from table_1;
 +----------------------+
 | a                    |
 +----------------------+
+| -9223372036854775808 |
+| 4255345657233445657  |
+| 9223372036854775807  |
 +----------------------+
 drop table if exists table_1;
 SQL SUCCESS

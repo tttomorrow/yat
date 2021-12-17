@@ -1,18 +1,4 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
-
-openGauss is licensed under Mulan PSL v2.
-You can use this software according to the terms and conditions of the Mulan PSL v2.
-You may obtain a copy of Mulan PSL v2 at:
-
-          http://license.coscl.org.cn/MulanPSL2
-
-THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-See the Mulan PSL v2 for more details.
-"""
-"""
 Case Type   : 基础功能
 Case Name   : 创建模式时创建对象
 Description :
@@ -61,6 +47,7 @@ History     :
 import unittest
 import time
 from yat.test import Node
+from yat.test import macro
 from testcase.utils.Common import Common
 from testcase.utils.CommonSH import CommonSH
 from testcase.utils.Constant import Constant
@@ -80,7 +67,7 @@ class DdlDatabase(unittest.TestCase):
         self.indexname = 'idx_case003'
         self.viewname = 'view_case003'
         self.username = 'user_case003'
-        self.password = 'test@12345'
+        self.password = macro.COMMON_PASSWD
         self.comm = Common()
 
     def test_basebackup(self):
