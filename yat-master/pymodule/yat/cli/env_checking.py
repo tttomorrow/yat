@@ -39,7 +39,7 @@ def check_depend():
         errors.append("java is not install")
         return errors
 
-    if None is re.search(r'version[^0-9]*(1\.)?(8|9|10|11)\.*', out):
+    if None is re.search(r'version[^0-9]*(1\.)?(8|9|10|11|17)\.*', out):
         errors.append("java need version >= 1.8")
 
     return errors
