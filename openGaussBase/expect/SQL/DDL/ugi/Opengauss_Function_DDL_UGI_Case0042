@@ -185,7 +185,7 @@ explain analyse select * from test_ugi_042 where c_info = '1-4';
 |   Iterations: 5                                                                                                                               |
 ?.*->  Partitioned Seq Scan on test_ugi_042?.*
 |         Filter: ((c_info)::text = '1-4'::text)                                                                                                |
-|         Rows Removed by Filter: 8                                                                                                             |
+?.*Rows Removed by Filter.*
 |         Selected Partitions:  1..5                                                                                                            |
 ?.*Total runtime:?.*
 +-----------------------------------------------------------------------------------------------------------------------------------------------+

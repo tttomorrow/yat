@@ -11,6 +11,7 @@ update all_datatype_tbl set (c1,c2,c3,c4,c5) = (select c16,c17,c18,c19,c20 from 
 drop table if exists all_datatype_tb2;
 create table all_datatype_tb2(c1 int,c2 int,c3 int,c4 int,c5 int,c6 int,c7 int,c8 int,c9 int,c10 int);
 --插入数据
+insert into all_datatype_tb2 values(1,22,333,4444,55555,666666,7777777,88888888,999999999,1000000000);
 select * from all_datatype_tb2;
 --修改数据
 update all_datatype_tbl set (c1,c2,c3,c4,c5) = (select c6,c7,c8,c9,c10 from all_datatype_tb2);

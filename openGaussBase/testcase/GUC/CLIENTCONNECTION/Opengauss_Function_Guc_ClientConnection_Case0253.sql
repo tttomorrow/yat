@@ -3,6 +3,7 @@
 show max_locks_per_transaction;
 --设置，报错
 ALTER SYSTEM SET max_locks_per_transaction to 9;
+ALTER SYSTEM SET max_locks_per_transaction to 2147483648;
 ALTER SYSTEM SET max_locks_per_transaction to 'test';
 ALTER SYSTEM SET max_locks_per_transaction to 182.589;
 ALTER SYSTEM SET max_locks_per_transaction to '10&%$#';

@@ -1,0 +1,89 @@
+-- @testpoint: 关闭回收站后执行闪回,合理报错
+--step1: 查询enable_recyclebin 默认值; expect:显示默认值
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+
+--step2: 修改enable_recyclebin为off; expect:显示值为off
+alter system set enable_recyclebin to off;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+
+--step3: 清除回收站; expect:回收站清除成功
+drop table if exists t_timecapsule_0026;
+SQL SUCCESS
+purge recyclebin;
+SQL SUCCESS
+--step4: 创建表、插入数据并删除表; expect:表创建成功、数据插入成功且表删除成功
+create table t_timecapsule_0026(a int);
+SQL SUCCESS
+insert into t_timecapsule_0026 values(1);
+SQL SUCCESS
+insert into t_timecapsule_0026 values(2);
+SQL SUCCESS
+insert into t_timecapsule_0026 values(3);
+SQL SUCCESS
+drop table t_timecapsule_0026;
+SQL SUCCESS
+--step5: 在回收站中统计原始对象名称t_timecapsule_0026和操作类型为drop; expect:预期结果为0
+select count(*) from gs_recyclebin where rcyoriginname = 'tab1' and rcyoperation = 'd';
++-------+
+| count |
++-------+
+| 0     |
++-------+
+--step6: 执行闪回drop; expect:闪回失败，合理报错
+timecapsule table t_timecapsule_0026 to before truncate;
+?.*ERROR: recycle object "t_timecapsule_0026" desired does not exis.*
+--step7: 查询闪回后的表; expect:查询失败，合理报错
+select * from  t_timecapsule_0026 order by a;
+?.*ERROR: relation "t_timecapsule_0026" does not exist on dn_6001.*
+?.*
+--step8: 创建表、插入数据并清空表; expect:表创建成功、数据插入成功且表清空成功
+create table t_timecapsule_0026(a int);
+SQL SUCCESS
+insert into t_timecapsule_0026 values(1);
+SQL SUCCESS
+insert into t_timecapsule_0026 values(2);
+SQL SUCCESS
+insert into t_timecapsule_0026 values(3);
+SQL SUCCESS
+truncate table t_timecapsule_0026;
+SQL SUCCESS
+--step9: 在回收站中统计原始对象名称t_timecapsule_0026和操作类型为truncate; expect:预期结果为0
+select count(*) from gs_recyclebin where rcyoriginname = 'tab1' and rcyoperation = 't';
++-------+
+| count |
++-------+
+| 0     |
++-------+
+--step10: 执行闪回truncate; expect:闪回失败，合理报错
+timecapsule table t_timecapsule_0026 to before truncate;
+?.*ERROR: recycle object "t_timecapsule_0026" desired does not exis.*
+--step11: 查询闪回后的表; expect:查询结果为空与预期结果一致
+select * from  t_timecapsule_0026 order by a;
++---+
+| a |
++---+
++---+
+--step12: 清空回收站中的表; expect:清空成功
+drop table t_timecapsule_0026 purge;
+SQL SUCCESS
+--step13: 清空回收站; expect:回收站清空成功
+purge recyclebin;
+SQL SUCCESS
+--step14: 清理环境; expect:清理成功
+drop table if exists t_timecapsule_0026;
+SQL SUCCESS

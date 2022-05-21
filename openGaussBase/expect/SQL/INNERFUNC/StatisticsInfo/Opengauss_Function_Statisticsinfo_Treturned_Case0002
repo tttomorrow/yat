@@ -19,6 +19,7 @@ select pg_stat_get_tuples_returned('&^%^&*') from PG_CLASS a where a.relname = '
 ?.*ERROR: invalid input syntax for type oid: \"\&\^\%\^\&\*\"
 ?.*
   Where: referenced column: pg_stat_get_tuples_returned
+select pg_stat_get_tuples_returned(99999999999998789) from PG_CLASS a where a.relname = 'sales';
 ?.*ERROR: OID out of range
   Where: referenced column: pg_stat_get_tuples_returned
 select pg_stat_get_tuples_returned(a.oid) from PG_CLASS a where a.relname = 'sales';

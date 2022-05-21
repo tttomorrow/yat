@@ -1,0 +1,55 @@
+-- @testpoint: Hash分区表结合LIKE INCLUDING  CONSTRAINTS参数 插入0和负数时合理报错
+--step1：创建hash分区表 expect：成功
+drop table if exists partition_hash_tab;
+SQL SUCCESS
+drop table if exists partition_hash_tab_like;
+SQL SUCCESS
+create table partition_hash_tab
+(id                        number(7) check(id>0),
+ use_filename               varchar2(20) ,
+ filename                   varchar2(255),
+ text                       varchar2(2000))
+partition by hash(id)
+(partition p1,
+ partition p2);
+SQL SUCCESS
+--step2：插入正确数据 expect：成功
+insert into partition_hash_tab values(10,'张三','数学','老师');
+SQL SUCCESS
+--step3：插入数据id=0 expect：check约束导致合理报错
+insert into partition_hash_tab values(0,'张三','数学','老师');
+?.*ERROR: new row for relation "partition_hash_tab" violates check constraint "partition_hash_tab_id_check"
+  Detail: N/A
+--step4：插入数据id为负数 expect：check约束导致合理报错
+insert into partition_hash_tab values(-10,'张三','数学','老师');
+?.*ERROR: new row for relation "partition_hash_tab" violates check constraint "partition_hash_tab_id_check"
+  Detail: N/A
+--step5：查看数据 expect：只有step2中插入的数值
+select * from partition_hash_tab;
++----+--------------+----------+------+
+| id | use_filename | filename | text |
++----+--------------+----------+------+
+| 10 | 张三           | 数学       | 老师   |
++----+--------------+----------+------+
+--step6：使用like参数建表 expect：成功
+create table partition_hash_tab_like (like  partition_hash_tab including constraints);
+SQL SUCCESS
+--step7：插入正确数据 expect：成功
+insert into partition_hash_tab_like values(3,'李四','数学系','学生');
+SQL SUCCESS
+--step8：插入数据id为负数 expect：check约束导致合理报错
+insert into partition_hash_tab_like values(-4,'李四','数学系','学生');
+?.*ERROR: new row for relation "partition_hash_tab_like" violates check constraint "partition_hash_tab_id_check"
+  Detail: N/A
+--step9：查看数据 expect：只有step7中插入的数值
+select * from partition_hash_tab_like;
++----+--------------+----------+------+
+| id | use_filename | filename | text |
++----+--------------+----------+------+
+| 3  | 李四           | 数学系      | 学生   |
++----+--------------+----------+------+
+--step10：清理环境 expect：成功
+drop table if exists partition_hash_tab;
+SQL SUCCESS
+drop table if exists partition_hash_tab_like;
+SQL SUCCESS

@@ -7,11 +7,13 @@ DROP FUNCTION IF EXISTS func_add_sql;
 CREATE FUNCTION func_add_sql(integer, integer) RETURNS integer AS 'select $1 + $2;' LANGUAGE SQL IMMUTABLE RETURNS NULL ON NULL INPUT;
 /
 select func_add_sql(3,7);
-SELECT pg_sleep(5);
+SELECT pg_sleep(6);
+SELECT pg_sleep(6);
 select pg_stat_get_function_calls(a.oid) from PG_PROC a where a.proname = 'func_add_sql';
 select func_add_sql(3,7);
 select func_add_sql(8,9);
-SELECT pg_sleep(5);
+SELECT pg_sleep(6);
+SELECT pg_sleep(6);
 select pg_stat_get_function_calls(a.oid) from PG_PROC a where a.proname = 'func_add_sql';
 -- 关闭相关参数
 set track_functions to 'none';
@@ -37,11 +39,13 @@ AS
     END;
 /
 CALL proc_while_loop(10);
-SELECT pg_sleep(5);
+SELECT pg_sleep(6);
+SELECT pg_sleep(6);
 select pg_stat_get_function_calls(a.oid) from PG_PROC a where a.proname = 'proc_while_loop';
 CALL proc_while_loop(10);
 CALL proc_while_loop(10);
-SELECT pg_sleep(5);
+SELECT pg_sleep(6);
+SELECT pg_sleep(6);
 select pg_stat_get_function_calls(a.oid) from PG_PROC a where a.proname = 'proc_while_loop';
 -- 关闭相关参数
 set track_functions to 'none';

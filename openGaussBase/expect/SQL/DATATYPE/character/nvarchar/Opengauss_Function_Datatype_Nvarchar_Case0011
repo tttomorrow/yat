@@ -1,0 +1,355 @@
+-- @testpoint: 行存range分区表-nvarchar(n)的约束\索引\表操作测试 部分测试点合理报错
+--step1:建表; expect:成功
+drop table if exists t_nvarchar_0011_01 cascade;
+SQL SUCCESS
+drop table if exists t_nvarchar_0011_02 cascade;
+SQL SUCCESS
+create table t_nvarchar_0011_01(c_nvarchar nvarchar primary key);
+SQL SUCCESS
+create table t_nvarchar_0011_02(
+c_nvarchar nvarchar
+) with (orientation = row) partition by range(c_nvarchar)(
+partition p1 values less than ('a'),
+partition p2 values less than ('g'),
+partition p3 values less than ('k'),
+partition p4 values less than ('u')
+);
+SQL SUCCESS
+--step2:约束测试; expect:成功
+--增加/删除唯一约束
+alter table t_nvarchar_0011_02 add constraint t_nvarchar_0011_02_c_nvarchar_key unique(c_nvarchar);
+SQL SUCCESS
+insert into t_nvarchar_0011_02(c_nvarchar) values('test'),('test');
+?.*ERROR: duplicate key value violates unique constraint "t_nvarchar_0011_02_c_nvarchar_key"?.*
+  Detail: Key (c_nvarchar)=(test) already exists.
+alter table t_nvarchar_0011_02 drop constraint t_nvarchar_0011_02_c_nvarchar_key;
+SQL SUCCESS
+insert into t_nvarchar_0011_02(c_nvarchar) values('test'),('test');
+SQL SUCCESS
+truncate t_nvarchar_0011_02;
+SQL SUCCESS
+--增加/删除not null约束:支持但null为非法值
+alter table t_nvarchar_0011_02 modify c_nvarchar not null;
+SQL SUCCESS
+insert into t_nvarchar_0011_02(c_nvarchar) values(null);
+?.*ERROR: null value in column "c_nvarchar" violates not-null constraint?.*
+  Detail: Failing row contains (null).
+alter table t_nvarchar_0011_02 modify c_nvarchar null;
+SQL SUCCESS
+insert into t_nvarchar_0011_02(c_nvarchar) values(null);
+?.*ERROR: inserted partition key does not map to any table partition?.*
+truncate t_nvarchar_0011_02;
+SQL SUCCESS
+--增加/删除默认约束
+alter table t_nvarchar_0011_02 alter c_nvarchar set default 'test0011';
+SQL SUCCESS
+insert into t_nvarchar_0011_02(c_nvarchar) values(default);
+SQL SUCCESS
+select c_nvarchar from t_nvarchar_0011_02;
++------------+
+| c_nvarchar |
++------------+
+| test0011   |
++------------+
+truncate t_nvarchar_0011_02;
+SQL SUCCESS
+alter table t_nvarchar_0011_02 alter c_nvarchar drop default;
+SQL SUCCESS
+insert into t_nvarchar_0011_02(c_nvarchar) values(default);
+?.*ERROR: inserted partition key does not map to any table partition?.*
+select c_nvarchar from t_nvarchar_0011_02;
++------------+
+| c_nvarchar |
++------------+
++------------+
+truncate t_nvarchar_0011_02;
+SQL SUCCESS
+--增加/删除检查约束;
+alter table t_nvarchar_0011_02 add constraint t_nvarchar_0011_02_c_nvarchar_key check (c_nvarchar='test');
+SQL SUCCESS
+insert into t_nvarchar_0011_02(c_nvarchar) values('test0011');
+?.*ERROR: new row for relation "t_nvarchar_0011_02" violates check constraint "t_nvarchar_0011_02_c_nvarchar_key"?.*
+  Detail: N/A
+select c_nvarchar from t_nvarchar_0011_02;
++------------+
+| c_nvarchar |
++------------+
++------------+
+alter table t_nvarchar_0011_02 drop constraint t_nvarchar_0011_02_c_nvarchar_key;
+SQL SUCCESS
+insert into t_nvarchar_0011_02(c_nvarchar) values('test0011');
+SQL SUCCESS
+select c_nvarchar from t_nvarchar_0011_02;
++------------+
+| c_nvarchar |
++------------+
+| test0011   |
++------------+
+truncate t_nvarchar_0011_02;
+SQL SUCCESS
+--增加/删除主外键约束
+alter table t_nvarchar_0011_02 add constraint t_nvarchar_0011_02_c_nvarchar_key  primary key (c_nvarchar);
+SQL SUCCESS
+alter table t_nvarchar_0011_02 add column c_nvarchar1 nvarchar;
+SQL SUCCESS
+alter table t_nvarchar_0011_02 add constraint t_nvarchar_0011_02_c_nvarchar_fkey  foreign key (c_nvarchar1) references t_nvarchar_0011_01(c_nvarchar);
+SQL SUCCESS
+select conname from pg_constraint where conrelid in (select oid from pg_class where relname like 't_nvarchar_0011_02') order by conname;
++------------------------------------+
+| conname                            |
++------------------------------------+
+| t_nvarchar_0011_02_c_nvarchar_fkey |
+| t_nvarchar_0011_02_c_nvarchar_key  |
++------------------------------------+
+alter table t_nvarchar_0011_02 drop constraint t_nvarchar_0011_02_c_nvarchar_key cascade;
+SQL SUCCESS
+alter table t_nvarchar_0011_01 drop constraint "t_nvarchar_0011_01_pkey" cascade;
+SQL SUCCESS
+select conname from pg_constraint where conrelid in (select oid from pg_class where relname like 't_nvarchar_0011_02') order by conname;
++---------+
+| conname |
++---------+
++---------+
+--step3:索引; expect:成功
+create index index_0011_001 on t_nvarchar_0011_02(c_nvarchar,c_nvarchar1);
+SQL SUCCESS
+--local gin索引;expect:成功
+create index index_0011_002 on t_nvarchar_0011_02 using gin(to_tsvector('english', c_nvarchar)) local;
+SQL SUCCESS
+--gin索引;expect:失败：error:  global partition index only support btree
+create index index_0011_002 on t_nvarchar_0011_03 using gin(to_tsvector('english', c_nvarchar));
+?.*ERROR: relation "t_nvarchar_0011_03" does not exist?.*
+--step4:表操作; expect:成功
+--增删字段
+alter table t_nvarchar_0011_02 drop column c_nvarchar1;
+SQL SUCCESS
+alter table t_nvarchar_0011_02 add column c_nvarchar1 nvarchar;
+SQL SUCCESS
+--修改字段长度
+alter table t_nvarchar_0011_02 modify c_nvarchar1 nvarchar(200);
+SQL SUCCESS
+alter table t_nvarchar_0011_02 modify c_nvarchar1 nvarchar(1048576);
+SQL SUCCESS
+alter table t_nvarchar_0011_02 modify c_nvarchar1 nvarchar(1048575);
+SQL SUCCESS
+alter table t_nvarchar_0011_02 modify c_nvarchar1 nvarchar(1048577);
+SQL SUCCESS
+--修改字段类型
+alter table t_nvarchar_0011_02 modify c_nvarchar1 nvarchar2(100);
+SQL SUCCESS
+alter table t_nvarchar_0011_02 modify c_nvarchar1 nvarchar(150);
+SQL SUCCESS
+alter table t_nvarchar_0011_02 add constraint t_nvarchar_0011_02_c_nvarchar_key unique(c_nvarchar);
+SQL SUCCESS
+alter table t_nvarchar_0011_02 modify c_nvarchar1 nvarchar2(100);
+SQL SUCCESS
+alter table t_nvarchar_0011_02 modify c_nvarchar1 text;
+SQL SUCCESS
+alter table t_nvarchar_0011_02 modify c_nvarchar1 clob;
+SQL SUCCESS
+alter table t_nvarchar_0011_02 modify c_nvarchar1 char;
+SQL SUCCESS
+alter table t_nvarchar_0011_02 modify c_nvarchar1 nvarchar(150);
+SQL SUCCESS
+--修改分区
+--增加分区
+alter table t_nvarchar_0011_02 add partition p6 values less than ('x');
+SQL SUCCESS
+SELECT t1.relname, partstrategy, boundaries
+FROM pg_partition t1, pg_class t2
+WHERE t1.parentid = t2.oid AND t2.relname = 't_nvarchar_0011_02' AND t1.parttype = 'p' order by t1.relname;
++---------+--------------+------------+
+| relname | partstrategy | boundaries |
++---------+--------------+------------+
+| p1      | r            | {a}        |
+| p2      | r            | {g}        |
+| p3      | r            | {k}        |
+| p4      | r            | {u}        |
+| p6      | r            | {x}        |
++---------+--------------+------------+
+--增加分区
+alter table t_nvarchar_0011_02 add partition p5 values less than (maxvalue);
+SQL SUCCESS
+SELECT t1.relname, partstrategy, boundaries
+FROM pg_partition t1, pg_class t2
+WHERE t1.parentid = t2.oid AND t2.relname = 't_nvarchar_0011_02' AND t1.parttype = 'p' order by t1.relname;
++---------+--------------+------------+
+| relname | partstrategy | boundaries |
++---------+--------------+------------+
+| p1      | r            | {a}        |
+| p2      | r            | {g}        |
+| p3      | r            | {k}        |
+| p4      | r            | {u}        |
+| p5      | r            | {}         |
+| p6      | r            | {x}        |
++---------+--------------+------------+
+--删除分区p6
+alter table t_nvarchar_0011_02 drop partition for ('w');
+SQL SUCCESS
+SELECT t1.relname, partstrategy, boundaries
+FROM pg_partition t1, pg_class t2
+WHERE t1.parentid = t2.oid AND t2.relname = 't_nvarchar_0011_02' AND t1.parttype = 'p' order by t1.relname;
++---------+--------------+------------+
+| relname | partstrategy | boundaries |
++---------+--------------+------------+
+| p1      | r            | {a}        |
+| p2      | r            | {g}        |
+| p3      | r            | {k}        |
+| p4      | r            | {u}        |
+| p5      | r            | {}         |
++---------+--------------+------------+
+--分区p1重命名为p10。
+alter table t_nvarchar_0011_02 rename partition p1 to p10;
+SQL SUCCESS
+SELECT t1.relname, partstrategy, boundaries
+FROM pg_partition t1, pg_class t2
+WHERE t1.parentid = t2.oid AND t2.relname = 't_nvarchar_0011_02' AND t1.parttype = 'p' order by t1.relname;
++---------+--------------+------------+
+| relname | partstrategy | boundaries |
++---------+--------------+------------+
+| p10     | r            | {a}        |
+| p2      | r            | {g}        |
+| p3      | r            | {k}        |
+| p4      | r            | {u}        |
+| p5      | r            | {}         |
++---------+--------------+------------+
+--分区p2重命名为p11。
+alter table t_nvarchar_0011_02 rename partition for ('f') to p11;
+SQL SUCCESS
+SELECT t1.relname, partstrategy, boundaries
+FROM pg_partition t1, pg_class t2
+WHERE t1.parentid = t2.oid AND t2.relname = 't_nvarchar_0011_02' AND t1.parttype = 'p' order by t1.relname;
++---------+--------------+------------+
+| relname | partstrategy | boundaries |
++---------+--------------+------------+
+| p10     | r            | {a}        |
+| p11     | r            | {g}        |
+| p3      | r            | {k}        |
+| p4      | r            | {u}        |
+| p5      | r            | {}         |
++---------+--------------+------------+
+--修改分区p1的表空间为example2
+drop tablespace if exists tablespace_0011;
+SQL SUCCESS
+create tablespace tablespace_0011 relative location 'tablespace11/tablespace_11';
+SQL SUCCESS
+alter table t_nvarchar_0011_02 move partition p10 tablespace tablespace_0011;
+SQL SUCCESS
+SELECT t1.relname, partstrategy, boundaries
+FROM pg_partition t1, pg_class t2
+WHERE t1.parentid = t2.oid AND t2.relname = 't_nvarchar_0011_02' AND t1.parttype = 'p' order by t1.relname;
++---------+--------------+------------+
+| relname | partstrategy | boundaries |
++---------+--------------+------------+
+| p10     | r            | {a}        |
+| p11     | r            | {g}        |
+| p3      | r            | {k}        |
+| p4      | r            | {u}        |
+| p5      | r            | {}         |
++---------+--------------+------------+
+--以i为分割点切分p3
+alter table t_nvarchar_0011_02 split partition p3 at ('i') into
+(
+    partition p12,
+    partition p13
+);
+SQL SUCCESS
+SELECT t1.relname, partstrategy, boundaries
+FROM pg_partition t1, pg_class t2
+WHERE t1.parentid = t2.oid AND t2.relname = 't_nvarchar_0011_02' AND t1.parttype = 'p' order by t1.relname;
++---------+--------------+------------+
+| relname | partstrategy | boundaries |
++---------+--------------+------------+
+| p10     | r            | {a}        |
+| p11     | r            | {g}        |
+| p12     | r            | {i}        |
+| p13     | r            | {k}        |
+| p4      | r            | {u}        |
+| p5      | r            | {}         |
++---------+--------------+------------+
+--将p12，p13合并为一个分区。
+alter table t_nvarchar_0011_02 merge partitions p12, p13 into partition p3;
+SQL SUCCESS
+SELECT t1.relname, partstrategy, boundaries
+FROM pg_partition t1, pg_class t2
+WHERE t1.parentid = t2.oid AND t2.relname = 't_nvarchar_0011_02' AND t1.parttype = 'p' order by t1.relname;
++---------+--------------+------------+
+| relname | partstrategy | boundaries |
++---------+--------------+------------+
+| p10     | r            | {a}        |
+| p11     | r            | {g}        |
+| p3      | r            | {k}        |
+| p4      | r            | {u}        |
+| p5      | r            | {}         |
++---------+--------------+------------+
+--step5:sql操作; expect:成功
+insert into t_nvarchar_0011_02 values ('a'::nvarchar),('b'::nvarchar),('o'::nvarchar),('p'::nvarchar),('x'::nvarchar);
+SQL SUCCESS
+select * from t_nvarchar_0011_02;
++------------+-------------+
+| c_nvarchar | c_nvarchar1 |
++------------+-------------+
+| a          |             |
+| b          |             |
+| o          |             |
+| p          |             |
+| x          |             |
++------------+-------------+
+update t_nvarchar_0011_02 set c_nvarchar = 'test' where c_nvarchar='1';
+SQL SUCCESS
+select * from t_nvarchar_0011_02;
++------------+-------------+
+| c_nvarchar | c_nvarchar1 |
++------------+-------------+
+| a          |             |
+| b          |             |
+| o          |             |
+| p          |             |
+| x          |             |
++------------+-------------+
+delete from t_nvarchar_0011_02 where c_nvarchar = '2';
+SQL SUCCESS
+select * from t_nvarchar_0011_02;
++------------+-------------+
+| c_nvarchar | c_nvarchar1 |
++------------+-------------+
+| a          |             |
+| b          |             |
+| o          |             |
+| p          |             |
+| x          |             |
++------------+-------------+
+select count(*) from t_nvarchar_0011_02 partition (p10);
++-------+
+| count |
++-------+
+| 0     |
++-------+
+--upsert;
+truncate t_nvarchar_0011_01;
+SQL SUCCESS
+truncate t_nvarchar_0011_02;
+SQL SUCCESS
+insert into t_nvarchar_0011_02 values ('a','test0011');
+SQL SUCCESS
+select * from t_nvarchar_0011_02 where c_nvarchar = 'a';
++------------+-------------+
+| c_nvarchar | c_nvarchar1 |
++------------+-------------+
+| a          | test0011    |
++------------+-------------+
+insert into t_nvarchar_0011_02 values ('a','test0011_01') on duplicate key update c_nvarchar1='test0011_01';
+SQL SUCCESS
+select * from t_nvarchar_0011_02 where c_nvarchar = 'a';
++------------+-------------+
+| c_nvarchar | c_nvarchar1 |
++------------+-------------+
+| a          | test0011_01 |
++------------+-------------+
+--step6:清理环境; expect:成功
+drop table if exists t_nvarchar_0011_01 cascade;
+SQL SUCCESS
+drop table if exists t_nvarchar_0011_02 cascade;
+SQL SUCCESS
+drop tablespace if exists tablespace_0011;
+SQL SUCCESS

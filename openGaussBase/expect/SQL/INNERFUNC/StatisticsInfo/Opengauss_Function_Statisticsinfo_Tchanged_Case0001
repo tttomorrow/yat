@@ -9,7 +9,13 @@ select pg_stat_reset();
 +---------------+
 |               |
 +---------------+
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -45,7 +51,13 @@ select pg_stat_get_tuples_changed(a.oid) from PG_CLASS a where a.relname = 'sale
 -- analyse 后插入数据 1
 INSERT INTO sales VALUES(1, 12, '2019-01-10 00:00:00', 'a', 1, 1, 1);
 SQL SUCCESS
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -60,7 +72,13 @@ select pg_stat_get_tuples_changed(a.oid) from PG_CLASS a where a.relname = 'sale
 -- analyse 后插入多行数据 2 5
 INSERT INTO sales VALUES(1, 12, '2019-02-01 00:00:00', 'b', 1, 1, 1);
 SQL SUCCESS
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -78,7 +96,13 @@ INSERT INTO sales VALUES(1, 12, '2019-02-03 00:00:00', 'd', 1, 1, 1);
 SQL SUCCESS
 INSERT INTO sales VALUES(1, 12, '2019-02-05 00:00:00', 'e', 1, 1, 1);
 SQL SUCCESS
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -93,7 +117,13 @@ select pg_stat_get_tuples_changed(a.oid) from PG_CLASS a where a.relname = 'sale
 -- analyse 后更新一条 6
 update sales set time_id = '2017-12-10 00:00:00' where channel_id = 'a';
 SQL SUCCESS
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -110,7 +140,13 @@ update sales set time_id = '2019-06-02 10:00:00' where channel_id = 'b';
 SQL SUCCESS
 update sales set time_id = '2019-06-02 10:00:00' where channel_id = 'b';
 SQL SUCCESS
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -129,7 +165,13 @@ update sales set time_id = '2019-06-02 10:00:00' where channel_id = 'd';
 SQL SUCCESS
 update sales set time_id = '2019-06-03 10:00:00' where channel_id = 'e';
 SQL SUCCESS
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -144,7 +186,13 @@ select pg_stat_get_tuples_changed(a.oid) from PG_CLASS a where a.relname = 'sale
 -- analyse 后删除一行 12
 delete  from  sales  where channel_id = 'a';
 SQL SUCCESS
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -161,7 +209,13 @@ delete  from  sales  where channel_id = 'b';
 SQL SUCCESS
 delete  from  sales  where channel_id = 'c';
 SQL SUCCESS
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -180,7 +234,13 @@ delete  from  sales  where channel_id = 'e';
 SQL SUCCESS
 delete  from  sales  where channel_id = 'f';
 SQL SUCCESS
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+

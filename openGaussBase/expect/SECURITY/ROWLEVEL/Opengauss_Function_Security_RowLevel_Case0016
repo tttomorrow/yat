@@ -1,0 +1,59 @@
+-- @testpoint: 系统管理员不受行访问控制影响，可以查看表的全量数据
+--step1: 创建表、用户；expect:成功
+DROP USER IF EXISTS u01_security_RowLwvel_0016 CASCADE;
+SQL SUCCESS
+DROP USER IF EXISTS u02_security_RowLwvel_0016 CASCADE;
+SQL SUCCESS
+DROP USER IF EXISTS u03_security_RowLwvel_0016 CASCADE;
+SQL SUCCESS
+CREATE USER u01_security_RowLwvel_0016 PASSWORD 'Test@123';
+SQL SUCCESS
+CREATE USER u02_security_RowLwvel_0016 PASSWORD 'Test@123';
+SQL SUCCESS
+CREATE USER u03_security_RowLwvel_0016 PASSWORD 'Test@123';
+SQL SUCCESS
+DROP TABLE IF EXISTS t_security_RowLwvel_0016;
+SQL SUCCESS
+CREATE TABLE t_security_RowLwvel_0016(id int, role varchar(100), data varchar(100));
+SQL SUCCESS
+INSERT INTO t_security_RowLwvel_0016 VALUES(1, 'u01_security_RowLwvel_0016', 'alice data');
+SQL SUCCESS
+INSERT INTO t_security_RowLwvel_0016 VALUES(2, 'u02_security_RowLwvel_0016', 'bob data');
+SQL SUCCESS
+INSERT INTO t_security_RowLwvel_0016 VALUES(3, 'u03_security_RowLwvel_0016', 'peter data');
+SQL SUCCESS
+--step2: 创建行级访问策略；expect:失败
+ALTER TABLE t_security_RowLwvel_0016 ENABLE ROW LEVEL SECURITY;
+SQL SUCCESS
+CREATE ROW LEVEL SECURITY POLICY rls_security_RowLwvel_0016 ON t_security_RowLwvel_0016 USING(role = CURRENT_USER);
+SQL SUCCESS
+--step3: 管理员永华查看表；expect:成功
+select data from t_security_RowLwvel_0016 where role = 'u01_security_RowLwvel_0016';
++------------+
+| data       |
++------------+
+| alice data |
++------------+
+select data from t_security_RowLwvel_0016 where role = 'u02_security_RowLwvel_0016';
++----------+
+| data     |
++----------+
+| bob data |
++----------+
+select data from t_security_RowLwvel_0016 where role = 'u03_security_RowLwvel_0016';
++------------+
+| data       |
++------------+
+| peter data |
++------------+
+--step4: 清理环境；expect:成功
+DROP ROW LEVEL SECURITY POLICY rls_security_RowLwvel_0016 ON t_security_RowLwvel_0016;
+SQL SUCCESS
+DROP TABLE t_security_RowLwvel_0016 CASCADE;
+SQL SUCCESS
+DROP USER u01_security_RowLwvel_0016 CASCADE;
+SQL SUCCESS
+DROP USER u02_security_RowLwvel_0016 CASCADE;
+SQL SUCCESS
+DROP USER u03_security_RowLwvel_0016 CASCADE;
+SQL SUCCESS

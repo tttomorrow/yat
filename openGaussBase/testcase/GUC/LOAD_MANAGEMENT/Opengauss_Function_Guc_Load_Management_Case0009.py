@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -19,6 +19,7 @@ Description :
     1、查询memory_detail_tracking默认值 ；
     show memory_detail_tracking;
     2、修改memory_detail_tracking为空，重启使其生效，并校验其预期结果；
+    gs_guc set -D {cluster/dn1} -c 'memory_detail_tracking=140611422254848'
     gs_om -t stop && gs_om -t start
     show memory_detail_tracking;
     3、重启后做简单DML
@@ -53,9 +54,11 @@ class GucTestCase(unittest.TestCase):
         LOGGER.info(sql_cmd)
         self.assertEqual('', sql_cmd.split('\n')[-2].strip())
 
+        LOGGER.info('修改memory_detail_tracking为140611422254848，'
                     '重启使其生效，期望：设置失败')
         result = COMMONSH.execute_gsguc(
             'set', self.constant.GSGUC_SUCCESS_MSG,
+            'memory_detail_tracking=140611422254848')
         self.assertFalse(result)
         LOGGER.info('期望：重启后查询结果为空')
         COMMONSH.restart_db_cluster()

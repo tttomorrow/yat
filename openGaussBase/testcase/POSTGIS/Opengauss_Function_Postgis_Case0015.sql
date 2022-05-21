@@ -1,0 +1,32 @@
+-- @testpoint: postgis功能覆盖，查询判断geoga与geogb是否相离,st_disjoint
+
+drop table if exists t_postgis_0014_01;
+drop table if exists t_postgis_0014_02;
+drop table if exists t_postgis_0014_03;
+
+create table t_postgis_0014_01 (smgeometry geometry(Point,4490));
+create table t_postgis_0014_02 (smgeometry geometry(MultiLineString,4490));
+create table t_postgis_0014_03 (smgeometry geometry(MultiPolygon,4490));
+
+INSERT INTO t_postgis_0014_01 VALUES(ST_GeomFromText('Point(2 1)',4490));
+INSERT INTO t_postgis_0014_01 VALUES(ST_GeomFromText('Point(5 9)',4490));
+
+INSERT INTO t_postgis_0014_02 VALUES(ST_GeomFromText('MultiLineString((0 0,1 1,1 2),(2 1,3 2,5 4))',4490));
+INSERT INTO t_postgis_0014_02 VALUES(ST_GeomFromText('MultiLineString((0 0,1 1,1 2),(1 1,2 0,3 1))',4490));
+INSERT INTO t_postgis_0014_02 VALUES(ST_GeomFromText('MultiLineString((0 0,1 1,1 2),(1 2,2 1,3 1))',4490));
+
+INSERT INTO t_postgis_0014_03 VALUES(ST_GeomFromText('MultiPolygon(((1 0, 0 1, 1 2, 2 1, 1 0), (2 0, 1 1, 2 2, 3 1, 2 0)))',4490));
+INSERT INTO t_postgis_0014_03 VALUES(ST_GeomFromText('MULTIPOLYGON(((0 0,4 0,4 4,0 4,0 0),(1 1,2 1,2 2,1 2,1 1)), ((-1 -1,-1 -2,-2 -2,-2 -1,-1 -1)))',4490));
+INSERT INTO t_postgis_0014_03 VALUES(ST_GeomFromText('MULTIPOLYGON (((2 0, 3 1, 2 2, 1.5 1.5, 2 1, 1.5 0.5, 2 0)), ((1 0, 1.5 0.5, 1 1, 1.5 1.5, 1 2, 0 1, 1 0)))',4490));
+
+--判断点线是否相离
+select st_disjoint(t1.smgeometry,t2.smgeometry) from t_postgis_0014_01 t1,t_postgis_0014_02 t2;
+--判断点面是否相离
+select st_disjoint(t1.smgeometry,t3.smgeometry) from t_postgis_0014_01 t1,t_postgis_0014_03 t3;
+--判断线面是否相离
+select st_disjoint(t2.smgeometry,t3.smgeometry) from t_postgis_0014_02 t2,t_postgis_0014_03 t3;
+
+drop table t_postgis_0014_01;
+drop table t_postgis_0014_02;
+drop table t_postgis_0014_03;
+

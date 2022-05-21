@@ -1,0 +1,54 @@
+-- @testpoint: List分区表与普通表交换数据（对应信息严格一致）（验证表空间）
+--step1:创建表空间;expect:成功
+create tablespace ts_partition_list_0063 relative location 'tablespace/tablespace_0063';
+SQL SUCCESS
+create tablespace ts_exchange_tablespace relative location 'tablespace/tablespace_0063_02';
+SQL SUCCESS
+--step2:创建list分区表;expect:成功
+drop table if exists t_partition_list_0063;
+SQL SUCCESS
+create table t_partition_list_0063(p_id int,p_name varchar,p_age int)
+tablespace ts_partition_list_0063
+partition by list(p_id)
+(partition p1 values(10),
+ partition p2 values(20),
+ partition p3 values(30));
+SQL SUCCESS
+--step3:插入数据;expect:成功
+insert into t_partition_list_0063 values( 10,  '张三', 25);
+SQL SUCCESS
+insert into t_partition_list_0063 values( 10,  '张三', 26);
+SQL SUCCESS
+insert into t_partition_list_0063 values( 20,  '张三', 27);
+SQL SUCCESS
+insert into t_partition_list_0063 values( 20,  '张三', 28);
+SQL SUCCESS
+--step4:创建普通表;expect:成功
+drop table if exists exchange_tab;
+SQL SUCCESS
+create table exchange_tab(
+p_id int,
+p_name varchar,
+p_age int)
+tablespace ts_exchange_tablespace;
+SQL SUCCESS
+--step5:交换数据;expect:成功
+alter table t_partition_list_0063 exchange partition (p1) with table exchange_tab;
+SQL SUCCESS
+--step6:验证表空间信息;expect:成功
+select relname from pg_class t1 where relkind='r' and reltablespace=(select oid from pg_tablespace where spcname ='ts_partition_list_0063') order by relname;
++-----------------------+
+| relname               |
++-----------------------+
+| exchange_tab          |
+| t_partition_list_0063 |
++-----------------------+
+--step7:清理环境;expect:成功
+drop table if exists t_partition_list_0063;
+SQL SUCCESS
+drop table if exists exchange_tab;
+SQL SUCCESS
+drop tablespace ts_partition_list_0063;
+SQL SUCCESS
+drop tablespace ts_exchange_tablespace;
+SQL SUCCESS

@@ -16,6 +16,7 @@ select array_to_string(array[1, 2, 3, null, 5], '8', '6') as result;
 +-----------+
 | result    |
 +-----------+
+| 182838685 |
 +-----------+
 --数组中没有null
 select array_to_string(array[1, 2, 3, 5], ',', '*') as result;

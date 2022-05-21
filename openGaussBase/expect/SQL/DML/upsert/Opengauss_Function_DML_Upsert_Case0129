@@ -347,23 +347,18 @@ select * from t_dml_upsert0129;
 +---+---+------+-----+
 --CTE with子句 多表关联查询
 explain (costs off, verbose) with tmptb(a,c,d) as (select * from t_dml_upsert_sub0129_01 tb1 ,t_dml_upsert_sub0129_02 tb2 where tb1.b=tb2.b) select c from tmptb where a=4;
-+--------------------------------------------------------------------+
-| QUERY PLAN                                                         |
-+--------------------------------------------------------------------+
-| CTE Scan on tmptb                                                  |
-|   Output: tmptb.c                                                  |
-|   Filter: (tmptb.a = 4)                                            |
-|   CTE tmptb                                                        |
-|     ->  Hash Join                                                  |
-|           Output: tb1.b, tb1.c, tb2.b, tb2.d                       |
-|           Hash Cond: (tb1.b = tb2.b)                               |
-|           ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1       |
-|                 Output: tb1.b, tb1.c                               |
-|           ->  Hash                                                 |
-|                 Output: tb2.b, tb2.d                               |
-|                 ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2 |
-|                       Output: tb2.b, tb2.d                         |
-+--------------------------------------------------------------------+
++------------------------------------------------------+
+| QUERY PLAN                                           |
++------------------------------------------------------+
+| Nested Loop                                          |
+|   Output: tb1.c                                      |
+|   ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1 |
+|         Output: tb1.b, tb1.c                         |
+|         Filter: (tb1.b = 4)                          |
+|   ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2 |
+|         Output: tb2.b, tb2.d                         |
+|         Filter: (tb2.b = 4)                          |
++------------------------------------------------------+
 insert into t_dml_upsert0129 values (4,4) on duplicate key update c = (with tmptb(a,c,d) as (select * from t_dml_upsert_sub0129_01 tb1 ,t_dml_upsert_sub0129_02 tb2 where tb1.b=tb2.b) select c from tmptb where a=4);
 SQL SUCCESS
 select * from t_dml_upsert0129;
@@ -376,29 +371,24 @@ select * from t_dml_upsert0129;
 | 4 | 4 | c-4  |     |
 +---+---+------+-----+
 explain (costs off, verbose) insert into t_dml_upsert0129 values (4,4) on duplicate key update c = (with tmptb(a,c,d) as (select * from t_dml_upsert_sub0129_01 tb1 ,t_dml_upsert_sub0129_02 tb2 where tb1.b=tb2.b) select c from tmptb where a=4);
-+----------------------------------------------------------------------------+
-| QUERY PLAN                                                                 |
-+----------------------------------------------------------------------------+
-| Insert on public.t_dml_upsert0129                                          |
-|   Conflict Resolution: UPDATE                                              |
-|   Conflict Arbiter Indexes: t_dml_upsert0129_pkey                          |
-|   InitPlan 2 (returns $1)                                                  |
-|     ->  CTE Scan on tmptb                                                  |
-|           Output: tmptb.c                                                  |
-|           Filter: (tmptb.a = 4)                                            |
-|           CTE tmptb                                                        |
-|             ->  Hash Join                                                  |
-|                   Output: tb1.b, tb1.c, tb2.b, tb2.d                       |
-|                   Hash Cond: (tb1.b = tb2.b)                               |
-|                   ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1       |
-|                         Output: tb1.b, tb1.c                               |
-|                   ->  Hash                                                 |
-|                         Output: tb2.b, tb2.d                               |
-|                         ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2 |
-|                               Output: tb2.b, tb2.d                         |
-|   ->  Result                                                               |
-|         Output: 4, '4'::text, NULL::text, NULL::text                       |
-+----------------------------------------------------------------------------+
++--------------------------------------------------------------+
+| QUERY PLAN                                                   |
++--------------------------------------------------------------+
+| Insert on public.t_dml_upsert0129                            |
+|   Conflict Resolution: UPDATE                                |
+|   Conflict Arbiter Indexes: t_dml_upsert0129_pkey            |
+|   InitPlan 1 (returns $0)                                    |
+|     ->  Nested Loop                                          |
+|           Output: tb1.c                                      |
+|           ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1 |
+|                 Output: tb1.b, tb1.c                         |
+|                 Filter: (tb1.b = 4)                          |
+|           ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2 |
+|                 Output: tb2.b, tb2.d                         |
+|                 Filter: (tb2.b = 4)                          |
+|   ->  Result                                                 |
+|         Output: 4, '4'::text, NULL::text, NULL::text         |
++--------------------------------------------------------------+
 --except 多表关联查询
 explain (costs off, verbose) select c from t_dml_upsert_sub0129_01 where b = (select b from t_dml_upsert_sub0129_01 except select b from t_dml_upsert_sub0129_02 order by b limit 1);
 +----------------------------------------------------------------------------------+
@@ -731,29 +721,24 @@ select * from t_dml_upsert0129;
 | 4 | 4 | c-4  |     |
 +---+---+------+-----+
 explain (costs off, verbose) insert into t_dml_upsert0129 values (4,4) on duplicate key update c = (with tmptb(a,c,d) as (select * from t_dml_upsert_sub0129_01 tb1 ,t_dml_upsert_sub0129_02 tb2 where tb1.b=tb2.b) select c from tmptb where a=excluded.a);
-+----------------------------------------------------------------------------+
-| QUERY PLAN                                                                 |
-+----------------------------------------------------------------------------+
-| Insert on public.t_dml_upsert0129                                          |
-|   Conflict Resolution: UPDATE                                              |
-|   Conflict Arbiter Indexes: t_dml_upsert0129_pkey                          |
-|   ->  Result                                                               |
-|         Output: 4, '4'::text, NULL::text, NULL::text                       |
-|   SubPlan 2                                                                |
-|     ->  CTE Scan on tmptb                                                  |
-|           Output: tmptb.c                                                  |
-|           Filter: (tmptb.a = "excluded".a)                                 |
-|           CTE tmptb                                                        |
-|             ->  Hash Join                                                  |
-|                   Output: tb1.b, tb1.c, tb2.b, tb2.d                       |
-|                   Hash Cond: (tb1.b = tb2.b)                               |
-|                   ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1       |
-|                         Output: tb1.b, tb1.c                               |
-|                   ->  Hash                                                 |
-|                         Output: tb2.b, tb2.d                               |
-|                         ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2 |
-|                               Output: tb2.b, tb2.d                         |
-+----------------------------------------------------------------------------+
++--------------------------------------------------------------+
+| QUERY PLAN                                                   |
++--------------------------------------------------------------+
+| Insert on public.t_dml_upsert0129                            |
+|   Conflict Resolution: UPDATE                                |
+|   Conflict Arbiter Indexes: t_dml_upsert0129_pkey            |
+|   ->  Result                                                 |
+|         Output: 4, '4'::text, NULL::text, NULL::text         |
+|   SubPlan 1                                                  |
+|     ->  Nested Loop                                          |
+|           Output: tb1.c                                      |
+|           ->  Seq Scan on public.t_dml_upsert_sub0129_01 tb1 |
+|                 Output: tb1.b, tb1.c                         |
+|                 Filter: (tb1.b = "excluded".a)               |
+|           ->  Seq Scan on public.t_dml_upsert_sub0129_02 tb2 |
+|                 Output: tb2.b, tb2.d                         |
+|                 Filter: (tb2.b = "excluded".a)               |
++--------------------------------------------------------------+
 --excluded;except 多表关联查询
 insert into t_dml_upsert0129 values (3,3) on duplicate key update c = (select c from t_dml_upsert_sub0129_01 where b in (select b from t_dml_upsert_sub0129_01 except select b from t_dml_upsert_sub0129_02 order by b) and b > excluded.b*6 limit 1) ;
 SQL SUCCESS

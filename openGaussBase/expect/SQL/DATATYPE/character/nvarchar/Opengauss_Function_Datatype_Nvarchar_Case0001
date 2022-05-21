@@ -1,0 +1,40 @@
+-- @testpoint: NVARCHAR存储空间：最大为10MB 部分测试点合理报错
+--step1:建表; expect:成功
+drop table if exists t_nvarchar_0001 cascade;
+SQL SUCCESS
+create table t_nvarchar_0001(
+c_nvarchar nvarchar(10485760));
+SQL SUCCESS
+--step2:插入值10*1024*1024; expect:成功
+insert into t_nvarchar_0001(c_nvarchar) values(lpad('a', 1024*10*1024, 'x')::nvarchar);
+SQL SUCCESS
+select length(c_nvarchar) from t_nvarchar_0001;
++----------+
+| length   |
++----------+
+| 10485760 |
++----------+
+--step3:插入值10*1024*1024-1; expect:成功
+insert into t_nvarchar_0001(c_nvarchar) values(lpad('a', 1024*10*1024-1, 'x')::nvarchar);
+SQL SUCCESS
+select length(c_nvarchar) from t_nvarchar_0001;
++----------+
+| length   |
++----------+
+| 10485760 |
+| 10485759 |
++----------+
+--step4:插入值10*1024*1024+1; expect:失败
+insert into t_nvarchar_0001(c_nvarchar) values(lpad('a', 1024*10*1024+1, 'x')::nvarchar);
+?.*ERROR: value too long for type nvarchar2(10485760)?.*
+  Where: referenced column: c_nvarchar
+select length(c_nvarchar) from t_nvarchar_0001;
++----------+
+| length   |
++----------+
+| 10485760 |
+| 10485759 |
++----------+
+--step5:清理环境; expect:成功
+drop table if exists t_nvarchar_0001 cascade;
+SQL SUCCESS

@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -31,7 +31,6 @@ Expect      :
         5.导入成功
         6.导入表为分区表且数据正确
         7.清理环境完成
-History     :
 """
 import os
 import unittest
@@ -182,6 +181,10 @@ class ToolsBackup(unittest.TestCase):
         self.log.info(cmd)
         result = self.Primary_Node.sh(cmd).result()
         self.log.info(result)
+        restart_msg = self.pri_sh.restart_db_cluster()
+        self.log.info(restart_msg)
+        status = self.pri_sh.get_db_cluster_status()
+        self.assertTrue("Degraded" in status or "Normal" in status)
 
         self.log.info('---导出--')
         sql_cmd = f'''cd {self.package}/openGauss-tools-backup;\
@@ -234,15 +237,15 @@ class ToolsBackup(unittest.TestCase):
         sql_result = self.pri_sh.execut_db_sql(sql=sql_cmd,
                                                dbname=f'{self.db_name}')
         self.log.info(sql_result)
-        self.assertIn('Range partition by(field12)' and
-                      'Number of partition: 12', sql_result)
+        self.assertIn('Partition By RANGE(field12)' and
+                      'Number of partitions: 12', sql_result)
 
     def tearDown(self):
         self.log.info('---清理环境---')
-        sql_cmd = f'''rm -rf {self.package};'''
-        self.log.info(sql_cmd)
-        result = self.Root_Node.sh(sql_cmd).result()
-        self.log.info(result)
+        rm_cmd = f'''rm -rf {self.package};'''
+        self.log.info(rm_cmd)
+        rm_result = self.Root_Node.sh(rm_cmd).result()
+        self.log.info(rm_result)
         cmd = f"rm -rf " \
               f"{os.path.join(macro.DB_INSTANCE_PATH, 'pg_hba.conf')};" \
               f"mv " \
@@ -254,5 +257,8 @@ class ToolsBackup(unittest.TestCase):
             {self.db_name};
             drop user if exists {self.user} cascade;''')
         self.log.info(sql_cmd)
+        self.assertEqual('', rm_result)
+        self.assertIn(self.constant.DROP_DATABASE_SUCCESS, sql_cmd)
+        self.assertIn(self.constant.DROP_ROLE_SUCCESS_MSG, sql_cmd)
         self.log.info(
             '---Opengauss_Function_JdbcGsBackup_Case0036finish---')

@@ -15,12 +15,14 @@ where castsource= (select oid from pg_type where typname='numeric'));
 | typname   | proname         | castcontext | castmethod |
 +-----------+-----------------+-------------+------------+
 | int1      | numeric_int1    | i           | f          |
+| int16     | int16           | i           | f          |
 | int8      | int8            | i           | f          |
 | int2      | int2            | i           | f          |
 | int4      | int4            | i           | f          |
 | float4    | float4          | i           | f          |
 | float8    | float8          | i           | f          |
 | money     | money           | a           | f          |
+| bool      | numeric_bool    | i           | f          |
 | interval  | numtoday        | i           | f          |
 | numeric   | numeric         | i           | f          |
 | text      | numeric_text    | i           | f          |

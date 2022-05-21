@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -20,7 +20,6 @@ Description :
     show enable_auto_clean_unique_sql;
     show enable_resource_track;
     show instr_unique_sql_count;
-    show unique_sql_clean_ratio;
     2.写配置文件
     3.编译java工具
         3.1、开启自动淘汰 准备P
@@ -101,24 +100,15 @@ class Gucquerytestcase(unittest.TestCase):
                                             self.constant.GSGUC_SUCCESS_MSG,
                                             f"instr_unique_sql_count=100")
             LOGGER.info(result)
-        sql_cmd = COMMONSH.execut_db_sql("show unique_sql_clean_ratio;")
-        LOGGER.info(sql_cmd)
-        if "0.2" not in sql_cmd:
-            result = COMMONSH.execute_gsguc("reload",
-                                            self.constant.GSGUC_SUCCESS_MSG,
-                                            f"unique_sql_clean_ratio=0.2")
-            LOGGER.info(result)
         status = COMMONSH.restart_db_cluster()
         LOGGER.info(status)
         sql_cmd = COMMONSH.execut_db_sql("show enable_resource_track;"
-                                         "show unique_sql_clean_ratio;"
                                          "show instr_unique_sql_count;"
                                          "show enable_auto_clean_unique_sql;")
         LOGGER.info(sql_cmd)
         self.assertNotIn("off", sql_cmd)
         self.assertIn("on", sql_cmd)
         self.assertIn("100", sql_cmd)
-        self.assertIn("0.2", sql_cmd)
 
         LOGGER.info("步骤2：写配置文件")
         self.common.scp_file(self.root_node,
@@ -170,8 +160,8 @@ class Gucquerytestcase(unittest.TestCase):
         self.assertIn("清空hash tablet\t\n", result)
         self.assertIn("查询记录条数2\t\n", result)
         self.assertIn("再次查询记录条数4\t\n", result)
-        self.assertIn("查询触发自动淘汰后条数82\t\n", result)
-        self.assertIn("查询B/E阶段自动淘汰后记录条数83\t\n", result)
+        self.assertIn("查询触发自动淘汰后条数92\t\n", result)
+        self.assertIn("查询B/E阶段自动淘汰后记录条数93\t\n", result)
         self.assertIn("查询插入的数据2\t查询插入的数据4\t查询插入的数据6\t\n", result)
 
         LOGGER.info("查询调用记录和调用次数")
@@ -189,10 +179,6 @@ class Gucquerytestcase(unittest.TestCase):
         cmd = f"rm -rf {self.targetpath}"
         LOGGER.info(cmd)
         self.root_node.sh(cmd)
-        result = COMMONSH.execute_gsguc("reload",
-                                        self.constant.GSGUC_SUCCESS_MSG,
-                                        f"unique_sql_clean_ratio=0.1")
-        LOGGER.info(result)
         result = COMMONSH.execute_gsguc("reload",
                                         self.constant.GSGUC_SUCCESS_MSG,
                                         f"enable_auto_clean_unique_sql=off")

@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -16,14 +16,18 @@ See the Mulan PSL v2 for more details.
 Case Type   : 工具-GS_BASEBACKUP
 Case Name   : 自定义绝对路径表空间，远程备份，开启进度报告，开启冗余模式，出现输入密码提示
 Description :
-    1、开始备份：gs_basebackup -D /home/function0126/gs_basebackup -p 30126 -T
+    1.创建备份目录
+    2.创建表空间
+    3.开始备份：gs_basebackup -D /home/function0136/gs_basebackup -p 30136 -T
         /data/function0126/cluster/tablespace_test1=
         /data/function0126/cluster/tablespace_test2
         -P -v -W -h ip
-    2、使用备份目录启动数据库
+    4.使用备份目录启动数据库
 Expect      :
-    1、备份提示成功，/data/function0126/cluster/tablespace_test2目录不为空
-    2、使用备份目录启动数据库成功，并且数据与备份前一致
+    1.创建备份目录成功
+    2.创建表空间成功
+    3.备份提示成功，/data/function0136/cluster/tablespace_test3目录不为空
+    4.使用备份目录启动数据库成功，并且数据与备份前一致
 History     :
 """
 
@@ -63,48 +67,38 @@ class GsBaseBackUpCase28(unittest.TestCase):
         self.LOG.info(
             '----Opengauss_Function_Tools_gs_basebackup_Case0028 start----')
 
+        text = '----获取主机hostname值----'
+        self.LOG.info(text)
+        self.host_name = self.Primary_User_Node.sh(
+            'hostname').result().strip()
+
     def test_server_tools(self):
-        self.LOG.info('----主备机创建备份目录----')
+        text = '----step1.1: 主备机创建备份目录 expect: 成功----'
+        self.LOG.info(text)
         mkdir_cmd = f'''if [ ! -d "{self.backup_bak_path}" ]
                                 then
                                     mkdir -p {self.backup_bak_path}
                                 fi'''
         primary_result = self.Primary_User_Node.sh(mkdir_cmd).result()
         self.LOG.info(primary_result)
-        self.assertEqual(primary_result, '')
+        self.assertEqual(primary_result, '', '执行失败:' + text)
         standby1_result = self.Standby1_User_Node.sh(mkdir_cmd).result()
         self.LOG.info(standby1_result)
-        self.assertEqual(standby1_result, '')
+        self.assertEqual(standby1_result, '', '执行失败:' + text)
 
-        self.LOG.info('----主机创建表空间目录及重定向目录----')
-        is_dir_exists_cmd = f'''if [ ! -d "{self.Old_TableSpace_Path}" ]
-                                then
-                                    mkdir -p {self.Old_TableSpace_Path}
-                                fi'''
-        result = self.Primary_User_Node.sh(is_dir_exists_cmd).result()
-        self.LOG.info(result)
-        self.assertEqual(result, '')
-
-        self.LOG.info('----备机创建重定向目录----')
-        is_dir_exists_cmd = f'''if [ ! -d "{self.New_TableSpace_Path}" ]
-                                then
-                                    mkdir -p {self.New_TableSpace_Path}
-                                fi'''
-        result = self.Standby1_User_Node.sh(is_dir_exists_cmd).result()
-        self.LOG.info(result)
-        self.assertEqual(result, '')
-
-        self.LOG.info('----主备机修改备份目录权限700，以免权限有误----')
+        text = '----step1.2: 主备机修改备份目录权限700，以免权限有误 expect: 成功----'
+        self.LOG.info(text)
         chmod_cmd = f"chmod 700 -R {self.backup_bak_path}"
         self.LOG.info(chmod_cmd)
         primary_chmod_msg = self.Primary_Root_Node.sh(chmod_cmd).result()
         self.LOG.info(primary_chmod_msg)
-        self.assertEqual(primary_chmod_msg, '')
+        self.assertEqual(primary_chmod_msg, '', '执行失败:' + text)
         standby1_chmod_msg = self.Standby1_Root_Node.sh(chmod_cmd).result()
         self.LOG.info(standby1_chmod_msg)
-        self.assertEqual(standby1_chmod_msg, '')
+        self.assertEqual(standby1_chmod_msg, '', '执行失败:' + text)
 
-        self.LOG.info('----主备机查看备份目录----')
+        text = '----step1.3: 主备机查看备份目录 expect: 成功----'
+        self.LOG.info(text)
         ls_cmd = f"ls -l {os.path.dirname(self.backup_bak_path)}"
         self.LOG.info(ls_cmd)
         primary_ls_msg = self.Primary_User_Node.sh(ls_cmd).result()
@@ -112,7 +106,28 @@ class GsBaseBackUpCase28(unittest.TestCase):
         standby1_ls_msg = self.Primary_User_Node.sh(ls_cmd).result()
         self.LOG.info(standby1_ls_msg)
 
-        self.LOG.info('----主机创建测试表空间及表---')
+        text = '----step2.1: 主机创建表空间目录及重定向目录 expect: 成功----'
+        self.LOG.info(text)
+        is_dir_exists_cmd = f'''if [ ! -d "{self.Old_TableSpace_Path}" ]
+                                then
+                                    mkdir -p {self.Old_TableSpace_Path}
+                                fi'''
+        result = self.Primary_User_Node.sh(is_dir_exists_cmd).result()
+        self.LOG.info(result)
+        self.assertEqual(result, '', '执行失败:' + text)
+
+        text = '----step2.2: 备机创建重定向目录 expect: 成功----'
+        self.LOG.info(text)
+        is_dir_exists_cmd = f'''if [ ! -d "{self.New_TableSpace_Path}" ]
+                                then
+                                    mkdir -p {self.New_TableSpace_Path}
+                                fi'''
+        result = self.Standby1_User_Node.sh(is_dir_exists_cmd).result()
+        self.LOG.info(result)
+        self.assertEqual(result, '', '执行失败:' + text)
+
+        text = '----step2.3: 主机创建测试表空间及表 expect: 成功----'
+        self.LOG.info(text)
         sql_cmd = f"drop tablespace if exists {self.Old_TableSpace_Name};" \
             f"create tablespace {self.Old_TableSpace_Name} " \
             f"location '{self.Old_TableSpace_Path}';" \
@@ -122,11 +137,18 @@ class GsBaseBackUpCase28(unittest.TestCase):
         self.LOG.info(sql_cmd)
         sql_result = Primary_SH.execut_db_sql(sql_cmd)
         self.LOG.info(sql_result)
-        self.assertIn(self.Constant.TABLESPCE_CREATE_SUCCESS, sql_result)
-        self.assertIn(self.Constant.CREATE_TABLE_SUCCESS, sql_result)
-        self.assertIn(self.Constant.INSERT_SUCCESS_MSG, sql_result)
+        self.assertIn(self.Constant.TABLESPCE_CREATE_SUCCESS,
+                      sql_result,
+                      '执行失败:' + text)
+        self.assertIn(self.Constant.CREATE_TABLE_SUCCESS,
+                      sql_result,
+                      '执行失败:' + text)
+        self.assertIn(self.Constant.INSERT_SUCCESS_MSG,
+                      sql_result,
+                      '执行失败:' + text)
 
-        self.LOG.info('----备机执行远程备份----')
+        text = '----step3.1: 备机执行远程备份 expect: 成功----'
+        self.LOG.info(text)
         gs_basebackup_cmd = f"gs_basebackup " \
             f"-D {self.backup_bak_path} " \
             f"-p {self.Primary_User_Node.db_port} " \
@@ -139,19 +161,21 @@ class GsBaseBackUpCase28(unittest.TestCase):
             expect <<EOF
             set timeout 1200
             spawn {gs_basebackup_cmd}
-            expect "*assword:"
-            send "{self.Primary_User_Node.ssh_password}\\n"
-            expect "*assword:"
-            send "{self.Primary_User_Node.ssh_password}\\n"
-            expect "{self.Constant.gs_basebackup_success_msg}" 
-            send_user "执行成功";exit
+            expect {{{{
+                "*assword:" {{{{ send \
+                    "{self.Primary_User_Node.ssh_password}\\n";\
+                    exp_continue }}}}
+                "{self.Constant.gs_basebackup_success_msg}" \
+                {{{{ send_user "执行成功\\n" }}}}
+            }}}}
             expect eof\n''' + '''EOF'''
         self.LOG.info(backup_cmd)
         backup_msg = self.Standby1_User_Node.sh(backup_cmd).result()
         self.LOG.info(backup_msg)
-        self.assertIn("执行成功", backup_msg)
+        self.assertIn("执行成功", backup_msg, '执行失败:' + text)
 
-        self.LOG.info('----查看重定向目录----')
+        text = '----step3.2: 查看重定向目录 expect: 成功----'
+        self.LOG.info(text)
         ls_new_cmd = f"ls {self.New_TableSpace_Path}"
         self.LOG.info(ls_new_cmd)
         ls_new_result = self.Standby1_User_Node.sh(ls_new_cmd).result()
@@ -160,9 +184,10 @@ class GsBaseBackUpCase28(unittest.TestCase):
         self.LOG.info(ls_old_cmd)
         ls_old_result = self.Primary_User_Node.sh(ls_old_cmd).result()
         self.LOG.info(ls_old_result)
-        self.assertEqual(ls_new_result, ls_old_result)
+        self.assertEqual(ls_new_result, ls_old_result, '执行失败:' + text)
 
-        self.LOG.info('----scp备份文件到主机----')
+        text = '----step3.3: scp备份文件到主机 expect: 成功----'
+        self.LOG.info(text)
         scp_cmd = f"scp -r {os.path.join(self.backup_bak_path, '*')}" \
             f" {self.Primary_User_Node.ssh_user}@" \
             f"{self.Primary_User_Node.ssh_host}:" \
@@ -170,50 +195,71 @@ class GsBaseBackUpCase28(unittest.TestCase):
         self.LOG.info(scp_cmd)
         scp_msg = self.Standby1_User_Node.sh(scp_cmd).result()
         self.LOG.info(scp_msg)
-        self.assertNotIn('failed', scp_msg)
+        self.assertNotIn('failed', scp_msg, '执行失败:' + text)
 
-        self.LOG.info('----停止数据库----')
+        text = '----step4.1: 停止数据库 expect: 成功----'
+        self.LOG.info(text)
         is_stopped = Primary_SH.execute_gsctl(
             'stop', self.Constant.GS_CTL_STOP_SUCCESS_MSG)
-        self.assertTrue(is_stopped)
+        self.assertTrue(is_stopped, '执行失败:' + text)
 
         time.sleep(5)
 
-        self.LOG.info('----使用备份目录启动数据库----')
+        text = '----step4.2: 修改参数data_directory expect: 成功----'
+        self.LOG.info(text)
+        msg = Primary_SH.execute_gsguc(
+            command='set',
+            assert_flag=self.Constant.GSGUC_SUCCESS_MSG,
+            param=f"data_directory='{self.backup_bak_path}'",
+            node_name=self.host_name,
+            dn_path=self.backup_bak_path)
+        self.assertTrue(msg, '执行失败:' + text)
+
+        text = '----step4.3: 使用备份目录启动数据库 expect: 成功----'
+        self.LOG.info(text)
         start_cmd = f"source {macro.DB_ENV_PATH}; " \
             f"gs_ctl start -D {self.backup_bak_path} -M primary"
         self.LOG.info(start_cmd)
         start_msg = self.Primary_User_Node.sh(start_cmd).result()
         self.LOG.info(start_msg)
-        self.assertIn(self.Constant.RESTART_SUCCESS_MSG, start_msg)
+        self.assertIn(self.Constant.RESTART_SUCCESS_MSG,
+                      start_msg,
+                      '执行失败:' + text)
 
-        self.LOG.info('----重建备机需主备连接正常----')
+        text = '----step4.4: 重建备机需主备连接正常 expect: 成功----'
+        self.LOG.info(text)
         result = Primary_SH.wait_cluster_connected(self.backup_bak_path)
-        self.assertTrue(result)
+        self.assertTrue(result, '执行失败:' + text)
 
-        self.LOG.info('----重建备机----')
+        text = '----step4.5: 重建备机 expect: 成功----'
+        self.LOG.info(text)
         build_msg_list = Primary_SH.get_standby_and_build()
         for msg in build_msg_list:
-            self.assertIn(self.Constant.BUILD_SUCCESS_MSG, msg)
+            self.assertIn(self.Constant.BUILD_SUCCESS_MSG,
+                          msg,
+                          '执行失败:' + text)
 
-        self.LOG.info('----查询数据库状态确认是否启动成功----')
+        text = '----step4.6: 查询数据库状态确认是否启动成功 expect: 成功----'
+        self.LOG.info(text)
         query_cmd = f"source {macro.DB_ENV_PATH}; " \
             f"gs_ctl query -D {self.backup_bak_path}"
         self.LOG.info(query_cmd)
         query_msg = self.Primary_User_Node.sh(query_cmd).result()
         self.LOG.info(query_msg)
-        self.assertIn('db_state', query_msg)
+        self.assertIn('db_state', query_msg, '执行失败:' + text)
         for arg in query_msg.splitlines():
             if 'db_state' in arg:
-                self.assertIn('Normal', arg)
+                self.assertIn('Normal', arg, '执行失败:' + text)
 
-        self.LOG.info('----查询测试表是否存在----')
+        text = '----step4.7: 查询测试表是否存在 expect: 成功----'
+        self.LOG.info(text)
         sql_cmd = f"select * from {self.T_NAME};"
         self.LOG.info(sql_cmd)
         sql_msg = Primary_SH.execut_db_sql(sql_cmd)
-        self.assertIn('10000 rows', sql_msg)
+        self.assertIn('10000 rows', sql_msg, '执行失败:' + text)
 
     def tearDown(self):
+        self.LOG.info('----step5: run_teardown expect: 成功----')
         self.LOG.info('----停止数据库----')
         stop_cmd = f"source {macro.DB_ENV_PATH}; " \
             f"gs_ctl stop -D {self.backup_bak_path}"
@@ -221,12 +267,19 @@ class GsBaseBackUpCase28(unittest.TestCase):
         stop_msg = self.Primary_User_Node.sh(stop_cmd).result()
         self.LOG.info(stop_msg)
 
+        self.LOG.info('----修改参数data_directory----')
+        msg = Primary_SH.execute_gsguc(
+            command='set',
+            assert_flag=self.Constant.GSGUC_SUCCESS_MSG,
+            param=f"data_directory='{macro.DB_INSTANCE_PATH}'")
+        self.LOG.info(msg)
+
         self.LOG.info('----使用原目录启动数据库----')
-        start_cmd = f"source {macro.DB_ENV_PATH}; " \
-            f"gs_om -t restart"
-        self.LOG.info(start_cmd)
-        start_msg = self.Primary_User_Node.sh(start_cmd).result()
-        self.LOG.info(start_msg)
+        start_flag = Primary_SH.execute_gsctl(
+            'start',
+            self.Constant.RESTART_SUCCESS_MSG,
+            '-M primary')
+        self.LOG.info(start_flag)
 
         self.LOG.info('----重建备机需主备连接正常----')
         result = Primary_SH.wait_cluster_connected()

@@ -5,6 +5,7 @@ drop table if exists tab127;
 SQL SUCCESS
 create table tab127(id int,name varchar,address char(50),number text);
 SQL SUCCESS
+insert into tab127 values(023,'Jack','{"age":20,"city":"xiamen"}',158237664);
 SQL SUCCESS
 alter table tab127 modify address jsonb;
 ?.*ERROR: column "address" cannot be cast automatically to type json.*

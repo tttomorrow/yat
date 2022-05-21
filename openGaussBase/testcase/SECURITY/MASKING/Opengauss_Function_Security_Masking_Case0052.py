@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -83,6 +83,7 @@ class Security(unittest.TestCase):
         sql_cmd4 = f'''drop table if exists {self.table};
                 create table {self.table}(id int,name char(10),string
                 varchar(25),address varchar(60));
+                insert into {self.table} values(1,'张三','640521189505211815',
                 'Shanxi,Xian,yuhuazhai'),(2,'李四','xinlang@163.com',
                 'Fujian');'''
         excute_cmd4 = f'source {macro.DB_ENV_PATH};' \
@@ -126,6 +127,7 @@ class Security(unittest.TestCase):
         msg6 = self.userNode.sh(excute_cmd6).result()
         logger.info(msg6)
         msg6_list = msg6.splitlines()
+        assert_1 = msg6_list[2].strip() != '640521189505211815' and \
                    msg6_list[3].strip() != 'xinlang@163.com'
         self.assertTrue(assert_1, '执行失败:' + text)
         text = '---step4：表中插入新的的数据，查看存量数据和新增数据是否脱敏 ' \
@@ -133,6 +135,7 @@ class Security(unittest.TestCase):
         logger.info(text)
         sql_cmd7 = f'''insert into {self.table} values(1,'张三',
                     'Inventory@163.com','Shanxi,Xian,yuhuazhai'),(2,'李四',
+                    '622826199308301512','Fujian');'''
         msg7 = self.sh_primy.execut_db_sql(sql_cmd7)
         logger.info(msg7)
         logger.info(text)
@@ -145,8 +148,10 @@ class Security(unittest.TestCase):
         msg8 = self.userNode.sh(excute_cmd8).result()
         logger.info(msg8)
         msg8_list = msg8.splitlines()
+        assert_1 = msg8_list[2].strip() != '640521189505211815' and \
                    msg8_list[3].strip() != 'xinlang@163.com' and \
                    msg8_list[4].strip() != 'Inventory@163.com' and \
+                   msg8_list[5].strip() != '622826199308301512'
         self.assertTrue(assert_1, '执行失败:' + text)
     
     def tearDown(self):

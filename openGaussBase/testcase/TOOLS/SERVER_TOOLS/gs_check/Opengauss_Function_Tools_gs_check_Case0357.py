@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -22,39 +22,54 @@ Expect      :
 History     :
 """
 
+import os
 import unittest
-from yat.test import Node
-from yat.test import macro
+
 from testcase.utils.Constant import Constant
 from testcase.utils.Logger import Logger
+from yat.test import Node
+from yat.test import macro
 
 
 class Tools(unittest.TestCase):
     def setUp(self):
         self.log = Logger()
-        self.log.info('---Opengauss_Function_Tools_gs_check_Case0357start---')
-        self.dbusernode = Node('dbuser')
-        self.rootnode = Node('default')
-        self.constant = Constant()
+        self.log.info(
+            '-----Opengauss_Function_Tools_gs_check_Case0357_start-----')
+        self.dbuserNode = Node('dbuser')
+        self.rootNode = Node('default')
+        self.clear_path = os.path.join(
+            os.path.dirname(macro.DB_INSTANCE_PATH), 'tool', 'script',
+            'gspylib', 'inspection', 'output', 'CheckReport*')
+        self.Constant = Constant()
 
     def test_server_tools1(self):
-        self.log.info('-------------在本地执行安装场景检查---------------')
-        check_cmd1 = f'''source {macro.DB_ENV_PATH};
-            expect <<EOF
-            set timeout -1
-            spawn gs_check -e install -L 
-            expect "*]:"
-            send "{self.rootnode.ssh_user}\r"
-            expect "*]:"
-            send "{self.rootnode.ssh_password}\r"
-            expect eof\n''' + "EOF"
-
-        self.log.info(check_cmd1)
-        check_msg1 = self.dbusernode.sh(check_cmd1).result()
-        check_result = check_msg1.count('[RST]')
+        text = '-----step1:在本地执行安装场景检查;expect:检查完成-----'
+        self.log.info(text)
+        check_cmd = f'''su - {self.dbuserNode.ssh_user} -c "
+                    source {macro.DB_ENV_PATH};
+                    expect -c \\\"set timeout -1
+                    spawn gs_check -e install -L
+                    expect *]:
+                    send {self.rootNode.ssh_user}\\n
+                    expect *]:
+                    send {self.rootNode.ssh_password}\\n
+                    expect eof\\\""'''
+        self.log.info(check_cmd)
+        shell_res = os.popen(check_cmd)
+        str_res = ''.join(shell_res.readlines())
+        self.log.info(str_res)
+        check_result = str_res.count('[RST]')
         self.log.info(check_result)
-        self.assertEqual(check_result, 40, '在本地执行安装场景检查不通过')
+        self.assertLessEqual(check_result, 40, '在本地执行安装场景检查不通过')
 
     def tearDown(self):
-        self.log.info('--------------无需清理环境-------------------')
-        self.log.info('--Opengauss_Function_Tools_gs_check_Case0357finish--')
+        text = '----------清理环境----------'
+        self.log.info(text)
+        clear_cmd = f'rm -rf {self.clear_path};'
+        self.log.info(clear_cmd)
+        clear_msg = self.rootNode.sh(clear_cmd).result()
+        self.log.info(clear_msg)
+        self.assertEqual('', clear_msg, '执行失败:' + text)
+        self.log.info(
+            '----Opengauss_Function_Tools_gs_check_Case0357_finish----')

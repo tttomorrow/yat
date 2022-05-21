@@ -1,0 +1,71 @@
+-- @testpoint: 创建列存表,设置字段的收集目标set statistics,部分step合理报错
+--测试点一:创建列存普通表，指定主键/唯一约束，新增字段的收集目标set statistics
+--step1:测试点一,创建列存普通表,指定主键/唯一约束   expect:成功
+drop table if exists t_columns_unique_index_0082_01;
+SQL SUCCESS
+create table t_columns_unique_index_0082_01(id1 smallint primary key, id2 integer unique) with(orientation=column);
+SQL SUCCESS
+--step2:测试点一,新增字段的收集目标   expect:成功
+alter table t_columns_unique_index_0082_01 add statistics((id1,id2));
+SQL SUCCESS
+--step3:测试点一,查看系统表中字段统计信息   expect:无统计信息
+select attname,null_frac,n_distinct,n_dndistinct from pg_stats where tablename='t_columns_unique_index_0082_01';
++---------+-----------+------------+--------------+
+| attname | null_frac | n_distinct | n_dndistinct |
++---------+-----------+------------+--------------+
++---------+-----------+------------+--------------+
+--step4:测试点一,插入数据，执行analyze   expect:成功
+insert into t_columns_unique_index_0082_01 values(generate_series(1,1000),generate_series(1,1000));
+SQL SUCCESS
+analyze t_columns_unique_index_0082_01(id1,id2);
+SQL SUCCESS
+--step5:测试点一,再次查看系统表中字段统计信息   expect:有对应统计信息
+select attname,null_frac,n_distinct,n_dndistinct from pg_stats where tablename='t_columns_unique_index_0082_01';
++---------+-----------+------------+--------------+
+| attname | null_frac | n_distinct | n_dndistinct |
++---------+-----------+------------+--------------+
+| id1     | 0.0       | -1.0       | 0.0          |
+| id2     | 0.0       | -1.0       | 0.0          |
++---------+-----------+------------+--------------+
+--step6:测试点一,再次插入数据   expect:失败
+insert into t_columns_unique_index_0082_01 values(generate_series(1,1000),generate_series(1,1000));
+?.*ERROR: duplicate key value violates unique constraint "t_columns_unique_index_0082_01_pkey".*
+?.*Detail: Key \(id1\)=\(1\) already exists.*
+--step7:测试点一,清理环境   expect:成功
+drop table t_columns_unique_index_0082_01 cascade;
+SQL SUCCESS
+--测试点二:创建列存普通表，指定主键/唯一约束，删除字段的收集目标set statistics
+--step1:测试点二,创建列存普通表,指定主键/唯一约束   expect:成功
+drop table if exists t_columns_unique_index_0082_02;
+SQL SUCCESS
+create table t_columns_unique_index_0082_02(id1 smallint primary key, id2 integer unique) with(orientation=column);
+SQL SUCCESS
+--step2:测试点二,删除字段的收集目标   expect:成功
+alter table t_columns_unique_index_0082_02 delete statistics((id1,id2));
+SQL SUCCESS
+--step3:测试点二,对表字段执行analyze，查看系统表中字段统计信息   expect:无统计信息
+select attname,null_frac,n_distinct,n_dndistinct from pg_stats where tablename='t_columns_unique_index_0082_02';
++---------+-----------+------------+--------------+
+| attname | null_frac | n_distinct | n_dndistinct |
++---------+-----------+------------+--------------+
++---------+-----------+------------+--------------+
+--step4:测试点二,插入数据，执行analyze   expect:成功
+insert into t_columns_unique_index_0082_02 values(generate_series(1,1000),generate_series(1,1000));
+SQL SUCCESS
+analyze t_columns_unique_index_0082_02(id1,id2);
+SQL SUCCESS
+--step5:测试点二,再次查看系统表中字段统计信息   expect:有对应统计信息
+select attname,null_frac,n_distinct,n_dndistinct from pg_stats where tablename='t_columns_unique_index_0082_02';
++---------+-----------+------------+--------------+
+| attname | null_frac | n_distinct | n_dndistinct |
++---------+-----------+------------+--------------+
+| id1     | 0.0       | -1.0       | 0.0          |
+| id2     | 0.0       | -1.0       | 0.0          |
++---------+-----------+------------+--------------+
+--step6:测试点二,再次插入数据   expect:失败
+insert into t_columns_unique_index_0082_02 values(generate_series(1,1000),generate_series(1,1000));
+?.*ERROR: duplicate key value violates unique constraint "t_columns_unique_index_0082_02_pkey".*
+?.*Detail: Key \(id1\)=\(1\) already exists.*
+--step7:测试点二,清理环境   expect:成功
+drop table t_columns_unique_index_0082_02 cascade;
+SQL SUCCESS

@@ -1,0 +1,62 @@
+-- @testpoint: 删除行存表的索引添加on table，部分测试点合理报错
+--step1:建表;expect:成功
+drop table if exists t_plugin0006;
+SQL SUCCESS
+create table t_plugin0006 (a text(10), b box);
+SQL SUCCESS
+--step2:创建btree索引;expect:成功
+drop index if exists  id_plugin0006;
+SQL SUCCESS
+create index id_plugin0006 on t_plugin0006 using btree(a);
+SQL SUCCESS
+--step3:删除索引添加on table;expect:成功
+drop index id_plugin0006 on t_plugin0006;
+SQL SUCCESS
+--step4:创建hash索引;expect:成功
+drop index if exists id_plugin0006_01;
+SQL SUCCESS
+create index id_plugin0006_01 on t_plugin0006 using hash(a);
+SQL SUCCESS
+--step5:删除索引添加on table;expect:成功
+drop index id_plugin0006_01 on t_plugin0006;
+SQL SUCCESS
+--step6:创建gin索引;expect:成功
+drop index if exists id_plugin0006_02;
+SQL SUCCESS
+create index id_plugin0006_02 on t_plugin0006 using gin(to_tsvector('ngram', a));
+SQL SUCCESS
+--step7:删除索引添加on table;expect:成功
+drop index id_plugin0006_02 on t_plugin0006;
+SQL SUCCESS
+--step8:创建gist索引;expect:成功
+drop index if exists id_plugin0006_03;
+SQL SUCCESS
+create index  id_plugin0006_03 on t_plugin0006 using gist (b);
+SQL SUCCESS
+--step9:删除索引添加on table;expect:成功
+drop index id_plugin0006_03 on t_plugin0006;
+SQL SUCCESS
+--step10:创建ustore表;expect:成功
+drop table if exists t_plugin0006_01;
+SQL SUCCESS
+create table t_plugin0006_01 (a text(10), b box)with (storage_type=ustore);
+SQL SUCCESS
+--step11:创建ubtree索引;expect:成功
+drop index if exists id_plugin0006_04;
+SQL SUCCESS
+create index  id_plugin0006_04 on t_plugin0006_01 using ubtree (a);
+SQL SUCCESS
+--step12:删除索引添加on table;expect:成功
+drop index id_plugin0006_04 on t_plugin0006_01;
+SQL SUCCESS
+--step13:删除索引;expect:成功
+drop index if exists id_plugin0006_04 on t_plugin0006_01;
+SQL SUCCESS
+--step14:删除索引，表名不存在;expect:合理报错err
+drop index id_plugin0006_04 on t_plugin0006_015689;
+?.*ERROR: index "id_plugin0006_04" does not exist
+--step15:清理环境;expect:成功
+drop table if exists t_plugin0006;
+SQL SUCCESS
+drop table if exists t_plugin0006_01;
+SQL SUCCESS

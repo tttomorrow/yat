@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -74,6 +74,7 @@ class Synonym(unittest.TestCase):
         sql_cmd = self.commonsh.execut_db_sql('''
     begin
 	   for i in 1..1000 loop
+		   insert into SYN_TAB_038_02 values (i,i+1,'acdfbgkhbjklhlljnnohgjjgtvvdesaafgaeagacdtbfacdfbgkhbjklhlljnnohgjjgtvvdesaafgaeagacdtbfacdfbgkhbjklhlljnnohgjjgtvvdesaafgaeagacdtbfacdfbgkhbjklhlljnnohgjjgtvvdesaafgaeagacdtbf','16166316161a131661131311ada');
 	   end loop;
     end;''')
         self.log.info(sql_cmd)

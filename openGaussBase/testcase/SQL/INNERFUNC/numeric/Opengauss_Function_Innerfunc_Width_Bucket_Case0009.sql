@@ -1,4 +1,4 @@
--- @testpoint: width_bucket函数op为非数值类型,合理报错
+-- @testpoint: width_bucket函数op为非数值类型,部分测试点合理报错
 drop table if exists data_01;
 create table data_01 (clo1 char,clo2 boolean);
 insert into data_01 values ('a',true);

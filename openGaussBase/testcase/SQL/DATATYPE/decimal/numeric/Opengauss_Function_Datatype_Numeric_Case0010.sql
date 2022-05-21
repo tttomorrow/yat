@@ -1,4 +1,4 @@
--- @testpoint: 插入bool类型，合理报错
+-- @testpoint: 插入bool类型
 
 drop table if exists numeric_10;
 create table numeric_10 (name numeric);

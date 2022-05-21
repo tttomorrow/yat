@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -16,15 +16,15 @@ See the Mulan PSL v2 for more details.
 Case Type   : Separation_rights
 Case Name   : 三权分立后管理员用户对表空间有所有权限
 Description :
-    1.初始用户执行：CREATE USER sysadmin01 WITH SYSADMIN password 'Qazwsx@123';
-                CREATE USER wf WITH password 'Qazwsx@123';
+    1.初始用户执行：CREATE USER sysadmin01 WITH SYSADMIN password '$PASSWORD';
+                CREATE USER wf WITH password '$PASSWORD';
     2.sysadmin01 用户执行：CREATE TABLESPACE tablespace01 RELATIVE LOCATION
     'tablespace/tablespace_3';
-                GRANT CREATE ON TABLESPACE tablespace01 TO wf;
-                SELECT PG_TABLESPACE_SIZE('tablespace01');
-                ALTER TABLESPACE tablespace01 RENAME TO new_tablespace01;
-                REVOKE CREATE ON TABLESPACE new_tablespace01 FROM wf;
-                DROP TABLESPACE new_tablespace01;
+    GRANT CREATE ON TABLESPACE tablespace01 TO wf;
+    SELECT PG_TABLESPACE_SIZE('tablespace01');
+    ALTER TABLESPACE tablespace01 RENAME TO new_tablespace01;
+    REVOKE CREATE ON TABLESPACE new_tablespace01 FROM wf;
+    DROP TABLESPACE new_tablespace01;
 Expect      :
     1.CREATE ROLE
     CREATE ROLE

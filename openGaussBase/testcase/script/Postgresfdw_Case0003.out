@@ -1,0 +1,3543 @@
+-- ===================================================================
+-- create FDW objects
+-- ===================================================================
+CREATE EXTENSION postgres_fdw;
+CREATE EXTENSION
+CREATE SERVER testserver1 FOREIGN DATA WRAPPER postgres_fdw;
+CREATE SERVER
+CREATE EXTENSION postgres_fdw;
+ERROR:  extension "postgres_fdw" already exists in schema "public"
+DO $d$
+    BEGIN
+        EXECUTE $$CREATE SERVER loopback FOREIGN DATA WRAPPER postgres_fdw
+            OPTIONS (dbname '$$||current_database()||$$',
+                     port '$$||current_setting('port')||$$'
+            )$$;
+    END;
+$d$;
+ANONYMOUS BLOCK EXECUTE
+CREATE USER MAPPING FOR public SERVER testserver1
+	OPTIONS (user 'value', password 'value');
+CREATE USER MAPPING
+CREATE USER MAPPING FOR CURRENT_USER SERVER loopback;
+CREATE USER MAPPING
+-- ===================================================================
+-- create objects used through FDW loopback server
+-- ===================================================================
+CREATE TYPE user_enum AS ENUM ('foo', 'bar', 'buz');
+CREATE TYPE
+CREATE SCHEMA "S 1";
+CREATE SCHEMA
+CREATE TABLE "S 1"."T 1" (
+	"C 1" int NOT NULL,
+	c2 int NOT NULL,
+	c3 text,
+	c4 timestamptz,
+	c5 timestamp,
+	c6 varchar(10),
+	c7 char(10),
+	c8 user_enum,
+	CONSTRAINT t1_pkey PRIMARY KEY ("C 1")
+);
+NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t1_pkey" for table "T 1"
+CREATE TABLE
+CREATE TABLE "S 1"."T 2" (
+	c1 int NOT NULL,
+	c2 text,
+	CONSTRAINT t2_pkey PRIMARY KEY (c1)
+);
+NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t2_pkey" for table "T 2"
+CREATE TABLE
+CREATE TABLE "S 1"."T 3" (
+	c1 int NOT NULL,
+	c2 int NOT NULL,
+	c3 text,
+	CONSTRAINT t3_pkey PRIMARY KEY (c1)
+);
+NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t3_pkey" for table "T 3"
+CREATE TABLE
+CREATE TABLE "S 1"."T 4" (
+	c1 int NOT NULL,
+	c2 int NOT NULL,
+	c3 text,
+	CONSTRAINT t4_pkey PRIMARY KEY (c1)
+);
+NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "t4_pkey" for table "T 4"
+CREATE TABLE
+INSERT INTO "S 1"."T 1"
+	SELECT id,
+	       id % 10,
+	       to_char(id, 'FM00000'),
+	       '1970-01-01'::timestamptz + ((id % 100) || ' days')::interval,
+	       '1970-01-01'::timestamp + ((id % 100) || ' days')::interval,
+	       id % 10,
+	       id % 10,
+	       'foo'::user_enum
+	FROM generate_series(1, 1000) id;
+INSERT 0 1000
+INSERT INTO "S 1"."T 2"
+	SELECT id,
+	       'AAA' || to_char(id, 'FM000')
+	FROM generate_series(1, 100) id;
+INSERT 0 100
+INSERT INTO "S 1"."T 3"
+	SELECT id,
+	       id + 1,
+	       'AAA' || to_char(id, 'FM000')
+	FROM generate_series(1, 100) id;
+INSERT 0 100
+DELETE FROM "S 1"."T 3" WHERE c1 % 2 != 0;	-- delete for outer join tests
+DELETE 50
+INSERT INTO "S 1"."T 4"
+	SELECT id,
+	       id + 1,
+	       'AAA' || to_char(id, 'FM000')
+	FROM generate_series(1, 100) id;
+INSERT 0 100
+DELETE FROM "S 1"."T 4" WHERE c1 % 3 != 0;	-- delete for outer join tests
+DELETE 67
+ANALYZE "S 1"."T 1";
+ANALYZE
+ANALYZE "S 1"."T 2";
+ANALYZE
+ANALYZE "S 1"."T 3";
+ANALYZE
+ANALYZE "S 1"."T 4";
+ANALYZE
+-- ===================================================================
+-- create local tables to check whether the grammer is support
+-- ===================================================================
+CREATE TABLE local_ft1 (
+	c1 int NOT NULL,
+	"C 1" int NOT NULL,
+	c2 int NOT NULL,
+	c3 text,
+	c4 timestamptz,
+	c5 timestamp,
+	c6 varchar(10),
+	c7 char(10) default 'ft1',
+	c8 user_enum
+);
+CREATE TABLE
+CREATE TABLE local_ft2 (
+	c1 int NOT NULL,
+	"C 1" int NOT NULL,
+	c2 int NOT NULL,
+	c3 text,
+	c4 timestamptz,
+	c5 timestamp,
+	c6 varchar(10),
+	c7 char(10) default 'ft2',
+	c8 user_enum
+);
+CREATE TABLE
+-- ===================================================================
+-- create foreign tables
+-- ===================================================================
+CREATE FOREIGN TABLE ft1 (
+	c0 int,
+	c1 int NOT NULL,
+	c2 int NOT NULL,
+	c3 text,
+	c4 timestamptz,
+	c5 timestamp,
+	c6 varchar(10),
+	c7 char(10) default 'ft1',
+	c8 user_enum
+) SERVER loopback;
+CREATE FOREIGN TABLE
+ALTER FOREIGN TABLE ft1 DROP COLUMN c0;
+ALTER FOREIGN TABLE
+CREATE FOREIGN TABLE ft2 (
+	c1 int NOT NULL,
+	c2 int NOT NULL,
+	cx int,
+	c3 text,
+	c4 timestamptz,
+	c5 timestamp,
+	c6 varchar(10),
+	c7 char(10) default 'ft2',
+	c8 user_enum
+) SERVER loopback;
+CREATE FOREIGN TABLE
+ALTER FOREIGN TABLE ft2 DROP COLUMN cx;
+ALTER FOREIGN TABLE
+CREATE FOREIGN TABLE ft4 (
+	c1 int NOT NULL,
+	c2 int NOT NULL,
+	c3 text
+) SERVER loopback OPTIONS (schema_name 'S 1', table_name 'T 3');
+CREATE FOREIGN TABLE
+CREATE FOREIGN TABLE ft5 (
+	c1 int NOT NULL,
+	c2 int NOT NULL,
+	c3 text
+) SERVER loopback OPTIONS (schema_name 'S 1', table_name 'T 4');
+CREATE FOREIGN TABLE
+-- ===================================================================
+-- tests for validator
+-- ===================================================================
+-- requiressl and some other parameters are omitted because
+-- valid values for them depend on configure options
+ALTER SERVER testserver1 OPTIONS (
+	use_remote_estimate 'false',
+	updatable 'true',
+	fdw_startup_cost '123.456',
+	fdw_tuple_cost '0.123',
+	service 'value',
+	connect_timeout 'value',
+	dbname 'value',
+	host 'value',
+	hostaddr 'value',
+	port 'value',
+	--client_encoding 'value',
+	application_name 'value',
+	--fallback_application_name 'value',
+	keepalives 'value',
+	keepalives_idle 'value',
+	keepalives_interval 'value',
+	-- requiressl 'value',
+	sslcompression 'value',
+	sslmode 'value',
+	sslcert 'value',
+	sslkey 'value',
+	sslrootcert 'value',
+	sslcrl 'value',
+	--requirepeer 'value',
+	krbsrvname 'value'
+	--gsslib 'value'
+	--replication 'value'
+);
+ALTER SERVER
+ALTER USER MAPPING FOR public SERVER testserver1
+	OPTIONS (DROP user, DROP password);
+ALTER USER MAPPING
+ALTER FOREIGN TABLE ft1 OPTIONS (schema_name 'S 1', table_name 'T 1');
+ALTER FOREIGN TABLE
+ALTER FOREIGN TABLE ft2 OPTIONS (schema_name 'S 1', table_name 'T 1');
+ALTER FOREIGN TABLE
+ALTER FOREIGN TABLE ft1 ALTER COLUMN c1 OPTIONS (column_name 'C 1');
+ALTER FOREIGN TABLE
+ALTER FOREIGN TABLE ft2 ALTER COLUMN c1 OPTIONS (column_name 'C 1');
+ALTER FOREIGN TABLE
+\det+
+                             List of foreign tables
+ Schema | Table |  Server  |              FDW Options              | Description 
+--------+-------+----------+---------------------------------------+-------------
+ public | ft1   | loopback | (schema_name 'S 1', table_name 'T 1') | 
+ public | ft2   | loopback | (schema_name 'S 1', table_name 'T 1') | 
+ public | ft4   | loopback | (schema_name 'S 1', table_name 'T 3') | 
+ public | ft5   | loopback | (schema_name 'S 1', table_name 'T 4') | 
+(4 rows)
+
+-- Test that alteration of server options causes reconnection
+-- Remote's errors might be non-English, so hide them to ensure stable results
+\set VERBOSITY terse
+SELECT c3, c4 FROM ft1 ORDER BY c3, c1 LIMIT 1;  -- should work
+  c3   |           c4           
+-------+------------------------
+ 00001 | 1970-01-02 00:00:00+08
+(1 row)
+
+ALTER SERVER loopback OPTIONS (SET dbname 'no such database');
+ALTER SERVER
+SELECT c3, c4 FROM ft1 ORDER BY c3, c1 LIMIT 1;  -- should fail
+ERROR:  could not connect to server "loopback"
+DO $d$
+    BEGIN
+        EXECUTE $$ALTER SERVER loopback
+            OPTIONS (SET dbname '$$||current_database()||$$')$$;
+    END;
+$d$;
+ANONYMOUS BLOCK EXECUTE
+SELECT c3, c4 FROM ft1 ORDER BY c3, c1 LIMIT 1;  -- should work again
+  c3   |           c4           
+-------+------------------------
+ 00001 | 1970-01-02 00:00:00+08
+(1 row)
+
+-- Test that alteration of user mapping options causes reconnection
+ALTER USER MAPPING FOR CURRENT_USER SERVER loopback
+  OPTIONS (ADD user 'no such user');
+ALTER USER MAPPING
+SELECT c3, c4 FROM ft1 ORDER BY c3, c1 LIMIT 1;  -- should fail
+ERROR:  could not connect to server "loopback"
+ALTER USER MAPPING FOR CURRENT_USER SERVER loopback
+  OPTIONS (DROP user);
+ALTER USER MAPPING
+SELECT c3, c4 FROM ft1 ORDER BY c3, c1 LIMIT 1;  -- should work again
+  c3   |           c4           
+-------+------------------------
+ 00001 | 1970-01-02 00:00:00+08
+(1 row)
+
+\set VERBOSITY default
+-- Now we should be able to run ANALYZE.
+-- To exercise multiple code paths, we use local stats on ft1
+-- and remote-estimate mode on ft2.
+ANALYZE ft1;
+ANALYZE
+ANALYZE ft4;
+ANALYZE
+ANALYZE ft5;
+ANALYZE
+ALTER FOREIGN TABLE ft2 OPTIONS (use_remote_estimate 'true');
+ALTER FOREIGN TABLE
+-- ===================================================================
+-- simple queries
+-- ===================================================================
+-- single table, with/without alias
+EXPLAIN (COSTS false) SELECT * FROM ft1 ORDER BY c3, c1 OFFSET 100 LIMIT 10;
+           QUERY PLAN            
+---------------------------------
+ Limit
+   ->  Sort
+         Sort Key: c3, c1
+         ->  Foreign Scan on ft1
+(4 rows)
+
+SELECT * FROM ft1 ORDER BY c3, c1 OFFSET 100 LIMIT 10;
+ c1  | c2 |  c3   |           c4           |         c5          | c6 |     c7     | c8  
+-----+----+-------+------------------------+---------------------+----+------------+-----
+ 101 |  1 | 00101 | 1970-01-02 00:00:00+08 | 1970-01-02 00:00:00 | 1  | 1          | foo
+ 102 |  2 | 00102 | 1970-01-03 00:00:00+08 | 1970-01-03 00:00:00 | 2  | 2          | foo
+ 103 |  3 | 00103 | 1970-01-04 00:00:00+08 | 1970-01-04 00:00:00 | 3  | 3          | foo
+ 104 |  4 | 00104 | 1970-01-05 00:00:00+08 | 1970-01-05 00:00:00 | 4  | 4          | foo
+ 105 |  5 | 00105 | 1970-01-06 00:00:00+08 | 1970-01-06 00:00:00 | 5  | 5          | foo
+ 106 |  6 | 00106 | 1970-01-07 00:00:00+08 | 1970-01-07 00:00:00 | 6  | 6          | foo
+ 107 |  7 | 00107 | 1970-01-08 00:00:00+08 | 1970-01-08 00:00:00 | 7  | 7          | foo
+ 108 |  8 | 00108 | 1970-01-09 00:00:00+08 | 1970-01-09 00:00:00 | 8  | 8          | foo
+ 109 |  9 | 00109 | 1970-01-10 00:00:00+08 | 1970-01-10 00:00:00 | 9  | 9          | foo
+ 110 |  0 | 00110 | 1970-01-11 00:00:00+08 | 1970-01-11 00:00:00 | 0  | 0          | foo
+(10 rows)
+
+EXPLAIN (VERBOSE, COSTS false) SELECT * FROM ft1 t1 ORDER BY t1.c3, t1.c1 OFFSET 100 LIMIT 10;
+                                     QUERY PLAN                                      
+-------------------------------------------------------------------------------------
+ Limit
+   Output: c1, c2, c3, c4, c5, c6, c7, c8
+   ->  Sort
+         Output: c1, c2, c3, c4, c5, c6, c7, c8
+         Sort Key: t1.c3, t1.c1
+         ->  Foreign Scan on public.ft1 t1
+               Output: c1, c2, c3, c4, c5, c6, c7, c8
+               Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+(8 rows)
+
+SELECT * FROM ft1 t1 ORDER BY t1.c3, t1.c1 OFFSET 100 LIMIT 10;
+ c1  | c2 |  c3   |           c4           |         c5          | c6 |     c7     | c8  
+-----+----+-------+------------------------+---------------------+----+------------+-----
+ 101 |  1 | 00101 | 1970-01-02 00:00:00+08 | 1970-01-02 00:00:00 | 1  | 1          | foo
+ 102 |  2 | 00102 | 1970-01-03 00:00:00+08 | 1970-01-03 00:00:00 | 2  | 2          | foo
+ 103 |  3 | 00103 | 1970-01-04 00:00:00+08 | 1970-01-04 00:00:00 | 3  | 3          | foo
+ 104 |  4 | 00104 | 1970-01-05 00:00:00+08 | 1970-01-05 00:00:00 | 4  | 4          | foo
+ 105 |  5 | 00105 | 1970-01-06 00:00:00+08 | 1970-01-06 00:00:00 | 5  | 5          | foo
+ 106 |  6 | 00106 | 1970-01-07 00:00:00+08 | 1970-01-07 00:00:00 | 6  | 6          | foo
+ 107 |  7 | 00107 | 1970-01-08 00:00:00+08 | 1970-01-08 00:00:00 | 7  | 7          | foo
+ 108 |  8 | 00108 | 1970-01-09 00:00:00+08 | 1970-01-09 00:00:00 | 8  | 8          | foo
+ 109 |  9 | 00109 | 1970-01-10 00:00:00+08 | 1970-01-10 00:00:00 | 9  | 9          | foo
+ 110 |  0 | 00110 | 1970-01-11 00:00:00+08 | 1970-01-11 00:00:00 | 0  | 0          | foo
+(10 rows)
+
+-- whole-row reference
+EXPLAIN (VERBOSE, COSTS false) SELECT t1 FROM ft1 t1 ORDER BY t1.c3, t1.c1 OFFSET 100 LIMIT 10;
+                                     QUERY PLAN                                      
+-------------------------------------------------------------------------------------
+ Limit
+   Output: t1.*, c3, c1
+   ->  Sort
+         Output: t1.*, c3, c1
+         Sort Key: t1.c3, t1.c1
+         ->  Foreign Scan on public.ft1 t1
+               Output: t1.*, c3, c1
+               Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+(8 rows)
+
+SELECT t1 FROM ft1 t1 ORDER BY t1.c3, t1.c1 OFFSET 100 LIMIT 10;
+                                       t1                                        
+---------------------------------------------------------------------------------
+ (101,1,00101,"1970-01-02 00:00:00+08","1970-01-02 00:00:00",1,"1         ",foo)
+ (102,2,00102,"1970-01-03 00:00:00+08","1970-01-03 00:00:00",2,"2         ",foo)
+ (103,3,00103,"1970-01-04 00:00:00+08","1970-01-04 00:00:00",3,"3         ",foo)
+ (104,4,00104,"1970-01-05 00:00:00+08","1970-01-05 00:00:00",4,"4         ",foo)
+ (105,5,00105,"1970-01-06 00:00:00+08","1970-01-06 00:00:00",5,"5         ",foo)
+ (106,6,00106,"1970-01-07 00:00:00+08","1970-01-07 00:00:00",6,"6         ",foo)
+ (107,7,00107,"1970-01-08 00:00:00+08","1970-01-08 00:00:00",7,"7         ",foo)
+ (108,8,00108,"1970-01-09 00:00:00+08","1970-01-09 00:00:00",8,"8         ",foo)
+ (109,9,00109,"1970-01-10 00:00:00+08","1970-01-10 00:00:00",9,"9         ",foo)
+ (110,0,00110,"1970-01-11 00:00:00+08","1970-01-11 00:00:00",0,"0         ",foo)
+(10 rows)
+
+-- empty result
+SELECT * FROM ft1 WHERE false;
+ c1 | c2 | c3 | c4 | c5 | c6 | c7 | c8 
+----+----+----+----+----+----+----+----
+(0 rows)
+
+-- with WHERE clause
+EXPLAIN (VERBOSE, COSTS false) SELECT * FROM ft1 t1 WHERE t1.c1 = 101 AND t1.c6 = '1' AND t1.c7 >= '1';
+                                      QUERY PLAN                                      
+--------------------------------------------------------------------------------------
+ Foreign Scan on public.ft1 t1
+   Output: c1, c2, c3, c4, c5, c6, c7, c8
+   Filter: ((t1.c7 >= '1'::bpchar) AND (t1.c1 = 101) AND ((t1.c6)::text = '1'::text))
+   Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+(4 rows)
+
+SELECT * FROM ft1 t1 WHERE t1.c1 = 101 AND t1.c6 = '1' AND t1.c7 >= '1';
+ c1  | c2 |  c3   |           c4           |         c5          | c6 |     c7     | c8  
+-----+----+-------+------------------------+---------------------+----+------------+-----
+ 101 |  1 | 00101 | 1970-01-02 00:00:00+08 | 1970-01-02 00:00:00 | 1  | 1          | foo
+(1 row)
+
+-- with FOR UPDATE/SHARE
+EXPLAIN (VERBOSE, COSTS false) SELECT * FROM ft1 t1 WHERE c1 = 101 FOR UPDATE;
+                                        QUERY PLAN                                        
+------------------------------------------------------------------------------------------
+ LockRows
+   Output: c1, c2, c3, c4, c5, c6, c7, c8, t1.*
+   ->  Foreign Scan on public.ft1 t1
+         Output: c1, c2, c3, c4, c5, c6, c7, c8, t1.*
+         Filter: (t1.c1 = 101)
+         Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1" FOR UPDATE
+(6 rows)
+
+SELECT * FROM ft1 t1 WHERE c1 = 101 FOR UPDATE;
+ c1  | c2 |  c3   |           c4           |         c5          | c6 |     c7     | c8  
+-----+----+-------+------------------------+---------------------+----+------------+-----
+ 101 |  1 | 00101 | 1970-01-02 00:00:00+08 | 1970-01-02 00:00:00 | 1  | 1          | foo
+(1 row)
+
+EXPLAIN (VERBOSE, COSTS false) SELECT * FROM ft1 t1 WHERE c1 = 102 FOR SHARE;
+                                       QUERY PLAN                                        
+-----------------------------------------------------------------------------------------
+ LockRows
+   Output: c1, c2, c3, c4, c5, c6, c7, c8, t1.*
+   ->  Foreign Scan on public.ft1 t1
+         Output: c1, c2, c3, c4, c5, c6, c7, c8, t1.*
+         Filter: (t1.c1 = 102)
+         Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1" FOR SHARE
+(6 rows)
+
+SELECT * FROM ft1 t1 WHERE c1 = 102 FOR SHARE;
+ c1  | c2 |  c3   |           c4           |         c5          | c6 |     c7     | c8  
+-----+----+-------+------------------------+---------------------+----+------------+-----
+ 102 |  2 | 00102 | 1970-01-03 00:00:00+08 | 1970-01-03 00:00:00 | 2  | 2          | foo
+(1 row)
+
+-- aggregate
+SELECT COUNT(*) FROM ft1 t1;
+ count 
+-------
+  1000
+(1 row)
+
+-- join two tables
+SELECT t1.c1 FROM ft1 t1 JOIN ft2 t2 ON (t1.c1 = t2.c1) ORDER BY t1.c3, t1.c1 OFFSET 100 LIMIT 10;
+ c1  
+-----
+ 101
+ 102
+ 103
+ 104
+ 105
+ 106
+ 107
+ 108
+ 109
+ 110
+(10 rows)
+
+-- subquery
+SELECT * FROM ft1 t1 WHERE t1.c3 IN (SELECT c3 FROM ft2 t2 WHERE c1 <= 10) ORDER BY c1;
+ c1 | c2 |  c3   |           c4           |         c5          | c6 |     c7     | c8  
+----+----+-------+------------------------+---------------------+----+------------+-----
+  1 |  1 | 00001 | 1970-01-02 00:00:00+08 | 1970-01-02 00:00:00 | 1  | 1          | foo
+  2 |  2 | 00002 | 1970-01-03 00:00:00+08 | 1970-01-03 00:00:00 | 2  | 2          | foo
+  3 |  3 | 00003 | 1970-01-04 00:00:00+08 | 1970-01-04 00:00:00 | 3  | 3          | foo
+  4 |  4 | 00004 | 1970-01-05 00:00:00+08 | 1970-01-05 00:00:00 | 4  | 4          | foo
+  5 |  5 | 00005 | 1970-01-06 00:00:00+08 | 1970-01-06 00:00:00 | 5  | 5          | foo
+  6 |  6 | 00006 | 1970-01-07 00:00:00+08 | 1970-01-07 00:00:00 | 6  | 6          | foo
+  7 |  7 | 00007 | 1970-01-08 00:00:00+08 | 1970-01-08 00:00:00 | 7  | 7          | foo
+  8 |  8 | 00008 | 1970-01-09 00:00:00+08 | 1970-01-09 00:00:00 | 8  | 8          | foo
+  9 |  9 | 00009 | 1970-01-10 00:00:00+08 | 1970-01-10 00:00:00 | 9  | 9          | foo
+ 10 |  0 | 00010 | 1970-01-11 00:00:00+08 | 1970-01-11 00:00:00 | 0  | 0          | foo
+(10 rows)
+
+-- subquery+MAX
+SELECT * FROM ft1 t1 WHERE t1.c3 = (SELECT MAX(c3) FROM ft2 t2) ORDER BY c1;
+  c1  | c2 |  c3   |           c4           |         c5          | c6 |     c7     | c8  
+------+----+-------+------------------------+---------------------+----+------------+-----
+ 1000 |  0 | 01000 | 1970-01-01 00:00:00+08 | 1970-01-01 00:00:00 | 0  | 0          | foo
+(1 row)
+
+-- used in CTE
+WITH t1 AS (SELECT * FROM ft1 WHERE c1 <= 10) SELECT t2.c1, t2.c2, t2.c3, t2.c4 FROM t1, ft2 t2 WHERE t1.c1 = t2.c1 ORDER BY t1.c1;
+ c1 | c2 |  c3   |           c4           
+----+----+-------+------------------------
+  1 |  1 | 00001 | 1970-01-02 00:00:00+08
+  2 |  2 | 00002 | 1970-01-03 00:00:00+08
+  3 |  3 | 00003 | 1970-01-04 00:00:00+08
+  4 |  4 | 00004 | 1970-01-05 00:00:00+08
+  5 |  5 | 00005 | 1970-01-06 00:00:00+08
+  6 |  6 | 00006 | 1970-01-07 00:00:00+08
+  7 |  7 | 00007 | 1970-01-08 00:00:00+08
+  8 |  8 | 00008 | 1970-01-09 00:00:00+08
+  9 |  9 | 00009 | 1970-01-10 00:00:00+08
+ 10 |  0 | 00010 | 1970-01-11 00:00:00+08
+(10 rows)
+
+-- fixed values
+SELECT 'fixed', NULL FROM ft1 t1 WHERE c1 = 1;
+ ?column? | ?column? 
+----------+----------
+ fixed    | 
+(1 row)
+
+-- user-defined operator/function
+CREATE FUNCTION postgres_fdw_abs(int) RETURNS int AS $$
+BEGIN
+RETURN abs($1);
+END
+$$ LANGUAGE plpgsql IMMUTABLE;
+CREATE FUNCTION
+CREATE OPERATOR === (
+    LEFTARG = int,
+    RIGHTARG = int,
+    PROCEDURE = int4eq,
+    COMMUTATOR = ===,
+    NEGATOR = !==
+);
+CREATE OPERATOR
+EXPLAIN (VERBOSE, COSTS false) SELECT * FROM ft1 t1 WHERE t1.c1 = postgres_fdw_abs(t1.c2);
+                               QUERY PLAN                                
+-------------------------------------------------------------------------
+ Foreign Scan on public.ft1 t1
+   Output: c1, c2, c3, c4, c5, c6, c7, c8
+   Filter: (t1.c1 = postgres_fdw_abs(t1.c2))
+   Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+(4 rows)
+
+EXPLAIN (VERBOSE, COSTS false) SELECT * FROM ft1 t1 WHERE t1.c1 === t1.c2;
+                               QUERY PLAN                                
+-------------------------------------------------------------------------
+ Foreign Scan on public.ft1 t1
+   Output: c1, c2, c3, c4, c5, c6, c7, c8
+   Filter: (t1.c1 === t1.c2)
+   Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+(4 rows)
+
+EXPLAIN (VERBOSE, COSTS false) SELECT * FROM ft1 t1 WHERE t1.c1 = abs(t1.c2);
+                                            QUERY PLAN                                             
+---------------------------------------------------------------------------------------------------
+ Foreign Scan on public.ft1 t1
+   Output: c1, c2, c3, c4, c5, c6, c7, c8
+   Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1" WHERE (("C 1" = abs(c2)))
+(3 rows)
+
+EXPLAIN (VERBOSE, COSTS false) SELECT * FROM ft1 t1 WHERE t1.c1 = t1.c2;
+                                          QUERY PLAN                                          
+----------------------------------------------------------------------------------------------
+ Foreign Scan on public.ft1 t1
+   Output: c1, c2, c3, c4, c5, c6, c7, c8
+   Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1" WHERE (("C 1" = c2))
+(3 rows)
+
+-- ===================================================================
+-- WHERE with remotely-executable conditions
+-- ===================================================================
+EXPLAIN (VERBOSE, COSTS false) SELECT * FROM ft1 t1 WHERE t1.c1 = 1;         -- Var, OpExpr(b), Const
+                               QUERY PLAN                                
+-------------------------------------------------------------------------
+ Foreign Scan on public.ft1 t1
+   Output: c1, c2, c3, c4, c5, c6, c7, c8
+   Filter: (t1.c1 = 1)
+   Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+(4 rows)
+
+EXPLAIN (VERBOSE, COSTS false) SELECT * FROM ft1 t1 WHERE t1.c1 = 100 AND t1.c2 = 0; -- BoolExpr
+                               QUERY PLAN                                
+-------------------------------------------------------------------------
+ Foreign Scan on public.ft1 t1
+   Output: c1, c2, c3, c4, c5, c6, c7, c8
+   Filter: ((t1.c1 = 100) AND (t1.c2 = 0))
+   Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+(4 rows)
+
+EXPLAIN (VERBOSE, COSTS false) SELECT * FROM ft1 t1 WHERE c1 IS NULL;        -- NullTest
+                                           QUERY PLAN                                            
+-------------------------------------------------------------------------------------------------
+ Foreign Scan on public.ft1 t1
+   Output: c1, c2, c3, c4, c5, c6, c7, c8
+   Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1" WHERE (("C 1" IS NULL))
+(3 rows)
+
+EXPLAIN (VERBOSE, COSTS false) SELECT * FROM ft1 t1 WHERE c1 IS NOT NULL;    -- NullTest
+                               QUERY PLAN                                
+-------------------------------------------------------------------------
+ Foreign Scan on public.ft1 t1
+   Output: c1, c2, c3, c4, c5, c6, c7, c8
+   Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+(3 rows)
+
+EXPLAIN (VERBOSE, COSTS false) SELECT * FROM ft1 t1 WHERE round(abs(c1), 0) = 1; -- FuncExpr
+                               QUERY PLAN                                
+-------------------------------------------------------------------------
+ Foreign Scan on public.ft1 t1
+   Output: c1, c2, c3, c4, c5, c6, c7, c8
+   Filter: (round((abs(t1.c1))::numeric, 0) = 1::numeric)
+   Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+(4 rows)
+
+EXPLAIN (VERBOSE, COSTS false) SELECT * FROM ft1 t1 WHERE c1 = -c1;          -- OpExpr(l)
+                                             QUERY PLAN                                              
+-----------------------------------------------------------------------------------------------------
+ Foreign Scan on public.ft1 t1
+   Output: c1, c2, c3, c4, c5, c6, c7, c8
+   Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1" WHERE (("C 1" = (- "C 1")))
+(3 rows)
+
+EXPLAIN (VERBOSE, COSTS false) SELECT * FROM ft1 t1 WHERE 1 = c1!;           -- OpExpr(r)
+                               QUERY PLAN                                
+-------------------------------------------------------------------------
+ Foreign Scan on public.ft1 t1
+   Output: c1, c2, c3, c4, c5, c6, c7, c8
+   Filter: (1::numeric = ((t1.c1)::bigint !))
+   Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+(4 rows)
+
+EXPLAIN (VERBOSE, COSTS false) SELECT * FROM ft1 t1 WHERE (c1 IS NOT NULL) IS DISTINCT FROM (c1 IS NOT NULL); -- DistinctExpr
+                                                                 QUERY PLAN                                                                 
+--------------------------------------------------------------------------------------------------------------------------------------------
+ Foreign Scan on public.ft1 t1
+   Output: c1, c2, c3, c4, c5, c6, c7, c8
+   Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1" WHERE ((("C 1" IS NOT NULL) IS DISTINCT FROM ("C 1" IS NOT NULL)))
+(3 rows)
+
+EXPLAIN (VERBOSE, COSTS false) SELECT * FROM ft1 t1 WHERE c1 = ANY(ARRAY[c2, 1, c1 + 0]); -- ScalarArrayOpExpr
+                               QUERY PLAN                                
+-------------------------------------------------------------------------
+ Foreign Scan on public.ft1 t1
+   Output: c1, c2, c3, c4, c5, c6, c7, c8
+   Filter: (t1.c1 = ANY (ARRAY[t1.c2, 1, (t1.c1 + 0)]))
+   Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+(4 rows)
+
+EXPLAIN (VERBOSE, COSTS false) SELECT * FROM ft1 t1 WHERE c1 = (ARRAY[c1,c2,3])[1]; -- ArrayRef
+                               QUERY PLAN                                
+-------------------------------------------------------------------------
+ Foreign Scan on public.ft1 t1
+   Output: c1, c2, c3, c4, c5, c6, c7, c8
+   Filter: (t1.c1 = (ARRAY[t1.c1, t1.c2, 3])[1])
+   Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+(4 rows)
+
+EXPLAIN (VERBOSE, COSTS false) SELECT * FROM ft1 t1 WHERE c6 = E'foo''s\\bar';  -- check special chars
+                               QUERY PLAN                                
+-------------------------------------------------------------------------
+ Foreign Scan on public.ft1 t1
+   Output: c1, c2, c3, c4, c5, c6, c7, c8
+   Filter: ((t1.c6)::text = 'foo''s\bar'::text)
+   Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+(4 rows)
+
+EXPLAIN (VERBOSE, COSTS false) SELECT * FROM ft1 t1 WHERE c8 = 'foo';  -- can't be sent to remote
+                               QUERY PLAN                                
+-------------------------------------------------------------------------
+ Foreign Scan on public.ft1 t1
+   Output: c1, c2, c3, c4, c5, c6, c7, c8
+   Filter: (t1.c8 = 'foo'::user_enum)
+   Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+(4 rows)
+
+-- parameterized remote path
+EXPLAIN (VERBOSE, COSTS false)
+  SELECT * FROM ft2 a, ft2 b WHERE a.c1 = 47 AND b.c1 = a.c2;
+                                                QUERY PLAN                                                
+----------------------------------------------------------------------------------------------------------
+ Hash Join
+   Output: a.c1, a.c2, a.c3, a.c4, a.c5, a.c6, a.c7, a.c8, b.c1, b.c2, b.c3, b.c4, b.c5, b.c6, b.c7, b.c8
+   Hash Cond: (a.c2 = b.c1)
+   ->  Foreign Scan on public.ft2 a
+         Output: a.c1, a.c2, a.c3, a.c4, a.c5, a.c6, a.c7, a.c8
+         Filter: (a.c1 = 47)
+         Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+   ->  Hash
+         Output: b.c1, b.c2, b.c3, b.c4, b.c5, b.c6, b.c7, b.c8
+         ->  Foreign Scan on public.ft2 b
+               Output: b.c1, b.c2, b.c3, b.c4, b.c5, b.c6, b.c7, b.c8
+               Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+(12 rows)
+
+SELECT * FROM ft2 a, ft2 b WHERE a.c1 = 47 AND b.c1 = a.c2;
+ c1 | c2 |  c3   |           c4           |         c5          | c6 |     c7     | c8  | c1 | c2 |  c3   |           c4           |         c5          | c6 |     c7     | c8  
+----+----+-------+------------------------+---------------------+----+------------+-----+----+----+-------+------------------------+---------------------+----+------------+-----
+ 47 |  7 | 00047 | 1970-02-17 00:00:00+08 | 1970-02-17 00:00:00 | 7  | 7          | foo |  7 |  7 | 00007 | 1970-01-08 00:00:00+08 | 1970-01-08 00:00:00 | 7  | 7          | foo
+(1 row)
+
+-- check both safe and unsafe join conditions
+EXPLAIN (VERBOSE, COSTS false)
+  SELECT * FROM ft2 a, ft2 b
+  WHERE a.c2 = 6 AND b.c1 = a.c1 AND a.c8 = 'foo' AND b.c7 = upper(a.c7);
+                                                QUERY PLAN                                                
+----------------------------------------------------------------------------------------------------------
+ Hash Join
+   Output: a.c1, a.c2, a.c3, a.c4, a.c5, a.c6, a.c7, a.c8, b.c1, b.c2, b.c3, b.c4, b.c5, b.c6, b.c7, b.c8
+   Hash Cond: ((a.c1 = b.c1) AND (upper((a.c7)::text) = (b.c7)::text))
+   ->  Foreign Scan on public.ft2 a
+         Output: a.c1, a.c2, a.c3, a.c4, a.c5, a.c6, a.c7, a.c8
+         Filter: ((a.c2 = 6) AND (a.c8 = 'foo'::user_enum))
+         Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+   ->  Hash
+         Output: b.c1, b.c2, b.c3, b.c4, b.c5, b.c6, b.c7, b.c8
+         ->  Foreign Scan on public.ft2 b
+               Output: b.c1, b.c2, b.c3, b.c4, b.c5, b.c6, b.c7, b.c8
+               Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+(12 rows)
+
+SELECT * FROM ft2 a, ft2 b
+WHERE a.c2 = 6 AND b.c1 = a.c1 AND a.c8 = 'foo' AND b.c7 = upper(a.c7);
+ c1  | c2 |  c3   |           c4           |         c5          | c6 |     c7     | c8  | c1  | c2 |  c3   |           c4           |         c5          | c6 |     c7     | c8  
+-----+----+-------+------------------------+---------------------+----+------------+-----+-----+----+-------+------------------------+---------------------+----+------------+-----
+   6 |  6 | 00006 | 1970-01-07 00:00:00+08 | 1970-01-07 00:00:00 | 6  | 6          | foo |   6 |  6 | 00006 | 1970-01-07 00:00:00+08 | 1970-01-07 00:00:00 | 6  | 6          | foo
+  16 |  6 | 00016 | 1970-01-17 00:00:00+08 | 1970-01-17 00:00:00 | 6  | 6          | foo |  16 |  6 | 00016 | 1970-01-17 00:00:00+08 | 1970-01-17 00:00:00 | 6  | 6          | foo
+  26 |  6 | 00026 | 1970-01-27 00:00:00+08 | 1970-01-27 00:00:00 | 6  | 6          | foo |  26 |  6 | 00026 | 1970-01-27 00:00:00+08 | 1970-01-27 00:00:00 | 6  | 6          | foo
+  36 |  6 | 00036 | 1970-02-06 00:00:00+08 | 1970-02-06 00:00:00 | 6  | 6          | foo |  36 |  6 | 00036 | 1970-02-06 00:00:00+08 | 1970-02-06 00:00:00 | 6  | 6          | foo
+  46 |  6 | 00046 | 1970-02-16 00:00:00+08 | 1970-02-16 00:00:00 | 6  | 6          | foo |  46 |  6 | 00046 | 1970-02-16 00:00:00+08 | 1970-02-16 00:00:00 | 6  | 6          | foo
+  56 |  6 | 00056 | 1970-02-26 00:00:00+08 | 1970-02-26 00:00:00 | 6  | 6          | foo |  56 |  6 | 00056 | 1970-02-26 00:00:00+08 | 1970-02-26 00:00:00 | 6  | 6          | foo
+  66 |  6 | 00066 | 1970-03-08 00:00:00+08 | 1970-03-08 00:00:00 | 6  | 6          | foo |  66 |  6 | 00066 | 1970-03-08 00:00:00+08 | 1970-03-08 00:00:00 | 6  | 6          | foo
+  76 |  6 | 00076 | 1970-03-18 00:00:00+08 | 1970-03-18 00:00:00 | 6  | 6          | foo |  76 |  6 | 00076 | 1970-03-18 00:00:00+08 | 1970-03-18 00:00:00 | 6  | 6          | foo
+  86 |  6 | 00086 | 1970-03-28 00:00:00+08 | 1970-03-28 00:00:00 | 6  | 6          | foo |  86 |  6 | 00086 | 1970-03-28 00:00:00+08 | 1970-03-28 00:00:00 | 6  | 6          | foo
+  96 |  6 | 00096 | 1970-04-07 00:00:00+08 | 1970-04-07 00:00:00 | 6  | 6          | foo |  96 |  6 | 00096 | 1970-04-07 00:00:00+08 | 1970-04-07 00:00:00 | 6  | 6          | foo
+ 106 |  6 | 00106 | 1970-01-07 00:00:00+08 | 1970-01-07 00:00:00 | 6  | 6          | foo | 106 |  6 | 00106 | 1970-01-07 00:00:00+08 | 1970-01-07 00:00:00 | 6  | 6          | foo
+ 116 |  6 | 00116 | 1970-01-17 00:00:00+08 | 1970-01-17 00:00:00 | 6  | 6          | foo | 116 |  6 | 00116 | 1970-01-17 00:00:00+08 | 1970-01-17 00:00:00 | 6  | 6          | foo
+ 126 |  6 | 00126 | 1970-01-27 00:00:00+08 | 1970-01-27 00:00:00 | 6  | 6          | foo | 126 |  6 | 00126 | 1970-01-27 00:00:00+08 | 1970-01-27 00:00:00 | 6  | 6          | foo
+ 136 |  6 | 00136 | 1970-02-06 00:00:00+08 | 1970-02-06 00:00:00 | 6  | 6          | foo | 136 |  6 | 00136 | 1970-02-06 00:00:00+08 | 1970-02-06 00:00:00 | 6  | 6          | foo
+ 146 |  6 | 00146 | 1970-02-16 00:00:00+08 | 1970-02-16 00:00:00 | 6  | 6          | foo | 146 |  6 | 00146 | 1970-02-16 00:00:00+08 | 1970-02-16 00:00:00 | 6  | 6          | foo
+ 156 |  6 | 00156 | 1970-02-26 00:00:00+08 | 1970-02-26 00:00:00 | 6  | 6          | foo | 156 |  6 | 00156 | 1970-02-26 00:00:00+08 | 1970-02-26 00:00:00 | 6  | 6          | foo
+ 166 |  6 | 00166 | 1970-03-08 00:00:00+08 | 1970-03-08 00:00:00 | 6  | 6          | foo | 166 |  6 | 00166 | 1970-03-08 00:00:00+08 | 1970-03-08 00:00:00 | 6  | 6          | foo
+ 176 |  6 | 00176 | 1970-03-18 00:00:00+08 | 1970-03-18 00:00:00 | 6  | 6          | foo | 176 |  6 | 00176 | 1970-03-18 00:00:00+08 | 1970-03-18 00:00:00 | 6  | 6          | foo
+ 186 |  6 | 00186 | 1970-03-28 00:00:00+08 | 1970-03-28 00:00:00 | 6  | 6          | foo | 186 |  6 | 00186 | 1970-03-28 00:00:00+08 | 1970-03-28 00:00:00 | 6  | 6          | foo
+ 196 |  6 | 00196 | 1970-04-07 00:00:00+08 | 1970-04-07 00:00:00 | 6  | 6          | foo | 196 |  6 | 00196 | 1970-04-07 00:00:00+08 | 1970-04-07 00:00:00 | 6  | 6          | foo
+ 206 |  6 | 00206 | 1970-01-07 00:00:00+08 | 1970-01-07 00:00:00 | 6  | 6          | foo | 206 |  6 | 00206 | 1970-01-07 00:00:00+08 | 1970-01-07 00:00:00 | 6  | 6          | foo
+ 216 |  6 | 00216 | 1970-01-17 00:00:00+08 | 1970-01-17 00:00:00 | 6  | 6          | foo | 216 |  6 | 00216 | 1970-01-17 00:00:00+08 | 1970-01-17 00:00:00 | 6  | 6          | foo
+ 226 |  6 | 00226 | 1970-01-27 00:00:00+08 | 1970-01-27 00:00:00 | 6  | 6          | foo | 226 |  6 | 00226 | 1970-01-27 00:00:00+08 | 1970-01-27 00:00:00 | 6  | 6          | foo
+ 236 |  6 | 00236 | 1970-02-06 00:00:00+08 | 1970-02-06 00:00:00 | 6  | 6          | foo | 236 |  6 | 00236 | 1970-02-06 00:00:00+08 | 1970-02-06 00:00:00 | 6  | 6          | foo
+ 246 |  6 | 00246 | 1970-02-16 00:00:00+08 | 1970-02-16 00:00:00 | 6  | 6          | foo | 246 |  6 | 00246 | 1970-02-16 00:00:00+08 | 1970-02-16 00:00:00 | 6  | 6          | foo
+ 256 |  6 | 00256 | 1970-02-26 00:00:00+08 | 1970-02-26 00:00:00 | 6  | 6          | foo | 256 |  6 | 00256 | 1970-02-26 00:00:00+08 | 1970-02-26 00:00:00 | 6  | 6          | foo
+ 266 |  6 | 00266 | 1970-03-08 00:00:00+08 | 1970-03-08 00:00:00 | 6  | 6          | foo | 266 |  6 | 00266 | 1970-03-08 00:00:00+08 | 1970-03-08 00:00:00 | 6  | 6          | foo
+ 276 |  6 | 00276 | 1970-03-18 00:00:00+08 | 1970-03-18 00:00:00 | 6  | 6          | foo | 276 |  6 | 00276 | 1970-03-18 00:00:00+08 | 1970-03-18 00:00:00 | 6  | 6          | foo
+ 286 |  6 | 00286 | 1970-03-28 00:00:00+08 | 1970-03-28 00:00:00 | 6  | 6          | foo | 286 |  6 | 00286 | 1970-03-28 00:00:00+08 | 1970-03-28 00:00:00 | 6  | 6          | foo
+ 296 |  6 | 00296 | 1970-04-07 00:00:00+08 | 1970-04-07 00:00:00 | 6  | 6          | foo | 296 |  6 | 00296 | 1970-04-07 00:00:00+08 | 1970-04-07 00:00:00 | 6  | 6          | foo
+ 306 |  6 | 00306 | 1970-01-07 00:00:00+08 | 1970-01-07 00:00:00 | 6  | 6          | foo | 306 |  6 | 00306 | 1970-01-07 00:00:00+08 | 1970-01-07 00:00:00 | 6  | 6          | foo
+ 316 |  6 | 00316 | 1970-01-17 00:00:00+08 | 1970-01-17 00:00:00 | 6  | 6          | foo | 316 |  6 | 00316 | 1970-01-17 00:00:00+08 | 1970-01-17 00:00:00 | 6  | 6          | foo
+ 326 |  6 | 00326 | 1970-01-27 00:00:00+08 | 1970-01-27 00:00:00 | 6  | 6          | foo | 326 |  6 | 00326 | 1970-01-27 00:00:00+08 | 1970-01-27 00:00:00 | 6  | 6          | foo
+ 336 |  6 | 00336 | 1970-02-06 00:00:00+08 | 1970-02-06 00:00:00 | 6  | 6          | foo | 336 |  6 | 00336 | 1970-02-06 00:00:00+08 | 1970-02-06 00:00:00 | 6  | 6          | foo
+ 346 |  6 | 00346 | 1970-02-16 00:00:00+08 | 1970-02-16 00:00:00 | 6  | 6          | foo | 346 |  6 | 00346 | 1970-02-16 00:00:00+08 | 1970-02-16 00:00:00 | 6  | 6          | foo
+ 356 |  6 | 00356 | 1970-02-26 00:00:00+08 | 1970-02-26 00:00:00 | 6  | 6          | foo | 356 |  6 | 00356 | 1970-02-26 00:00:00+08 | 1970-02-26 00:00:00 | 6  | 6          | foo
+ 366 |  6 | 00366 | 1970-03-08 00:00:00+08 | 1970-03-08 00:00:00 | 6  | 6          | foo | 366 |  6 | 00366 | 1970-03-08 00:00:00+08 | 1970-03-08 00:00:00 | 6  | 6          | foo
+ 376 |  6 | 00376 | 1970-03-18 00:00:00+08 | 1970-03-18 00:00:00 | 6  | 6          | foo | 376 |  6 | 00376 | 1970-03-18 00:00:00+08 | 1970-03-18 00:00:00 | 6  | 6          | foo
+ 386 |  6 | 00386 | 1970-03-28 00:00:00+08 | 1970-03-28 00:00:00 | 6  | 6          | foo | 386 |  6 | 00386 | 1970-03-28 00:00:00+08 | 1970-03-28 00:00:00 | 6  | 6          | foo
+ 396 |  6 | 00396 | 1970-04-07 00:00:00+08 | 1970-04-07 00:00:00 | 6  | 6          | foo | 396 |  6 | 00396 | 1970-04-07 00:00:00+08 | 1970-04-07 00:00:00 | 6  | 6          | foo
+ 406 |  6 | 00406 | 1970-01-07 00:00:00+08 | 1970-01-07 00:00:00 | 6  | 6          | foo | 406 |  6 | 00406 | 1970-01-07 00:00:00+08 | 1970-01-07 00:00:00 | 6  | 6          | foo
+ 416 |  6 | 00416 | 1970-01-17 00:00:00+08 | 1970-01-17 00:00:00 | 6  | 6          | foo | 416 |  6 | 00416 | 1970-01-17 00:00:00+08 | 1970-01-17 00:00:00 | 6  | 6          | foo
+ 426 |  6 | 00426 | 1970-01-27 00:00:00+08 | 1970-01-27 00:00:00 | 6  | 6          | foo | 426 |  6 | 00426 | 1970-01-27 00:00:00+08 | 1970-01-27 00:00:00 | 6  | 6          | foo
+ 436 |  6 | 00436 | 1970-02-06 00:00:00+08 | 1970-02-06 00:00:00 | 6  | 6          | foo | 436 |  6 | 00436 | 1970-02-06 00:00:00+08 | 1970-02-06 00:00:00 | 6  | 6          | foo
+ 446 |  6 | 00446 | 1970-02-16 00:00:00+08 | 1970-02-16 00:00:00 | 6  | 6          | foo | 446 |  6 | 00446 | 1970-02-16 00:00:00+08 | 1970-02-16 00:00:00 | 6  | 6          | foo
+ 456 |  6 | 00456 | 1970-02-26 00:00:00+08 | 1970-02-26 00:00:00 | 6  | 6          | foo | 456 |  6 | 00456 | 1970-02-26 00:00:00+08 | 1970-02-26 00:00:00 | 6  | 6          | foo
+ 466 |  6 | 00466 | 1970-03-08 00:00:00+08 | 1970-03-08 00:00:00 | 6  | 6          | foo | 466 |  6 | 00466 | 1970-03-08 00:00:00+08 | 1970-03-08 00:00:00 | 6  | 6          | foo
+ 476 |  6 | 00476 | 1970-03-18 00:00:00+08 | 1970-03-18 00:00:00 | 6  | 6          | foo | 476 |  6 | 00476 | 1970-03-18 00:00:00+08 | 1970-03-18 00:00:00 | 6  | 6          | foo
+ 486 |  6 | 00486 | 1970-03-28 00:00:00+08 | 1970-03-28 00:00:00 | 6  | 6          | foo | 486 |  6 | 00486 | 1970-03-28 00:00:00+08 | 1970-03-28 00:00:00 | 6  | 6          | foo
+ 496 |  6 | 00496 | 1970-04-07 00:00:00+08 | 1970-04-07 00:00:00 | 6  | 6          | foo | 496 |  6 | 00496 | 1970-04-07 00:00:00+08 | 1970-04-07 00:00:00 | 6  | 6          | foo
+ 506 |  6 | 00506 | 1970-01-07 00:00:00+08 | 1970-01-07 00:00:00 | 6  | 6          | foo | 506 |  6 | 00506 | 1970-01-07 00:00:00+08 | 1970-01-07 00:00:00 | 6  | 6          | foo
+ 516 |  6 | 00516 | 1970-01-17 00:00:00+08 | 1970-01-17 00:00:00 | 6  | 6          | foo | 516 |  6 | 00516 | 1970-01-17 00:00:00+08 | 1970-01-17 00:00:00 | 6  | 6          | foo
+ 526 |  6 | 00526 | 1970-01-27 00:00:00+08 | 1970-01-27 00:00:00 | 6  | 6          | foo | 526 |  6 | 00526 | 1970-01-27 00:00:00+08 | 1970-01-27 00:00:00 | 6  | 6          | foo
+ 536 |  6 | 00536 | 1970-02-06 00:00:00+08 | 1970-02-06 00:00:00 | 6  | 6          | foo | 536 |  6 | 00536 | 1970-02-06 00:00:00+08 | 1970-02-06 00:00:00 | 6  | 6          | foo
+ 546 |  6 | 00546 | 1970-02-16 00:00:00+08 | 1970-02-16 00:00:00 | 6  | 6          | foo | 546 |  6 | 00546 | 1970-02-16 00:00:00+08 | 1970-02-16 00:00:00 | 6  | 6          | foo
+ 556 |  6 | 00556 | 1970-02-26 00:00:00+08 | 1970-02-26 00:00:00 | 6  | 6          | foo | 556 |  6 | 00556 | 1970-02-26 00:00:00+08 | 1970-02-26 00:00:00 | 6  | 6          | foo
+ 566 |  6 | 00566 | 1970-03-08 00:00:00+08 | 1970-03-08 00:00:00 | 6  | 6          | foo | 566 |  6 | 00566 | 1970-03-08 00:00:00+08 | 1970-03-08 00:00:00 | 6  | 6          | foo
+ 576 |  6 | 00576 | 1970-03-18 00:00:00+08 | 1970-03-18 00:00:00 | 6  | 6          | foo | 576 |  6 | 00576 | 1970-03-18 00:00:00+08 | 1970-03-18 00:00:00 | 6  | 6          | foo
+ 586 |  6 | 00586 | 1970-03-28 00:00:00+08 | 1970-03-28 00:00:00 | 6  | 6          | foo | 586 |  6 | 00586 | 1970-03-28 00:00:00+08 | 1970-03-28 00:00:00 | 6  | 6          | foo
+ 596 |  6 | 00596 | 1970-04-07 00:00:00+08 | 1970-04-07 00:00:00 | 6  | 6          | foo | 596 |  6 | 00596 | 1970-04-07 00:00:00+08 | 1970-04-07 00:00:00 | 6  | 6          | foo
+ 606 |  6 | 00606 | 1970-01-07 00:00:00+08 | 1970-01-07 00:00:00 | 6  | 6          | foo | 606 |  6 | 00606 | 1970-01-07 00:00:00+08 | 1970-01-07 00:00:00 | 6  | 6          | foo
+ 616 |  6 | 00616 | 1970-01-17 00:00:00+08 | 1970-01-17 00:00:00 | 6  | 6          | foo | 616 |  6 | 00616 | 1970-01-17 00:00:00+08 | 1970-01-17 00:00:00 | 6  | 6          | foo
+ 626 |  6 | 00626 | 1970-01-27 00:00:00+08 | 1970-01-27 00:00:00 | 6  | 6          | foo | 626 |  6 | 00626 | 1970-01-27 00:00:00+08 | 1970-01-27 00:00:00 | 6  | 6          | foo
+ 636 |  6 | 00636 | 1970-02-06 00:00:00+08 | 1970-02-06 00:00:00 | 6  | 6          | foo | 636 |  6 | 00636 | 1970-02-06 00:00:00+08 | 1970-02-06 00:00:00 | 6  | 6          | foo
+ 646 |  6 | 00646 | 1970-02-16 00:00:00+08 | 1970-02-16 00:00:00 | 6  | 6          | foo | 646 |  6 | 00646 | 1970-02-16 00:00:00+08 | 1970-02-16 00:00:00 | 6  | 6          | foo
+ 656 |  6 | 00656 | 1970-02-26 00:00:00+08 | 1970-02-26 00:00:00 | 6  | 6          | foo | 656 |  6 | 00656 | 1970-02-26 00:00:00+08 | 1970-02-26 00:00:00 | 6  | 6          | foo
+ 666 |  6 | 00666 | 1970-03-08 00:00:00+08 | 1970-03-08 00:00:00 | 6  | 6          | foo | 666 |  6 | 00666 | 1970-03-08 00:00:00+08 | 1970-03-08 00:00:00 | 6  | 6          | foo
+ 676 |  6 | 00676 | 1970-03-18 00:00:00+08 | 1970-03-18 00:00:00 | 6  | 6          | foo | 676 |  6 | 00676 | 1970-03-18 00:00:00+08 | 1970-03-18 00:00:00 | 6  | 6          | foo
+ 686 |  6 | 00686 | 1970-03-28 00:00:00+08 | 1970-03-28 00:00:00 | 6  | 6          | foo | 686 |  6 | 00686 | 1970-03-28 00:00:00+08 | 1970-03-28 00:00:00 | 6  | 6          | foo
+ 696 |  6 | 00696 | 1970-04-07 00:00:00+08 | 1970-04-07 00:00:00 | 6  | 6          | foo | 696 |  6 | 00696 | 1970-04-07 00:00:00+08 | 1970-04-07 00:00:00 | 6  | 6          | foo
+ 706 |  6 | 00706 | 1970-01-07 00:00:00+08 | 1970-01-07 00:00:00 | 6  | 6          | foo | 706 |  6 | 00706 | 1970-01-07 00:00:00+08 | 1970-01-07 00:00:00 | 6  | 6          | foo
+ 716 |  6 | 00716 | 1970-01-17 00:00:00+08 | 1970-01-17 00:00:00 | 6  | 6          | foo | 716 |  6 | 00716 | 1970-01-17 00:00:00+08 | 1970-01-17 00:00:00 | 6  | 6          | foo
+ 726 |  6 | 00726 | 1970-01-27 00:00:00+08 | 1970-01-27 00:00:00 | 6  | 6          | foo | 726 |  6 | 00726 | 1970-01-27 00:00:00+08 | 1970-01-27 00:00:00 | 6  | 6          | foo
+ 736 |  6 | 00736 | 1970-02-06 00:00:00+08 | 1970-02-06 00:00:00 | 6  | 6          | foo | 736 |  6 | 00736 | 1970-02-06 00:00:00+08 | 1970-02-06 00:00:00 | 6  | 6          | foo
+ 746 |  6 | 00746 | 1970-02-16 00:00:00+08 | 1970-02-16 00:00:00 | 6  | 6          | foo | 746 |  6 | 00746 | 1970-02-16 00:00:00+08 | 1970-02-16 00:00:00 | 6  | 6          | foo
+ 756 |  6 | 00756 | 1970-02-26 00:00:00+08 | 1970-02-26 00:00:00 | 6  | 6          | foo | 756 |  6 | 00756 | 1970-02-26 00:00:00+08 | 1970-02-26 00:00:00 | 6  | 6          | foo
+ 766 |  6 | 00766 | 1970-03-08 00:00:00+08 | 1970-03-08 00:00:00 | 6  | 6          | foo | 766 |  6 | 00766 | 1970-03-08 00:00:00+08 | 1970-03-08 00:00:00 | 6  | 6          | foo
+ 776 |  6 | 00776 | 1970-03-18 00:00:00+08 | 1970-03-18 00:00:00 | 6  | 6          | foo | 776 |  6 | 00776 | 1970-03-18 00:00:00+08 | 1970-03-18 00:00:00 | 6  | 6          | foo
+ 786 |  6 | 00786 | 1970-03-28 00:00:00+08 | 1970-03-28 00:00:00 | 6  | 6          | foo | 786 |  6 | 00786 | 1970-03-28 00:00:00+08 | 1970-03-28 00:00:00 | 6  | 6          | foo
+ 796 |  6 | 00796 | 1970-04-07 00:00:00+08 | 1970-04-07 00:00:00 | 6  | 6          | foo | 796 |  6 | 00796 | 1970-04-07 00:00:00+08 | 1970-04-07 00:00:00 | 6  | 6          | foo
+ 806 |  6 | 00806 | 1970-01-07 00:00:00+08 | 1970-01-07 00:00:00 | 6  | 6          | foo | 806 |  6 | 00806 | 1970-01-07 00:00:00+08 | 1970-01-07 00:00:00 | 6  | 6          | foo
+ 816 |  6 | 00816 | 1970-01-17 00:00:00+08 | 1970-01-17 00:00:00 | 6  | 6          | foo | 816 |  6 | 00816 | 1970-01-17 00:00:00+08 | 1970-01-17 00:00:00 | 6  | 6          | foo
+ 826 |  6 | 00826 | 1970-01-27 00:00:00+08 | 1970-01-27 00:00:00 | 6  | 6          | foo | 826 |  6 | 00826 | 1970-01-27 00:00:00+08 | 1970-01-27 00:00:00 | 6  | 6          | foo
+ 836 |  6 | 00836 | 1970-02-06 00:00:00+08 | 1970-02-06 00:00:00 | 6  | 6          | foo | 836 |  6 | 00836 | 1970-02-06 00:00:00+08 | 1970-02-06 00:00:00 | 6  | 6          | foo
+ 846 |  6 | 00846 | 1970-02-16 00:00:00+08 | 1970-02-16 00:00:00 | 6  | 6          | foo | 846 |  6 | 00846 | 1970-02-16 00:00:00+08 | 1970-02-16 00:00:00 | 6  | 6          | foo
+ 856 |  6 | 00856 | 1970-02-26 00:00:00+08 | 1970-02-26 00:00:00 | 6  | 6          | foo | 856 |  6 | 00856 | 1970-02-26 00:00:00+08 | 1970-02-26 00:00:00 | 6  | 6          | foo
+ 866 |  6 | 00866 | 1970-03-08 00:00:00+08 | 1970-03-08 00:00:00 | 6  | 6          | foo | 866 |  6 | 00866 | 1970-03-08 00:00:00+08 | 1970-03-08 00:00:00 | 6  | 6          | foo
+ 876 |  6 | 00876 | 1970-03-18 00:00:00+08 | 1970-03-18 00:00:00 | 6  | 6          | foo | 876 |  6 | 00876 | 1970-03-18 00:00:00+08 | 1970-03-18 00:00:00 | 6  | 6          | foo
+ 886 |  6 | 00886 | 1970-03-28 00:00:00+08 | 1970-03-28 00:00:00 | 6  | 6          | foo | 886 |  6 | 00886 | 1970-03-28 00:00:00+08 | 1970-03-28 00:00:00 | 6  | 6          | foo
+ 896 |  6 | 00896 | 1970-04-07 00:00:00+08 | 1970-04-07 00:00:00 | 6  | 6          | foo | 896 |  6 | 00896 | 1970-04-07 00:00:00+08 | 1970-04-07 00:00:00 | 6  | 6          | foo
+ 906 |  6 | 00906 | 1970-01-07 00:00:00+08 | 1970-01-07 00:00:00 | 6  | 6          | foo | 906 |  6 | 00906 | 1970-01-07 00:00:00+08 | 1970-01-07 00:00:00 | 6  | 6          | foo
+ 916 |  6 | 00916 | 1970-01-17 00:00:00+08 | 1970-01-17 00:00:00 | 6  | 6          | foo | 916 |  6 | 00916 | 1970-01-17 00:00:00+08 | 1970-01-17 00:00:00 | 6  | 6          | foo
+ 926 |  6 | 00926 | 1970-01-27 00:00:00+08 | 1970-01-27 00:00:00 | 6  | 6          | foo | 926 |  6 | 00926 | 1970-01-27 00:00:00+08 | 1970-01-27 00:00:00 | 6  | 6          | foo
+ 936 |  6 | 00936 | 1970-02-06 00:00:00+08 | 1970-02-06 00:00:00 | 6  | 6          | foo | 936 |  6 | 00936 | 1970-02-06 00:00:00+08 | 1970-02-06 00:00:00 | 6  | 6          | foo
+ 946 |  6 | 00946 | 1970-02-16 00:00:00+08 | 1970-02-16 00:00:00 | 6  | 6          | foo | 946 |  6 | 00946 | 1970-02-16 00:00:00+08 | 1970-02-16 00:00:00 | 6  | 6          | foo
+ 956 |  6 | 00956 | 1970-02-26 00:00:00+08 | 1970-02-26 00:00:00 | 6  | 6          | foo | 956 |  6 | 00956 | 1970-02-26 00:00:00+08 | 1970-02-26 00:00:00 | 6  | 6          | foo
+ 966 |  6 | 00966 | 1970-03-08 00:00:00+08 | 1970-03-08 00:00:00 | 6  | 6          | foo | 966 |  6 | 00966 | 1970-03-08 00:00:00+08 | 1970-03-08 00:00:00 | 6  | 6          | foo
+ 976 |  6 | 00976 | 1970-03-18 00:00:00+08 | 1970-03-18 00:00:00 | 6  | 6          | foo | 976 |  6 | 00976 | 1970-03-18 00:00:00+08 | 1970-03-18 00:00:00 | 6  | 6          | foo
+ 986 |  6 | 00986 | 1970-03-28 00:00:00+08 | 1970-03-28 00:00:00 | 6  | 6          | foo | 986 |  6 | 00986 | 1970-03-28 00:00:00+08 | 1970-03-28 00:00:00 | 6  | 6          | foo
+ 996 |  6 | 00996 | 1970-04-07 00:00:00+08 | 1970-04-07 00:00:00 | 6  | 6          | foo | 996 |  6 | 00996 | 1970-04-07 00:00:00+08 | 1970-04-07 00:00:00 | 6  | 6          | foo
+(100 rows)
+
+-- bug before 9.3.5 due to sloppy handling of remote-estimate parameters
+SELECT * FROM ft1 WHERE c1 = ANY (ARRAY(SELECT c1 FROM ft2 WHERE c1 < 5));
+ c1 | c2 |  c3   |           c4           |         c5          | c6 |     c7     | c8  
+----+----+-------+------------------------+---------------------+----+------------+-----
+  1 |  1 | 00001 | 1970-01-02 00:00:00+08 | 1970-01-02 00:00:00 | 1  | 1          | foo
+  2 |  2 | 00002 | 1970-01-03 00:00:00+08 | 1970-01-03 00:00:00 | 2  | 2          | foo
+  3 |  3 | 00003 | 1970-01-04 00:00:00+08 | 1970-01-04 00:00:00 | 3  | 3          | foo
+  4 |  4 | 00004 | 1970-01-05 00:00:00+08 | 1970-01-05 00:00:00 | 4  | 4          | foo
+(4 rows)
+
+SELECT * FROM ft2 WHERE c1 = ANY (ARRAY(SELECT c1 FROM ft1 WHERE c1 < 5));
+ c1 | c2 |  c3   |           c4           |         c5          | c6 |     c7     | c8  
+----+----+-------+------------------------+---------------------+----+------------+-----
+  1 |  1 | 00001 | 1970-01-02 00:00:00+08 | 1970-01-02 00:00:00 | 1  | 1          | foo
+  2 |  2 | 00002 | 1970-01-03 00:00:00+08 | 1970-01-03 00:00:00 | 2  | 2          | foo
+  3 |  3 | 00003 | 1970-01-04 00:00:00+08 | 1970-01-04 00:00:00 | 3  | 3          | foo
+  4 |  4 | 00004 | 1970-01-05 00:00:00+08 | 1970-01-05 00:00:00 | 4  | 4          | foo
+(4 rows)
+
+-- bug #15613: bad plan for foreign table scan with lateral reference
+EXPLAIN (VERBOSE, COSTS OFF)
+SELECT ref_0.c2, subq_1.*
+FROM
+    "S 1"."T 1" AS ref_0,
+    LATERAL (
+        SELECT ref_0."C 1" c1, subq_0.*
+        FROM (SELECT ref_0.c2, ref_1.c3
+              FROM ft1 AS ref_1) AS subq_0
+             RIGHT JOIN ft2 AS ref_3 ON (subq_0.c3 = ref_3.c3)
+    ) AS subq_1
+WHERE ref_0."C 1" < 10 AND subq_1.c3 = '00001'
+ORDER BY ref_0."C 1";
+ERROR:  syntax error at or near "SELECT"
+LINE 6:         SELECT ref_0."C 1" c1, subq_0.*
+                ^
+-- use local table to check whether this sql supported
+EXPLAIN (VERBOSE, COSTS OFF)
+SELECT ref_0.c2, subq_1.*
+FROM
+    "S 1"."T 1" AS ref_0,
+    LATERAL (
+        SELECT ref_0."C 1" c1, subq_0.*
+        FROM (SELECT ref_0.c2, ref_1.c3
+              FROM local_ft1 AS ref_1) AS subq_0
+             RIGHT JOIN local_ft2 AS ref_3 ON (subq_0.c3 = ref_3.c3)
+    ) AS subq_1
+WHERE ref_0."C 1" < 10 AND subq_1.c3 = '00001'
+ORDER BY ref_0."C 1";
+ERROR:  syntax error at or near "SELECT"
+LINE 6:         SELECT ref_0."C 1" c1, subq_0.*
+                ^
+SELECT ref_0.c2, subq_1.*
+FROM
+    "S 1"."T 1" AS ref_0,
+    LATERAL (
+        SELECT ref_0."C 1" c1, subq_0.*
+        FROM (SELECT ref_0.c2, ref_1.c3
+              FROM ft1 AS ref_1) AS subq_0
+             RIGHT JOIN ft2 AS ref_3 ON (subq_0.c3 = ref_3.c3)
+    ) AS subq_1
+WHERE ref_0."C 1" < 10 AND subq_1.c3 = '00001'
+ORDER BY ref_0."C 1";
+ERROR:  syntax error at or near "SELECT"
+LINE 5:         SELECT ref_0."C 1" c1, subq_0.*
+                ^
+-- use local table to check whether this sql supported
+SELECT ref_0.c2, subq_1.*
+FROM
+    "S 1"."T 1" AS ref_0,
+    LATERAL (
+        SELECT ref_0."C 1" c1, subq_0.*
+        FROM (SELECT ref_0.c2, ref_1.c3
+              FROM local_ft1 AS ref_1) AS subq_0
+             RIGHT JOIN local_ft2 AS ref_3 ON (subq_0.c3 = ref_3.c3)
+    ) AS subq_1
+WHERE ref_0."C 1" < 10 AND subq_1.c3 = '00001'
+ORDER BY ref_0."C 1";
+ERROR:  syntax error at or near "SELECT"
+LINE 5:         SELECT ref_0."C 1" c1, subq_0.*
+                ^
+-- ===================================================================
+-- parameterized queries
+-- ===================================================================
+-- simple join
+PREPARE st1(int, int) AS SELECT t1.c3, t2.c3 FROM ft1 t1, ft2 t2 WHERE t1.c1 = $1 AND t2.c1 = $2;
+PREPARE
+EXPLAIN (VERBOSE, COSTS false) EXECUTE st1(1, 2);
+                      QUERY PLAN                       
+-------------------------------------------------------
+ Nested Loop
+   Output: t1.c3, t2.c3
+   ->  Foreign Scan on public.ft1 t1
+         Output: t1.c3
+         Filter: (t1.c1 = $1)
+         Remote SQL: SELECT "C 1", c3 FROM "S 1"."T 1"
+   ->  Foreign Scan on public.ft2 t2
+         Output: t2.c3
+         Filter: (t2.c1 = $2)
+         Remote SQL: SELECT "C 1", c3 FROM "S 1"."T 1"
+(10 rows)
+
+EXECUTE st1(1, 1);
+  c3   |  c3   
+-------+-------
+ 00001 | 00001
+(1 row)
+
+EXECUTE st1(101, 101);
+  c3   |  c3   
+-------+-------
+ 00101 | 00101
+(1 row)
+
+-- subquery using stable function (can't be sent to remote)
+PREPARE st2(int) AS SELECT * FROM ft1 t1 WHERE t1.c1 < $2 AND t1.c3 IN (SELECT c3 FROM ft2 t2 WHERE c1 > $1 AND (c4) = '1970-01-17'::date) ORDER BY c1;
+PREPARE
+EXPLAIN (VERBOSE, COSTS false) EXECUTE st2(10, 20);
+                                                QUERY PLAN                                                
+----------------------------------------------------------------------------------------------------------
+ Sort
+   Output: t1.c1, t1.c2, t1.c3, t1.c4, t1.c5, t1.c6, t1.c7, t1.c8
+   Sort Key: t1.c1
+   ->  Hash Right Semi Join
+         Output: t1.c1, t1.c2, t1.c3, t1.c4, t1.c5, t1.c6, t1.c7, t1.c8
+         Hash Cond: (t2.c3 = t1.c3)
+         ->  Foreign Scan on public.ft2 t2
+               Output: t2.c3
+               Filter: ((t2.c1 > $1) AND (t2.c4 = '1970-01-17 00:00:00'::timestamp(0) without time zone))
+               Remote SQL: SELECT "C 1", c3, c4 FROM "S 1"."T 1"
+         ->  Hash
+               Output: t1.c1, t1.c2, t1.c3, t1.c4, t1.c5, t1.c6, t1.c7, t1.c8
+               ->  Foreign Scan on public.ft1 t1
+                     Output: t1.c1, t1.c2, t1.c3, t1.c4, t1.c5, t1.c6, t1.c7, t1.c8
+                     Filter: (t1.c1 < $2)
+                     Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+(16 rows)
+
+EXECUTE st2(10, 20);
+ c1 | c2 |  c3   |           c4           |         c5          | c6 |     c7     | c8  
+----+----+-------+------------------------+---------------------+----+------------+-----
+ 16 |  6 | 00016 | 1970-01-17 00:00:00+08 | 1970-01-17 00:00:00 | 6  | 6          | foo
+(1 row)
+
+EXECUTE st2(101, 121);
+ c1  | c2 |  c3   |           c4           |         c5          | c6 |     c7     | c8  
+-----+----+-------+------------------------+---------------------+----+------------+-----
+ 116 |  6 | 00116 | 1970-01-17 00:00:00+08 | 1970-01-17 00:00:00 | 6  | 6          | foo
+(1 row)
+
+-- subquery using immutable function (can be sent to remote)
+PREPARE st3(int) AS SELECT * FROM ft1 t1 WHERE t1.c1 < $2 AND t1.c3 IN (SELECT c3 FROM ft2 t2 WHERE c1 > $1 AND (c5) = '1970-01-17'::date) ORDER BY c1;
+PREPARE
+EXPLAIN (VERBOSE, COSTS false) EXECUTE st3(10, 20);
+                                                QUERY PLAN                                                
+----------------------------------------------------------------------------------------------------------
+ Sort
+   Output: t1.c1, t1.c2, t1.c3, t1.c4, t1.c5, t1.c6, t1.c7, t1.c8
+   Sort Key: t1.c1
+   ->  Hash Right Semi Join
+         Output: t1.c1, t1.c2, t1.c3, t1.c4, t1.c5, t1.c6, t1.c7, t1.c8
+         Hash Cond: (t2.c3 = t1.c3)
+         ->  Foreign Scan on public.ft2 t2
+               Output: t2.c3
+               Filter: ((t2.c1 > $1) AND (t2.c5 = '1970-01-17 00:00:00'::timestamp(0) without time zone))
+               Remote SQL: SELECT "C 1", c3, c5 FROM "S 1"."T 1"
+         ->  Hash
+               Output: t1.c1, t1.c2, t1.c3, t1.c4, t1.c5, t1.c6, t1.c7, t1.c8
+               ->  Foreign Scan on public.ft1 t1
+                     Output: t1.c1, t1.c2, t1.c3, t1.c4, t1.c5, t1.c6, t1.c7, t1.c8
+                     Filter: (t1.c1 < $2)
+                     Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+(16 rows)
+
+EXECUTE st3(10, 20);
+ c1 | c2 |  c3   |           c4           |         c5          | c6 |     c7     | c8  
+----+----+-------+------------------------+---------------------+----+------------+-----
+ 16 |  6 | 00016 | 1970-01-17 00:00:00+08 | 1970-01-17 00:00:00 | 6  | 6          | foo
+(1 row)
+
+EXECUTE st3(20, 30);
+ c1 | c2 | c3 | c4 | c5 | c6 | c7 | c8 
+----+----+----+----+----+----+----+----
+(0 rows)
+
+-- custom plan should be chosen initially
+PREPARE st4(int) AS SELECT * FROM ft1 t1 WHERE t1.c1 = $1;
+PREPARE
+EXPLAIN (VERBOSE, COSTS false) EXECUTE st4(1);
+                               QUERY PLAN                                
+-------------------------------------------------------------------------
+ Foreign Scan on public.ft1 t1
+   Output: c1, c2, c3, c4, c5, c6, c7, c8
+   Filter: (t1.c1 = $1)
+   Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+(4 rows)
+
+EXPLAIN (VERBOSE, COSTS false) EXECUTE st4(1);
+                               QUERY PLAN                                
+-------------------------------------------------------------------------
+ Foreign Scan on public.ft1 t1
+   Output: c1, c2, c3, c4, c5, c6, c7, c8
+   Filter: (t1.c1 = $1)
+   Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+(4 rows)
+
+EXPLAIN (VERBOSE, COSTS false) EXECUTE st4(1);
+                               QUERY PLAN                                
+-------------------------------------------------------------------------
+ Foreign Scan on public.ft1 t1
+   Output: c1, c2, c3, c4, c5, c6, c7, c8
+   Filter: (t1.c1 = $1)
+   Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+(4 rows)
+
+EXPLAIN (VERBOSE, COSTS false) EXECUTE st4(1);
+                               QUERY PLAN                                
+-------------------------------------------------------------------------
+ Foreign Scan on public.ft1 t1
+   Output: c1, c2, c3, c4, c5, c6, c7, c8
+   Filter: (t1.c1 = $1)
+   Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+(4 rows)
+
+EXPLAIN (VERBOSE, COSTS false) EXECUTE st4(1);
+                               QUERY PLAN                                
+-------------------------------------------------------------------------
+ Foreign Scan on public.ft1 t1
+   Output: c1, c2, c3, c4, c5, c6, c7, c8
+   Filter: (t1.c1 = $1)
+   Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+(4 rows)
+
+-- once we try it enough times, should switch to generic plan
+EXPLAIN (VERBOSE, COSTS false) EXECUTE st4(1);
+                               QUERY PLAN                                
+-------------------------------------------------------------------------
+ Foreign Scan on public.ft1 t1
+   Output: c1, c2, c3, c4, c5, c6, c7, c8
+   Filter: (t1.c1 = $1)
+   Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+(4 rows)
+
+-- value of $1 should not be sent to remote
+PREPARE st5(user_enum,int) AS SELECT * FROM ft1 t1 WHERE c8 = $1 and c1 = $2;
+PREPARE
+EXPLAIN (VERBOSE, COSTS false) EXECUTE st5('foo', 1);
+                               QUERY PLAN                                
+-------------------------------------------------------------------------
+ Foreign Scan on public.ft1 t1
+   Output: c1, c2, c3, c4, c5, c6, c7, c8
+   Filter: ((t1.c8 = $1) AND (t1.c1 = $2))
+   Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+(4 rows)
+
+EXPLAIN (VERBOSE, COSTS false) EXECUTE st5('foo', 1);
+                               QUERY PLAN                                
+-------------------------------------------------------------------------
+ Foreign Scan on public.ft1 t1
+   Output: c1, c2, c3, c4, c5, c6, c7, c8
+   Filter: ((t1.c8 = $1) AND (t1.c1 = $2))
+   Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+(4 rows)
+
+EXPLAIN (VERBOSE, COSTS false) EXECUTE st5('foo', 1);
+                               QUERY PLAN                                
+-------------------------------------------------------------------------
+ Foreign Scan on public.ft1 t1
+   Output: c1, c2, c3, c4, c5, c6, c7, c8
+   Filter: ((t1.c8 = $1) AND (t1.c1 = $2))
+   Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+(4 rows)
+
+EXPLAIN (VERBOSE, COSTS false) EXECUTE st5('foo', 1);
+                               QUERY PLAN                                
+-------------------------------------------------------------------------
+ Foreign Scan on public.ft1 t1
+   Output: c1, c2, c3, c4, c5, c6, c7, c8
+   Filter: ((t1.c8 = $1) AND (t1.c1 = $2))
+   Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+(4 rows)
+
+EXPLAIN (VERBOSE, COSTS false) EXECUTE st5('foo', 1);
+                               QUERY PLAN                                
+-------------------------------------------------------------------------
+ Foreign Scan on public.ft1 t1
+   Output: c1, c2, c3, c4, c5, c6, c7, c8
+   Filter: ((t1.c8 = $1) AND (t1.c1 = $2))
+   Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+(4 rows)
+
+EXPLAIN (VERBOSE, COSTS false) EXECUTE st5('foo', 1);
+                               QUERY PLAN                                
+-------------------------------------------------------------------------
+ Foreign Scan on public.ft1 t1
+   Output: c1, c2, c3, c4, c5, c6, c7, c8
+   Filter: ((t1.c8 = $1) AND (t1.c1 = $2))
+   Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+(4 rows)
+
+EXECUTE st5('foo', 1);
+ c1 | c2 |  c3   |           c4           |         c5          | c6 |     c7     | c8  
+----+----+-------+------------------------+---------------------+----+------------+-----
+  1 |  1 | 00001 | 1970-01-02 00:00:00+08 | 1970-01-02 00:00:00 | 1  | 1          | foo
+(1 row)
+
+-- altering FDW options requires replanning
+PREPARE st6 AS SELECT * FROM ft1 t1 WHERE t1.c1 = t1.c2;
+PREPARE
+EXPLAIN (VERBOSE, COSTS OFF) EXECUTE st6;
+                                          QUERY PLAN                                          
+----------------------------------------------------------------------------------------------
+ Foreign Scan on public.ft1 t1
+   Output: c1, c2, c3, c4, c5, c6, c7, c8
+   Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1" WHERE (("C 1" = c2))
+(3 rows)
+
+PREPARE st7 AS INSERT INTO ft1 (c1,c2,c3) VALUES (1001,101,'foo');
+PREPARE
+EXPLAIN (VERBOSE, COSTS OFF) EXECUTE st7;
+                                                                                           QUERY PLAN                                                                                            
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Insert on public.ft1
+   ->  Result
+         Output: NULL::integer, 1001, 101, 'foo'::text, NULL::timestamp with time zone, NULL::timestamp without time zone, NULL::character varying, 'ft1       '::character(10), NULL::user_enum
+(3 rows)
+
+ALTER TABLE "S 1"."T 1" RENAME TO "T 0";
+ALTER TABLE
+ALTER FOREIGN TABLE ft1 OPTIONS (SET table_name 'T 0');
+ALTER FOREIGN TABLE
+EXPLAIN (VERBOSE, COSTS OFF) EXECUTE st6;
+                                          QUERY PLAN                                          
+----------------------------------------------------------------------------------------------
+ Foreign Scan on public.ft1 t1
+   Output: c1, c2, c3, c4, c5, c6, c7, c8
+   Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 0" WHERE (("C 1" = c2))
+(3 rows)
+
+EXECUTE st6;
+ c1 | c2 |  c3   |           c4           |         c5          | c6 |     c7     | c8  
+----+----+-------+------------------------+---------------------+----+------------+-----
+  1 |  1 | 00001 | 1970-01-02 00:00:00+08 | 1970-01-02 00:00:00 | 1  | 1          | foo
+  2 |  2 | 00002 | 1970-01-03 00:00:00+08 | 1970-01-03 00:00:00 | 2  | 2          | foo
+  3 |  3 | 00003 | 1970-01-04 00:00:00+08 | 1970-01-04 00:00:00 | 3  | 3          | foo
+  4 |  4 | 00004 | 1970-01-05 00:00:00+08 | 1970-01-05 00:00:00 | 4  | 4          | foo
+  5 |  5 | 00005 | 1970-01-06 00:00:00+08 | 1970-01-06 00:00:00 | 5  | 5          | foo
+  6 |  6 | 00006 | 1970-01-07 00:00:00+08 | 1970-01-07 00:00:00 | 6  | 6          | foo
+  7 |  7 | 00007 | 1970-01-08 00:00:00+08 | 1970-01-08 00:00:00 | 7  | 7          | foo
+  8 |  8 | 00008 | 1970-01-09 00:00:00+08 | 1970-01-09 00:00:00 | 8  | 8          | foo
+  9 |  9 | 00009 | 1970-01-10 00:00:00+08 | 1970-01-10 00:00:00 | 9  | 9          | foo
+(9 rows)
+
+EXPLAIN (VERBOSE, COSTS OFF) EXECUTE st7;
+                                                                                           QUERY PLAN                                                                                            
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Insert on public.ft1
+   ->  Result
+         Output: NULL::integer, 1001, 101, 'foo'::text, NULL::timestamp with time zone, NULL::timestamp without time zone, NULL::character varying, 'ft1       '::character(10), NULL::user_enum
+(3 rows)
+
+ALTER TABLE "S 1"."T 0" RENAME TO "T 1";
+ALTER TABLE
+ALTER FOREIGN TABLE ft1 OPTIONS (SET table_name 'T 1');
+ALTER FOREIGN TABLE
+-- cleanup
+DEALLOCATE st1;
+DEALLOCATE
+DEALLOCATE st2;
+DEALLOCATE
+DEALLOCATE st3;
+DEALLOCATE
+DEALLOCATE st4;
+DEALLOCATE
+DEALLOCATE st5;
+DEALLOCATE
+DEALLOCATE st6;
+DEALLOCATE
+DEALLOCATE st7;
+DEALLOCATE
+-- System columns, except ctid, should not be sent to remote
+EXPLAIN (VERBOSE, COSTS false)
+SELECT * FROM ft1 t1 WHERE t1.tableoid = 'pg_class'::regclass LIMIT 1;
+ERROR:  column t1.tableoid does not exist
+LINE 2: SELECT * FROM ft1 t1 WHERE t1.tableoid = 'pg_class'::regclas...
+                                   ^
+SELECT * FROM ft1 t1 WHERE t1.tableoid = 'ft1'::regclass LIMIT 1;
+ERROR:  column t1.tableoid does not exist
+LINE 1: SELECT * FROM ft1 t1 WHERE t1.tableoid = 'ft1'::regclass LIM...
+                                   ^
+EXPLAIN (VERBOSE, COSTS false)
+SELECT tableoid::regclass, * FROM ft1 t1 LIMIT 1;
+ERROR:  column "tableoid" does not exist
+LINE 2: SELECT tableoid::regclass, * FROM ft1 t1 LIMIT 1;
+               ^
+CONTEXT:  referenced column: tableoid
+SELECT tableoid::regclass, * FROM ft1 t1 LIMIT 1;
+ERROR:  column "tableoid" does not exist
+LINE 1: SELECT tableoid::regclass, * FROM ft1 t1 LIMIT 1;
+               ^
+CONTEXT:  referenced column: tableoid
+EXPLAIN (VERBOSE, COSTS false)
+SELECT * FROM ft1 t1 WHERE t1.ctid = '(0,2)';
+ERROR:  column t1.ctid does not exist
+LINE 2: SELECT * FROM ft1 t1 WHERE t1.ctid = '(0,2)';
+                                   ^
+SELECT * FROM ft1 t1 WHERE t1.ctid = '(0,2)';
+ERROR:  column t1.ctid does not exist
+LINE 1: SELECT * FROM ft1 t1 WHERE t1.ctid = '(0,2)';
+                                   ^
+EXPLAIN (VERBOSE, COSTS false)
+SELECT ctid, * FROM ft1 t1 LIMIT 1;
+ERROR:  column "ctid" does not exist
+LINE 2: SELECT ctid, * FROM ft1 t1 LIMIT 1;
+               ^
+CONTEXT:  referenced column: ctid
+SELECT ctid, * FROM ft1 t1 LIMIT 1;
+ERROR:  column "ctid" does not exist
+LINE 1: SELECT ctid, * FROM ft1 t1 LIMIT 1;
+               ^
+CONTEXT:  referenced column: ctid
+-- ===================================================================
+-- used in pl/pgsql function
+-- ===================================================================
+CREATE OR REPLACE FUNCTION f_test(p_c1 int) RETURNS int AS $$
+DECLARE
+	v_c1 int;
+BEGIN
+    SELECT c1 INTO v_c1 FROM ft1 WHERE c1 = p_c1 LIMIT 1;
+    PERFORM c1 FROM ft1 WHERE c1 = p_c1 AND p_c1 = v_c1 LIMIT 1;
+    RETURN v_c1;
+END;
+$$ LANGUAGE plpgsql;
+CREATE FUNCTION
+SELECT f_test(100);
+ f_test 
+--------
+    100
+(1 row)
+
+DROP FUNCTION f_test(int);
+DROP FUNCTION
+-- ===================================================================
+-- conversion error
+-- ===================================================================
+ALTER FOREIGN TABLE ft1 ALTER COLUMN c8 TYPE int;
+ALTER FOREIGN TABLE
+SELECT * FROM ft1 WHERE c1 = 1;  -- ERROR
+ERROR:  invalid input syntax for integer: "foo"
+CONTEXT:  column "c8" of foreign table "ft1"
+ALTER FOREIGN TABLE ft1 ALTER COLUMN c8 TYPE user_enum;
+ALTER FOREIGN TABLE
+-- ===================================================================
+-- subtransaction
+--  + local/remote error doesn't break cursor
+-- ===================================================================
+BEGIN;
+BEGIN
+DECLARE c CURSOR FOR SELECT * FROM ft1 ORDER BY c1;
+DECLARE CURSOR
+FETCH c;
+ c1 | c2 |  c3   |           c4           |         c5          | c6 |     c7     | c8  
+----+----+-------+------------------------+---------------------+----+------------+-----
+  1 |  1 | 00001 | 1970-01-02 00:00:00+08 | 1970-01-02 00:00:00 | 1  | 1          | foo
+(1 row)
+
+SAVEPOINT s;
+SAVEPOINT
+ERROR OUT;          -- ERROR
+ERROR:  syntax error at or near "ERROR"
+LINE 1: ERROR OUT;
+        ^
+ROLLBACK TO s;
+ROLLBACK
+FETCH c;
+ c1 | c2 |  c3   |           c4           |         c5          | c6 |     c7     | c8  
+----+----+-------+------------------------+---------------------+----+------------+-----
+  2 |  2 | 00002 | 1970-01-03 00:00:00+08 | 1970-01-03 00:00:00 | 2  | 2          | foo
+(1 row)
+
+SAVEPOINT s;
+SAVEPOINT
+SELECT * FROM ft1 WHERE 1 / (c1 - 1) > 0;  -- ERROR
+ERROR:  division by zero
+ROLLBACK TO s;
+ROLLBACK
+FETCH c;
+ c1 | c2 |  c3   |           c4           |         c5          | c6 |     c7     | c8  
+----+----+-------+------------------------+---------------------+----+------------+-----
+  3 |  3 | 00003 | 1970-01-04 00:00:00+08 | 1970-01-04 00:00:00 | 3  | 3          | foo
+(1 row)
+
+SELECT * FROM ft1 ORDER BY c1 LIMIT 1;
+ c1 | c2 |  c3   |           c4           |         c5          | c6 |     c7     | c8  
+----+----+-------+------------------------+---------------------+----+------------+-----
+  1 |  1 | 00001 | 1970-01-02 00:00:00+08 | 1970-01-02 00:00:00 | 1  | 1          | foo
+(1 row)
+
+COMMIT;
+COMMIT
+-- ===================================================================
+-- test handling of collations
+-- ===================================================================
+create table loct3 (f1 text collate "C" unique, f2 text, f3 varchar(10) unique);
+NOTICE:  CREATE TABLE / UNIQUE will create implicit index "loct3_f1_key" for table "loct3"
+NOTICE:  CREATE TABLE / UNIQUE will create implicit index "loct3_f3_key" for table "loct3"
+CREATE TABLE
+create foreign table ft3 (f1 text collate "C", f2 text, f3 varchar(10))
+  server loopback options (table_name 'loct3', use_remote_estimate 'true');
+CREATE FOREIGN TABLE
+-- can be sent to remote
+explain (verbose, costs off) select * from ft3 where f1 = 'foo';
+                    QUERY PLAN                     
+---------------------------------------------------
+ Foreign Scan on public.ft3
+   Output: f1, f2, f3
+   Filter: (ft3.f1 = 'foo'::text)
+   Remote SQL: SELECT f1, f2, f3 FROM public.loct3
+(4 rows)
+
+explain (verbose, costs off) select * from ft3 where f1 COLLATE "C" = 'foo';
+                    QUERY PLAN                     
+---------------------------------------------------
+ Foreign Scan on public.ft3
+   Output: f1, f2, f3
+   Filter: (ft3.f1 = 'foo'::text)
+   Remote SQL: SELECT f1, f2, f3 FROM public.loct3
+(4 rows)
+
+explain (verbose, costs off) select * from ft3 where f2 = 'foo';
+                    QUERY PLAN                     
+---------------------------------------------------
+ Foreign Scan on public.ft3
+   Output: f1, f2, f3
+   Filter: (ft3.f2 = 'foo'::text)
+   Remote SQL: SELECT f1, f2, f3 FROM public.loct3
+(4 rows)
+
+explain (verbose, costs off) select * from ft3 where f3 = 'foo';
+                    QUERY PLAN                     
+---------------------------------------------------
+ Foreign Scan on public.ft3
+   Output: f1, f2, f3
+   Filter: ((ft3.f3)::text = 'foo'::text)
+   Remote SQL: SELECT f1, f2, f3 FROM public.loct3
+(4 rows)
+
+explain (verbose, costs off) select * from ft3 f, loct3 l
+  where f.f3 = l.f3 and l.f1 = 'foo';
+                         QUERY PLAN                          
+-------------------------------------------------------------
+ Hash Join
+   Output: f.f1, f.f2, f.f3, l.f1, l.f2, l.f3
+   Hash Cond: ((f.f3)::text = (l.f3)::text)
+   ->  Foreign Scan on public.ft3 f
+         Output: f.f1, f.f2, f.f3
+         Remote SQL: SELECT f1, f2, f3 FROM public.loct3
+   ->  Hash
+         Output: l.f1, l.f2, l.f3
+         ->  Index Scan using loct3_f1_key on public.loct3 l
+               Output: l.f1, l.f2, l.f3
+               Index Cond: (l.f1 = 'foo'::text)
+(11 rows)
+
+-- can't be sent to remote
+explain (verbose, costs off) select * from ft3 where f1 COLLATE "POSIX" = 'foo';
+                    QUERY PLAN                     
+---------------------------------------------------
+ Foreign Scan on public.ft3
+   Output: f1, f2, f3
+   Filter: ((ft3.f1)::text = 'foo'::text)
+   Remote SQL: SELECT f1, f2, f3 FROM public.loct3
+(4 rows)
+
+explain (verbose, costs off) select * from ft3 where f1 = 'foo' COLLATE "C";
+                    QUERY PLAN                     
+---------------------------------------------------
+ Foreign Scan on public.ft3
+   Output: f1, f2, f3
+   Filter: (ft3.f1 = 'foo'::text COLLATE "C")
+   Remote SQL: SELECT f1, f2, f3 FROM public.loct3
+(4 rows)
+
+explain (verbose, costs off) select * from ft3 where f2 COLLATE "C" = 'foo';
+                    QUERY PLAN                     
+---------------------------------------------------
+ Foreign Scan on public.ft3
+   Output: f1, f2, f3
+   Filter: ((ft3.f2)::text = 'foo'::text)
+   Remote SQL: SELECT f1, f2, f3 FROM public.loct3
+(4 rows)
+
+explain (verbose, costs off) select * from ft3 where f2 = 'foo' COLLATE "C";
+                    QUERY PLAN                     
+---------------------------------------------------
+ Foreign Scan on public.ft3
+   Output: f1, f2, f3
+   Filter: (ft3.f2 = 'foo'::text COLLATE "C")
+   Remote SQL: SELECT f1, f2, f3 FROM public.loct3
+(4 rows)
+
+explain (verbose, costs off) select * from ft3 f, loct3 l
+  where f.f3 = l.f3 COLLATE "POSIX" and l.f1 = 'foo';
+                         QUERY PLAN                          
+-------------------------------------------------------------
+ Hash Join
+   Output: f.f1, f.f2, f.f3, l.f1, l.f2, l.f3
+   Hash Cond: ((f.f3)::text = (l.f3)::text)
+   ->  Foreign Scan on public.ft3 f
+         Output: f.f1, f.f2, f.f3
+         Remote SQL: SELECT f1, f2, f3 FROM public.loct3
+   ->  Hash
+         Output: l.f1, l.f2, l.f3
+         ->  Index Scan using loct3_f1_key on public.loct3 l
+               Output: l.f1, l.f2, l.f3
+               Index Cond: (l.f1 = 'foo'::text)
+(11 rows)
+
+-- ===================================================================
+-- test writable foreign table stuff
+-- ===================================================================
+EXPLAIN (verbose, costs off)
+INSERT INTO ft2 (c1,c2,c3) SELECT c1+1000,c2+100, c3 || c3 FROM ft2 LIMIT 20;
+                                                                                                                  QUERY PLAN                                                                                                                  
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Insert on public.ft2
+   ->  Subquery Scan on "*SELECT*"
+         Output: "*SELECT*"."?column?", "*SELECT*"."?column?", NULL::integer, "*SELECT*"."?column?", NULL::timestamp with time zone, NULL::timestamp without time zone, NULL::character varying, 'ft2       '::character(10), NULL::user_enum
+         ->  Limit
+               Output: ((public.ft2.c1 + 1000)), ((public.ft2.c2 + 100)), ((public.ft2.c3 || public.ft2.c3))
+               ->  Foreign Scan on public.ft2
+                     Output: (public.ft2.c1 + 1000), (public.ft2.c2 + 100), (public.ft2.c3 || public.ft2.c3)
+                     Remote SQL: SELECT "C 1", c2, c3 FROM "S 1"."T 1"
+(8 rows)
+
+INSERT INTO ft2 (c1,c2,c3) SELECT c1+1000,c2+100, c3 || c3 FROM ft2 LIMIT 20;
+INSERT 0 20
+INSERT INTO ft2 (c1,c2,c3)
+  VALUES (1101,201,'aaa'), (1102,202,'bbb'), (1103,203,'ccc') RETURNING *;
+  c1  | c2  | c3  | c4 | c5 | c6 |     c7     | c8 
+------+-----+-----+----+----+----+------------+----
+ 1101 | 201 | aaa |    |    |    | ft2        | 
+ 1102 | 202 | bbb |    |    |    | ft2        | 
+ 1103 | 203 | ccc |    |    |    | ft2        | 
+(3 rows)
+
+INSERT 0 3
+INSERT INTO ft2 (c1,c2,c3) VALUES (1104,204,'ddd'), (1105,205,'eee');
+INSERT 0 2
+UPDATE ft2 SET c2 = c2 + 300, c3 = c3 || '_update3' WHERE c1 % 10 = 3;
+UPDATE 103
+UPDATE ft2 SET c2 = c2 + 400, c3 = c3 || '_update7' WHERE c1 % 10 = 7 RETURNING *;
+  c1  | c2  |         c3         |           c4           |         c5          | c6 |     c7     | c8  
+------+-----+--------------------+------------------------+---------------------+----+------------+-----
+    7 | 407 | 00007_update7      | 1970-01-08 00:00:00+08 | 1970-01-08 00:00:00 | 7  | 7          | foo
+   17 | 407 | 00017_update7      | 1970-01-18 00:00:00+08 | 1970-01-18 00:00:00 | 7  | 7          | foo
+   27 | 407 | 00027_update7      | 1970-01-28 00:00:00+08 | 1970-01-28 00:00:00 | 7  | 7          | foo
+   37 | 407 | 00037_update7      | 1970-02-07 00:00:00+08 | 1970-02-07 00:00:00 | 7  | 7          | foo
+   47 | 407 | 00047_update7      | 1970-02-17 00:00:00+08 | 1970-02-17 00:00:00 | 7  | 7          | foo
+   57 | 407 | 00057_update7      | 1970-02-27 00:00:00+08 | 1970-02-27 00:00:00 | 7  | 7          | foo
+   67 | 407 | 00067_update7      | 1970-03-09 00:00:00+08 | 1970-03-09 00:00:00 | 7  | 7          | foo
+   77 | 407 | 00077_update7      | 1970-03-19 00:00:00+08 | 1970-03-19 00:00:00 | 7  | 7          | foo
+   87 | 407 | 00087_update7      | 1970-03-29 00:00:00+08 | 1970-03-29 00:00:00 | 7  | 7          | foo
+   97 | 407 | 00097_update7      | 1970-04-08 00:00:00+08 | 1970-04-08 00:00:00 | 7  | 7          | foo
+  107 | 407 | 00107_update7      | 1970-01-08 00:00:00+08 | 1970-01-08 00:00:00 | 7  | 7          | foo
+  117 | 407 | 00117_update7      | 1970-01-18 00:00:00+08 | 1970-01-18 00:00:00 | 7  | 7          | foo
+  127 | 407 | 00127_update7      | 1970-01-28 00:00:00+08 | 1970-01-28 00:00:00 | 7  | 7          | foo
+  137 | 407 | 00137_update7      | 1970-02-07 00:00:00+08 | 1970-02-07 00:00:00 | 7  | 7          | foo
+  147 | 407 | 00147_update7      | 1970-02-17 00:00:00+08 | 1970-02-17 00:00:00 | 7  | 7          | foo
+  157 | 407 | 00157_update7      | 1970-02-27 00:00:00+08 | 1970-02-27 00:00:00 | 7  | 7          | foo
+  167 | 407 | 00167_update7      | 1970-03-09 00:00:00+08 | 1970-03-09 00:00:00 | 7  | 7          | foo
+  177 | 407 | 00177_update7      | 1970-03-19 00:00:00+08 | 1970-03-19 00:00:00 | 7  | 7          | foo
+  187 | 407 | 00187_update7      | 1970-03-29 00:00:00+08 | 1970-03-29 00:00:00 | 7  | 7          | foo
+  197 | 407 | 00197_update7      | 1970-04-08 00:00:00+08 | 1970-04-08 00:00:00 | 7  | 7          | foo
+  207 | 407 | 00207_update7      | 1970-01-08 00:00:00+08 | 1970-01-08 00:00:00 | 7  | 7          | foo
+  217 | 407 | 00217_update7      | 1970-01-18 00:00:00+08 | 1970-01-18 00:00:00 | 7  | 7          | foo
+  227 | 407 | 00227_update7      | 1970-01-28 00:00:00+08 | 1970-01-28 00:00:00 | 7  | 7          | foo
+  237 | 407 | 00237_update7      | 1970-02-07 00:00:00+08 | 1970-02-07 00:00:00 | 7  | 7          | foo
+  247 | 407 | 00247_update7      | 1970-02-17 00:00:00+08 | 1970-02-17 00:00:00 | 7  | 7          | foo
+  257 | 407 | 00257_update7      | 1970-02-27 00:00:00+08 | 1970-02-27 00:00:00 | 7  | 7          | foo
+  267 | 407 | 00267_update7      | 1970-03-09 00:00:00+08 | 1970-03-09 00:00:00 | 7  | 7          | foo
+  277 | 407 | 00277_update7      | 1970-03-19 00:00:00+08 | 1970-03-19 00:00:00 | 7  | 7          | foo
+  287 | 407 | 00287_update7      | 1970-03-29 00:00:00+08 | 1970-03-29 00:00:00 | 7  | 7          | foo
+  297 | 407 | 00297_update7      | 1970-04-08 00:00:00+08 | 1970-04-08 00:00:00 | 7  | 7          | foo
+  307 | 407 | 00307_update7      | 1970-01-08 00:00:00+08 | 1970-01-08 00:00:00 | 7  | 7          | foo
+  317 | 407 | 00317_update7      | 1970-01-18 00:00:00+08 | 1970-01-18 00:00:00 | 7  | 7          | foo
+  327 | 407 | 00327_update7      | 1970-01-28 00:00:00+08 | 1970-01-28 00:00:00 | 7  | 7          | foo
+  337 | 407 | 00337_update7      | 1970-02-07 00:00:00+08 | 1970-02-07 00:00:00 | 7  | 7          | foo
+  347 | 407 | 00347_update7      | 1970-02-17 00:00:00+08 | 1970-02-17 00:00:00 | 7  | 7          | foo
+  357 | 407 | 00357_update7      | 1970-02-27 00:00:00+08 | 1970-02-27 00:00:00 | 7  | 7          | foo
+  367 | 407 | 00367_update7      | 1970-03-09 00:00:00+08 | 1970-03-09 00:00:00 | 7  | 7          | foo
+  377 | 407 | 00377_update7      | 1970-03-19 00:00:00+08 | 1970-03-19 00:00:00 | 7  | 7          | foo
+  387 | 407 | 00387_update7      | 1970-03-29 00:00:00+08 | 1970-03-29 00:00:00 | 7  | 7          | foo
+  397 | 407 | 00397_update7      | 1970-04-08 00:00:00+08 | 1970-04-08 00:00:00 | 7  | 7          | foo
+  407 | 407 | 00407_update7      | 1970-01-08 00:00:00+08 | 1970-01-08 00:00:00 | 7  | 7          | foo
+  417 | 407 | 00417_update7      | 1970-01-18 00:00:00+08 | 1970-01-18 00:00:00 | 7  | 7          | foo
+  427 | 407 | 00427_update7      | 1970-01-28 00:00:00+08 | 1970-01-28 00:00:00 | 7  | 7          | foo
+  437 | 407 | 00437_update7      | 1970-02-07 00:00:00+08 | 1970-02-07 00:00:00 | 7  | 7          | foo
+  447 | 407 | 00447_update7      | 1970-02-17 00:00:00+08 | 1970-02-17 00:00:00 | 7  | 7          | foo
+  457 | 407 | 00457_update7      | 1970-02-27 00:00:00+08 | 1970-02-27 00:00:00 | 7  | 7          | foo
+  467 | 407 | 00467_update7      | 1970-03-09 00:00:00+08 | 1970-03-09 00:00:00 | 7  | 7          | foo
+  477 | 407 | 00477_update7      | 1970-03-19 00:00:00+08 | 1970-03-19 00:00:00 | 7  | 7          | foo
+  487 | 407 | 00487_update7      | 1970-03-29 00:00:00+08 | 1970-03-29 00:00:00 | 7  | 7          | foo
+  497 | 407 | 00497_update7      | 1970-04-08 00:00:00+08 | 1970-04-08 00:00:00 | 7  | 7          | foo
+  507 | 407 | 00507_update7      | 1970-01-08 00:00:00+08 | 1970-01-08 00:00:00 | 7  | 7          | foo
+  517 | 407 | 00517_update7      | 1970-01-18 00:00:00+08 | 1970-01-18 00:00:00 | 7  | 7          | foo
+  527 | 407 | 00527_update7      | 1970-01-28 00:00:00+08 | 1970-01-28 00:00:00 | 7  | 7          | foo
+  537 | 407 | 00537_update7      | 1970-02-07 00:00:00+08 | 1970-02-07 00:00:00 | 7  | 7          | foo
+  547 | 407 | 00547_update7      | 1970-02-17 00:00:00+08 | 1970-02-17 00:00:00 | 7  | 7          | foo
+  557 | 407 | 00557_update7      | 1970-02-27 00:00:00+08 | 1970-02-27 00:00:00 | 7  | 7          | foo
+  567 | 407 | 00567_update7      | 1970-03-09 00:00:00+08 | 1970-03-09 00:00:00 | 7  | 7          | foo
+  577 | 407 | 00577_update7      | 1970-03-19 00:00:00+08 | 1970-03-19 00:00:00 | 7  | 7          | foo
+  587 | 407 | 00587_update7      | 1970-03-29 00:00:00+08 | 1970-03-29 00:00:00 | 7  | 7          | foo
+  597 | 407 | 00597_update7      | 1970-04-08 00:00:00+08 | 1970-04-08 00:00:00 | 7  | 7          | foo
+  607 | 407 | 00607_update7      | 1970-01-08 00:00:00+08 | 1970-01-08 00:00:00 | 7  | 7          | foo
+  617 | 407 | 00617_update7      | 1970-01-18 00:00:00+08 | 1970-01-18 00:00:00 | 7  | 7          | foo
+  627 | 407 | 00627_update7      | 1970-01-28 00:00:00+08 | 1970-01-28 00:00:00 | 7  | 7          | foo
+  637 | 407 | 00637_update7      | 1970-02-07 00:00:00+08 | 1970-02-07 00:00:00 | 7  | 7          | foo
+  647 | 407 | 00647_update7      | 1970-02-17 00:00:00+08 | 1970-02-17 00:00:00 | 7  | 7          | foo
+  657 | 407 | 00657_update7      | 1970-02-27 00:00:00+08 | 1970-02-27 00:00:00 | 7  | 7          | foo
+  667 | 407 | 00667_update7      | 1970-03-09 00:00:00+08 | 1970-03-09 00:00:00 | 7  | 7          | foo
+  677 | 407 | 00677_update7      | 1970-03-19 00:00:00+08 | 1970-03-19 00:00:00 | 7  | 7          | foo
+  687 | 407 | 00687_update7      | 1970-03-29 00:00:00+08 | 1970-03-29 00:00:00 | 7  | 7          | foo
+  697 | 407 | 00697_update7      | 1970-04-08 00:00:00+08 | 1970-04-08 00:00:00 | 7  | 7          | foo
+  707 | 407 | 00707_update7      | 1970-01-08 00:00:00+08 | 1970-01-08 00:00:00 | 7  | 7          | foo
+  717 | 407 | 00717_update7      | 1970-01-18 00:00:00+08 | 1970-01-18 00:00:00 | 7  | 7          | foo
+  727 | 407 | 00727_update7      | 1970-01-28 00:00:00+08 | 1970-01-28 00:00:00 | 7  | 7          | foo
+  737 | 407 | 00737_update7      | 1970-02-07 00:00:00+08 | 1970-02-07 00:00:00 | 7  | 7          | foo
+  747 | 407 | 00747_update7      | 1970-02-17 00:00:00+08 | 1970-02-17 00:00:00 | 7  | 7          | foo
+  757 | 407 | 00757_update7      | 1970-02-27 00:00:00+08 | 1970-02-27 00:00:00 | 7  | 7          | foo
+  767 | 407 | 00767_update7      | 1970-03-09 00:00:00+08 | 1970-03-09 00:00:00 | 7  | 7          | foo
+  777 | 407 | 00777_update7      | 1970-03-19 00:00:00+08 | 1970-03-19 00:00:00 | 7  | 7          | foo
+  787 | 407 | 00787_update7      | 1970-03-29 00:00:00+08 | 1970-03-29 00:00:00 | 7  | 7          | foo
+  797 | 407 | 00797_update7      | 1970-04-08 00:00:00+08 | 1970-04-08 00:00:00 | 7  | 7          | foo
+  807 | 407 | 00807_update7      | 1970-01-08 00:00:00+08 | 1970-01-08 00:00:00 | 7  | 7          | foo
+  817 | 407 | 00817_update7      | 1970-01-18 00:00:00+08 | 1970-01-18 00:00:00 | 7  | 7          | foo
+  827 | 407 | 00827_update7      | 1970-01-28 00:00:00+08 | 1970-01-28 00:00:00 | 7  | 7          | foo
+  837 | 407 | 00837_update7      | 1970-02-07 00:00:00+08 | 1970-02-07 00:00:00 | 7  | 7          | foo
+  847 | 407 | 00847_update7      | 1970-02-17 00:00:00+08 | 1970-02-17 00:00:00 | 7  | 7          | foo
+  857 | 407 | 00857_update7      | 1970-02-27 00:00:00+08 | 1970-02-27 00:00:00 | 7  | 7          | foo
+  867 | 407 | 00867_update7      | 1970-03-09 00:00:00+08 | 1970-03-09 00:00:00 | 7  | 7          | foo
+  877 | 407 | 00877_update7      | 1970-03-19 00:00:00+08 | 1970-03-19 00:00:00 | 7  | 7          | foo
+  887 | 407 | 00887_update7      | 1970-03-29 00:00:00+08 | 1970-03-29 00:00:00 | 7  | 7          | foo
+  897 | 407 | 00897_update7      | 1970-04-08 00:00:00+08 | 1970-04-08 00:00:00 | 7  | 7          | foo
+  907 | 407 | 00907_update7      | 1970-01-08 00:00:00+08 | 1970-01-08 00:00:00 | 7  | 7          | foo
+  917 | 407 | 00917_update7      | 1970-01-18 00:00:00+08 | 1970-01-18 00:00:00 | 7  | 7          | foo
+  927 | 407 | 00927_update7      | 1970-01-28 00:00:00+08 | 1970-01-28 00:00:00 | 7  | 7          | foo
+  937 | 407 | 00937_update7      | 1970-02-07 00:00:00+08 | 1970-02-07 00:00:00 | 7  | 7          | foo
+  947 | 407 | 00947_update7      | 1970-02-17 00:00:00+08 | 1970-02-17 00:00:00 | 7  | 7          | foo
+  957 | 407 | 00957_update7      | 1970-02-27 00:00:00+08 | 1970-02-27 00:00:00 | 7  | 7          | foo
+  967 | 407 | 00967_update7      | 1970-03-09 00:00:00+08 | 1970-03-09 00:00:00 | 7  | 7          | foo
+  977 | 407 | 00977_update7      | 1970-03-19 00:00:00+08 | 1970-03-19 00:00:00 | 7  | 7          | foo
+  987 | 407 | 00987_update7      | 1970-03-29 00:00:00+08 | 1970-03-29 00:00:00 | 7  | 7          | foo
+  997 | 407 | 00997_update7      | 1970-04-08 00:00:00+08 | 1970-04-08 00:00:00 | 7  | 7          | foo
+ 1007 | 507 | 0000700007_update7 |                        |                     |    | ft2        | 
+ 1017 | 507 | 0001700017_update7 |                        |                     |    | ft2        | 
+(102 rows)
+
+UPDATE 102
+EXPLAIN (verbose, costs off)
+UPDATE ft2 SET c2 = ft2.c2 + 500, c3 = ft2.c3 || '_update9', c7 = DEFAULT
+  FROM ft1 WHERE ft1.c1 = ft2.c2 AND ft1.c1 % 10 = 9;
+                                                                            QUERY PLAN                                                                             
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Update on public.ft2
+   ->  Hash Join
+         Output: ft2.c1, (ft2.c2 + 500), NULL::integer, (ft2.c3 || '_update9'::text), ft2.c4, ft2.c5, ft2.c6, 'ft2       '::character(10), ft2.c8, ft2.ctid, ft1.*
+         Hash Cond: (ft2.c2 = ft1.c1)
+         ->  Foreign Scan on public.ft2
+               Output: ft2.c1, ft2.c2, ft2.c3, ft2.c4, ft2.c5, ft2.c6, ft2.c8, ft2.ctid
+               Filter: ((ft2.c2 % 10) = 9)
+               Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c8, ctid FROM "S 1"."T 1" FOR UPDATE
+         ->  Hash
+               Output: ft1.*, ft1.c1
+               ->  Foreign Scan on public.ft1
+                     Output: ft1.*, ft1.c1
+                     Filter: ((ft1.c1 % 10) = 9)
+                     Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+(14 rows)
+
+UPDATE ft2 SET c2 = ft2.c2 + 500, c3 = ft2.c3 || '_update9', c7 = DEFAULT
+  FROM ft1 WHERE ft1.c1 = ft2.c2 AND ft1.c1 % 10 = 9;
+UPDATE 102
+EXPLAIN (verbose, costs off)
+  DELETE FROM ft2 WHERE c1 % 10 = 5 RETURNING c1, c4;
+                             QUERY PLAN                             
+--------------------------------------------------------------------
+ Delete on public.ft2
+   Output: c1, c4
+   ->  Foreign Scan on public.ft2
+         Output: ctid
+         Filter: ((ft2.c1 % 10) = 5)
+         Remote SQL: SELECT "C 1", ctid FROM "S 1"."T 1" FOR UPDATE
+(6 rows)
+
+DELETE FROM ft2 WHERE c1 % 10 = 5 RETURNING c1, c4;
+  c1  |           c4           
+------+------------------------
+    5 | 1970-01-06 00:00:00+08
+   15 | 1970-01-16 00:00:00+08
+   25 | 1970-01-26 00:00:00+08
+   35 | 1970-02-05 00:00:00+08
+   45 | 1970-02-15 00:00:00+08
+   55 | 1970-02-25 00:00:00+08
+   65 | 1970-03-07 00:00:00+08
+   75 | 1970-03-17 00:00:00+08
+   85 | 1970-03-27 00:00:00+08
+   95 | 1970-04-06 00:00:00+08
+  105 | 1970-01-06 00:00:00+08
+  115 | 1970-01-16 00:00:00+08
+  125 | 1970-01-26 00:00:00+08
+  135 | 1970-02-05 00:00:00+08
+  145 | 1970-02-15 00:00:00+08
+  155 | 1970-02-25 00:00:00+08
+  165 | 1970-03-07 00:00:00+08
+  175 | 1970-03-17 00:00:00+08
+  185 | 1970-03-27 00:00:00+08
+  195 | 1970-04-06 00:00:00+08
+  205 | 1970-01-06 00:00:00+08
+  215 | 1970-01-16 00:00:00+08
+  225 | 1970-01-26 00:00:00+08
+  235 | 1970-02-05 00:00:00+08
+  245 | 1970-02-15 00:00:00+08
+  255 | 1970-02-25 00:00:00+08
+  265 | 1970-03-07 00:00:00+08
+  275 | 1970-03-17 00:00:00+08
+  285 | 1970-03-27 00:00:00+08
+  295 | 1970-04-06 00:00:00+08
+  305 | 1970-01-06 00:00:00+08
+  315 | 1970-01-16 00:00:00+08
+  325 | 1970-01-26 00:00:00+08
+  335 | 1970-02-05 00:00:00+08
+  345 | 1970-02-15 00:00:00+08
+  355 | 1970-02-25 00:00:00+08
+  365 | 1970-03-07 00:00:00+08
+  375 | 1970-03-17 00:00:00+08
+  385 | 1970-03-27 00:00:00+08
+  395 | 1970-04-06 00:00:00+08
+  405 | 1970-01-06 00:00:00+08
+  415 | 1970-01-16 00:00:00+08
+  425 | 1970-01-26 00:00:00+08
+  435 | 1970-02-05 00:00:00+08
+  445 | 1970-02-15 00:00:00+08
+  455 | 1970-02-25 00:00:00+08
+  465 | 1970-03-07 00:00:00+08
+  475 | 1970-03-17 00:00:00+08
+  485 | 1970-03-27 00:00:00+08
+  495 | 1970-04-06 00:00:00+08
+  505 | 1970-01-06 00:00:00+08
+  515 | 1970-01-16 00:00:00+08
+  525 | 1970-01-26 00:00:00+08
+  535 | 1970-02-05 00:00:00+08
+  545 | 1970-02-15 00:00:00+08
+  555 | 1970-02-25 00:00:00+08
+  565 | 1970-03-07 00:00:00+08
+  575 | 1970-03-17 00:00:00+08
+  585 | 1970-03-27 00:00:00+08
+  595 | 1970-04-06 00:00:00+08
+  605 | 1970-01-06 00:00:00+08
+  615 | 1970-01-16 00:00:00+08
+  625 | 1970-01-26 00:00:00+08
+  635 | 1970-02-05 00:00:00+08
+  645 | 1970-02-15 00:00:00+08
+  655 | 1970-02-25 00:00:00+08
+  665 | 1970-03-07 00:00:00+08
+  675 | 1970-03-17 00:00:00+08
+  685 | 1970-03-27 00:00:00+08
+  695 | 1970-04-06 00:00:00+08
+  705 | 1970-01-06 00:00:00+08
+  715 | 1970-01-16 00:00:00+08
+  725 | 1970-01-26 00:00:00+08
+  735 | 1970-02-05 00:00:00+08
+  745 | 1970-02-15 00:00:00+08
+  755 | 1970-02-25 00:00:00+08
+  765 | 1970-03-07 00:00:00+08
+  775 | 1970-03-17 00:00:00+08
+  785 | 1970-03-27 00:00:00+08
+  795 | 1970-04-06 00:00:00+08
+  805 | 1970-01-06 00:00:00+08
+  815 | 1970-01-16 00:00:00+08
+  825 | 1970-01-26 00:00:00+08
+  835 | 1970-02-05 00:00:00+08
+  845 | 1970-02-15 00:00:00+08
+  855 | 1970-02-25 00:00:00+08
+  865 | 1970-03-07 00:00:00+08
+  875 | 1970-03-17 00:00:00+08
+  885 | 1970-03-27 00:00:00+08
+  895 | 1970-04-06 00:00:00+08
+  905 | 1970-01-06 00:00:00+08
+  915 | 1970-01-16 00:00:00+08
+  925 | 1970-01-26 00:00:00+08
+  935 | 1970-02-05 00:00:00+08
+  945 | 1970-02-15 00:00:00+08
+  955 | 1970-02-25 00:00:00+08
+  965 | 1970-03-07 00:00:00+08
+  975 | 1970-03-17 00:00:00+08
+  985 | 1970-03-27 00:00:00+08
+  995 | 1970-04-06 00:00:00+08
+ 1005 | 
+ 1015 | 
+ 1105 | 
+(103 rows)
+
+DELETE 103
+EXPLAIN (verbose, costs off)
+DELETE FROM ft2 USING ft1 WHERE ft1.c1 = ft2.c2 AND ft1.c1 % 10 = 2;
+                                        QUERY PLAN                                         
+-------------------------------------------------------------------------------------------
+ Delete on public.ft2
+   ->  Hash Join
+         Output: ft2.ctid, ft1.*
+         Hash Cond: (ft2.c2 = ft1.c1)
+         ->  Foreign Scan on public.ft2
+               Output: ft2.ctid, ft2.c2
+               Filter: ((ft2.c2 % 10) = 2)
+               Remote SQL: SELECT c2, ctid FROM "S 1"."T 1" FOR UPDATE
+         ->  Hash
+               Output: ft1.*, ft1.c1
+               ->  Foreign Scan on public.ft1
+                     Output: ft1.*, ft1.c1
+                     Filter: ((ft1.c1 % 10) = 2)
+                     Remote SQL: SELECT "C 1", c2, c3, c4, c5, c6, c7, c8 FROM "S 1"."T 1"
+(14 rows)
+
+DELETE FROM ft2 USING ft1 WHERE ft1.c1 = ft2.c2 AND ft1.c1 % 10 = 2;
+DELETE 103
+SELECT c1,c2,c3,c4 FROM ft2 ORDER BY c1;
+  c1  | c2  |         c3         |           c4           
+------+-----+--------------------+------------------------
+    1 |   1 | 00001              | 1970-01-02 00:00:00+08
+    3 | 303 | 00003_update3      | 1970-01-04 00:00:00+08
+    4 |   4 | 00004              | 1970-01-05 00:00:00+08
+    6 |   6 | 00006              | 1970-01-07 00:00:00+08
+    7 | 407 | 00007_update7      | 1970-01-08 00:00:00+08
+    8 |   8 | 00008              | 1970-01-09 00:00:00+08
+    9 | 509 | 00009_update9      | 1970-01-10 00:00:00+08
+   10 |   0 | 00010              | 1970-01-11 00:00:00+08
+   11 |   1 | 00011              | 1970-01-12 00:00:00+08
+   13 | 303 | 00013_update3      | 1970-01-14 00:00:00+08
+   14 |   4 | 00014              | 1970-01-15 00:00:00+08
+   16 |   6 | 00016              | 1970-01-17 00:00:00+08
+   17 | 407 | 00017_update7      | 1970-01-18 00:00:00+08
+   18 |   8 | 00018              | 1970-01-19 00:00:00+08
+   19 | 509 | 00019_update9      | 1970-01-20 00:00:00+08
+   20 |   0 | 00020              | 1970-01-21 00:00:00+08
+   21 |   1 | 00021              | 1970-01-22 00:00:00+08
+   23 | 303 | 00023_update3      | 1970-01-24 00:00:00+08
+   24 |   4 | 00024              | 1970-01-25 00:00:00+08
+   26 |   6 | 00026              | 1970-01-27 00:00:00+08
+   27 | 407 | 00027_update7      | 1970-01-28 00:00:00+08
+   28 |   8 | 00028              | 1970-01-29 00:00:00+08
+   29 | 509 | 00029_update9      | 1970-01-30 00:00:00+08
+   30 |   0 | 00030              | 1970-01-31 00:00:00+08
+   31 |   1 | 00031              | 1970-02-01 00:00:00+08
+   33 | 303 | 00033_update3      | 1970-02-03 00:00:00+08
+   34 |   4 | 00034              | 1970-02-04 00:00:00+08
+   36 |   6 | 00036              | 1970-02-06 00:00:00+08
+   37 | 407 | 00037_update7      | 1970-02-07 00:00:00+08
+   38 |   8 | 00038              | 1970-02-08 00:00:00+08
+   39 | 509 | 00039_update9      | 1970-02-09 00:00:00+08
+   40 |   0 | 00040              | 1970-02-10 00:00:00+08
+   41 |   1 | 00041              | 1970-02-11 00:00:00+08
+   43 | 303 | 00043_update3      | 1970-02-13 00:00:00+08
+   44 |   4 | 00044              | 1970-02-14 00:00:00+08
+   46 |   6 | 00046              | 1970-02-16 00:00:00+08
+   47 | 407 | 00047_update7      | 1970-02-17 00:00:00+08
+   48 |   8 | 00048              | 1970-02-18 00:00:00+08
+   49 | 509 | 00049_update9      | 1970-02-19 00:00:00+08
+   50 |   0 | 00050              | 1970-02-20 00:00:00+08
+   51 |   1 | 00051              | 1970-02-21 00:00:00+08
+   53 | 303 | 00053_update3      | 1970-02-23 00:00:00+08
+   54 |   4 | 00054              | 1970-02-24 00:00:00+08
+   56 |   6 | 00056              | 1970-02-26 00:00:00+08
+   57 | 407 | 00057_update7      | 1970-02-27 00:00:00+08
+   58 |   8 | 00058              | 1970-02-28 00:00:00+08
+   59 | 509 | 00059_update9      | 1970-03-01 00:00:00+08
+   60 |   0 | 00060              | 1970-03-02 00:00:00+08
+   61 |   1 | 00061              | 1970-03-03 00:00:00+08
+   63 | 303 | 00063_update3      | 1970-03-05 00:00:00+08
+   64 |   4 | 00064              | 1970-03-06 00:00:00+08
+   66 |   6 | 00066              | 1970-03-08 00:00:00+08
+   67 | 407 | 00067_update7      | 1970-03-09 00:00:00+08
+   68 |   8 | 00068              | 1970-03-10 00:00:00+08
+   69 | 509 | 00069_update9      | 1970-03-11 00:00:00+08
+   70 |   0 | 00070              | 1970-03-12 00:00:00+08
+   71 |   1 | 00071              | 1970-03-13 00:00:00+08
+   73 | 303 | 00073_update3      | 1970-03-15 00:00:00+08
+   74 |   4 | 00074              | 1970-03-16 00:00:00+08
+   76 |   6 | 00076              | 1970-03-18 00:00:00+08
+   77 | 407 | 00077_update7      | 1970-03-19 00:00:00+08
+   78 |   8 | 00078              | 1970-03-20 00:00:00+08
+   79 | 509 | 00079_update9      | 1970-03-21 00:00:00+08
+   80 |   0 | 00080              | 1970-03-22 00:00:00+08
+   81 |   1 | 00081              | 1970-03-23 00:00:00+08
+   83 | 303 | 00083_update3      | 1970-03-25 00:00:00+08
+   84 |   4 | 00084              | 1970-03-26 00:00:00+08
+   86 |   6 | 00086              | 1970-03-28 00:00:00+08
+   87 | 407 | 00087_update7      | 1970-03-29 00:00:00+08
+   88 |   8 | 00088              | 1970-03-30 00:00:00+08
+   89 | 509 | 00089_update9      | 1970-03-31 00:00:00+08
+   90 |   0 | 00090              | 1970-04-01 00:00:00+08
+   91 |   1 | 00091              | 1970-04-02 00:00:00+08
+   93 | 303 | 00093_update3      | 1970-04-04 00:00:00+08
+   94 |   4 | 00094              | 1970-04-05 00:00:00+08
+   96 |   6 | 00096              | 1970-04-07 00:00:00+08
+   97 | 407 | 00097_update7      | 1970-04-08 00:00:00+08
+   98 |   8 | 00098              | 1970-04-09 00:00:00+08
+   99 | 509 | 00099_update9      | 1970-04-10 00:00:00+08
+  100 |   0 | 00100              | 1970-01-01 00:00:00+08
+  101 |   1 | 00101              | 1970-01-02 00:00:00+08
+  103 | 303 | 00103_update3      | 1970-01-04 00:00:00+08
+  104 |   4 | 00104              | 1970-01-05 00:00:00+08
+  106 |   6 | 00106              | 1970-01-07 00:00:00+08
+  107 | 407 | 00107_update7      | 1970-01-08 00:00:00+08
+  108 |   8 | 00108              | 1970-01-09 00:00:00+08
+  109 | 509 | 00109_update9      | 1970-01-10 00:00:00+08
+  110 |   0 | 00110              | 1970-01-11 00:00:00+08
+  111 |   1 | 00111              | 1970-01-12 00:00:00+08
+  113 | 303 | 00113_update3      | 1970-01-14 00:00:00+08
+  114 |   4 | 00114              | 1970-01-15 00:00:00+08
+  116 |   6 | 00116              | 1970-01-17 00:00:00+08
+  117 | 407 | 00117_update7      | 1970-01-18 00:00:00+08
+  118 |   8 | 00118              | 1970-01-19 00:00:00+08
+  119 | 509 | 00119_update9      | 1970-01-20 00:00:00+08
+  120 |   0 | 00120              | 1970-01-21 00:00:00+08
+  121 |   1 | 00121              | 1970-01-22 00:00:00+08
+  123 | 303 | 00123_update3      | 1970-01-24 00:00:00+08
+  124 |   4 | 00124              | 1970-01-25 00:00:00+08
+  126 |   6 | 00126              | 1970-01-27 00:00:00+08
+  127 | 407 | 00127_update7      | 1970-01-28 00:00:00+08
+  128 |   8 | 00128              | 1970-01-29 00:00:00+08
+  129 | 509 | 00129_update9      | 1970-01-30 00:00:00+08
+  130 |   0 | 00130              | 1970-01-31 00:00:00+08
+  131 |   1 | 00131              | 1970-02-01 00:00:00+08
+  133 | 303 | 00133_update3      | 1970-02-03 00:00:00+08
+  134 |   4 | 00134              | 1970-02-04 00:00:00+08
+  136 |   6 | 00136              | 1970-02-06 00:00:00+08
+  137 | 407 | 00137_update7      | 1970-02-07 00:00:00+08
+  138 |   8 | 00138              | 1970-02-08 00:00:00+08
+  139 | 509 | 00139_update9      | 1970-02-09 00:00:00+08
+  140 |   0 | 00140              | 1970-02-10 00:00:00+08
+  141 |   1 | 00141              | 1970-02-11 00:00:00+08
+  143 | 303 | 00143_update3      | 1970-02-13 00:00:00+08
+  144 |   4 | 00144              | 1970-02-14 00:00:00+08
+  146 |   6 | 00146              | 1970-02-16 00:00:00+08
+  147 | 407 | 00147_update7      | 1970-02-17 00:00:00+08
+  148 |   8 | 00148              | 1970-02-18 00:00:00+08
+  149 | 509 | 00149_update9      | 1970-02-19 00:00:00+08
+  150 |   0 | 00150              | 1970-02-20 00:00:00+08
+  151 |   1 | 00151              | 1970-02-21 00:00:00+08
+  153 | 303 | 00153_update3      | 1970-02-23 00:00:00+08
+  154 |   4 | 00154              | 1970-02-24 00:00:00+08
+  156 |   6 | 00156              | 1970-02-26 00:00:00+08
+  157 | 407 | 00157_update7      | 1970-02-27 00:00:00+08
+  158 |   8 | 00158              | 1970-02-28 00:00:00+08
+  159 | 509 | 00159_update9      | 1970-03-01 00:00:00+08
+  160 |   0 | 00160              | 1970-03-02 00:00:00+08
+  161 |   1 | 00161              | 1970-03-03 00:00:00+08
+  163 | 303 | 00163_update3      | 1970-03-05 00:00:00+08
+  164 |   4 | 00164              | 1970-03-06 00:00:00+08
+  166 |   6 | 00166              | 1970-03-08 00:00:00+08
+  167 | 407 | 00167_update7      | 1970-03-09 00:00:00+08
+  168 |   8 | 00168              | 1970-03-10 00:00:00+08
+  169 | 509 | 00169_update9      | 1970-03-11 00:00:00+08
+  170 |   0 | 00170              | 1970-03-12 00:00:00+08
+  171 |   1 | 00171              | 1970-03-13 00:00:00+08
+  173 | 303 | 00173_update3      | 1970-03-15 00:00:00+08
+  174 |   4 | 00174              | 1970-03-16 00:00:00+08
+  176 |   6 | 00176              | 1970-03-18 00:00:00+08
+  177 | 407 | 00177_update7      | 1970-03-19 00:00:00+08
+  178 |   8 | 00178              | 1970-03-20 00:00:00+08
+  179 | 509 | 00179_update9      | 1970-03-21 00:00:00+08
+  180 |   0 | 00180              | 1970-03-22 00:00:00+08
+  181 |   1 | 00181              | 1970-03-23 00:00:00+08
+  183 | 303 | 00183_update3      | 1970-03-25 00:00:00+08
+  184 |   4 | 00184              | 1970-03-26 00:00:00+08
+  186 |   6 | 00186              | 1970-03-28 00:00:00+08
+  187 | 407 | 00187_update7      | 1970-03-29 00:00:00+08
+  188 |   8 | 00188              | 1970-03-30 00:00:00+08
+  189 | 509 | 00189_update9      | 1970-03-31 00:00:00+08
+  190 |   0 | 00190              | 1970-04-01 00:00:00+08
+  191 |   1 | 00191              | 1970-04-02 00:00:00+08
+  193 | 303 | 00193_update3      | 1970-04-04 00:00:00+08
+  194 |   4 | 00194              | 1970-04-05 00:00:00+08
+  196 |   6 | 00196              | 1970-04-07 00:00:00+08
+  197 | 407 | 00197_update7      | 1970-04-08 00:00:00+08
+  198 |   8 | 00198              | 1970-04-09 00:00:00+08
+  199 | 509 | 00199_update9      | 1970-04-10 00:00:00+08
+  200 |   0 | 00200              | 1970-01-01 00:00:00+08
+  201 |   1 | 00201              | 1970-01-02 00:00:00+08
+  203 | 303 | 00203_update3      | 1970-01-04 00:00:00+08
+  204 |   4 | 00204              | 1970-01-05 00:00:00+08
+  206 |   6 | 00206              | 1970-01-07 00:00:00+08
+  207 | 407 | 00207_update7      | 1970-01-08 00:00:00+08
+  208 |   8 | 00208              | 1970-01-09 00:00:00+08
+  209 | 509 | 00209_update9      | 1970-01-10 00:00:00+08
+  210 |   0 | 00210              | 1970-01-11 00:00:00+08
+  211 |   1 | 00211              | 1970-01-12 00:00:00+08
+  213 | 303 | 00213_update3      | 1970-01-14 00:00:00+08
+  214 |   4 | 00214              | 1970-01-15 00:00:00+08
+  216 |   6 | 00216              | 1970-01-17 00:00:00+08
+  217 | 407 | 00217_update7      | 1970-01-18 00:00:00+08
+  218 |   8 | 00218              | 1970-01-19 00:00:00+08
+  219 | 509 | 00219_update9      | 1970-01-20 00:00:00+08
+  220 |   0 | 00220              | 1970-01-21 00:00:00+08
+  221 |   1 | 00221              | 1970-01-22 00:00:00+08
+  223 | 303 | 00223_update3      | 1970-01-24 00:00:00+08
+  224 |   4 | 00224              | 1970-01-25 00:00:00+08
+  226 |   6 | 00226              | 1970-01-27 00:00:00+08
+  227 | 407 | 00227_update7      | 1970-01-28 00:00:00+08
+  228 |   8 | 00228              | 1970-01-29 00:00:00+08
+  229 | 509 | 00229_update9      | 1970-01-30 00:00:00+08
+  230 |   0 | 00230              | 1970-01-31 00:00:00+08
+  231 |   1 | 00231              | 1970-02-01 00:00:00+08
+  233 | 303 | 00233_update3      | 1970-02-03 00:00:00+08
+  234 |   4 | 00234              | 1970-02-04 00:00:00+08
+  236 |   6 | 00236              | 1970-02-06 00:00:00+08
+  237 | 407 | 00237_update7      | 1970-02-07 00:00:00+08
+  238 |   8 | 00238              | 1970-02-08 00:00:00+08
+  239 | 509 | 00239_update9      | 1970-02-09 00:00:00+08
+  240 |   0 | 00240              | 1970-02-10 00:00:00+08
+  241 |   1 | 00241              | 1970-02-11 00:00:00+08
+  243 | 303 | 00243_update3      | 1970-02-13 00:00:00+08
+  244 |   4 | 00244              | 1970-02-14 00:00:00+08
+  246 |   6 | 00246              | 1970-02-16 00:00:00+08
+  247 | 407 | 00247_update7      | 1970-02-17 00:00:00+08
+  248 |   8 | 00248              | 1970-02-18 00:00:00+08
+  249 | 509 | 00249_update9      | 1970-02-19 00:00:00+08
+  250 |   0 | 00250              | 1970-02-20 00:00:00+08
+  251 |   1 | 00251              | 1970-02-21 00:00:00+08
+  253 | 303 | 00253_update3      | 1970-02-23 00:00:00+08
+  254 |   4 | 00254              | 1970-02-24 00:00:00+08
+  256 |   6 | 00256              | 1970-02-26 00:00:00+08
+  257 | 407 | 00257_update7      | 1970-02-27 00:00:00+08
+  258 |   8 | 00258              | 1970-02-28 00:00:00+08
+  259 | 509 | 00259_update9      | 1970-03-01 00:00:00+08
+  260 |   0 | 00260              | 1970-03-02 00:00:00+08
+  261 |   1 | 00261              | 1970-03-03 00:00:00+08
+  263 | 303 | 00263_update3      | 1970-03-05 00:00:00+08
+  264 |   4 | 00264              | 1970-03-06 00:00:00+08
+  266 |   6 | 00266              | 1970-03-08 00:00:00+08
+  267 | 407 | 00267_update7      | 1970-03-09 00:00:00+08
+  268 |   8 | 00268              | 1970-03-10 00:00:00+08
+  269 | 509 | 00269_update9      | 1970-03-11 00:00:00+08
+  270 |   0 | 00270              | 1970-03-12 00:00:00+08
+  271 |   1 | 00271              | 1970-03-13 00:00:00+08
+  273 | 303 | 00273_update3      | 1970-03-15 00:00:00+08
+  274 |   4 | 00274              | 1970-03-16 00:00:00+08
+  276 |   6 | 00276              | 1970-03-18 00:00:00+08
+  277 | 407 | 00277_update7      | 1970-03-19 00:00:00+08
+  278 |   8 | 00278              | 1970-03-20 00:00:00+08
+  279 | 509 | 00279_update9      | 1970-03-21 00:00:00+08
+  280 |   0 | 00280              | 1970-03-22 00:00:00+08
+  281 |   1 | 00281              | 1970-03-23 00:00:00+08
+  283 | 303 | 00283_update3      | 1970-03-25 00:00:00+08
+  284 |   4 | 00284              | 1970-03-26 00:00:00+08
+  286 |   6 | 00286              | 1970-03-28 00:00:00+08
+  287 | 407 | 00287_update7      | 1970-03-29 00:00:00+08
+  288 |   8 | 00288              | 1970-03-30 00:00:00+08
+  289 | 509 | 00289_update9      | 1970-03-31 00:00:00+08
+  290 |   0 | 00290              | 1970-04-01 00:00:00+08
+  291 |   1 | 00291              | 1970-04-02 00:00:00+08
+  293 | 303 | 00293_update3      | 1970-04-04 00:00:00+08
+  294 |   4 | 00294              | 1970-04-05 00:00:00+08
+  296 |   6 | 00296              | 1970-04-07 00:00:00+08
+  297 | 407 | 00297_update7      | 1970-04-08 00:00:00+08
+  298 |   8 | 00298              | 1970-04-09 00:00:00+08
+  299 | 509 | 00299_update9      | 1970-04-10 00:00:00+08
+  300 |   0 | 00300              | 1970-01-01 00:00:00+08
+  301 |   1 | 00301              | 1970-01-02 00:00:00+08
+  303 | 303 | 00303_update3      | 1970-01-04 00:00:00+08
+  304 |   4 | 00304              | 1970-01-05 00:00:00+08
+  306 |   6 | 00306              | 1970-01-07 00:00:00+08
+  307 | 407 | 00307_update7      | 1970-01-08 00:00:00+08
+  308 |   8 | 00308              | 1970-01-09 00:00:00+08
+  309 | 509 | 00309_update9      | 1970-01-10 00:00:00+08
+  310 |   0 | 00310              | 1970-01-11 00:00:00+08
+  311 |   1 | 00311              | 1970-01-12 00:00:00+08
+  313 | 303 | 00313_update3      | 1970-01-14 00:00:00+08
+  314 |   4 | 00314              | 1970-01-15 00:00:00+08
+  316 |   6 | 00316              | 1970-01-17 00:00:00+08
+  317 | 407 | 00317_update7      | 1970-01-18 00:00:00+08
+  318 |   8 | 00318              | 1970-01-19 00:00:00+08
+  319 | 509 | 00319_update9      | 1970-01-20 00:00:00+08
+  320 |   0 | 00320              | 1970-01-21 00:00:00+08
+  321 |   1 | 00321              | 1970-01-22 00:00:00+08
+  323 | 303 | 00323_update3      | 1970-01-24 00:00:00+08
+  324 |   4 | 00324              | 1970-01-25 00:00:00+08
+  326 |   6 | 00326              | 1970-01-27 00:00:00+08
+  327 | 407 | 00327_update7      | 1970-01-28 00:00:00+08
+  328 |   8 | 00328              | 1970-01-29 00:00:00+08
+  329 | 509 | 00329_update9      | 1970-01-30 00:00:00+08
+  330 |   0 | 00330              | 1970-01-31 00:00:00+08
+  331 |   1 | 00331              | 1970-02-01 00:00:00+08
+  333 | 303 | 00333_update3      | 1970-02-03 00:00:00+08
+  334 |   4 | 00334              | 1970-02-04 00:00:00+08
+  336 |   6 | 00336              | 1970-02-06 00:00:00+08
+  337 | 407 | 00337_update7      | 1970-02-07 00:00:00+08
+  338 |   8 | 00338              | 1970-02-08 00:00:00+08
+  339 | 509 | 00339_update9      | 1970-02-09 00:00:00+08
+  340 |   0 | 00340              | 1970-02-10 00:00:00+08
+  341 |   1 | 00341              | 1970-02-11 00:00:00+08
+  343 | 303 | 00343_update3      | 1970-02-13 00:00:00+08
+  344 |   4 | 00344              | 1970-02-14 00:00:00+08
+  346 |   6 | 00346              | 1970-02-16 00:00:00+08
+  347 | 407 | 00347_update7      | 1970-02-17 00:00:00+08
+  348 |   8 | 00348              | 1970-02-18 00:00:00+08
+  349 | 509 | 00349_update9      | 1970-02-19 00:00:00+08
+  350 |   0 | 00350              | 1970-02-20 00:00:00+08
+  351 |   1 | 00351              | 1970-02-21 00:00:00+08
+  353 | 303 | 00353_update3      | 1970-02-23 00:00:00+08
+  354 |   4 | 00354              | 1970-02-24 00:00:00+08
+  356 |   6 | 00356              | 1970-02-26 00:00:00+08
+  357 | 407 | 00357_update7      | 1970-02-27 00:00:00+08
+  358 |   8 | 00358              | 1970-02-28 00:00:00+08
+  359 | 509 | 00359_update9      | 1970-03-01 00:00:00+08
+  360 |   0 | 00360              | 1970-03-02 00:00:00+08
+  361 |   1 | 00361              | 1970-03-03 00:00:00+08
+  363 | 303 | 00363_update3      | 1970-03-05 00:00:00+08
+  364 |   4 | 00364              | 1970-03-06 00:00:00+08
+  366 |   6 | 00366              | 1970-03-08 00:00:00+08
+  367 | 407 | 00367_update7      | 1970-03-09 00:00:00+08
+  368 |   8 | 00368              | 1970-03-10 00:00:00+08
+  369 | 509 | 00369_update9      | 1970-03-11 00:00:00+08
+  370 |   0 | 00370              | 1970-03-12 00:00:00+08
+  371 |   1 | 00371              | 1970-03-13 00:00:00+08
+  373 | 303 | 00373_update3      | 1970-03-15 00:00:00+08
+  374 |   4 | 00374              | 1970-03-16 00:00:00+08
+  376 |   6 | 00376              | 1970-03-18 00:00:00+08
+  377 | 407 | 00377_update7      | 1970-03-19 00:00:00+08
+  378 |   8 | 00378              | 1970-03-20 00:00:00+08
+  379 | 509 | 00379_update9      | 1970-03-21 00:00:00+08
+  380 |   0 | 00380              | 1970-03-22 00:00:00+08
+  381 |   1 | 00381              | 1970-03-23 00:00:00+08
+  383 | 303 | 00383_update3      | 1970-03-25 00:00:00+08
+  384 |   4 | 00384              | 1970-03-26 00:00:00+08
+  386 |   6 | 00386              | 1970-03-28 00:00:00+08
+  387 | 407 | 00387_update7      | 1970-03-29 00:00:00+08
+  388 |   8 | 00388              | 1970-03-30 00:00:00+08
+  389 | 509 | 00389_update9      | 1970-03-31 00:00:00+08
+  390 |   0 | 00390              | 1970-04-01 00:00:00+08
+  391 |   1 | 00391              | 1970-04-02 00:00:00+08
+  393 | 303 | 00393_update3      | 1970-04-04 00:00:00+08
+  394 |   4 | 00394              | 1970-04-05 00:00:00+08
+  396 |   6 | 00396              | 1970-04-07 00:00:00+08
+  397 | 407 | 00397_update7      | 1970-04-08 00:00:00+08
+  398 |   8 | 00398              | 1970-04-09 00:00:00+08
+  399 | 509 | 00399_update9      | 1970-04-10 00:00:00+08
+  400 |   0 | 00400              | 1970-01-01 00:00:00+08
+  401 |   1 | 00401              | 1970-01-02 00:00:00+08
+  403 | 303 | 00403_update3      | 1970-01-04 00:00:00+08
+  404 |   4 | 00404              | 1970-01-05 00:00:00+08
+  406 |   6 | 00406              | 1970-01-07 00:00:00+08
+  407 | 407 | 00407_update7      | 1970-01-08 00:00:00+08
+  408 |   8 | 00408              | 1970-01-09 00:00:00+08
+  409 | 509 | 00409_update9      | 1970-01-10 00:00:00+08
+  410 |   0 | 00410              | 1970-01-11 00:00:00+08
+  411 |   1 | 00411              | 1970-01-12 00:00:00+08
+  413 | 303 | 00413_update3      | 1970-01-14 00:00:00+08
+  414 |   4 | 00414              | 1970-01-15 00:00:00+08
+  416 |   6 | 00416              | 1970-01-17 00:00:00+08
+  417 | 407 | 00417_update7      | 1970-01-18 00:00:00+08
+  418 |   8 | 00418              | 1970-01-19 00:00:00+08
+  419 | 509 | 00419_update9      | 1970-01-20 00:00:00+08
+  420 |   0 | 00420              | 1970-01-21 00:00:00+08
+  421 |   1 | 00421              | 1970-01-22 00:00:00+08
+  423 | 303 | 00423_update3      | 1970-01-24 00:00:00+08
+  424 |   4 | 00424              | 1970-01-25 00:00:00+08
+  426 |   6 | 00426              | 1970-01-27 00:00:00+08
+  427 | 407 | 00427_update7      | 1970-01-28 00:00:00+08
+  428 |   8 | 00428              | 1970-01-29 00:00:00+08
+  429 | 509 | 00429_update9      | 1970-01-30 00:00:00+08
+  430 |   0 | 00430              | 1970-01-31 00:00:00+08
+  431 |   1 | 00431              | 1970-02-01 00:00:00+08
+  433 | 303 | 00433_update3      | 1970-02-03 00:00:00+08
+  434 |   4 | 00434              | 1970-02-04 00:00:00+08
+  436 |   6 | 00436              | 1970-02-06 00:00:00+08
+  437 | 407 | 00437_update7      | 1970-02-07 00:00:00+08
+  438 |   8 | 00438              | 1970-02-08 00:00:00+08
+  439 | 509 | 00439_update9      | 1970-02-09 00:00:00+08
+  440 |   0 | 00440              | 1970-02-10 00:00:00+08
+  441 |   1 | 00441              | 1970-02-11 00:00:00+08
+  443 | 303 | 00443_update3      | 1970-02-13 00:00:00+08
+  444 |   4 | 00444              | 1970-02-14 00:00:00+08
+  446 |   6 | 00446              | 1970-02-16 00:00:00+08
+  447 | 407 | 00447_update7      | 1970-02-17 00:00:00+08
+  448 |   8 | 00448              | 1970-02-18 00:00:00+08
+  449 | 509 | 00449_update9      | 1970-02-19 00:00:00+08
+  450 |   0 | 00450              | 1970-02-20 00:00:00+08
+  451 |   1 | 00451              | 1970-02-21 00:00:00+08
+  453 | 303 | 00453_update3      | 1970-02-23 00:00:00+08
+  454 |   4 | 00454              | 1970-02-24 00:00:00+08
+  456 |   6 | 00456              | 1970-02-26 00:00:00+08
+  457 | 407 | 00457_update7      | 1970-02-27 00:00:00+08
+  458 |   8 | 00458              | 1970-02-28 00:00:00+08
+  459 | 509 | 00459_update9      | 1970-03-01 00:00:00+08
+  460 |   0 | 00460              | 1970-03-02 00:00:00+08
+  461 |   1 | 00461              | 1970-03-03 00:00:00+08
+  463 | 303 | 00463_update3      | 1970-03-05 00:00:00+08
+  464 |   4 | 00464              | 1970-03-06 00:00:00+08
+  466 |   6 | 00466              | 1970-03-08 00:00:00+08
+  467 | 407 | 00467_update7      | 1970-03-09 00:00:00+08
+  468 |   8 | 00468              | 1970-03-10 00:00:00+08
+  469 | 509 | 00469_update9      | 1970-03-11 00:00:00+08
+  470 |   0 | 00470              | 1970-03-12 00:00:00+08
+  471 |   1 | 00471              | 1970-03-13 00:00:00+08
+  473 | 303 | 00473_update3      | 1970-03-15 00:00:00+08
+  474 |   4 | 00474              | 1970-03-16 00:00:00+08
+  476 |   6 | 00476              | 1970-03-18 00:00:00+08
+  477 | 407 | 00477_update7      | 1970-03-19 00:00:00+08
+  478 |   8 | 00478              | 1970-03-20 00:00:00+08
+  479 | 509 | 00479_update9      | 1970-03-21 00:00:00+08
+  480 |   0 | 00480              | 1970-03-22 00:00:00+08
+  481 |   1 | 00481              | 1970-03-23 00:00:00+08
+  483 | 303 | 00483_update3      | 1970-03-25 00:00:00+08
+  484 |   4 | 00484              | 1970-03-26 00:00:00+08
+  486 |   6 | 00486              | 1970-03-28 00:00:00+08
+  487 | 407 | 00487_update7      | 1970-03-29 00:00:00+08
+  488 |   8 | 00488              | 1970-03-30 00:00:00+08
+  489 | 509 | 00489_update9      | 1970-03-31 00:00:00+08
+  490 |   0 | 00490              | 1970-04-01 00:00:00+08
+  491 |   1 | 00491              | 1970-04-02 00:00:00+08
+  493 | 303 | 00493_update3      | 1970-04-04 00:00:00+08
+  494 |   4 | 00494              | 1970-04-05 00:00:00+08
+  496 |   6 | 00496              | 1970-04-07 00:00:00+08
+  497 | 407 | 00497_update7      | 1970-04-08 00:00:00+08
+  498 |   8 | 00498              | 1970-04-09 00:00:00+08
+  499 | 509 | 00499_update9      | 1970-04-10 00:00:00+08
+  500 |   0 | 00500              | 1970-01-01 00:00:00+08
+  501 |   1 | 00501              | 1970-01-02 00:00:00+08
+  503 | 303 | 00503_update3      | 1970-01-04 00:00:00+08
+  504 |   4 | 00504              | 1970-01-05 00:00:00+08
+  506 |   6 | 00506              | 1970-01-07 00:00:00+08
+  507 | 407 | 00507_update7      | 1970-01-08 00:00:00+08
+  508 |   8 | 00508              | 1970-01-09 00:00:00+08
+  509 | 509 | 00509_update9      | 1970-01-10 00:00:00+08
+  510 |   0 | 00510              | 1970-01-11 00:00:00+08
+  511 |   1 | 00511              | 1970-01-12 00:00:00+08
+  513 | 303 | 00513_update3      | 1970-01-14 00:00:00+08
+  514 |   4 | 00514              | 1970-01-15 00:00:00+08
+  516 |   6 | 00516              | 1970-01-17 00:00:00+08
+  517 | 407 | 00517_update7      | 1970-01-18 00:00:00+08
+  518 |   8 | 00518              | 1970-01-19 00:00:00+08
+  519 | 509 | 00519_update9      | 1970-01-20 00:00:00+08
+  520 |   0 | 00520              | 1970-01-21 00:00:00+08
+  521 |   1 | 00521              | 1970-01-22 00:00:00+08
+  523 | 303 | 00523_update3      | 1970-01-24 00:00:00+08
+  524 |   4 | 00524              | 1970-01-25 00:00:00+08
+  526 |   6 | 00526              | 1970-01-27 00:00:00+08
+  527 | 407 | 00527_update7      | 1970-01-28 00:00:00+08
+  528 |   8 | 00528              | 1970-01-29 00:00:00+08
+  529 | 509 | 00529_update9      | 1970-01-30 00:00:00+08
+  530 |   0 | 00530              | 1970-01-31 00:00:00+08
+  531 |   1 | 00531              | 1970-02-01 00:00:00+08
+  533 | 303 | 00533_update3      | 1970-02-03 00:00:00+08
+  534 |   4 | 00534              | 1970-02-04 00:00:00+08
+  536 |   6 | 00536              | 1970-02-06 00:00:00+08
+  537 | 407 | 00537_update7      | 1970-02-07 00:00:00+08
+  538 |   8 | 00538              | 1970-02-08 00:00:00+08
+  539 | 509 | 00539_update9      | 1970-02-09 00:00:00+08
+  540 |   0 | 00540              | 1970-02-10 00:00:00+08
+  541 |   1 | 00541              | 1970-02-11 00:00:00+08
+  543 | 303 | 00543_update3      | 1970-02-13 00:00:00+08
+  544 |   4 | 00544              | 1970-02-14 00:00:00+08
+  546 |   6 | 00546              | 1970-02-16 00:00:00+08
+  547 | 407 | 00547_update7      | 1970-02-17 00:00:00+08
+  548 |   8 | 00548              | 1970-02-18 00:00:00+08
+  549 | 509 | 00549_update9      | 1970-02-19 00:00:00+08
+  550 |   0 | 00550              | 1970-02-20 00:00:00+08
+  551 |   1 | 00551              | 1970-02-21 00:00:00+08
+  553 | 303 | 00553_update3      | 1970-02-23 00:00:00+08
+  554 |   4 | 00554              | 1970-02-24 00:00:00+08
+  556 |   6 | 00556              | 1970-02-26 00:00:00+08
+  557 | 407 | 00557_update7      | 1970-02-27 00:00:00+08
+  558 |   8 | 00558              | 1970-02-28 00:00:00+08
+  559 | 509 | 00559_update9      | 1970-03-01 00:00:00+08
+  560 |   0 | 00560              | 1970-03-02 00:00:00+08
+  561 |   1 | 00561              | 1970-03-03 00:00:00+08
+  563 | 303 | 00563_update3      | 1970-03-05 00:00:00+08
+  564 |   4 | 00564              | 1970-03-06 00:00:00+08
+  566 |   6 | 00566              | 1970-03-08 00:00:00+08
+  567 | 407 | 00567_update7      | 1970-03-09 00:00:00+08
+  568 |   8 | 00568              | 1970-03-10 00:00:00+08
+  569 | 509 | 00569_update9      | 1970-03-11 00:00:00+08
+  570 |   0 | 00570              | 1970-03-12 00:00:00+08
+  571 |   1 | 00571              | 1970-03-13 00:00:00+08
+  573 | 303 | 00573_update3      | 1970-03-15 00:00:00+08
+  574 |   4 | 00574              | 1970-03-16 00:00:00+08
+  576 |   6 | 00576              | 1970-03-18 00:00:00+08
+  577 | 407 | 00577_update7      | 1970-03-19 00:00:00+08
+  578 |   8 | 00578              | 1970-03-20 00:00:00+08
+  579 | 509 | 00579_update9      | 1970-03-21 00:00:00+08
+  580 |   0 | 00580              | 1970-03-22 00:00:00+08
+  581 |   1 | 00581              | 1970-03-23 00:00:00+08
+  583 | 303 | 00583_update3      | 1970-03-25 00:00:00+08
+  584 |   4 | 00584              | 1970-03-26 00:00:00+08
+  586 |   6 | 00586              | 1970-03-28 00:00:00+08
+  587 | 407 | 00587_update7      | 1970-03-29 00:00:00+08
+  588 |   8 | 00588              | 1970-03-30 00:00:00+08
+  589 | 509 | 00589_update9      | 1970-03-31 00:00:00+08
+  590 |   0 | 00590              | 1970-04-01 00:00:00+08
+  591 |   1 | 00591              | 1970-04-02 00:00:00+08
+  593 | 303 | 00593_update3      | 1970-04-04 00:00:00+08
+  594 |   4 | 00594              | 1970-04-05 00:00:00+08
+  596 |   6 | 00596              | 1970-04-07 00:00:00+08
+  597 | 407 | 00597_update7      | 1970-04-08 00:00:00+08
+  598 |   8 | 00598              | 1970-04-09 00:00:00+08
+  599 | 509 | 00599_update9      | 1970-04-10 00:00:00+08
+  600 |   0 | 00600              | 1970-01-01 00:00:00+08
+  601 |   1 | 00601              | 1970-01-02 00:00:00+08
+  603 | 303 | 00603_update3      | 1970-01-04 00:00:00+08
+  604 |   4 | 00604              | 1970-01-05 00:00:00+08
+  606 |   6 | 00606              | 1970-01-07 00:00:00+08
+  607 | 407 | 00607_update7      | 1970-01-08 00:00:00+08
+  608 |   8 | 00608              | 1970-01-09 00:00:00+08
+  609 | 509 | 00609_update9      | 1970-01-10 00:00:00+08
+  610 |   0 | 00610              | 1970-01-11 00:00:00+08
+  611 |   1 | 00611              | 1970-01-12 00:00:00+08
+  613 | 303 | 00613_update3      | 1970-01-14 00:00:00+08
+  614 |   4 | 00614              | 1970-01-15 00:00:00+08
+  616 |   6 | 00616              | 1970-01-17 00:00:00+08
+  617 | 407 | 00617_update7      | 1970-01-18 00:00:00+08
+  618 |   8 | 00618              | 1970-01-19 00:00:00+08
+  619 | 509 | 00619_update9      | 1970-01-20 00:00:00+08
+  620 |   0 | 00620              | 1970-01-21 00:00:00+08
+  621 |   1 | 00621              | 1970-01-22 00:00:00+08
+  623 | 303 | 00623_update3      | 1970-01-24 00:00:00+08
+  624 |   4 | 00624              | 1970-01-25 00:00:00+08
+  626 |   6 | 00626              | 1970-01-27 00:00:00+08
+  627 | 407 | 00627_update7      | 1970-01-28 00:00:00+08
+  628 |   8 | 00628              | 1970-01-29 00:00:00+08
+  629 | 509 | 00629_update9      | 1970-01-30 00:00:00+08
+  630 |   0 | 00630              | 1970-01-31 00:00:00+08
+  631 |   1 | 00631              | 1970-02-01 00:00:00+08
+  633 | 303 | 00633_update3      | 1970-02-03 00:00:00+08
+  634 |   4 | 00634              | 1970-02-04 00:00:00+08
+  636 |   6 | 00636              | 1970-02-06 00:00:00+08
+  637 | 407 | 00637_update7      | 1970-02-07 00:00:00+08
+  638 |   8 | 00638              | 1970-02-08 00:00:00+08
+  639 | 509 | 00639_update9      | 1970-02-09 00:00:00+08
+  640 |   0 | 00640              | 1970-02-10 00:00:00+08
+  641 |   1 | 00641              | 1970-02-11 00:00:00+08
+  643 | 303 | 00643_update3      | 1970-02-13 00:00:00+08
+  644 |   4 | 00644              | 1970-02-14 00:00:00+08
+  646 |   6 | 00646              | 1970-02-16 00:00:00+08
+  647 | 407 | 00647_update7      | 1970-02-17 00:00:00+08
+  648 |   8 | 00648              | 1970-02-18 00:00:00+08
+  649 | 509 | 00649_update9      | 1970-02-19 00:00:00+08
+  650 |   0 | 00650              | 1970-02-20 00:00:00+08
+  651 |   1 | 00651              | 1970-02-21 00:00:00+08
+  653 | 303 | 00653_update3      | 1970-02-23 00:00:00+08
+  654 |   4 | 00654              | 1970-02-24 00:00:00+08
+  656 |   6 | 00656              | 1970-02-26 00:00:00+08
+  657 | 407 | 00657_update7      | 1970-02-27 00:00:00+08
+  658 |   8 | 00658              | 1970-02-28 00:00:00+08
+  659 | 509 | 00659_update9      | 1970-03-01 00:00:00+08
+  660 |   0 | 00660              | 1970-03-02 00:00:00+08
+  661 |   1 | 00661              | 1970-03-03 00:00:00+08
+  663 | 303 | 00663_update3      | 1970-03-05 00:00:00+08
+  664 |   4 | 00664              | 1970-03-06 00:00:00+08
+  666 |   6 | 00666              | 1970-03-08 00:00:00+08
+  667 | 407 | 00667_update7      | 1970-03-09 00:00:00+08
+  668 |   8 | 00668              | 1970-03-10 00:00:00+08
+  669 | 509 | 00669_update9      | 1970-03-11 00:00:00+08
+  670 |   0 | 00670              | 1970-03-12 00:00:00+08
+  671 |   1 | 00671              | 1970-03-13 00:00:00+08
+  673 | 303 | 00673_update3      | 1970-03-15 00:00:00+08
+  674 |   4 | 00674              | 1970-03-16 00:00:00+08
+  676 |   6 | 00676              | 1970-03-18 00:00:00+08
+  677 | 407 | 00677_update7      | 1970-03-19 00:00:00+08
+  678 |   8 | 00678              | 1970-03-20 00:00:00+08
+  679 | 509 | 00679_update9      | 1970-03-21 00:00:00+08
+  680 |   0 | 00680              | 1970-03-22 00:00:00+08
+  681 |   1 | 00681              | 1970-03-23 00:00:00+08
+  683 | 303 | 00683_update3      | 1970-03-25 00:00:00+08
+  684 |   4 | 00684              | 1970-03-26 00:00:00+08
+  686 |   6 | 00686              | 1970-03-28 00:00:00+08
+  687 | 407 | 00687_update7      | 1970-03-29 00:00:00+08
+  688 |   8 | 00688              | 1970-03-30 00:00:00+08
+  689 | 509 | 00689_update9      | 1970-03-31 00:00:00+08
+  690 |   0 | 00690              | 1970-04-01 00:00:00+08
+  691 |   1 | 00691              | 1970-04-02 00:00:00+08
+  693 | 303 | 00693_update3      | 1970-04-04 00:00:00+08
+  694 |   4 | 00694              | 1970-04-05 00:00:00+08
+  696 |   6 | 00696              | 1970-04-07 00:00:00+08
+  697 | 407 | 00697_update7      | 1970-04-08 00:00:00+08
+  698 |   8 | 00698              | 1970-04-09 00:00:00+08
+  699 | 509 | 00699_update9      | 1970-04-10 00:00:00+08
+  700 |   0 | 00700              | 1970-01-01 00:00:00+08
+  701 |   1 | 00701              | 1970-01-02 00:00:00+08
+  703 | 303 | 00703_update3      | 1970-01-04 00:00:00+08
+  704 |   4 | 00704              | 1970-01-05 00:00:00+08
+  706 |   6 | 00706              | 1970-01-07 00:00:00+08
+  707 | 407 | 00707_update7      | 1970-01-08 00:00:00+08
+  708 |   8 | 00708              | 1970-01-09 00:00:00+08
+  709 | 509 | 00709_update9      | 1970-01-10 00:00:00+08
+  710 |   0 | 00710              | 1970-01-11 00:00:00+08
+  711 |   1 | 00711              | 1970-01-12 00:00:00+08
+  713 | 303 | 00713_update3      | 1970-01-14 00:00:00+08
+  714 |   4 | 00714              | 1970-01-15 00:00:00+08
+  716 |   6 | 00716              | 1970-01-17 00:00:00+08
+  717 | 407 | 00717_update7      | 1970-01-18 00:00:00+08
+  718 |   8 | 00718              | 1970-01-19 00:00:00+08
+  719 | 509 | 00719_update9      | 1970-01-20 00:00:00+08
+  720 |   0 | 00720              | 1970-01-21 00:00:00+08
+  721 |   1 | 00721              | 1970-01-22 00:00:00+08
+  723 | 303 | 00723_update3      | 1970-01-24 00:00:00+08
+  724 |   4 | 00724              | 1970-01-25 00:00:00+08
+  726 |   6 | 00726              | 1970-01-27 00:00:00+08
+  727 | 407 | 00727_update7      | 1970-01-28 00:00:00+08
+  728 |   8 | 00728              | 1970-01-29 00:00:00+08
+  729 | 509 | 00729_update9      | 1970-01-30 00:00:00+08
+  730 |   0 | 00730              | 1970-01-31 00:00:00+08
+  731 |   1 | 00731              | 1970-02-01 00:00:00+08
+  733 | 303 | 00733_update3      | 1970-02-03 00:00:00+08
+  734 |   4 | 00734              | 1970-02-04 00:00:00+08
+  736 |   6 | 00736              | 1970-02-06 00:00:00+08
+  737 | 407 | 00737_update7      | 1970-02-07 00:00:00+08
+  738 |   8 | 00738              | 1970-02-08 00:00:00+08
+  739 | 509 | 00739_update9      | 1970-02-09 00:00:00+08
+  740 |   0 | 00740              | 1970-02-10 00:00:00+08
+  741 |   1 | 00741              | 1970-02-11 00:00:00+08
+  743 | 303 | 00743_update3      | 1970-02-13 00:00:00+08
+  744 |   4 | 00744              | 1970-02-14 00:00:00+08
+  746 |   6 | 00746              | 1970-02-16 00:00:00+08
+  747 | 407 | 00747_update7      | 1970-02-17 00:00:00+08
+  748 |   8 | 00748              | 1970-02-18 00:00:00+08
+  749 | 509 | 00749_update9      | 1970-02-19 00:00:00+08
+  750 |   0 | 00750              | 1970-02-20 00:00:00+08
+  751 |   1 | 00751              | 1970-02-21 00:00:00+08
+  753 | 303 | 00753_update3      | 1970-02-23 00:00:00+08
+  754 |   4 | 00754              | 1970-02-24 00:00:00+08
+  756 |   6 | 00756              | 1970-02-26 00:00:00+08
+  757 | 407 | 00757_update7      | 1970-02-27 00:00:00+08
+  758 |   8 | 00758              | 1970-02-28 00:00:00+08
+  759 | 509 | 00759_update9      | 1970-03-01 00:00:00+08
+  760 |   0 | 00760              | 1970-03-02 00:00:00+08
+  761 |   1 | 00761              | 1970-03-03 00:00:00+08
+  763 | 303 | 00763_update3      | 1970-03-05 00:00:00+08
+  764 |   4 | 00764              | 1970-03-06 00:00:00+08
+  766 |   6 | 00766              | 1970-03-08 00:00:00+08
+  767 | 407 | 00767_update7      | 1970-03-09 00:00:00+08
+  768 |   8 | 00768              | 1970-03-10 00:00:00+08
+  769 | 509 | 00769_update9      | 1970-03-11 00:00:00+08
+  770 |   0 | 00770              | 1970-03-12 00:00:00+08
+  771 |   1 | 00771              | 1970-03-13 00:00:00+08
+  773 | 303 | 00773_update3      | 1970-03-15 00:00:00+08
+  774 |   4 | 00774              | 1970-03-16 00:00:00+08
+  776 |   6 | 00776              | 1970-03-18 00:00:00+08
+  777 | 407 | 00777_update7      | 1970-03-19 00:00:00+08
+  778 |   8 | 00778              | 1970-03-20 00:00:00+08
+  779 | 509 | 00779_update9      | 1970-03-21 00:00:00+08
+  780 |   0 | 00780              | 1970-03-22 00:00:00+08
+  781 |   1 | 00781              | 1970-03-23 00:00:00+08
+  783 | 303 | 00783_update3      | 1970-03-25 00:00:00+08
+  784 |   4 | 00784              | 1970-03-26 00:00:00+08
+  786 |   6 | 00786              | 1970-03-28 00:00:00+08
+  787 | 407 | 00787_update7      | 1970-03-29 00:00:00+08
+  788 |   8 | 00788              | 1970-03-30 00:00:00+08
+  789 | 509 | 00789_update9      | 1970-03-31 00:00:00+08
+  790 |   0 | 00790              | 1970-04-01 00:00:00+08
+  791 |   1 | 00791              | 1970-04-02 00:00:00+08
+  793 | 303 | 00793_update3      | 1970-04-04 00:00:00+08
+  794 |   4 | 00794              | 1970-04-05 00:00:00+08
+  796 |   6 | 00796              | 1970-04-07 00:00:00+08
+  797 | 407 | 00797_update7      | 1970-04-08 00:00:00+08
+  798 |   8 | 00798              | 1970-04-09 00:00:00+08
+  799 | 509 | 00799_update9      | 1970-04-10 00:00:00+08
+  800 |   0 | 00800              | 1970-01-01 00:00:00+08
+  801 |   1 | 00801              | 1970-01-02 00:00:00+08
+  803 | 303 | 00803_update3      | 1970-01-04 00:00:00+08
+  804 |   4 | 00804              | 1970-01-05 00:00:00+08
+  806 |   6 | 00806              | 1970-01-07 00:00:00+08
+  807 | 407 | 00807_update7      | 1970-01-08 00:00:00+08
+  808 |   8 | 00808              | 1970-01-09 00:00:00+08
+  809 | 509 | 00809_update9      | 1970-01-10 00:00:00+08
+  810 |   0 | 00810              | 1970-01-11 00:00:00+08
+  811 |   1 | 00811              | 1970-01-12 00:00:00+08
+  813 | 303 | 00813_update3      | 1970-01-14 00:00:00+08
+  814 |   4 | 00814              | 1970-01-15 00:00:00+08
+  816 |   6 | 00816              | 1970-01-17 00:00:00+08
+  817 | 407 | 00817_update7      | 1970-01-18 00:00:00+08
+  818 |   8 | 00818              | 1970-01-19 00:00:00+08
+  819 | 509 | 00819_update9      | 1970-01-20 00:00:00+08
+  820 |   0 | 00820              | 1970-01-21 00:00:00+08
+  821 |   1 | 00821              | 1970-01-22 00:00:00+08
+  823 | 303 | 00823_update3      | 1970-01-24 00:00:00+08
+  824 |   4 | 00824              | 1970-01-25 00:00:00+08
+  826 |   6 | 00826              | 1970-01-27 00:00:00+08
+  827 | 407 | 00827_update7      | 1970-01-28 00:00:00+08
+  828 |   8 | 00828              | 1970-01-29 00:00:00+08
+  829 | 509 | 00829_update9      | 1970-01-30 00:00:00+08
+  830 |   0 | 00830              | 1970-01-31 00:00:00+08
+  831 |   1 | 00831              | 1970-02-01 00:00:00+08
+  833 | 303 | 00833_update3      | 1970-02-03 00:00:00+08
+  834 |   4 | 00834              | 1970-02-04 00:00:00+08
+  836 |   6 | 00836              | 1970-02-06 00:00:00+08
+  837 | 407 | 00837_update7      | 1970-02-07 00:00:00+08
+  838 |   8 | 00838              | 1970-02-08 00:00:00+08
+  839 | 509 | 00839_update9      | 1970-02-09 00:00:00+08
+  840 |   0 | 00840              | 1970-02-10 00:00:00+08
+  841 |   1 | 00841              | 1970-02-11 00:00:00+08
+  843 | 303 | 00843_update3      | 1970-02-13 00:00:00+08
+  844 |   4 | 00844              | 1970-02-14 00:00:00+08
+  846 |   6 | 00846              | 1970-02-16 00:00:00+08
+  847 | 407 | 00847_update7      | 1970-02-17 00:00:00+08
+  848 |   8 | 00848              | 1970-02-18 00:00:00+08
+  849 | 509 | 00849_update9      | 1970-02-19 00:00:00+08
+  850 |   0 | 00850              | 1970-02-20 00:00:00+08
+  851 |   1 | 00851              | 1970-02-21 00:00:00+08
+  853 | 303 | 00853_update3      | 1970-02-23 00:00:00+08
+  854 |   4 | 00854              | 1970-02-24 00:00:00+08
+  856 |   6 | 00856              | 1970-02-26 00:00:00+08
+  857 | 407 | 00857_update7      | 1970-02-27 00:00:00+08
+  858 |   8 | 00858              | 1970-02-28 00:00:00+08
+  859 | 509 | 00859_update9      | 1970-03-01 00:00:00+08
+  860 |   0 | 00860              | 1970-03-02 00:00:00+08
+  861 |   1 | 00861              | 1970-03-03 00:00:00+08
+  863 | 303 | 00863_update3      | 1970-03-05 00:00:00+08
+  864 |   4 | 00864              | 1970-03-06 00:00:00+08
+  866 |   6 | 00866              | 1970-03-08 00:00:00+08
+  867 | 407 | 00867_update7      | 1970-03-09 00:00:00+08
+  868 |   8 | 00868              | 1970-03-10 00:00:00+08
+  869 | 509 | 00869_update9      | 1970-03-11 00:00:00+08
+  870 |   0 | 00870              | 1970-03-12 00:00:00+08
+  871 |   1 | 00871              | 1970-03-13 00:00:00+08
+  873 | 303 | 00873_update3      | 1970-03-15 00:00:00+08
+  874 |   4 | 00874              | 1970-03-16 00:00:00+08
+  876 |   6 | 00876              | 1970-03-18 00:00:00+08
+  877 | 407 | 00877_update7      | 1970-03-19 00:00:00+08
+  878 |   8 | 00878              | 1970-03-20 00:00:00+08
+  879 | 509 | 00879_update9      | 1970-03-21 00:00:00+08
+  880 |   0 | 00880              | 1970-03-22 00:00:00+08
+  881 |   1 | 00881              | 1970-03-23 00:00:00+08
+  883 | 303 | 00883_update3      | 1970-03-25 00:00:00+08
+  884 |   4 | 00884              | 1970-03-26 00:00:00+08
+  886 |   6 | 00886              | 1970-03-28 00:00:00+08
+  887 | 407 | 00887_update7      | 1970-03-29 00:00:00+08
+  888 |   8 | 00888              | 1970-03-30 00:00:00+08
+  889 | 509 | 00889_update9      | 1970-03-31 00:00:00+08
+  890 |   0 | 00890              | 1970-04-01 00:00:00+08
+  891 |   1 | 00891              | 1970-04-02 00:00:00+08
+  893 | 303 | 00893_update3      | 1970-04-04 00:00:00+08
+  894 |   4 | 00894              | 1970-04-05 00:00:00+08
+  896 |   6 | 00896              | 1970-04-07 00:00:00+08
+  897 | 407 | 00897_update7      | 1970-04-08 00:00:00+08
+  898 |   8 | 00898              | 1970-04-09 00:00:00+08
+  899 | 509 | 00899_update9      | 1970-04-10 00:00:00+08
+  900 |   0 | 00900              | 1970-01-01 00:00:00+08
+  901 |   1 | 00901              | 1970-01-02 00:00:00+08
+  903 | 303 | 00903_update3      | 1970-01-04 00:00:00+08
+  904 |   4 | 00904              | 1970-01-05 00:00:00+08
+  906 |   6 | 00906              | 1970-01-07 00:00:00+08
+  907 | 407 | 00907_update7      | 1970-01-08 00:00:00+08
+  908 |   8 | 00908              | 1970-01-09 00:00:00+08
+  909 | 509 | 00909_update9      | 1970-01-10 00:00:00+08
+  910 |   0 | 00910              | 1970-01-11 00:00:00+08
+  911 |   1 | 00911              | 1970-01-12 00:00:00+08
+  913 | 303 | 00913_update3      | 1970-01-14 00:00:00+08
+  914 |   4 | 00914              | 1970-01-15 00:00:00+08
+  916 |   6 | 00916              | 1970-01-17 00:00:00+08
+  917 | 407 | 00917_update7      | 1970-01-18 00:00:00+08
+  918 |   8 | 00918              | 1970-01-19 00:00:00+08
+  919 | 509 | 00919_update9      | 1970-01-20 00:00:00+08
+  920 |   0 | 00920              | 1970-01-21 00:00:00+08
+  921 |   1 | 00921              | 1970-01-22 00:00:00+08
+  923 | 303 | 00923_update3      | 1970-01-24 00:00:00+08
+  924 |   4 | 00924              | 1970-01-25 00:00:00+08
+  926 |   6 | 00926              | 1970-01-27 00:00:00+08
+  927 | 407 | 00927_update7      | 1970-01-28 00:00:00+08
+  928 |   8 | 00928              | 1970-01-29 00:00:00+08
+  929 | 509 | 00929_update9      | 1970-01-30 00:00:00+08
+  930 |   0 | 00930              | 1970-01-31 00:00:00+08
+  931 |   1 | 00931              | 1970-02-01 00:00:00+08
+  933 | 303 | 00933_update3      | 1970-02-03 00:00:00+08
+  934 |   4 | 00934              | 1970-02-04 00:00:00+08
+  936 |   6 | 00936              | 1970-02-06 00:00:00+08
+  937 | 407 | 00937_update7      | 1970-02-07 00:00:00+08
+  938 |   8 | 00938              | 1970-02-08 00:00:00+08
+  939 | 509 | 00939_update9      | 1970-02-09 00:00:00+08
+  940 |   0 | 00940              | 1970-02-10 00:00:00+08
+  941 |   1 | 00941              | 1970-02-11 00:00:00+08
+  943 | 303 | 00943_update3      | 1970-02-13 00:00:00+08
+  944 |   4 | 00944              | 1970-02-14 00:00:00+08
+  946 |   6 | 00946              | 1970-02-16 00:00:00+08
+  947 | 407 | 00947_update7      | 1970-02-17 00:00:00+08
+  948 |   8 | 00948              | 1970-02-18 00:00:00+08
+  949 | 509 | 00949_update9      | 1970-02-19 00:00:00+08
+  950 |   0 | 00950              | 1970-02-20 00:00:00+08
+  951 |   1 | 00951              | 1970-02-21 00:00:00+08
+  953 | 303 | 00953_update3      | 1970-02-23 00:00:00+08
+  954 |   4 | 00954              | 1970-02-24 00:00:00+08
+  956 |   6 | 00956              | 1970-02-26 00:00:00+08
+  957 | 407 | 00957_update7      | 1970-02-27 00:00:00+08
+  958 |   8 | 00958              | 1970-02-28 00:00:00+08
+  959 | 509 | 00959_update9      | 1970-03-01 00:00:00+08
+  960 |   0 | 00960              | 1970-03-02 00:00:00+08
+  961 |   1 | 00961              | 1970-03-03 00:00:00+08
+  963 | 303 | 00963_update3      | 1970-03-05 00:00:00+08
+  964 |   4 | 00964              | 1970-03-06 00:00:00+08
+  966 |   6 | 00966              | 1970-03-08 00:00:00+08
+  967 | 407 | 00967_update7      | 1970-03-09 00:00:00+08
+  968 |   8 | 00968              | 1970-03-10 00:00:00+08
+  969 | 509 | 00969_update9      | 1970-03-11 00:00:00+08
+  970 |   0 | 00970              | 1970-03-12 00:00:00+08
+  971 |   1 | 00971              | 1970-03-13 00:00:00+08
+  973 | 303 | 00973_update3      | 1970-03-15 00:00:00+08
+  974 |   4 | 00974              | 1970-03-16 00:00:00+08
+  976 |   6 | 00976              | 1970-03-18 00:00:00+08
+  977 | 407 | 00977_update7      | 1970-03-19 00:00:00+08
+  978 |   8 | 00978              | 1970-03-20 00:00:00+08
+  979 | 509 | 00979_update9      | 1970-03-21 00:00:00+08
+  980 |   0 | 00980              | 1970-03-22 00:00:00+08
+  981 |   1 | 00981              | 1970-03-23 00:00:00+08
+  983 | 303 | 00983_update3      | 1970-03-25 00:00:00+08
+  984 |   4 | 00984              | 1970-03-26 00:00:00+08
+  986 |   6 | 00986              | 1970-03-28 00:00:00+08
+  987 | 407 | 00987_update7      | 1970-03-29 00:00:00+08
+  988 |   8 | 00988              | 1970-03-30 00:00:00+08
+  989 | 509 | 00989_update9      | 1970-03-31 00:00:00+08
+  990 |   0 | 00990              | 1970-04-01 00:00:00+08
+  991 |   1 | 00991              | 1970-04-02 00:00:00+08
+  993 | 303 | 00993_update3      | 1970-04-04 00:00:00+08
+  994 |   4 | 00994              | 1970-04-05 00:00:00+08
+  996 |   6 | 00996              | 1970-04-07 00:00:00+08
+  997 | 407 | 00997_update7      | 1970-04-08 00:00:00+08
+  998 |   8 | 00998              | 1970-04-09 00:00:00+08
+  999 | 509 | 00999_update9      | 1970-04-10 00:00:00+08
+ 1000 |   0 | 01000              | 1970-01-01 00:00:00+08
+ 1001 | 101 | 0000100001         | 
+ 1003 | 403 | 0000300003_update3 | 
+ 1004 | 104 | 0000400004         | 
+ 1006 | 106 | 0000600006         | 
+ 1007 | 507 | 0000700007_update7 | 
+ 1008 | 108 | 0000800008         | 
+ 1009 | 609 | 0000900009_update9 | 
+ 1010 | 100 | 0001000010         | 
+ 1011 | 101 | 0001100011         | 
+ 1013 | 403 | 0001300013_update3 | 
+ 1014 | 104 | 0001400014         | 
+ 1016 | 106 | 0001600016         | 
+ 1017 | 507 | 0001700017_update7 | 
+ 1018 | 108 | 0001800018         | 
+ 1019 | 609 | 0001900019_update9 | 
+ 1020 | 100 | 0002000020         | 
+ 1101 | 201 | aaa                | 
+ 1103 | 503 | ccc_update3        | 
+ 1104 | 204 | ddd                | 
+(819 rows)
+
+EXPLAIN (verbose, costs off)
+INSERT INTO ft2 (c1,c2,c3) VALUES (9999,999,'foo') RETURNING tableoid::regclass;
+ERROR:  column "tableoid" does not exist
+LINE 2: ... ft2 (c1,c2,c3) VALUES (9999,999,'foo') RETURNING tableoid::...
+                                                             ^
+CONTEXT:  referenced column: tableoid
+INSERT INTO ft2 (c1,c2,c3) VALUES (9999,999,'foo') RETURNING tableoid::regclass;
+ERROR:  column "tableoid" does not exist
+LINE 1: ... ft2 (c1,c2,c3) VALUES (9999,999,'foo') RETURNING tableoid::...
+                                                             ^
+CONTEXT:  referenced column: tableoid
+EXPLAIN (verbose, costs off)
+UPDATE ft2 SET c3 = 'bar' WHERE c1 = 9999 RETURNING tableoid::regclass;
+ERROR:  column "tableoid" does not exist
+LINE 2: ...DATE ft2 SET c3 = 'bar' WHERE c1 = 9999 RETURNING tableoid::...
+                                                             ^
+CONTEXT:  referenced column: tableoid
+UPDATE ft2 SET c3 = 'bar' WHERE c1 = 9999 RETURNING tableoid::regclass;
+ERROR:  column "tableoid" does not exist
+LINE 1: ...DATE ft2 SET c3 = 'bar' WHERE c1 = 9999 RETURNING tableoid::...
+                                                             ^
+CONTEXT:  referenced column: tableoid
+EXPLAIN (verbose, costs off)
+DELETE FROM ft2 WHERE c1 = 9999 RETURNING tableoid::regclass;
+ERROR:  column "tableoid" does not exist
+LINE 2: DELETE FROM ft2 WHERE c1 = 9999 RETURNING tableoid::regclass...
+                                                  ^
+CONTEXT:  referenced column: tableoid
+DELETE FROM ft2 WHERE c1 = 9999 RETURNING tableoid::regclass;
+ERROR:  column "tableoid" does not exist
+LINE 1: DELETE FROM ft2 WHERE c1 = 9999 RETURNING tableoid::regclass...
+                                                  ^
+CONTEXT:  referenced column: tableoid
+-- Test UPDATE/DELETE with RETURNING on a three-table join
+INSERT INTO ft2 (c1,c2,c3)
+  SELECT id, id - 1200, to_char(id, 'FM00000') FROM generate_series(1201, 1300) id;
+INSERT 0 100
+EXPLAIN (verbose, costs off)
+UPDATE ft2 SET c3 = 'foo'
+  FROM ft4 INNER JOIN ft5 ON (ft4.c1 = ft5.c1)
+  WHERE ft2.c1 > 1200 AND ft2.c2 = ft4.c1
+  RETURNING ft2, ft2.*, ft4, ft4.*;       -- can be pushed down
+                                                                     QUERY PLAN                                                                     
+----------------------------------------------------------------------------------------------------------------------------------------------------
+ Update on public.ft2
+   Output: ft2.*, ft2.c1, ft2.c2, ft2.c3, ft2.c4, ft2.c5, ft2.c6, ft2.c7, ft2.c8, ft4.*, ft4.c1, ft4.c2, ft4.c3
+   ->  Hash Join
+         Output: ft2.c1, ft2.c2, NULL::integer, 'foo'::text, ft2.c4, ft2.c5, ft2.c6, ft2.c7, ft2.c8, ft2.ctid, ft4.*, ft5.*, ft4.c1, ft4.c2, ft4.c3
+         Hash Cond: (ft2.c2 = ft4.c1)
+         ->  Foreign Scan on public.ft2
+               Output: ft2.c1, ft2.c2, ft2.c4, ft2.c5, ft2.c6, ft2.c7, ft2.c8, ft2.ctid
+               Filter: (ft2.c1 > 1200)
+               Remote SQL: SELECT "C 1", c2, c4, c5, c6, c7, c8, ctid FROM "S 1"."T 1" FOR UPDATE
+         ->  Hash
+               Output: ft4.*, ft4.c1, ft4.c2, ft4.c3, ft5.*, ft5.c1
+               ->  Hash Join
+                     Output: ft4.*, ft4.c1, ft4.c2, ft4.c3, ft5.*, ft5.c1
+                     Hash Cond: (ft4.c1 = ft5.c1)
+                     ->  Foreign Scan on public.ft4
+                           Output: ft4.*, ft4.c1, ft4.c2, ft4.c3
+                           Remote SQL: SELECT c1, c2, c3 FROM "S 1"."T 3"
+                     ->  Hash
+                           Output: ft5.*, ft5.c1
+                           ->  Foreign Scan on public.ft5
+                                 Output: ft5.*, ft5.c1
+                                 Remote SQL: SELECT c1, c2, c3 FROM "S 1"."T 4"
+(22 rows)
+
+UPDATE ft2 SET c3 = 'foo'
+  FROM ft4 INNER JOIN ft5 ON (ft4.c1 = ft5.c1)
+  WHERE ft2.c1 > 1200 AND ft2.c2 = ft4.c1
+  RETURNING ft2, ft2.*, ft4, ft4.*;
+              ft2               |  c1  | c2 | c3  | c4 | c5 | c6 |     c7     | c8 |      ft4       | c1 | c2 |   c3   
+--------------------------------+------+----+-----+----+----+----+------------+----+----------------+----+----+--------
+ (1206,6,foo,,,,"ft2       ",)  | 1206 |  6 | foo |    |    |    | ft2        |    | (6,7,AAA006)   |  6 |  7 | AAA006
+ (1212,12,foo,,,,"ft2       ",) | 1212 | 12 | foo |    |    |    | ft2        |    | (12,13,AAA012) | 12 | 13 | AAA012
+ (1218,18,foo,,,,"ft2       ",) | 1218 | 18 | foo |    |    |    | ft2        |    | (18,19,AAA018) | 18 | 19 | AAA018
+ (1224,24,foo,,,,"ft2       ",) | 1224 | 24 | foo |    |    |    | ft2        |    | (24,25,AAA024) | 24 | 25 | AAA024
+ (1230,30,foo,,,,"ft2       ",) | 1230 | 30 | foo |    |    |    | ft2        |    | (30,31,AAA030) | 30 | 31 | AAA030
+ (1236,36,foo,,,,"ft2       ",) | 1236 | 36 | foo |    |    |    | ft2        |    | (36,37,AAA036) | 36 | 37 | AAA036
+ (1242,42,foo,,,,"ft2       ",) | 1242 | 42 | foo |    |    |    | ft2        |    | (42,43,AAA042) | 42 | 43 | AAA042
+ (1248,48,foo,,,,"ft2       ",) | 1248 | 48 | foo |    |    |    | ft2        |    | (48,49,AAA048) | 48 | 49 | AAA048
+ (1254,54,foo,,,,"ft2       ",) | 1254 | 54 | foo |    |    |    | ft2        |    | (54,55,AAA054) | 54 | 55 | AAA054
+ (1260,60,foo,,,,"ft2       ",) | 1260 | 60 | foo |    |    |    | ft2        |    | (60,61,AAA060) | 60 | 61 | AAA060
+ (1266,66,foo,,,,"ft2       ",) | 1266 | 66 | foo |    |    |    | ft2        |    | (66,67,AAA066) | 66 | 67 | AAA066
+ (1272,72,foo,,,,"ft2       ",) | 1272 | 72 | foo |    |    |    | ft2        |    | (72,73,AAA072) | 72 | 73 | AAA072
+ (1278,78,foo,,,,"ft2       ",) | 1278 | 78 | foo |    |    |    | ft2        |    | (78,79,AAA078) | 78 | 79 | AAA078
+ (1284,84,foo,,,,"ft2       ",) | 1284 | 84 | foo |    |    |    | ft2        |    | (84,85,AAA084) | 84 | 85 | AAA084
+ (1290,90,foo,,,,"ft2       ",) | 1290 | 90 | foo |    |    |    | ft2        |    | (90,91,AAA090) | 90 | 91 | AAA090
+ (1296,96,foo,,,,"ft2       ",) | 1296 | 96 | foo |    |    |    | ft2        |    | (96,97,AAA096) | 96 | 97 | AAA096
+(16 rows)
+
+UPDATE 16
+EXPLAIN (verbose, costs off)
+DELETE FROM ft2
+  USING ft4 LEFT JOIN ft5 ON (ft4.c1 = ft5.c1)
+  WHERE ft2.c1 > 1200 AND ft2.c1 % 10 = 0 AND ft2.c2 = ft4.c1
+  RETURNING 100;                          -- can be pushed down
+                                     QUERY PLAN                                     
+------------------------------------------------------------------------------------
+ Delete on public.ft2
+   Output: 100
+   ->  Hash Left Join
+         Output: ft2.ctid, ft4.*, ft5.*
+         Hash Cond: (ft4.c1 = ft5.c1)
+         ->  Hash Join
+               Output: ft2.ctid, ft4.*, ft4.c1
+               Hash Cond: (ft2.c2 = ft4.c1)
+               ->  Foreign Scan on public.ft2
+                     Output: ft2.ctid, ft2.c2
+                     Filter: ((ft2.c1 > 1200) AND ((ft2.c1 % 10) = 0))
+                     Remote SQL: SELECT "C 1", c2, ctid FROM "S 1"."T 1" FOR UPDATE
+               ->  Hash
+                     Output: ft4.*, ft4.c1
+                     ->  Foreign Scan on public.ft4
+                           Output: ft4.*, ft4.c1
+                           Remote SQL: SELECT c1, c2, c3 FROM "S 1"."T 3"
+         ->  Hash
+               Output: ft5.*, ft5.c1
+               ->  Foreign Scan on public.ft5
+                     Output: ft5.*, ft5.c1
+                     Remote SQL: SELECT c1, c2, c3 FROM "S 1"."T 4"
+(22 rows)
+
+DELETE FROM ft2
+  USING ft4 LEFT JOIN ft5 ON (ft4.c1 = ft5.c1)
+  WHERE ft2.c1 > 1200 AND ft2.c1 % 10 = 0 AND ft2.c2 = ft4.c1
+  RETURNING 100;
+ ?column? 
+----------
+      100
+      100
+      100
+      100
+      100
+      100
+      100
+      100
+      100
+      100
+(10 rows)
+
+DELETE 10
+DELETE FROM ft2 WHERE ft2.c1 > 1200;
+DELETE 90
+-- Test that trigger on remote table works as expected
+CREATE OR REPLACE FUNCTION "S 1".F_BRTRIG() RETURNS trigger AS $$
+BEGIN
+    NEW.c3 = NEW.c3 || '_trig_update';
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+CREATE FUNCTION
+CREATE TRIGGER t1_br_insert BEFORE INSERT OR UPDATE
+    ON "S 1"."T 1" FOR EACH ROW EXECUTE PROCEDURE "S 1".F_BRTRIG();
+CREATE TRIGGER
+INSERT INTO ft2 (c1,c2,c3) VALUES (1208, 818, 'fff') RETURNING *;
+  c1  | c2  |       c3        | c4 | c5 | c6 |     c7     | c8 
+------+-----+-----------------+----+----+----+------------+----
+ 1208 | 818 | fff_trig_update |    |    |    | ft2        | 
+(1 row)
+
+INSERT 0 1
+INSERT INTO ft2 (c1,c2,c3,c6) VALUES (1218, 818, 'ggg', '(--;') RETURNING *;
+  c1  | c2  |       c3        | c4 | c5 |  c6  |     c7     | c8 
+------+-----+-----------------+----+----+------+------------+----
+ 1218 | 818 | ggg_trig_update |    |    | (--; | ft2        | 
+(1 row)
+
+INSERT 0 1
+UPDATE ft2 SET c2 = c2 + 600 WHERE c1 % 10 = 8 AND c1 < 1200 RETURNING *;
+  c1  | c2  |           c3           |           c4           |         c5          | c6 |     c7     | c8  
+------+-----+------------------------+------------------------+---------------------+----+------------+-----
+    8 | 608 | 00008_trig_update      | 1970-01-09 00:00:00+08 | 1970-01-09 00:00:00 | 8  | 8          | foo
+   18 | 608 | 00018_trig_update      | 1970-01-19 00:00:00+08 | 1970-01-19 00:00:00 | 8  | 8          | foo
+   28 | 608 | 00028_trig_update      | 1970-01-29 00:00:00+08 | 1970-01-29 00:00:00 | 8  | 8          | foo
+   38 | 608 | 00038_trig_update      | 1970-02-08 00:00:00+08 | 1970-02-08 00:00:00 | 8  | 8          | foo
+   48 | 608 | 00048_trig_update      | 1970-02-18 00:00:00+08 | 1970-02-18 00:00:00 | 8  | 8          | foo
+   58 | 608 | 00058_trig_update      | 1970-02-28 00:00:00+08 | 1970-02-28 00:00:00 | 8  | 8          | foo
+   68 | 608 | 00068_trig_update      | 1970-03-10 00:00:00+08 | 1970-03-10 00:00:00 | 8  | 8          | foo
+   78 | 608 | 00078_trig_update      | 1970-03-20 00:00:00+08 | 1970-03-20 00:00:00 | 8  | 8          | foo
+   88 | 608 | 00088_trig_update      | 1970-03-30 00:00:00+08 | 1970-03-30 00:00:00 | 8  | 8          | foo
+   98 | 608 | 00098_trig_update      | 1970-04-09 00:00:00+08 | 1970-04-09 00:00:00 | 8  | 8          | foo
+  108 | 608 | 00108_trig_update      | 1970-01-09 00:00:00+08 | 1970-01-09 00:00:00 | 8  | 8          | foo
+  118 | 608 | 00118_trig_update      | 1970-01-19 00:00:00+08 | 1970-01-19 00:00:00 | 8  | 8          | foo
+  128 | 608 | 00128_trig_update      | 1970-01-29 00:00:00+08 | 1970-01-29 00:00:00 | 8  | 8          | foo
+  138 | 608 | 00138_trig_update      | 1970-02-08 00:00:00+08 | 1970-02-08 00:00:00 | 8  | 8          | foo
+  148 | 608 | 00148_trig_update      | 1970-02-18 00:00:00+08 | 1970-02-18 00:00:00 | 8  | 8          | foo
+  158 | 608 | 00158_trig_update      | 1970-02-28 00:00:00+08 | 1970-02-28 00:00:00 | 8  | 8          | foo
+  168 | 608 | 00168_trig_update      | 1970-03-10 00:00:00+08 | 1970-03-10 00:00:00 | 8  | 8          | foo
+  178 | 608 | 00178_trig_update      | 1970-03-20 00:00:00+08 | 1970-03-20 00:00:00 | 8  | 8          | foo
+  188 | 608 | 00188_trig_update      | 1970-03-30 00:00:00+08 | 1970-03-30 00:00:00 | 8  | 8          | foo
+  198 | 608 | 00198_trig_update      | 1970-04-09 00:00:00+08 | 1970-04-09 00:00:00 | 8  | 8          | foo
+  208 | 608 | 00208_trig_update      | 1970-01-09 00:00:00+08 | 1970-01-09 00:00:00 | 8  | 8          | foo
+  218 | 608 | 00218_trig_update      | 1970-01-19 00:00:00+08 | 1970-01-19 00:00:00 | 8  | 8          | foo
+  228 | 608 | 00228_trig_update      | 1970-01-29 00:00:00+08 | 1970-01-29 00:00:00 | 8  | 8          | foo
+  238 | 608 | 00238_trig_update      | 1970-02-08 00:00:00+08 | 1970-02-08 00:00:00 | 8  | 8          | foo
+  248 | 608 | 00248_trig_update      | 1970-02-18 00:00:00+08 | 1970-02-18 00:00:00 | 8  | 8          | foo
+  258 | 608 | 00258_trig_update      | 1970-02-28 00:00:00+08 | 1970-02-28 00:00:00 | 8  | 8          | foo
+  268 | 608 | 00268_trig_update      | 1970-03-10 00:00:00+08 | 1970-03-10 00:00:00 | 8  | 8          | foo
+  278 | 608 | 00278_trig_update      | 1970-03-20 00:00:00+08 | 1970-03-20 00:00:00 | 8  | 8          | foo
+  288 | 608 | 00288_trig_update      | 1970-03-30 00:00:00+08 | 1970-03-30 00:00:00 | 8  | 8          | foo
+  298 | 608 | 00298_trig_update      | 1970-04-09 00:00:00+08 | 1970-04-09 00:00:00 | 8  | 8          | foo
+  308 | 608 | 00308_trig_update      | 1970-01-09 00:00:00+08 | 1970-01-09 00:00:00 | 8  | 8          | foo
+  318 | 608 | 00318_trig_update      | 1970-01-19 00:00:00+08 | 1970-01-19 00:00:00 | 8  | 8          | foo
+  328 | 608 | 00328_trig_update      | 1970-01-29 00:00:00+08 | 1970-01-29 00:00:00 | 8  | 8          | foo
+  338 | 608 | 00338_trig_update      | 1970-02-08 00:00:00+08 | 1970-02-08 00:00:00 | 8  | 8          | foo
+  348 | 608 | 00348_trig_update      | 1970-02-18 00:00:00+08 | 1970-02-18 00:00:00 | 8  | 8          | foo
+  358 | 608 | 00358_trig_update      | 1970-02-28 00:00:00+08 | 1970-02-28 00:00:00 | 8  | 8          | foo
+  368 | 608 | 00368_trig_update      | 1970-03-10 00:00:00+08 | 1970-03-10 00:00:00 | 8  | 8          | foo
+  378 | 608 | 00378_trig_update      | 1970-03-20 00:00:00+08 | 1970-03-20 00:00:00 | 8  | 8          | foo
+  388 | 608 | 00388_trig_update      | 1970-03-30 00:00:00+08 | 1970-03-30 00:00:00 | 8  | 8          | foo
+  398 | 608 | 00398_trig_update      | 1970-04-09 00:00:00+08 | 1970-04-09 00:00:00 | 8  | 8          | foo
+  408 | 608 | 00408_trig_update      | 1970-01-09 00:00:00+08 | 1970-01-09 00:00:00 | 8  | 8          | foo
+  418 | 608 | 00418_trig_update      | 1970-01-19 00:00:00+08 | 1970-01-19 00:00:00 | 8  | 8          | foo
+  428 | 608 | 00428_trig_update      | 1970-01-29 00:00:00+08 | 1970-01-29 00:00:00 | 8  | 8          | foo
+  438 | 608 | 00438_trig_update      | 1970-02-08 00:00:00+08 | 1970-02-08 00:00:00 | 8  | 8          | foo
+  448 | 608 | 00448_trig_update      | 1970-02-18 00:00:00+08 | 1970-02-18 00:00:00 | 8  | 8          | foo
+  458 | 608 | 00458_trig_update      | 1970-02-28 00:00:00+08 | 1970-02-28 00:00:00 | 8  | 8          | foo
+  468 | 608 | 00468_trig_update      | 1970-03-10 00:00:00+08 | 1970-03-10 00:00:00 | 8  | 8          | foo
+  478 | 608 | 00478_trig_update      | 1970-03-20 00:00:00+08 | 1970-03-20 00:00:00 | 8  | 8          | foo
+  488 | 608 | 00488_trig_update      | 1970-03-30 00:00:00+08 | 1970-03-30 00:00:00 | 8  | 8          | foo
+  498 | 608 | 00498_trig_update      | 1970-04-09 00:00:00+08 | 1970-04-09 00:00:00 | 8  | 8          | foo
+  508 | 608 | 00508_trig_update      | 1970-01-09 00:00:00+08 | 1970-01-09 00:00:00 | 8  | 8          | foo
+  518 | 608 | 00518_trig_update      | 1970-01-19 00:00:00+08 | 1970-01-19 00:00:00 | 8  | 8          | foo
+  528 | 608 | 00528_trig_update      | 1970-01-29 00:00:00+08 | 1970-01-29 00:00:00 | 8  | 8          | foo
+  538 | 608 | 00538_trig_update      | 1970-02-08 00:00:00+08 | 1970-02-08 00:00:00 | 8  | 8          | foo
+  548 | 608 | 00548_trig_update      | 1970-02-18 00:00:00+08 | 1970-02-18 00:00:00 | 8  | 8          | foo
+  558 | 608 | 00558_trig_update      | 1970-02-28 00:00:00+08 | 1970-02-28 00:00:00 | 8  | 8          | foo
+  568 | 608 | 00568_trig_update      | 1970-03-10 00:00:00+08 | 1970-03-10 00:00:00 | 8  | 8          | foo
+  578 | 608 | 00578_trig_update      | 1970-03-20 00:00:00+08 | 1970-03-20 00:00:00 | 8  | 8          | foo
+  588 | 608 | 00588_trig_update      | 1970-03-30 00:00:00+08 | 1970-03-30 00:00:00 | 8  | 8          | foo
+  598 | 608 | 00598_trig_update      | 1970-04-09 00:00:00+08 | 1970-04-09 00:00:00 | 8  | 8          | foo
+  608 | 608 | 00608_trig_update      | 1970-01-09 00:00:00+08 | 1970-01-09 00:00:00 | 8  | 8          | foo
+  618 | 608 | 00618_trig_update      | 1970-01-19 00:00:00+08 | 1970-01-19 00:00:00 | 8  | 8          | foo
+  628 | 608 | 00628_trig_update      | 1970-01-29 00:00:00+08 | 1970-01-29 00:00:00 | 8  | 8          | foo
+  638 | 608 | 00638_trig_update      | 1970-02-08 00:00:00+08 | 1970-02-08 00:00:00 | 8  | 8          | foo
+  648 | 608 | 00648_trig_update      | 1970-02-18 00:00:00+08 | 1970-02-18 00:00:00 | 8  | 8          | foo
+  658 | 608 | 00658_trig_update      | 1970-02-28 00:00:00+08 | 1970-02-28 00:00:00 | 8  | 8          | foo
+  668 | 608 | 00668_trig_update      | 1970-03-10 00:00:00+08 | 1970-03-10 00:00:00 | 8  | 8          | foo
+  678 | 608 | 00678_trig_update      | 1970-03-20 00:00:00+08 | 1970-03-20 00:00:00 | 8  | 8          | foo
+  688 | 608 | 00688_trig_update      | 1970-03-30 00:00:00+08 | 1970-03-30 00:00:00 | 8  | 8          | foo
+  698 | 608 | 00698_trig_update      | 1970-04-09 00:00:00+08 | 1970-04-09 00:00:00 | 8  | 8          | foo
+  708 | 608 | 00708_trig_update      | 1970-01-09 00:00:00+08 | 1970-01-09 00:00:00 | 8  | 8          | foo
+  718 | 608 | 00718_trig_update      | 1970-01-19 00:00:00+08 | 1970-01-19 00:00:00 | 8  | 8          | foo
+  728 | 608 | 00728_trig_update      | 1970-01-29 00:00:00+08 | 1970-01-29 00:00:00 | 8  | 8          | foo
+  738 | 608 | 00738_trig_update      | 1970-02-08 00:00:00+08 | 1970-02-08 00:00:00 | 8  | 8          | foo
+  748 | 608 | 00748_trig_update      | 1970-02-18 00:00:00+08 | 1970-02-18 00:00:00 | 8  | 8          | foo
+  758 | 608 | 00758_trig_update      | 1970-02-28 00:00:00+08 | 1970-02-28 00:00:00 | 8  | 8          | foo
+  768 | 608 | 00768_trig_update      | 1970-03-10 00:00:00+08 | 1970-03-10 00:00:00 | 8  | 8          | foo
+  778 | 608 | 00778_trig_update      | 1970-03-20 00:00:00+08 | 1970-03-20 00:00:00 | 8  | 8          | foo
+  788 | 608 | 00788_trig_update      | 1970-03-30 00:00:00+08 | 1970-03-30 00:00:00 | 8  | 8          | foo
+  798 | 608 | 00798_trig_update      | 1970-04-09 00:00:00+08 | 1970-04-09 00:00:00 | 8  | 8          | foo
+  808 | 608 | 00808_trig_update      | 1970-01-09 00:00:00+08 | 1970-01-09 00:00:00 | 8  | 8          | foo
+  818 | 608 | 00818_trig_update      | 1970-01-19 00:00:00+08 | 1970-01-19 00:00:00 | 8  | 8          | foo
+  828 | 608 | 00828_trig_update      | 1970-01-29 00:00:00+08 | 1970-01-29 00:00:00 | 8  | 8          | foo
+  838 | 608 | 00838_trig_update      | 1970-02-08 00:00:00+08 | 1970-02-08 00:00:00 | 8  | 8          | foo
+  848 | 608 | 00848_trig_update      | 1970-02-18 00:00:00+08 | 1970-02-18 00:00:00 | 8  | 8          | foo
+  858 | 608 | 00858_trig_update      | 1970-02-28 00:00:00+08 | 1970-02-28 00:00:00 | 8  | 8          | foo
+  868 | 608 | 00868_trig_update      | 1970-03-10 00:00:00+08 | 1970-03-10 00:00:00 | 8  | 8          | foo
+  878 | 608 | 00878_trig_update      | 1970-03-20 00:00:00+08 | 1970-03-20 00:00:00 | 8  | 8          | foo
+  888 | 608 | 00888_trig_update      | 1970-03-30 00:00:00+08 | 1970-03-30 00:00:00 | 8  | 8          | foo
+  898 | 608 | 00898_trig_update      | 1970-04-09 00:00:00+08 | 1970-04-09 00:00:00 | 8  | 8          | foo
+  908 | 608 | 00908_trig_update      | 1970-01-09 00:00:00+08 | 1970-01-09 00:00:00 | 8  | 8          | foo
+  918 | 608 | 00918_trig_update      | 1970-01-19 00:00:00+08 | 1970-01-19 00:00:00 | 8  | 8          | foo
+  928 | 608 | 00928_trig_update      | 1970-01-29 00:00:00+08 | 1970-01-29 00:00:00 | 8  | 8          | foo
+  938 | 608 | 00938_trig_update      | 1970-02-08 00:00:00+08 | 1970-02-08 00:00:00 | 8  | 8          | foo
+  948 | 608 | 00948_trig_update      | 1970-02-18 00:00:00+08 | 1970-02-18 00:00:00 | 8  | 8          | foo
+  958 | 608 | 00958_trig_update      | 1970-02-28 00:00:00+08 | 1970-02-28 00:00:00 | 8  | 8          | foo
+  968 | 608 | 00968_trig_update      | 1970-03-10 00:00:00+08 | 1970-03-10 00:00:00 | 8  | 8          | foo
+  978 | 608 | 00978_trig_update      | 1970-03-20 00:00:00+08 | 1970-03-20 00:00:00 | 8  | 8          | foo
+  988 | 608 | 00988_trig_update      | 1970-03-30 00:00:00+08 | 1970-03-30 00:00:00 | 8  | 8          | foo
+  998 | 608 | 00998_trig_update      | 1970-04-09 00:00:00+08 | 1970-04-09 00:00:00 | 8  | 8          | foo
+ 1008 | 708 | 0000800008_trig_update |                        |                     |    | ft2        | 
+ 1018 | 708 | 0001800018_trig_update |                        |                     |    | ft2        | 
+(102 rows)
+
+UPDATE 102
+-- Test errors thrown on remote side during update
+ALTER TABLE "S 1"."T 1" ADD CONSTRAINT c2positive CHECK (c2 >= 0);
+ALTER TABLE
+INSERT INTO ft1(c1, c2) VALUES(11, 12);  -- duplicate key
+ERROR:  duplicate key value violates unique constraint "t1_pkey"
+DETAIL:  Key ("C 1")=(11) already exists.
+CONTEXT:  Remote SQL command: INSERT INTO "S 1"."T 1"("C 1", c2, c3, c4, c5, c6, c7, c8) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+INSERT INTO ft1(c1, c2) VALUES(1111, -2);  -- c2positive
+ERROR:  new row for relation "T 1" violates check constraint "c2positive"
+DETAIL:  N/A
+CONTEXT:  Remote SQL command: INSERT INTO "S 1"."T 1"("C 1", c2, c3, c4, c5, c6, c7, c8) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+UPDATE ft1 SET c2 = -c2 WHERE c1 = 1;  -- c2positive
+ERROR:  new row for relation "T 1" violates check constraint "c2positive"
+DETAIL:  N/A
+CONTEXT:  Remote SQL command: UPDATE "S 1"."T 1" SET c2 = $2 WHERE ctid = $1
+-- Test savepoint/rollback behavior
+select c2, count(*) from ft2 where c2 < 500 group by 1 order by 1;
+ c2  | count 
+-----+-------
+   0 |   100
+   1 |   100
+   4 |   100
+   6 |   100
+ 100 |     2
+ 101 |     2
+ 104 |     2
+ 106 |     2
+ 201 |     1
+ 204 |     1
+ 303 |   100
+ 403 |     2
+ 407 |   100
+(13 rows)
+
+select c2, count(*) from "S 1"."T 1" where c2 < 500 group by 1 order by 1;
+ c2  | count 
+-----+-------
+   0 |   100
+   1 |   100
+   4 |   100
+   6 |   100
+ 100 |     2
+ 101 |     2
+ 104 |     2
+ 106 |     2
+ 201 |     1
+ 204 |     1
+ 303 |   100
+ 403 |     2
+ 407 |   100
+(13 rows)
+
+begin;
+BEGIN
+update ft2 set c2 = 42 where c2 = 0;
+UPDATE 100
+select c2, count(*) from ft2 where c2 < 500 group by 1 order by 1;
+ c2  | count 
+-----+-------
+   1 |   100
+   4 |   100
+   6 |   100
+  42 |   100
+ 100 |     2
+ 101 |     2
+ 104 |     2
+ 106 |     2
+ 201 |     1
+ 204 |     1
+ 303 |   100
+ 403 |     2
+ 407 |   100
+(13 rows)
+
+savepoint s1;
+SAVEPOINT
+update ft2 set c2 = 44 where c2 = 4;
+UPDATE 100
+select c2, count(*) from ft2 where c2 < 500 group by 1 order by 1;
+ c2  | count 
+-----+-------
+   1 |   100
+   6 |   100
+  42 |   100
+  44 |   100
+ 100 |     2
+ 101 |     2
+ 104 |     2
+ 106 |     2
+ 201 |     1
+ 204 |     1
+ 303 |   100
+ 403 |     2
+ 407 |   100
+(13 rows)
+
+release savepoint s1;
+RELEASE
+select c2, count(*) from ft2 where c2 < 500 group by 1 order by 1;
+ c2  | count 
+-----+-------
+   1 |   100
+   6 |   100
+  42 |   100
+  44 |   100
+ 100 |     2
+ 101 |     2
+ 104 |     2
+ 106 |     2
+ 201 |     1
+ 204 |     1
+ 303 |   100
+ 403 |     2
+ 407 |   100
+(13 rows)
+
+savepoint s2;
+SAVEPOINT
+update ft2 set c2 = 46 where c2 = 6;
+UPDATE 100
+select c2, count(*) from ft2 where c2 < 500 group by 1 order by 1;
+ c2  | count 
+-----+-------
+   1 |   100
+  42 |   100
+  44 |   100
+  46 |   100
+ 100 |     2
+ 101 |     2
+ 104 |     2
+ 106 |     2
+ 201 |     1
+ 204 |     1
+ 303 |   100
+ 403 |     2
+ 407 |   100
+(13 rows)
+
+rollback to savepoint s2;
+ROLLBACK
+select c2, count(*) from ft2 where c2 < 500 group by 1 order by 1;
+ c2  | count 
+-----+-------
+   1 |   100
+   6 |   100
+  42 |   100
+  44 |   100
+ 100 |     2
+ 101 |     2
+ 104 |     2
+ 106 |     2
+ 201 |     1
+ 204 |     1
+ 303 |   100
+ 403 |     2
+ 407 |   100
+(13 rows)
+
+release savepoint s2;
+RELEASE
+select c2, count(*) from ft2 where c2 < 500 group by 1 order by 1;
+ c2  | count 
+-----+-------
+   1 |   100
+   6 |   100
+  42 |   100
+  44 |   100
+ 100 |     2
+ 101 |     2
+ 104 |     2
+ 106 |     2
+ 201 |     1
+ 204 |     1
+ 303 |   100
+ 403 |     2
+ 407 |   100
+(13 rows)
+
+savepoint s3;
+SAVEPOINT
+update ft2 set c2 = -2 where c2 = 42 and c1 = 10; -- fail on remote side
+ERROR:  new row for relation "T 1" violates check constraint "c2positive"
+DETAIL:  N/A
+CONTEXT:  Remote SQL command: UPDATE "S 1"."T 1" SET c2 = $2 WHERE ctid = $1
+rollback to savepoint s3;
+ROLLBACK
+select c2, count(*) from ft2 where c2 < 500 group by 1 order by 1;
+ c2  | count 
+-----+-------
+   1 |   100
+   6 |   100
+  42 |   100
+  44 |   100
+ 100 |     2
+ 101 |     2
+ 104 |     2
+ 106 |     2
+ 201 |     1
+ 204 |     1
+ 303 |   100
+ 403 |     2
+ 407 |   100
+(13 rows)
+
+release savepoint s3;
+RELEASE
+select c2, count(*) from ft2 where c2 < 500 group by 1 order by 1;
+ c2  | count 
+-----+-------
+   1 |   100
+   6 |   100
+  42 |   100
+  44 |   100
+ 100 |     2
+ 101 |     2
+ 104 |     2
+ 106 |     2
+ 201 |     1
+ 204 |     1
+ 303 |   100
+ 403 |     2
+ 407 |   100
+(13 rows)
+
+-- none of the above is committed yet remotely
+select c2, count(*) from "S 1"."T 1" where c2 < 500 group by 1 order by 1;
+ c2  | count 
+-----+-------
+   0 |   100
+   1 |   100
+   4 |   100
+   6 |   100
+ 100 |     2
+ 101 |     2
+ 104 |     2
+ 106 |     2
+ 201 |     1
+ 204 |     1
+ 303 |   100
+ 403 |     2
+ 407 |   100
+(13 rows)
+
+commit;
+COMMIT
+select c2, count(*) from ft2 where c2 < 500 group by 1 order by 1;
+ c2  | count 
+-----+-------
+   1 |   100
+   6 |   100
+  42 |   100
+  44 |   100
+ 100 |     2
+ 101 |     2
+ 104 |     2
+ 106 |     2
+ 201 |     1
+ 204 |     1
+ 303 |   100
+ 403 |     2
+ 407 |   100
+(13 rows)
+
+select c2, count(*) from "S 1"."T 1" where c2 < 500 group by 1 order by 1;
+ c2  | count 
+-----+-------
+   1 |   100
+   6 |   100
+  42 |   100
+  44 |   100
+ 100 |     2
+ 101 |     2
+ 104 |     2
+ 106 |     2
+ 201 |     1
+ 204 |     1
+ 303 |   100
+ 403 |     2
+ 407 |   100
+(13 rows)
+
+-- ===================================================================
+-- test copy
+-- ===================================================================
+select count(*) from ft2;
+ count 
+-------
+   821
+(1 row)
+
+select * from ft2 order by c1 limit 10;
+ c1 | c2  |        c3         |           c4           |         c5          | c6 |     c7     | c8  
+----+-----+-------------------+------------------------+---------------------+----+------------+-----
+  1 |   1 | 00001             | 1970-01-02 00:00:00+08 | 1970-01-02 00:00:00 | 1  | 1          | foo
+  3 | 303 | 00003_update3     | 1970-01-04 00:00:00+08 | 1970-01-04 00:00:00 | 3  | 3          | foo
+  4 |  44 | 00004_trig_update | 1970-01-05 00:00:00+08 | 1970-01-05 00:00:00 | 4  | 4          | foo
+  6 |   6 | 00006             | 1970-01-07 00:00:00+08 | 1970-01-07 00:00:00 | 6  | 6          | foo
+  7 | 407 | 00007_update7     | 1970-01-08 00:00:00+08 | 1970-01-08 00:00:00 | 7  | 7          | foo
+  8 | 608 | 00008_trig_update | 1970-01-09 00:00:00+08 | 1970-01-09 00:00:00 | 8  | 8          | foo
+  9 | 509 | 00009_update9     | 1970-01-10 00:00:00+08 | 1970-01-10 00:00:00 | 9  | ft2        | foo
+ 10 |  42 | 00010_trig_update | 1970-01-11 00:00:00+08 | 1970-01-11 00:00:00 | 0  | 0          | foo
+ 11 |   1 | 00011             | 1970-01-12 00:00:00+08 | 1970-01-12 00:00:00 | 1  | 1          | foo
+ 13 | 303 | 00013_update3     | 1970-01-14 00:00:00+08 | 1970-01-14 00:00:00 | 3  | 3          | foo
+(10 rows)
+
+\! rm -f ./foreigntable_ft2.data
+\COPY (select * from ft2) to './foreigntable_ft2.data';
+delete from ft2;
+DELETE 821
+select * from ft2 order by c1 limit 10;
+ c1 | c2 | c3 | c4 | c5 | c6 | c7 | c8 
+----+----+----+----+----+----+----+----
+(0 rows)
+
+\COPY ft2 from './foreigntable_ft2.data';
+select * from ft2 order by c1 limit 10;
+ c1 | c2  |              c3               |           c4           |         c5          | c6 |     c7     | c8  
+----+-----+-------------------------------+------------------------+---------------------+----+------------+-----
+  1 |   1 | 00001_trig_update             | 1970-01-02 00:00:00+08 | 1970-01-02 00:00:00 | 1  | 1          | foo
+  3 | 303 | 00003_update3_trig_update     | 1970-01-04 00:00:00+08 | 1970-01-04 00:00:00 | 3  | 3          | foo
+  4 |  44 | 00004_trig_update_trig_update | 1970-01-05 00:00:00+08 | 1970-01-05 00:00:00 | 4  | 4          | foo
+  6 |   6 | 00006_trig_update             | 1970-01-07 00:00:00+08 | 1970-01-07 00:00:00 | 6  | 6          | foo
+  7 | 407 | 00007_update7_trig_update     | 1970-01-08 00:00:00+08 | 1970-01-08 00:00:00 | 7  | 7          | foo
+  8 | 608 | 00008_trig_update_trig_update | 1970-01-09 00:00:00+08 | 1970-01-09 00:00:00 | 8  | 8          | foo
+  9 | 509 | 00009_update9_trig_update     | 1970-01-10 00:00:00+08 | 1970-01-10 00:00:00 | 9  | ft2        | foo
+ 10 |  42 | 00010_trig_update_trig_update | 1970-01-11 00:00:00+08 | 1970-01-11 00:00:00 | 0  | 0          | foo
+ 11 |   1 | 00011_trig_update             | 1970-01-12 00:00:00+08 | 1970-01-12 00:00:00 | 1  | 1          | foo
+ 13 | 303 | 00013_update3_trig_update     | 1970-01-14 00:00:00+08 | 1970-01-14 00:00:00 | 3  | 3          | foo
+(10 rows)
+
+select count(*) from ft2;
+ count 
+-------
+   821
+(1 row)
+
+\! rm -f ./foreigntable_ft2.data
+-- ===================================================================
+-- test serial columns (ie, sequence-based defaults)
+-- ===================================================================
+create table loc1 (f1 serial, f2 text);
+NOTICE:  CREATE TABLE will create implicit sequence "loc1_f1_seq" for serial column "loc1.f1"
+CREATE TABLE
+create foreign table rem1 (f1 serial, f2 text)
+  server loopback options(table_name 'loc1');
+NOTICE:  CREATE FOREIGN TABLE will create implicit sequence "rem1_f1_seq" for serial column "rem1.f1"
+CREATE FOREIGN TABLE
+select pg_catalog.setval('rem1_f1_seq', 10, false);
+ setval 
+--------
+     10
+(1 row)
+
+insert into loc1(f2) values('hi');
+INSERT 0 1
+insert into rem1(f2) values('hi remote');
+INSERT 0 1
+insert into loc1(f2) values('bye');
+INSERT 0 1
+insert into rem1(f2) values('bye remote');
+INSERT 0 1
+select * from loc1;
+ f1 |     f2     
+----+------------
+  1 | hi
+ 10 | hi remote
+  2 | bye
+ 11 | bye remote
+(4 rows)
+
+select * from rem1;
+ f1 |     f2     
+----+------------
+  1 | hi
+ 10 | hi remote
+  2 | bye
+ 11 | bye remote
+(4 rows)
+
+-- ===================================================================
+-- test local triggers
+-- ===================================================================
+-- Trigger functions "borrowed" from triggers regress test.
+CREATE FUNCTION trigger_func() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+	RAISE NOTICE 'trigger_func(%) called: action = %, when = %, level = %',
+		TG_ARGV[0], TG_OP, TG_WHEN, TG_LEVEL;
+	RETURN NULL;
+END;$$;
+CREATE FUNCTION
+CREATE TRIGGER trig_stmt_before BEFORE DELETE OR INSERT OR UPDATE ON rem1
+	FOR EACH STATEMENT EXECUTE PROCEDURE trigger_func();
+ERROR:  "rem1" is not a table or view
+CREATE TRIGGER trig_stmt_after AFTER DELETE OR INSERT OR UPDATE ON rem1
+	FOR EACH STATEMENT EXECUTE PROCEDURE trigger_func();
+ERROR:  "rem1" is not a table or view
+CREATE OR REPLACE FUNCTION trigger_data()  RETURNS trigger
+LANGUAGE plpgsql AS $$
+
+declare
+	oldnew text[];
+	relid text;
+    argstr text;
+begin
+
+	relid := TG_relid::regclass;
+	argstr := '';
+	for i in 0 .. TG_nargs - 1 loop
+		if i > 0 then
+			argstr := argstr || ', ';
+		end if;
+		argstr := argstr || TG_argv[i];
+	end loop;
+
+    RAISE NOTICE '%(%) % % % ON %',
+		tg_name, argstr, TG_when, TG_level, TG_OP, relid;
+    oldnew := '{}'::text[];
+	if TG_OP != 'INSERT' then
+		oldnew := array_append(oldnew, format('OLD: %s', OLD));
+	end if;
+
+	if TG_OP != 'DELETE' then
+		oldnew := array_append(oldnew, format('NEW: %s', NEW));
+	end if;
+
+    RAISE NOTICE '%', array_to_string(oldnew, ',');
+
+	if TG_OP = 'DELETE' then
+		return OLD;
+	else
+		return NEW;
+	end if;
+end;
+$$;
+CREATE FUNCTION
+-- Test basic functionality
+CREATE TRIGGER trig_row_before
+BEFORE INSERT OR UPDATE OR DELETE ON rem1
+FOR EACH ROW EXECUTE PROCEDURE trigger_data(23,'skidoo');
+ERROR:  "rem1" is not a table or view
+CREATE TRIGGER trig_row_after
+AFTER INSERT OR UPDATE OR DELETE ON rem1
+FOR EACH ROW EXECUTE PROCEDURE trigger_data(23,'skidoo');
+ERROR:  "rem1" is not a table or view
+delete from rem1;
+DELETE 4
+insert into rem1 values(1,'insert');
+INSERT 0 1
+update rem1 set f2  = 'update' where f1 = 1;
+UPDATE 1
+update rem1 set f2 = f2 || f2;
+UPDATE 1
+-- cleanup
+DROP TRIGGER trig_row_before ON rem1;
+ERROR:  trigger "trig_row_before" for table "rem1" does not exist
+DROP TRIGGER trig_row_after ON rem1;
+ERROR:  trigger "trig_row_after" for table "rem1" does not exist
+DROP TRIGGER trig_stmt_before ON rem1;
+ERROR:  trigger "trig_stmt_before" for table "rem1" does not exist
+DROP TRIGGER trig_stmt_after ON rem1;
+ERROR:  trigger "trig_stmt_after" for table "rem1" does not exist
+DELETE from rem1;
+DELETE 1
+-- Test WHEN conditions
+CREATE TRIGGER trig_row_before_insupd
+BEFORE INSERT OR UPDATE ON rem1
+FOR EACH ROW
+WHEN (NEW.f2 like '%update%')
+EXECUTE PROCEDURE trigger_data(23,'skidoo');
+ERROR:  "rem1" is not a table or view
+CREATE TRIGGER trig_row_after_insupd
+AFTER INSERT OR UPDATE ON rem1
+FOR EACH ROW
+WHEN (NEW.f2 like '%update%')
+EXECUTE PROCEDURE trigger_data(23,'skidoo');
+ERROR:  "rem1" is not a table or view
+-- Insert or update not matching: nothing happens
+INSERT INTO rem1 values(1, 'insert');
+INSERT 0 1
+UPDATE rem1 set f2 = 'test';
+UPDATE 1
+-- Insert or update matching: triggers are fired
+INSERT INTO rem1 values(2, 'update');
+INSERT 0 1
+UPDATE rem1 set f2 = 'update update' where f1 = '2';
+UPDATE 1
+CREATE TRIGGER trig_row_before_delete
+BEFORE DELETE ON rem1
+FOR EACH ROW
+WHEN (OLD.f2 like '%update%')
+EXECUTE PROCEDURE trigger_data(23,'skidoo');
+ERROR:  "rem1" is not a table or view
+CREATE TRIGGER trig_row_after_delete
+AFTER DELETE ON rem1
+FOR EACH ROW
+WHEN (OLD.f2 like '%update%')
+EXECUTE PROCEDURE trigger_data(23,'skidoo');
+ERROR:  "rem1" is not a table or view
+-- Trigger is fired for f1=2, not for f1=1
+DELETE FROM rem1;
+DELETE 2
+-- cleanup
+DROP TRIGGER trig_row_before_insupd ON rem1;
+ERROR:  trigger "trig_row_before_insupd" for table "rem1" does not exist
+DROP TRIGGER trig_row_after_insupd ON rem1;
+ERROR:  trigger "trig_row_after_insupd" for table "rem1" does not exist
+DROP TRIGGER trig_row_before_delete ON rem1;
+ERROR:  trigger "trig_row_before_delete" for table "rem1" does not exist
+DROP TRIGGER trig_row_after_delete ON rem1;
+ERROR:  trigger "trig_row_after_delete" for table "rem1" does not exist
+-- Test various RETURN statements in BEFORE triggers.
+CREATE FUNCTION trig_row_before_insupdate() RETURNS TRIGGER AS $$
+  BEGIN
+    NEW.f2 := NEW.f2 || ' triggered !';
+    RETURN NEW;
+  END
+$$ language plpgsql;
+CREATE FUNCTION
+CREATE TRIGGER trig_row_before_insupd
+BEFORE INSERT OR UPDATE ON rem1
+FOR EACH ROW EXECUTE PROCEDURE trig_row_before_insupdate();
+ERROR:  "rem1" is not a table or view
+-- The new values should have 'triggered' appended
+INSERT INTO rem1 values(1, 'insert');
+INSERT 0 1
+SELECT * from loc1;
+ f1 |   f2   
+----+--------
+  1 | insert
+(1 row)
+
+INSERT INTO rem1 values(2, 'insert') RETURNING f2;
+   f2   
+--------
+ insert
+(1 row)
+
+INSERT 0 1
+SELECT * from loc1;
+ f1 |   f2   
+----+--------
+  1 | insert
+  2 | insert
+(2 rows)
+
+UPDATE rem1 set f2 = '';
+UPDATE 2
+SELECT * from loc1;
+ f1 | f2 
+----+----
+  1 | 
+  2 | 
+(2 rows)
+
+UPDATE rem1 set f2 = 'skidoo' RETURNING f2;
+   f2   
+--------
+ skidoo
+ skidoo
+(2 rows)
+
+UPDATE 2
+SELECT * from loc1;
+ f1 |   f2   
+----+--------
+  1 | skidoo
+  2 | skidoo
+(2 rows)
+
+EXPLAIN (verbose, costs off)
+UPDATE rem1 set f1 = 10;          -- all columns should be transmitted
+                           QUERY PLAN                            
+-----------------------------------------------------------------
+ Update on public.rem1
+   ->  Foreign Scan on public.rem1
+         Output: 10, f2, ctid
+         Remote SQL: SELECT f2, ctid FROM public.loc1 FOR UPDATE
+(4 rows)
+
+UPDATE rem1 set f1 = 10;
+UPDATE 2
+SELECT * from loc1;
+ f1 |   f2   
+----+--------
+ 10 | skidoo
+ 10 | skidoo
+(2 rows)
+
+DELETE FROM rem1;
+DELETE 2
+-- Add a second trigger, to check that the changes are propagated correctly
+-- from trigger to trigger
+CREATE TRIGGER trig_row_before_insupd2
+BEFORE INSERT OR UPDATE ON rem1
+FOR EACH ROW EXECUTE PROCEDURE trig_row_before_insupdate();
+ERROR:  "rem1" is not a table or view
+INSERT INTO rem1 values(1, 'insert');
+INSERT 0 1
+SELECT * from loc1;
+ f1 |   f2   
+----+--------
+  1 | insert
+(1 row)
+
+INSERT INTO rem1 values(2, 'insert') RETURNING f2;
+   f2   
+--------
+ insert
+(1 row)
+
+INSERT 0 1
+SELECT * from loc1;
+ f1 |   f2   
+----+--------
+  1 | insert
+  2 | insert
+(2 rows)
+
+UPDATE rem1 set f2 = '';
+UPDATE 2
+SELECT * from loc1;
+ f1 | f2 
+----+----
+  1 | 
+  2 | 
+(2 rows)
+
+UPDATE rem1 set f2 = 'skidoo' RETURNING f2;
+   f2   
+--------
+ skidoo
+ skidoo
+(2 rows)
+
+UPDATE 2
+SELECT * from loc1;
+ f1 |   f2   
+----+--------
+  1 | skidoo
+  2 | skidoo
+(2 rows)
+
+DROP TRIGGER trig_row_before_insupd ON rem1;
+ERROR:  trigger "trig_row_before_insupd" for table "rem1" does not exist
+DROP TRIGGER trig_row_before_insupd2 ON rem1;
+ERROR:  trigger "trig_row_before_insupd2" for table "rem1" does not exist
+DELETE from rem1;
+DELETE 2
+INSERT INTO rem1 VALUES (1, 'test');
+INSERT 0 1
+-- Test with a trigger returning NULL
+CREATE FUNCTION trig_null() RETURNS TRIGGER AS $$
+  BEGIN
+    RETURN NULL;
+  END
+$$ language plpgsql;
+CREATE FUNCTION
+CREATE TRIGGER trig_null
+BEFORE INSERT OR UPDATE OR DELETE ON rem1
+FOR EACH ROW EXECUTE PROCEDURE trig_null();
+ERROR:  "rem1" is not a table or view
+-- Nothing should have changed.
+INSERT INTO rem1 VALUES (2, 'test2');
+INSERT 0 1
+SELECT * from loc1;
+ f1 |  f2   
+----+-------
+  1 | test
+  2 | test2
+(2 rows)
+
+UPDATE rem1 SET f2 = 'test2';
+UPDATE 2
+SELECT * from loc1;
+ f1 |  f2   
+----+-------
+  1 | test2
+  2 | test2
+(2 rows)
+
+DELETE from rem1;
+DELETE 2
+SELECT * from loc1;
+ f1 | f2 
+----+----
+(0 rows)
+
+DROP TRIGGER trig_null ON rem1;
+ERROR:  trigger "trig_null" for table "rem1" does not exist
+DELETE from rem1;
+DELETE 0
+-- Test a combination of local and remote triggers
+CREATE TRIGGER trig_row_before
+BEFORE INSERT OR UPDATE OR DELETE ON rem1
+FOR EACH ROW EXECUTE PROCEDURE trigger_data(23,'skidoo');
+ERROR:  "rem1" is not a table or view
+CREATE TRIGGER trig_row_after
+AFTER INSERT OR UPDATE OR DELETE ON rem1
+FOR EACH ROW EXECUTE PROCEDURE trigger_data(23,'skidoo');
+ERROR:  "rem1" is not a table or view
+CREATE TRIGGER trig_local_before BEFORE INSERT OR UPDATE ON loc1
+FOR EACH ROW EXECUTE PROCEDURE trig_row_before_insupdate();
+CREATE TRIGGER
+INSERT INTO rem1(f2) VALUES ('test');
+INSERT 0 1
+UPDATE rem1 SET f2 = 'testo';
+UPDATE 1
+-- Test returning a system attribute
+INSERT INTO rem1(f2) VALUES ('test') RETURNING ctid;
+ERROR:  column "ctid" does not exist
+LINE 1: INSERT INTO rem1(f2) VALUES ('test') RETURNING ctid;
+                                                       ^
+CONTEXT:  referenced column: ctid

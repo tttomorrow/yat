@@ -1,4 +1,4 @@
---  @testpoint:序列名与同一模式下的对象名相同，合理报错
+-- @testpoint: 序列名与同一模式下的对象名相同，合理报错
 --testpoint1:建表
 drop table if exists test_t1;
 create table test_t1(id int);

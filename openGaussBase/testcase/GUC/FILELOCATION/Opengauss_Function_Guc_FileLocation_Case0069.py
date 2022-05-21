@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -20,18 +20,17 @@ Description :
         2.修改参数config_file值为空
 Expect      :
         1.默认值是postgresql.conf，实际安装可能带有绝对目录
-        2.合理报错,开发薛蒙恩表示这个参数虽然是postmaster型，但是代码里限制
-        只能用guc方法设置,添加资料说明--I3EO6P
-History     :
+        2.合理报错,这个参数虽然是postmaster型，但是代码里限制只能用guc方法设置,
+        添加资料说明--I3EO6P
 """
-import unittest
 import os
-from yat.test import Node
-from yat.test import macro
+import unittest
 
 from testcase.utils.CommonSH import CommonSH
 from testcase.utils.Constant import Constant
 from testcase.utils.Logger import Logger
+from yat.test import Node
+from yat.test import macro
 
 LOG = Logger()
 commonsh = CommonSH('PrimaryDbUser')

@@ -4,7 +4,9 @@
 CREATE OR REPLACE PROCEDURE Proc_Syntax_008(IN name1 varchar2(20))
 IS
 DECLARE
+emp_id  BIGINT := 5462230555579;
 begin
+emp_id := 5462230555579+1;
 raise info ':%',emp_id;
 end;
 /

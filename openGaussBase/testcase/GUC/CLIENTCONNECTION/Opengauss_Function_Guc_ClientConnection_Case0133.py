@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -18,24 +18,27 @@ Case Name   : 使用alter user方法设置参数TimeZone为Australia/South,观�
 Description :
         1.查询TimeZone默认值
         2.创建用户
-        3.修改参数值为Australia/South并查询当前时间
-        4.删除用户
+        3.修改参数值为Australia/South
+        4.查询时区
+        5.查询当前时间及系统表的时区偏移量
+        6.清理环境
 Expect      :
         1.显示默认值PRC
         2.用户创建成功
-        3.设置成功当前时间为北京时间
-        4.删除成功
-History     :
+        3.设置成功
+        4.时区修改成功
+        5.时区修改成功，和系统表pg_timezone_names相对于UTC的偏移量一致
+        6.清理环境完成
+             故Australia/South时区的偏移量会变化
 """
 import time
 import unittest
 
-from yat.test import Node
-from yat.test import macro
-
 from testcase.utils.CommonSH import CommonSH
 from testcase.utils.Constant import Constant
 from testcase.utils.Logger import Logger
+from yat.test import Node
+from yat.test import macro
 
 
 class ClientConnection(unittest.TestCase):
@@ -46,45 +49,66 @@ class ClientConnection(unittest.TestCase):
         self.Constant = Constant()
         self.commonsh = CommonSH('dbuser')
         self.userNode = Node('dbuser')
+        self.us_name = "us_guc_clientconnection_case0133"
 
     def test_TimeZone(self):
-        self.log.info('查询默认值')
+        text = '--步骤1:查看默认值;expect:默认值为PRC--'
+        self.log.info(text)
         sql_cmd = self.commonsh.execut_db_sql(f'''show TimeZone;''')
         self.log.info(sql_cmd)
         self.res = sql_cmd.splitlines()[-2].strip()
-        self.log.info('创建测试用户')
+        text = '--步骤2:创建测试用户;expect:创建成功--'
+        self.log.info(text)
         sql_cmd = self.commonsh.execut_db_sql(f'''drop user if exists 
-            test_spur0133 cascade;
-            create user test_spur0133 password '{macro.COMMON_PASSWD}';''')
+            {self.us_name} cascade;
+            create user {self.us_name} password '{macro.COMMON_PASSWD}';''')
         self.log.info(sql_cmd)
-        self.assertIn(self.Constant.CREATE_ROLE_SUCCESS_MSG, sql_cmd)
-        self.log.info('修改用户级别参数')
-        sql_cmd = self.commonsh.execut_db_sql('''alter user test_spur0133 
+        self.assertIn(self.Constant.CREATE_ROLE_SUCCESS_MSG, sql_cmd,
+                      '执行失败:' + text)
+        text = '--步骤3:修改用户级别参数;expect:修改成功--'
+        self.log.info(text)
+        sql_cmd = self.commonsh.execut_db_sql(f'''alter user {self.us_name} 
             set TimeZone to 'Australia/South';''')
         self.log.info(sql_cmd)
         self.assertIn(self.Constant.ALTER_ROLE_SUCCESS_MSG, sql_cmd)
         time.sleep(3)
-        self.log.info('查询时间')
-        sql_cmd = '''show TimeZone;
-                      select now();'''
-        excute_cmd = f'''
-                        source {macro.DB_ENV_PATH};
-                        gsql -d {self.userNode.db_name} \
-                        -p {self.userNode.db_port} \
-                        -U test_spur0133 \
-                        -W '{macro.COMMON_PASSWD}' \
-                        -c "{sql_cmd}"
-                             '''
-        self.log.info(sql_cmd)
-        msg1 = self.userNode.sh(excute_cmd).result()
+        text = '--步骤4:查询时区;expect:时区修改成功--'
+        self.log.info(text)
+        sql_cmd = '''show TimeZone;'''
+        result = self.commonsh.execut_db_sql(sql=sql_cmd,
+                                             sql_type=f'-U {self.us_name} '
+                                            f'-W {macro.COMMON_PASSWD}')
+        self.log.info(result)
+        self.assertIn('Australia/South', result, '执行失败:' + text)
+        text = '--步骤5:查询当前时间及系统表的时区偏移量;expect:时区修改成功' \
+               '，和系统表pg_timezone_names相对于UTC的偏移量一致--'
+        self.log.info(text)
+        sql_cmd = '''select now();'''
+        result = self.commonsh.execut_db_sql(sql=sql_cmd,
+                                             sql_type=f'-U {self.us_name} '
+                                            f'-W {macro.COMMON_PASSWD}')
+        self.log.info(result)
+        msg1 = result.splitlines()[-2].strip()
         self.log.info(msg1)
-        self.assertIn('Australia/South', msg1)
-        self.assertIn('+09:30', msg1)
+        res1 = msg1.split('+')[-1]
+        self.log.info(res1)
+        sql_cmd = '''select * from  \
+            pg_timezone_names where name= 'Australia/South';'''
+        result = self.commonsh.execut_db_sql(sql=sql_cmd,
+                                             sql_type=f'-U {self.us_name} '
+                                            f'-W {macro.COMMON_PASSWD}')
+        self.log.info(result)
+        msg2 = result.splitlines()[-2].strip()
+        self.log.info(msg2)
+        res2 = msg2.split('|')[-2].strip().replace(':00', '')
+        self.log.info(res2)
+        self.assertEqual(res1, res2, '执行失败:' + text)
 
     def tearDown(self):
-        self.log.info('----------------恢复默认值-----------------------')
-        sql_cmd = self.commonsh.execut_db_sql('''drop user if exists 
-            test_spur0133 cascade;''')
+        text = '--步骤6:清理环境;expect:清理环境完成--'
+        self.log.info(text)
+        sql_cmd = self.commonsh.execut_db_sql(f'''drop user if exists 
+            {self.us_name} cascade;''')
         self.log.info(sql_cmd)
         self.log.info(
             '----Opengauss_Function_Guc_ClientConnection_Case0133执行完成---')

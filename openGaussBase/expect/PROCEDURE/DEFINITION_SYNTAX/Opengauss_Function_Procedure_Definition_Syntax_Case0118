@@ -16,6 +16,7 @@ select * from test_procedure_insert_118;
 +--------------------+------+
 | id                 | name |
 +--------------------+------+
+| 0.9999999999799858 | 44   |
 +--------------------+------+
 drop table test_procedure_insert_118;
 SQL SUCCESS

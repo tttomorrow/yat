@@ -14,7 +14,7 @@ insert into  tab_12 values(100,'zhang','text','hahahahah');
 SQL SUCCESS
 insert into  tab_12 values(-1,'zhang','text','hahahahah');
 ?.*ERROR: new row for relation "tab_12" violates check constraint "tab_12_id_check".*
-  Detail: Failing row contains (-1, zhang, text, hahahahah).
+  Detail: N/A
 select *from tab_12;
 +-----+-------+----------+-----------+
 | id  | name  | filename | text      |

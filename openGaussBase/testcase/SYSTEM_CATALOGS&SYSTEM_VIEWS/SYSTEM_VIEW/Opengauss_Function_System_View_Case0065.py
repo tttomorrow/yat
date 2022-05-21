@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -22,6 +22,7 @@ Expect      :
     1.查看系统视图PG_THREAD_WAIT_STATUS的结构成功
     2.该视图字段与字段数据类型对应正确
 History     :
+    modified：2021/10/12 by 5318639 优化用例适配新代码
 """
 
 import unittest
@@ -30,37 +31,37 @@ from testcase.utils.Common import Common
 from testcase.utils.CommonSH import CommonSH
 from testcase.utils.Logger import Logger
 
-LOG = Logger()
-
 
 class SystemView(unittest.TestCase):
     def setUp(self):
-        LOG.info('----------------this is setup-----------------------')
-        LOG.info(
-            '---------Opengauss_Function_System_View_Case0065开始执行-----')
+        self.log = Logger()
+        self.log.info(
+            '-----Opengauss_Function_System_View_Case0065start-----')
         self.com = Common()
         self.comsh = CommonSH('dbuser')
         self.expect_result_dict = {
             'Column': ['node_name', 'db_name', 'thread_name', 'query_id',
                        'tid', 'sessionid', 'lwtid', 'psessionid',
                        'tlevel', 'smpid', 'wait_status', 'wait_event',
-                       'locktag', 'lockmode', 'block_sessionid'],
+                       'locktag', 'lockmode', 'block_sessionid',
+                       'global_sessionid'],
             'Type': ['text', 'text', 'text', 'bigint', 'bigint', 'bigint',
                      'integer', 'bigint', 'integer', 'integer',
-                     'text', 'text', 'text', 'text', 'bigint']}
+                     'text', 'text', 'text', 'text', 'bigint', 'text']}
 
-    def test_index_file_damaged(self):
-        LOG.info(
-            '----------------------------查看表结构---------------------')
+    def test_sysview(self):
+        text = '----------step1:查看表结构;expect:查看成功-------------'
+        self.log.info(text)
         msg = self.comsh.execut_db_sql('\d PG_THREAD_WAIT_STATUS')
-        LOG.info(msg)
+        self.log.info(msg)
         result_dict = self.com.format_sql_result(msg)
-        LOG.info(result_dict)
+        self.log.info(result_dict)
+        text = '-----step2:查看表字段与对应字段数据类型是否正确;expect:对应正确-----'
+        self.log.info(text)
         del result_dict['Modifiers']
-        self.assertDictEqual(self.expect_result_dict, result_dict)
+        self.assertDictEqual(self.expect_result_dict, result_dict,
+                             '执行失败' + text)
 
     def tearDown(self):
-        LOG.info('----------------this is tearDown-----------------------')
-        # 无须清理环境
-        LOG.info(
-            '--------Opengauss_Function_System_View_Case0065执行完成------')
+        self.log.info(
+            '--------Opengauss_Function_System_View_Case0065finsh------')

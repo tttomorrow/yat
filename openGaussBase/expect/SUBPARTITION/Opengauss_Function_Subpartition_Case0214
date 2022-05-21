@@ -1,0 +1,157 @@
+-- @testpoint: range_list二级分区表修改：add字段/drop字段/add约束,部分测试点合理报错
+--step1: 创建表空间; expect:成功
+drop table if exists t_subpartition_0214;
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0214;
+SQL SUCCESS
+create tablespace ts_subpartition_0214 relative location 'subpartition_tablespace/subpartition_tablespace_0214';
+SQL SUCCESS
+--test1: alter table add/drop --字段
+--step2: 创建表空间; expect:成功
+create table if not exists t_subpartition_0214
+(
+    col_1 int ,
+    col_2 int ,
+    col_3 int ,
+    col_4 int 
+)tablespace ts_subpartition_0214
+partition by range (col_1) subpartition by list (col_2)
+(
+  partition p_range_1 values less than( -10 )
+  (
+    subpartition p_list_1_1 values ( '-1','-2','-3','-4','-5'),
+    subpartition p_list_1_2 values ( default )
+  ),
+  partition p_range_2 values less than( 20 )
+  (
+    subpartition p_list_2_1 values ( '6','7','8','9','10'),
+    subpartition p_list_2_2 values ( default )
+  ),
+   partition p_range_3 values less than( 30 )
+   (
+    subpartition p_list_3_1 values ( default )
+  ),
+   partition p_range_4 values less than( 40 )
+   (
+    subpartition p_list_4_1 values ( default )
+  ),
+  partition p_range_5 values less than( maxvalue )
+) enable row movement;
+SQL SUCCESS
+--step3: 修改二级分区表,添加列; expect:成功
+alter table t_subpartition_0214 add column col_5 int;
+SQL SUCCESS
+--step4: 插入数据; expect:成功
+insert into t_subpartition_0214 values(1,8,1,1,1),(4,7,4,4,4),(5,8,5,5,5),(8,9,8,8,8),(9,9,9,9,9);
+SQL SUCCESS
+--step5: 修改二级分区表,删除列; expect:成功
+alter table t_subpartition_0214 drop column col_5 ;
+SQL SUCCESS
+--test2: alter table add --约束
+--step6: 创建二级分区表; expect:成功
+drop table if exists t_subpartition_0214;
+SQL SUCCESS
+create table if not exists t_subpartition_0214
+(
+    col_1 int ,
+    col_2 int ,
+    col_3 int ,
+    col_4 int 
+)tablespace ts_subpartition_0214
+partition by range (col_1) subpartition by list (col_2)
+(
+  partition p_range_1 values less than( -10 )
+  (
+    subpartition p_list_1_1 values ( '-1','-2','-3','-4','-5'),
+    subpartition p_list_1_2 values ( default )
+  ),
+  partition p_range_2 values less than( 20 )
+  (
+    subpartition p_list_2_1 values ( '6','7','8','9','10'),
+    subpartition p_list_2_2 values ( default )
+  ),
+   partition p_range_3 values less than( 30 )
+   (
+    subpartition p_list_3_1 values ( default )
+  ),
+   partition p_range_4 values less than( 40 )
+   (
+    subpartition p_list_4_1 values ( default )
+  ),
+  partition p_range_5 values less than( maxvalue )
+) enable row movement;
+SQL SUCCESS
+--step7: 修改二级分区表,添加check约束; expect:成功
+alter table t_subpartition_0214 add constraint constraint_check check (col_3 is not null);
+SQL SUCCESS
+--step8: 创建索引并插入数据; expect:成功
+drop index if exists index_01;
+SQL SUCCESS
+create index index_01 on t_subpartition_0214(col_1,col_2);
+SQL SUCCESS
+insert into t_subpartition_0214 values(1,8,1,1),(4,7,4,4),(5,8,5,5),(8,9,8,8),(9,9,9,9);
+SQL SUCCESS
+--step9: 使用索引添加主键; expect:合理报错
+alter table  t_subpartition_0214 add  primary key (col_2) using index ppp;
+?.*ERROR: syntax error at or near "ppp.*
+?.*
+--step10: 使用索引添加唯一约束; expect:合理报错
+alter table  t_subpartition_0214 add  unique (col_1) using index uuu;
+?.*ERROR: syntax error at or near "uuu.*
+?.*
+--step11: 添加约束; expect:成功
+alter table  t_subpartition_0214 add  constraint aaa check(col_1 is not null) not valid ;
+SQL SUCCESS
+--step12: 验证检查类约束; expect:成功
+alter table  t_subpartition_0214 validate constraint aaa;
+SQL SUCCESS
+--step13: 删除约束; expect:成功
+alter table  t_subpartition_0214 drop constraint if exists aaa;
+SQL SUCCESS
+--step14: 添加索引; expect:合理报错
+alter table  t_subpartition_0214  add index index_01 (col_2);
+?.*ERROR: type "index_01" does not exis.*
+?.*
+--step15: cluster添加默认索引; expect:合理报错
+alter table  t_subpartition_0214 cluster on index_01;
+?.*ERROR: cannot cluster a subpartition tabl.*
+--step16: 新建用户; expect:成功
+create user u_subpartition_0214 password 'test@123';
+SQL SUCCESS
+--step17: 表的属主修改为指定用户; expect:成功
+alter table  t_subpartition_0214 owner to u_subpartition_0214;
+SQL SUCCESS
+--step18: 修改表的压缩特性nocompress; expect:成功
+alter table  t_subpartition_0214 set nocompress;
+SQL SUCCESS
+--step19: 修改表的行访问控制开关disable row level security; expect:合理报错
+alter table  t_subpartition_0214 disable row level security;
+?.*ERROR: Un-support featur.*
+  Detail: Do not support row level security policy on subpartition table.
+--step20: 强制修改表的行访问控制开关no force row level security; expect:合理报错
+alter table  t_subpartition_0214  no force row level security;
+?.*ERROR: Un-support featur.*
+  Detail: Do not support row level security policy on subpartition table.
+--step21: 插入数据; expect:成功
+insert into t_subpartition_0214 values(30,8,1,1),(29,9,9,9);
+SQL SUCCESS
+--step22: 修改表的行迁移开关disable row movement; expect:成功
+alter table t_subpartition_0214 disable row movement;
+SQL SUCCESS
+--step23: 更新数据至分区外; expect:合理报错
+update t_subpartition_0214  set col_1=1 where col_1=30;
+?.*ERROR: fail to update partitioned table "t_subpartition_0214.*
+  Detail: disable row movement
+--step24: 修改表的行迁移开关enable row movement; expect:成功
+alter table t_subpartition_0214 enable row movement;
+SQL SUCCESS
+--step25: 更新数据至分区外; expect:成功
+update t_subpartition_0214  set col_1=1 where col_1=30;
+SQL SUCCESS
+--step26: 清理环境; expect:成功
+drop user if exists u_subpartition_0214 cascade;
+SQL SUCCESS
+drop table if exists t_subpartition_0214;
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0214;
+SQL SUCCESS

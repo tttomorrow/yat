@@ -1,4 +1,5 @@
 -- @testpoint: 删除表数据后使用alter table语句，无法隐式转换的类型，合理报错
+-- @modify at: 2020-11-23
 --建表
 drop table if exists temp_table_alter_018;
 create global temporary table temp_table_alter_018(

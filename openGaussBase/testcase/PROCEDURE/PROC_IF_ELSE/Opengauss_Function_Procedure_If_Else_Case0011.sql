@@ -13,6 +13,7 @@ begin
 		end if;
 	end;
 	begin
+		if(NOT(1+2+3+4+5=3*5)OR(99999999999999-1>99999999999999)OR( (1=0) AND false))
 		then
 			raise info 'The condition is true';
 		else

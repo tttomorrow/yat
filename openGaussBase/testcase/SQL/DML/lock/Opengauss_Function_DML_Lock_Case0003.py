@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -44,15 +44,15 @@ class DmlTestCase(unittest.TestCase):
         self.log.info('Opengauss_Function_DML_Lock_Case0003开始')
         self.constant = Constant()
         self.commonsh1 = CommonSH('PrimaryDbUser')
-        self.commonsh2 = CommonSH('PrimaryDbUser')
+        self.t_name = 't_lock_0003'
 
     def test_dml_lock(self):
         text1 = '-----step1: 创建测试表; expect: 创建成功-----'
         self.log.info(text1)
         sql_cmd = self.commonsh1.execut_db_sql(
-            'drop table if exists t_lock_0003;'
-            'create table t_lock_0003(sk integer,id char(16),'
-            'name varchar(20),sq_ft integer);')
+            f'drop table if exists {self.t_name};'
+            f'create table {self.t_name}(sk integer,id char(16),'
+            f'name varchar(20),sq_ft integer);')
         self.log.info(sql_cmd)
         assert_in_1 = self.constant.CREATE_TABLE_SUCCESS in sql_cmd
         self.assertTrue(assert_in_1, '执行失败:' + text1)
@@ -60,14 +60,13 @@ class DmlTestCase(unittest.TestCase):
         text2 = '-----step2: 开启事务，为测试表加share锁，不做commit操作,成功' \
                 '新session执行完step3后，在session1中执行step4; expect: 创建成功-----'
         self.log.info(text2)
-        sql = '''start transaction;
-            lock table t_lock_0003 in share mode;
+        sql = f'''start transaction;
+            lock table {self.t_name} in share mode;
             select pg_sleep(5);
             
-            --step4: 查看视图pg_locks，查看锁是否都添加成功，期望都成功
-            select locktype,database,relation,transactionid,classid,\
-             virtualtransaction,pid,sessionid,mode,\
-             granted,fastpath from pg_locks;
+            --step4: 查看视图pg_locks，查看锁是否都添加成功;expect: 加锁成功
+             select mode from pg_locks where relation = \
+             (select oid from pg_class where relname = '{self.t_name}');
             '''
         thread_1 = ComThread(self.commonsh1.execut_db_sql, args=(sql, ''))
         thread_1.setDaemon(True)
@@ -76,12 +75,12 @@ class DmlTestCase(unittest.TestCase):
         text3 = '----step3: 开启新的session,在新的session中开启事务，' \
                 '再次对该测试表加share锁; expect: 加锁成功----'
         self.log.info(text3)
-        sql = '''select pg_sleep(1);
+        sql = f'''select pg_sleep(1);
             start transaction;
-            lock table t_lock_0003 in share mode;
+            lock table {self.t_name} in share mode;
             select pg_sleep(6);
             '''
-        thread_2 = ComThread(self.commonsh2.execut_db_sql, args=(sql, ''))
+        thread_2 = ComThread(self.commonsh1.execut_db_sql, args=(sql, ''))
         thread_2.setDaemon(True)
         thread_2.start()
 
@@ -97,7 +96,7 @@ class DmlTestCase(unittest.TestCase):
 
         assert_eq_1 = msg_result_1.count('START TRANSACTION') is 1
         assert_eq_2 = msg_result_1.count('LOCK TABLE') is 1
-        assert_eq_3 = msg_result_1.count('ShareLock       | t') is 2
+        assert_eq_3 = msg_result_1.count('ShareLock') is 2
         self.assertTrue(assert_eq_1 and assert_eq_2 and assert_eq_3,
                         '执行失败:' + text2)
         assert_eq_4 = msg_result_2.count('START TRANSACTION') is 1

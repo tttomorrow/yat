@@ -1,4 +1,5 @@
 -- @testpoint: upsert子查询多表关联查询覆盖，不符合语法要求，合理报错
+
 --创建upeset及子查询表，插入数据
 drop table if exists t_dml_upsert_sub0129_01;
 create table t_dml_upsert_sub0129_01 (b int,c text);

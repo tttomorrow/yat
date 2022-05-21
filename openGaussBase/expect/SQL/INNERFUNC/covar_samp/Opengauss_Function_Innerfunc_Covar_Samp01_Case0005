@@ -14,6 +14,7 @@ select covar_samp(COL_2/COL_3+COL_3,COL_2/COL_2+COL_3) from T_VAR_POP_SAMP_VARIA
 +--------------------+
 | covar_samp         |
 +--------------------+
+| 2.4411283548688516 |
 +--------------------+
 select covar_samp(-(-COL_1*-COL_2-mod(COL_2,COL_3)),-(-COL_1*-COL_2-mod(COL_2,COL_3))) from T_VAR_POP_SAMP_VARIANCE01 order by 1;
 +------------+

@@ -37,7 +37,7 @@ SQL SUCCESS
 insert into common_table1 values (1,'aaa',1,'2019-12-15',true,'aaa',1.1);
 SQL SUCCESS
 alter table pt1 exchange partition (pt1_p1) with table common_table1;
-?.*ERROR: tables in ALTER TABLE EXCHANGE PARTITION must have the same number of indexs
+?.*ERROR: index mismatch for tables in ALTER TABLE EXCHANGE PARTITION
 drop table if exists pt1;
 SQL SUCCESS
 drop table if exists common_table1;

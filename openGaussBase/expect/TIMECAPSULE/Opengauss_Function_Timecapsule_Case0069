@@ -1,0 +1,140 @@
+-- @testpoint: 验证CSN闪回查询csn边界值,合理报错
+--step1: 查询参数默认值; expect:显示默认值依次为off/0/0
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+
+show vacuum_defer_cleanup_age;
++--------------------------+
+| vacuum_defer_cleanup_age |
++--------------------------+
+| 0                        |
++--------------------------+
+show version_retention_age;
++-----------------------+
+| version_retention_age |
++-----------------------+
+| 0                     |
++-----------------------+
+--step2: 修改参数值; expect:显示结果依次为on/1000/1000
+alter system set enable_recyclebin to on;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| on                |
++-------------------+
+alter system set vacuum_defer_cleanup_age to 1000;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show vacuum_defer_cleanup_age;
++--------------------------+
+| vacuum_defer_cleanup_age |
++--------------------------+
+| 1000                     |
++--------------------------+
+alter system set version_retention_age to 1000;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show version_retention_age;
++-----------------------+
+| version_retention_age |
++-----------------------+
+| 1000                  |
++-----------------------+
+--step3: 清空回收站; expect:回收站清空成功
+purge recyclebin;
+SQL SUCCESS
+--step4: 创建表; expect:表创建成功
+drop table if exists t_timecapsule_0069;
+SQL SUCCESS
+create table t_timecapsule_0069(a int);
+SQL SUCCESS
+--step5: 边界值为2^63; expect:闪回失败
+select * from t_timecapsule_0069 timecapsule csn 9223372036854775808;
+?.*ERROR: bigint out of rang.*
+--step6: 边界值为2^63-1; expect:闪回失败
+select * from t_timecapsule_0069 timecapsule csn 9223372036854775807;
+?.*ERROR: invalid csn specifie.*
+--step7: 边界值为0; expect:闪回失败
+select * from t_timecapsule_0069 timecapsule csn 0;
+?.*ERROR: restore point not foun.*
+--step8: 边界值为-0; expect:闪回失败
+select * from t_timecapsule_0069 timecapsule csn -1;
+?.*ERROR: invalid csn specifie.*
+--step9: 边界值为-2^63+1; expect:闪回失败
+select * from t_timecapsule_0069 timecapsule csn -9223372036854775807;
+?.*ERROR: invalid csn specifie.*
+--step10: 边界值为-2^63; expect:闪回失败
+select * from t_timecapsule_0069 timecapsule csn -9223372036854775808;
+?.*ERROR: invalid csn specifie.*
+--step11: 边界值为-2^63-1; expect:闪回失败
+select * from t_timecapsule_0069 timecapsule csn -9223372036854775809;
+?.*ERROR: bigint out of rang.*
+--step12: 清理环境 expect:清理环境成功
+drop table if exists t_timecapsule_0069;
+SQL SUCCESS
+purge recyclebin;
+SQL SUCCESS
+--step13: 恢复默认值; expect:恢复成功，依次显示结果为off/0/0
+alter system set enable_recyclebin to off;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+
+alter system set vacuum_defer_cleanup_age to 0;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show vacuum_defer_cleanup_age;
++--------------------------+
+| vacuum_defer_cleanup_age |
++--------------------------+
+| 0                        |
++--------------------------+
+alter system set version_retention_age to 0;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show version_retention_age;
++-----------------------+
+| version_retention_age |
++-----------------------+
+| 0                     |
++-----------------------+

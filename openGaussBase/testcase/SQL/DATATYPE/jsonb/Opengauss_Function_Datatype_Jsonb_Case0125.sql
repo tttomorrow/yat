@@ -1,6 +1,6 @@
 -- @testpoint: 分区表使用数据类型为jsonb的列创建主外键，合理报错
 
--- 分区表创建主键:分区键不为主键，且数据类型不为jsonb，合理报错
+-- 分区表创建主键:分区键不为主键，且数据类型不为jsonb
 drop table if exists tab1251;
 create table tab1251(
 col_1 smallint,
@@ -51,7 +51,7 @@ partition by range (col_3)
 	partition tab125_p3 values less than ('20230501')
 );
 
---分区表创建主键:分区键数据类型为jsonb,不支持，故无法创建外键，合理报错
+--分区表创建主键:分区键数据类型为jsonb
 drop table if exists tab1254;
 drop table if exists tab1255;
 create table tab1254(

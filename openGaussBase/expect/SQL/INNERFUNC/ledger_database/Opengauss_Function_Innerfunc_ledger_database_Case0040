@@ -1,0 +1,19 @@
+-- @testpoint: 在非篡改模式下修复指定防篡改用户表对应的用户历史表hash值，不进行操作（合理报错）
+--step1：建模式建表;expect:成功
+drop schema if exists s_ledger_database_0040;
+SQL SUCCESS
+create schema s_ledger_database_0040;
+SQL SUCCESS
+drop table if exists s_ledger_database_0040.t_ledger_database_0040;
+SQL SUCCESS
+create table s_ledger_database_0040.t_ledger_database_0040(id int, name text);
+SQL SUCCESS
+--step2：调用函数在非篡改模式下修复指定防篡改用户表对应的用户历史表hash值，不进行操作;expect:失败
+select pg_catalog.ledger_hist_repair('s_ledger_database_0040','t_ledger_database_0040');
+?.*ERROR: table s_ledger_database_0040.t_ledger_database_0040 is not ledger user table.*
+  Where: referenced column: ledger_hist_repair
+--step3：删除表;expect:成功
+drop table s_ledger_database_0040.t_ledger_database_0040;
+SQL SUCCESS
+drop schema s_ledger_database_0040 cascade;
+SQL SUCCESS

@@ -9,6 +9,8 @@ select asin(c_decimal) from asin_test_02 where c_decimal not in (1,-1);
 +---------------------+
 | asin                |
 +---------------------+
+| -0.7131243848550526 |
+| 0.7131243848550526  |
 +---------------------+
 drop table if exists asin_test_02;
 SQL SUCCESS

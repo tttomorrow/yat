@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -38,7 +38,6 @@ Expect      :
         9.导入报错ERROR: cannot execute CREATE TABLE in a read-only
         transaction
         10.清理环境完成
-History     :
 """
 import os
 import unittest
@@ -49,10 +48,10 @@ from testcase.utils.Logger import Logger
 from yat.test import Node
 from yat.test import macro
 
-COMMONSH = CommonSH("PrimaryDbUser")
+Primary_SH = CommonSH("PrimaryDbUser")
 
 
-@unittest.skipIf(1 == COMMONSH.get_node_num(), "单机不执行")
+@unittest.skipIf(1 == Primary_SH.get_node_num(), "单机不执行")
 class ToolsBackup(unittest.TestCase):
     def setUp(self):
         self.log = Logger()
@@ -65,11 +64,27 @@ class ToolsBackup(unittest.TestCase):
         self.Standby_Node = Node('Standby1DbUser')
         self.package = os.path.join(
             os.path.dirname(macro.DB_INSTANCE_PATH), 'package_tool')
+        self.conf_path = os.path.join(macro.DB_INSTANCE_PATH,
+                                      macro.DB_PG_CONFIG_NAME)
         self.db_name = "db_jdbcgsbackup_0059"
         self.user = "u_jdbcgsbackup_0059"
         self.tb_name = "t_jdbcgsbackup_0059"
 
     def test_tools_backup(self):
+        self.log.info('--查看节点数----')
+        get_pgxc_node_name_cmd = f"cat {self.conf_path}|" \
+                                 f"grep 'pgxc_node_name'|" \
+                                 f"cut -d \"'\" -f 2"
+        self.log.info(get_pgxc_node_name_cmd)
+        pgxc_node_name = self.Primary_Node.sh(get_pgxc_node_name_cmd).result()
+        self.log.info(pgxc_node_name)
+        self.assertIsNotNone(pgxc_node_name)
+        node_num = len(pgxc_node_name.strip('dn_').split('_'))
+        self.log.info('--查看主机query，同步是否正常----')
+        Primary_SH.check_location_consistency('primary', node_num, 300)
+        self.log.info('----查询主备状态----')
+        status = Primary_SH.get_db_cluster_status()
+        self.assertTrue("Degraded" in status or "Normal" in status)
         text = '-----step1:执行switchover expect:switchover成功----'
         self.log.info(text)
         result = self.Standby_SH.execute_gsctl('switchover',
@@ -136,6 +151,7 @@ class ToolsBackup(unittest.TestCase):
         text = '----step6:备份新备机pg_hba.conf文件并修改新主节点的认证方式;' \
                'expect:修改成功----'
         self.log.info(text)
+        self.log.info(result)
         cmd = f"cp {os.path.join(macro.DB_INSTANCE_PATH, 'pg_hba.conf')}  " \
               f"{os.path.join(macro.DB_INSTANCE_PATH, 'pg_hba.conf_t_bak')}"
         self.log.info(cmd)
@@ -154,6 +170,10 @@ class ToolsBackup(unittest.TestCase):
         self.log.info(cmd)
         result = self.Primary_Node.sh(cmd).result()
         self.log.info(result)
+        restart_msg = Primary_SH.restart_db_cluster()
+        self.log.info(restart_msg)
+        status = Primary_SH.get_db_cluster_status()
+        self.assertTrue("Degraded" in status or "Normal" in status)
         self.assertIn(f'{self.Standby_Node.db_host}/32   sha256', result,
                       '执行失败:' + text)
 
@@ -225,14 +245,14 @@ class ToolsBackup(unittest.TestCase):
             {self.db_name};
             drop user if exists {self.user} cascade;''')
         self.log.info(sql_cmd)
-        result = COMMONSH.execute_gsctl('switchover',
+        result = Primary_SH.execute_gsctl('switchover',
                                         'switchover completed')
         self.log.info(result)
         self.assertTrue(result)
-        result = COMMONSH.exec_refresh_conf()
+        result = Primary_SH.exec_refresh_conf()
         self.log.info(result)
         self.assertTrue(result)
-        result = COMMONSH.get_db_cluster_status('detail')
+        result = Primary_SH.get_db_cluster_status('detail')
         self.log.info(result)
         self.assertTrue("Degraded" in result or "Normal" in result,
                         '执行失败:' + text)

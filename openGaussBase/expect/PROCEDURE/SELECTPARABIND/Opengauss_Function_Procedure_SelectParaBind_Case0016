@@ -6,6 +6,7 @@ as
 	v1 clob;
 	r1 clob;
 begin
+    v1 := 'abc123456789asdf';
     sqlstat := 'select :p1';
     execute immediate sqlstat into r1 using v1;
     raise info 'result:%',v1;

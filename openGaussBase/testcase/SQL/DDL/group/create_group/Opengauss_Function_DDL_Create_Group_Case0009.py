@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -29,13 +29,10 @@ History     :
 """
 
 import unittest
-import sys
-import time
-import datetime
+
 from yat.test import Node
 from yat.test import macro
 
-sys.path.append(sys.path[0] + "/../")
 from testcase.utils.Logger import Logger
 from testcase.utils.CommonSH import CommonSH
 
@@ -52,8 +49,11 @@ class Function(unittest.TestCase):
 
     def test_group(self):
         def func_login():  # 登陆
-            cmd = f'''source {self.DB_ENV_PATH}
-            gsql {self.userNode.db_name} my_group -W '{macro.COMMON_PASSWD}' -p {self.userNode.db_port} -c "select 'yes ok';"'''
+            cmd = f'''source {self.DB_ENV_PATH}; \
+            gsql {self.userNode.db_name} my_group \
+            -W '{macro.COMMON_PASSWD}' \
+            -p {self.userNode.db_port} \
+            -c "select sysdate;select 'yes ok';"'''
             logger.info(cmd)
             msg = self.userNode.sh(cmd).result()
             logger.info(msg)
@@ -61,10 +61,10 @@ class Function(unittest.TestCase):
 
         error_msg = "FATAL:  The account is not within the period of validity."
 
-        logger.info('----------设置生效的时间是当前时间后的5-10秒内--------')
+        logger.info('----------设置生效的时间是当前时间后的10-40秒内--------')
         cmd0 = f''' source {self.DB_ENV_PATH}
-                    date +"%Y-%m-%d %H:%M:%S" --date="+5 second";
-                    date +"%Y-%m-%d %H:%M:%S" --date="+8 second"'''
+                    date +"%Y-%m-%d %H:%M:%S" --date="+10 second";
+                    date +"%Y-%m-%d %H:%M:%S" --date="+40 second"'''
         msg0 = self.userNode.sh(cmd0).result()
         logger.info(msg0)
         begin, end = msg0.splitlines()[0].strip(), msg0.splitlines()[1].strip()
@@ -76,15 +76,21 @@ class Function(unittest.TestCase):
         self.assertTrue('DROP ROLE' in msg1 and 'CREATE ROLE' in msg1)
         logger.info('----------------提前登陆----------------------------')
         msg2 = func_login()
-        self.assertTrue(error_msg in msg2)
-        time.sleep(6)
+        self.assertIn(error_msg, msg2)
+        result = self.commonsh.execut_db_sql("select pg_sleep(11);"
+                                             "select sysdate")
+        logger.info(result)
+        self.assertIn("1 row", result)
         logger.info('----------------生效时间内登陆--------------- -------')
         msg3 = func_login()
-        self.assertTrue('yes ok' in msg3)
+        self.assertIn('yes ok', msg3)
         logger.info('----------------时间失效后登陆-----------------------')
-        time.sleep(3)
+        result = self.commonsh.execut_db_sql("select pg_sleep(30);"
+                                             "select sysdate")
+        logger.info(result)
+        self.assertIn("1 row", result)
         msg4 = func_login()
-        self.assertTrue(error_msg in msg4)
+        self.assertIn(error_msg, msg4)
         logger.info('----------------删除group---------------------------')
         del_cmd = """drop group my_group;"""
         msg = self.commonsh.execut_db_sql(del_cmd)

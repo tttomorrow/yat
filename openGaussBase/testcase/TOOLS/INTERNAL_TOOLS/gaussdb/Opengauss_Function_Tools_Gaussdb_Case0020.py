@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -34,6 +34,7 @@ Expect      :
 History     :
 """
 import unittest
+import os
 from multiprocessing import Process
 from testcase.utils.ComThread import ComThread
 from yat.test import Node
@@ -45,7 +46,7 @@ from testcase.utils.Logger import Logger
 class Tools(unittest.TestCase):
     def setUp(self):
         self.logger = Logger()
-        self.logger.info('--Opengauss_Function_Tools_Gaussdb_Case0020 start--')
+        self.logger.info(f'---{os.path.basename(__file__)} start---')
         self.userNode = Node(node='PrimaryDbUser')
         self.DB_ENV_PATH = macro.DB_ENV_PATH
         self.DB_INSTANCE_PATH = macro.DB_INSTANCE_PATH
@@ -91,7 +92,7 @@ class Tools(unittest.TestCase):
             sql_cmd4 = 'drop user if exists user006 cascade;'
             msg4 = self.sh_primy.execut_db_sql(sql_cmd4)
             self.logger.info(msg4)
-            self.assertTrue(msg4.find('failed to connect Unknown') > -1)
+            self.assertTrue(msg4.find('failed to connect') > -1)
             self.logger.info('-----------主机重启-----------')
             execute_cmd5 = f'source {self.DB_ENV_PATH};gs_ctl restart -D ' \
                            f'{self.DB_INSTANCE_PATH} -M primary'
@@ -106,4 +107,4 @@ class Tools(unittest.TestCase):
                 'P Primary Normal' in msg6 and 'S Standby Normal' in msg6)
 
     def tearDown(self):
-        self.logger.info('-Opengauss_Function_Tools_Gaussdb_Case0020 finish-')
+        self.logger.info(f'---{os.path.basename(__file__)} finish---')

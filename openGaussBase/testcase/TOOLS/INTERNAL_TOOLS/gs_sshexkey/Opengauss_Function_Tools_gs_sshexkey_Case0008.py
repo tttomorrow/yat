@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -52,33 +52,12 @@ class ToolsTestCase(unittest.TestCase):
         self.ssh_file = os.path.join('/home',
                                      self.primary_node.ssh_user,
                                      'hostfile')
-        self.ssh_backup = os.path.join('/home',
-                                       self.primary_node.ssh_user,
-                                       'ssh_backup')
         logger.info("======SetUp：检查数据库状态是否正常======")
         status = self.commonsh.get_db_cluster_status()
         self.assertTrue("Degraded" in status or "Normal" in status)
 
     def test_gs_sshexkey(self):
-        logger.info("Opengauss_Function_Tools_gs_sshexkey_Case0008开始执行")
-        logger.info("======创建备份目录======")
-        mk_cmd = f'''mkdir {self.ssh_backup}'''
-        mk_res1 = self.primary_node.sh(mk_cmd).result()
-        mk_res2 = self.standby_node.sh(mk_cmd).result()
-        logger.info(mk_res1)
-        logger.info(mk_res2)
-
-        logger.info("======查看是否已存在互信文件，如有则备份======")
-        check_cmd = 'ls ~/.ssh'
-        check_res = self.primary_node.sh(check_cmd).result()
-        logger.info(check_res)
-        if check_res is not None:
-            mv_cmd = f'''mv ~/.ssh/* {self.ssh_backup};ls {self.ssh_backup}'''
-            self.primary_node.sh(mv_cmd)
-            self.standby_node.sh(mv_cmd)
-        check_res = self.primary_node.sh(check_cmd).result()
-        logger.info(check_res)
-
+        logger.info(f"====={os.path.basename(__file__)}开始执行=====")
         logger.info("======步驟1：普通用户下创建hostfile文件，添加主备IP信息======")
         add_cmd = f'''touch {self.ssh_file}
             echo -e '{self.IP1}\n{self.IP2}' > {self.ssh_file}
@@ -110,7 +89,7 @@ class ToolsTestCase(unittest.TestCase):
 
     def tearDown(self):
         logger.info("======步驟3：清理环境，删除hostfile文件&log文件======")
-        rm_cmd1 = f'''rm -rf ~/.ssh/*;rm -rf {self.ssh_file}'''
+        rm_cmd1 = f'''rm -rf {self.ssh_file}'''
         logger.info(rm_cmd1)
         rm_res1 = self.primary_node.sh(rm_cmd1).result()
         rm_res2 = self.standby_node.sh(rm_cmd1).result()
@@ -120,13 +99,4 @@ class ToolsTestCase(unittest.TestCase):
         rm_cmd2 = f'''rm -rf {macro.DB_INSTANCE_PATH}/gs_log'''
         logger.info(rm_cmd2)
         self.root_node.sh(rm_cmd2).result()
-
-        logger.info("======恢复环境原有互信关系======")
-        gs_cmd = f'''cp {self.ssh_backup}/* ~/.ssh/
-            rm -rf {self.ssh_backup}'''
-        logger.info(gs_cmd)
-        gs_res1 = self.primary_node.sh(gs_cmd).result()
-        gs_res2 = self.standby_node.sh(gs_cmd).result()
-        self.assertNotIn('bash', gs_res1)
-        self.assertNotIn('bash', gs_res2)
-        logger.info("===Opengauss_Function_Tools_gs_sshexkey_Case0008执行结束===")
+        logger.info(f"====={os.path.basename(__file__)}执行结束=====")

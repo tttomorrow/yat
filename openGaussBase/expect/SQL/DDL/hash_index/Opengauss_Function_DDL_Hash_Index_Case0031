@@ -1,0 +1,23 @@
+-- @testpoint: 测试索引存在与否对修改哈希索引的影响，部分step合理报错
+--创建表
+drop table if exists  t_hash_index_0031;
+SQL SUCCESS
+create table t_hash_index_0031(id01 float(4),id02 int) with(orientation=row);
+SQL SUCCESS
+--创建哈希索引
+create index i_hash_index_0031_01 on t_hash_index_0031 using hash(id01);
+SQL SUCCESS
+--修改哈希索引(索引存在)
+alter index  i_hash_index_0031_01 rename to i_hash_index_0031_03;
+SQL SUCCESS
+--修改哈希索引(索引不存在)
+alter index  i_hash_index_0031_02 rename to i_hash_index_0031_04;
+?.*ERROR: relation "i_hash_index_0031_02" does not exist
+--删除哈希索引
+drop index i_hash_index_0031_03;
+SQL SUCCESS
+drop index i_hash_index_0031_04;
+?.*ERROR: index "i_hash_index_0031_04" does not exist
+--删除表、表空间
+drop table  t_hash_index_0031 cascade;
+SQL SUCCESS

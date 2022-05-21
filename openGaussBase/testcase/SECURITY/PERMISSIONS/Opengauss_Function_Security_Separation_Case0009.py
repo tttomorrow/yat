@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -16,7 +16,7 @@ See the Mulan PSL v2 for more details.
 Case Type   : security-Separation_rights
 Case Name   : 三权分立后系统管理员对其他用户放在属于各自模式下的表无权限
 Description :
-    1.初始用户执行：create user sysadmin01 with sysadmin password 'Qazwsx@123';
+    1.初始用户执行：create user sysadmin01 with sysadmin password '$PASSWORD';
                 create schema myschema;
                 create table myschema.table02(id1 int,id2 int,id3 int);
     2.sysadmin01 用户执行：SELECT * FROM myschema.table02;

@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -18,7 +18,7 @@ Case Name   : 修改enable_adio_debug，观察其预期结果（因当前版本�
 Description :
         1、查询enable_adio_debug默认值；
            show enable_adio_debug;
-        2、修改enable_adio_debug为on，重启使其生效，并校验其预期结果；这个参数不让设置，会强制关闭
+        2、修改enable_adio_debug为on，重启使其生效，并校验其预期结果；
            gs_guc set -D /cluster/dn1 -c "enable_adio_debug=on"
            gs_om -t stop && gs_om -t start
            show enable_adio_debug;
@@ -61,7 +61,6 @@ class Deletaduit(unittest.TestCase):
         self.assertTrue("Normal" in status)
         sql_cmd = self.commonsh.execut_db_sql(f'''show enable_adio_debug;''')
         self.log.info(sql_cmd)
-        # 这个参数不让设置，会强制关闭
         self.assertIn('off', sql_cmd)
 
     def tearDown(self):

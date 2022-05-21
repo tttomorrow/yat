@@ -24,7 +24,6 @@ select regr_slope(height, id)from  table_test where id <5;
 +-------------------+
 | regr_slope        |
 +-------------------+
-| 2.160000000000025 |
 +-------------------+
 select regr_slope(age, id)from  table_test where id <9;
 +------------+

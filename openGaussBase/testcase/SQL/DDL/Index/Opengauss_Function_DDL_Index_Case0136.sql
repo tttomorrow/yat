@@ -1,4 +1,4 @@
---  @testpoint: REBUILD：自动拓展分区表设置索引不可用后重建
+-- @testpoint: REBUILD：自动拓展分区表设置索引不可用后重建
 
 --建自动拓展分区表
 DROP TABLE if EXISTS test_index_table_136 CASCADE;

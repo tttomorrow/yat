@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -16,7 +16,7 @@ See the Mulan PSL v2 for more details.
 Case Type   : security
 Case Name   : 非对象所有者不能修改对象
 Description :
-    1.初始用户执行：create user wf with password 'Qazwsx@123';
+    1.初始用户执行：create user wf with password '$PASSWORD';
                     grant create on database postgres to wf;
                     create table security_table(id1 int,id2 int, id3 int)
     2.wf用户执行：alter table security_table add(id4 int);

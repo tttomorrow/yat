@@ -15,10 +15,10 @@ SQL SUCCESS
 --插入数据,报错
 insert into temp_table_053 (id_p,lastname) values(0,'b');
 ?.*ERROR: new row for relation "temp_table_053" violates check constraint "temp_table_053_id_p_check"
-  Detail: Failing row contains (0, b).
+  Detail: N/A
 insert into temp_table_053 values(-9,'xw');
 ?.*ERROR: new row for relation "temp_table_053" violates check constraint "temp_table_053_id_p_check"
-  Detail: Failing row contains (-9, xw).
+  Detail: N/A
 --查询
 select * from temp_table_053;
 +------+----------+

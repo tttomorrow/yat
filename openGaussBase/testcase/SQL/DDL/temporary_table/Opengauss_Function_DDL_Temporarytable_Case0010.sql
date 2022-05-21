@@ -1,4 +1,5 @@
 -- @testpoint: 表中插入数据前后，执行列的添加、删除操作
+-- @modify at: 2020-11-23
 --建表
 drop table if exists temp_table_alter_010;
 create global temporary table temp_table_alter_010(
@@ -22,7 +23,6 @@ c_timestamp timestamp
 )on commit preserve rows;
 --增加列
 alter table temp_table_alter_010 add(c_1 int);
-alter table temp_table_alter_010 add(c_2 blob default '0101010101111100001110');
 alter table temp_table_alter_010 add(c_3 varchar(200));
 alter table temp_table_alter_010 add(c_4 clob);
 --查询表

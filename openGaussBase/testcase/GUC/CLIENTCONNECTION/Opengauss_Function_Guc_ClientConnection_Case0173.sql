@@ -8,6 +8,7 @@ show deadlock_timeout;
 set deadlock_timeout to 123.859;
 set deadlock_timeout to 'test';
 set deadlock_timeout to -1;
+set deadlock_timeout to 2147483648;
 set deadlock_timeout to '123&^$#';
 set deadlock_timeout to '';
 --恢复默认

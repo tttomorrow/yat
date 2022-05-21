@@ -80,6 +80,7 @@ select ASIN(SYN_FUN_SYN_015_001(SYN_FUN_SYN_015_002(SYN_FUN_SYN_015_003(SYN_FUN_
 +---------------------+
 | asin                |
 +---------------------+
+| -1.5707963267948966 |
 +---------------------+
 select SYN_FUN_SYN_015_001(ASIN(SYN_FUN_SYN_015_002(SYN_FUN_SYN_015_003(SYN_FUN_SYN_015_004(-1))))) from sys_dummy;
 +---------------------+

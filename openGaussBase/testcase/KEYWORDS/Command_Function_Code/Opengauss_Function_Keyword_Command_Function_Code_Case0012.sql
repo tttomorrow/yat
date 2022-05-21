@@ -11,6 +11,9 @@ create table "command_function_code"(
 )
 PARTITION BY RANGE (c_integer)
 (
+	partition P_20180121 values less than (0),
+	partition P_20190122 values less than (50000),
+	partition P_20200123 values less than (100000),
 	partition P_max values less than (maxvalue)
 );
 delete from "command_function_code";

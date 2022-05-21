@@ -13,6 +13,7 @@ end;
 /
 --调用自定义函数
 select FVT_FUNC_CLOB_007(to_char(88877));
+select FVT_FUNC_CLOB_007(to_char(1234567890,'099999999999999'));
 
 --恢复环境
 drop function fvt_func_clob_007;

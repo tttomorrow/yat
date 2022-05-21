@@ -1,0 +1,109 @@
+-- @testpoint: 非网络类型转换为inet后ipv4地址取最小值
+--step1:创建表; expect:成功
+drop table if exists t_min_case0013;
+SQL SUCCESS
+create table t_min_case0013(c inet);
+SQL SUCCESS
+create table t_min_case0013_text(t text);
+SQL SUCCESS
+create table t_min_case0013_clob(c clob);
+SQL SUCCESS
+create table t_min_case0013_varchar(c varchar);
+SQL SUCCESS
+create table t_min_case0013_bpchar(c bpchar);
+SQL SUCCESS
+create table t_min_case0013_nvarchar2(c nvarchar2);
+SQL SUCCESS
+create table t_min_case0013_cidr(c cidr);
+SQL SUCCESS
+--step2:text类型转换为inet; expect:192.168.0.1/24
+insert into t_min_case0013_text values('192.168.0.1/24'),('192.168.0.0/25'),('192.168.1.0'),('192.168.1.0/25');
+SQL SUCCESS
+insert into t_min_case0013  select inet(t) from t_min_case0013_text;
+SQL SUCCESS
+select min(c) from  t_min_case0013;
++----------------+
+| min            |
++----------------+
+| 192.168.0.1/24 |
++----------------+
+--step3:clob类型转换为inet; expect:192.168.255.1/14
+delete from t_min_case0013;
+SQL SUCCESS
+insert into t_min_case0013_clob values('192.168.255.1/14'),('192.169.0.0/14');
+SQL SUCCESS
+insert into t_min_case0013  select inet(c) from t_min_case0013_clob;
+SQL SUCCESS
+select min(c) from  t_min_case0013;
++------------------+
+| min              |
++------------------+
+| 192.168.255.1/14 |
++------------------+
+--step4:varchar类型转换为inet; expect:9.8.0.0/16
+delete from t_min_case0013;
+SQL SUCCESS
+insert into t_min_case0013_varchar values('10.0.0.0/8'),('9.8.0.0/16'),('10.1.0.0/16');
+SQL SUCCESS
+insert into t_min_case0013  select inet(c) from t_min_case0013_varchar;
+SQL SUCCESS
+select min(c) from  t_min_case0013;
++------------+
+| min        |
++------------+
+| 9.8.0.0/16 |
++------------+
+--step5:bpchar类型转换为inet; expect:192.168.100.128/25
+delete from t_min_case0013;
+SQL SUCCESS
+insert into t_min_case0013_bpchar values('192.168.100.128/25'),('192.168.100.128');
+SQL SUCCESS
+insert into t_min_case0013  select inet(c) from t_min_case0013_bpchar;
+SQL SUCCESS
+select min(c) from  t_min_case0013;
++--------------------+
+| min                |
++--------------------+
+| 192.168.100.128/25 |
++--------------------+
+--step6:nvarchar2类型转换为inet; expect:10.1.2.3/32
+delete from t_min_case0013;
+SQL SUCCESS
+insert into t_min_case0013_nvarchar2 values('10.1.2.3/32'),('10.1.2.12'),('10.1.2.12/30');
+SQL SUCCESS
+insert into t_min_case0013  select inet(c) from t_min_case0013_nvarchar2;
+SQL SUCCESS
+select min(c) from  t_min_case0013;
++----------+
+| min      |
++----------+
+| 10.1.2.3 |
++----------+
+--step7:cidr类型转换为inet; expect:10.1.2.3/32
+delete from t_min_case0013;
+SQL SUCCESS
+insert into t_min_case0013_cidr values('10.1.2.3/32'),('10.1.2.12/31'),('10.1.2.12/30');
+SQL SUCCESS
+insert into t_min_case0013  select inet(c) from t_min_case0013_cidr;
+SQL SUCCESS
+select min(c) from  t_min_case0013;
++----------+
+| min      |
++----------+
+| 10.1.2.3 |
++----------+
+--tearDown
+drop table if exists t_min_case0013;
+SQL SUCCESS
+drop table if exists t_min_case0013_text;
+SQL SUCCESS
+drop table if exists t_min_case0013_clob;
+SQL SUCCESS
+drop table if exists t_min_case0013_varchar;
+SQL SUCCESS
+drop table if exists t_min_case0013_bpchar;
+SQL SUCCESS
+drop table if exists t_min_case0013_nvarchar2;
+SQL SUCCESS
+drop table if exists t_min_case0013_cidr;
+SQL SUCCESS

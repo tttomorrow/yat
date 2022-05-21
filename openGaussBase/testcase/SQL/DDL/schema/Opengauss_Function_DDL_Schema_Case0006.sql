@@ -29,7 +29,7 @@ CREATE FUNCTION schema_test_006.func_add_sql(integer, integer) RETURNS integer
 /
 select schema_test_006.func_add_sql(1,3);
 --8.create user
-create user user_case006 with password 'test@12345';
+create user user_case006 with password 'Mima@123';
 --9.alter schema
 alter schema schema_test_006 rename to schema_test_006_new;
 alter schema schema_test_006_new owner to user_case006;

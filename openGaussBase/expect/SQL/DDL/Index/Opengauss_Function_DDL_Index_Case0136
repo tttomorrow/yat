@@ -1,4 +1,4 @@
---  @testpoint: REBUILD：自动拓展分区表设置索引不可用后重建
+-- @testpoint: REBUILD：自动拓展分区表设置索引不可用后重建
 --建自动拓展分区表
 DROP TABLE if EXISTS test_index_table_136 CASCADE;
 SQL SUCCESS
@@ -33,54 +33,54 @@ select relname from pg_class where relname like 'index_136_%' order by relname;
 --UNUSABLE
 --索引可被引用
 explain select * from test_index_table_136 where c_int >10 group by c_int,c_date ;
-+--------------------------------------------------------------------------------------------------------+
-| QUERY PLAN                                                                                             |
-+--------------------------------------------------------------------------------------------------------+
 ?.*
+?.*QUERY PLAN?.*
 ?.*
+?.*HashAggregate?.*
+?.*Group By Key: c_int, c_date?.*
+?.*Partition Iterator ?.*
+?.*Iterations: 2 ?.*
+?.* Partitioned Bitmap Heap Scan on test_index_table_136 ?.*
+?.*Recheck Cond: (c_int > 10)?.*
+?.*Selected Partitions:  1..2  ?.*
+?.*Partitioned Bitmap Index Scan on index_136_01?.*
+?.*Index Cond: (c_int > 10)?.*
+?.*Selected Partitions:  1..2?.*
 ?.*
-?.*
-?.*Bitmap.*
-?.*
-?.*
-?.*Bitmap.*
-?.*
-?.*
-+--------------------------------------------------------------------------------------------------------+
 --can not set unusable index partition against NON-PARTITIONED index
 ALTER INDEX  index_136_01 modify PARTITION p2 UNUSABLE;
 SQL SUCCESS
 --索引不被引用
 explain select * from test_index_table_136 where c_int >10 group by c_int,c_date ;
-+------------------------------------------------------------------------------------------------+
-| QUERY PLAN                                                                                     |
-+------------------------------------------------------------------------------------------------+
 ?.*
+?.* QUERY PLAN ?.*
 ?.*
+?.*HashAggregate?.*
+?.*Group By Key: c_int, c_date ?.*
+?.*Partition Iterator?.*
+?.*Iterations: 2?.*
+?.*Partitioned Seq Scan on test_index_table_136?.*
+?.*Filter: (c_int > 10)?.*
+?.*Selected Partitions:  1..2?.*
 ?.*
-?.*
-?.*
-?.*
-?.*
-+------------------------------------------------------------------------------------------------+
 --rebuild
 ALTER INDEX index_136_01 REBUILD  PARTITION p2;
 SQL SUCCESS
 explain select * from test_index_table_136 where c_int >10 group by c_int,c_date ;
-+--------------------------------------------------------------------------------------------------------+
-| QUERY PLAN                                                                                             |
-+--------------------------------------------------------------------------------------------------------+
 ?.*
+?.*QUERY PLAN ?.*
 ?.*
+?.*HashAggregate ?.*
+?.*Group By Key: c_int, c_date ?.*
+?.*Partition Iterator?.*
+?.*Iterations: 2 ?.*
+?.*Partitioned Bitmap Heap Scan on test_index_table_136?.*
+?.*Recheck Cond: (c_int > 10)?.*
+?.*Selected Partitions:  1..2 ?.*
+?.*Partitioned Bitmap Index Scan on index_136_01?.*
+?.*Index Cond: (c_int > 10)?.*
+?.*Selected Partitions:  1..2?.*
 ?.*
-?.*
-?.*Bitmap.*
-?.*
-?.*
-?.*Bitmap.*
-?.*
-?.*
-+--------------------------------------------------------------------------------------------------------+
 --清理环境
 DROP TABLE if EXISTS test_index_table_136 CASCADE;
 SQL SUCCESS

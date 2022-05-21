@@ -33,6 +33,7 @@ select pg_stat_get_analyze_count() from pg_class  a where a.relname = 't1';
   Hint: No function matches the given name and argument types. You might need to add explicit type casts.
 ?.*
   Where: referenced column: pg_stat_get_analyze_count
+select pg_stat_get_analyze_count(99999999999999999999);
 ?.*ERROR: function pg_stat_get_analyze_count\(numeric\) does not exist
   Hint: No function matches the given name and argument types. You might need to add explicit type casts.
 ?.*

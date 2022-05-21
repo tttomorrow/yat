@@ -1,0 +1,137 @@
+-- @testpoint: range_hash二级分区表：表约束(约束推迟)/null/not null,部分测试点合理报错
+--test1: 表约束：not null约束推迟
+--step1: 创建二级分区表; expect:成功
+drop table if exists t_subpartition_0313;
+SQL SUCCESS
+create table if not exists t_subpartition_0313
+(
+    col_1 int ,
+    col_2 int  not null ,
+    col_3 int not null ,
+    col_4 int ,
+    primary key (col_1,col_2) deferrable
+)
+partition by range (col_1) subpartition by hash (col_2)
+(
+  partition p_range_1 values less than( -10 )
+  (
+    subpartition p_hash_1_1 ,
+    subpartition p_hash_1_2 ,
+     subpartition p_hash_1_3
+  ),
+  partition p_range_2 values less than( 20 ),
+  partition p_range_3 values less than( 30)
+  (
+    subpartition p_hash_3_1 ,
+    subpartition p_hash_3_2 ,
+    subpartition p_hash_3_3
+  ),
+    partition p_range_4 values less than( 50)
+  (
+    subpartition p_hash_4_1 ,
+    subpartition p_hash_4_2 ,
+    subpartition p_hash_4_3
+  ),
+  partition p_range_5 values less than( maxvalue )
+) enable row movement;
+SQL SUCCESS
+--step2: 开始一个事务; expect:成功
+start transaction;
+SQL SUCCESS
+--step3: 设置所有约束在事务提交时检查; expect:成功
+set constraints all deferred;
+SQL SUCCESS
+--step4: 插入符合(col_1,col_2)唯一约束的数据; expect:成功
+insert into t_subpartition_0313 values(111,111,111),(118,118,118),(205,205,205),(505,505,505);
+SQL SUCCESS
+--step5: 插入不符合(col_1,col_2)唯一约束的数据; expect:成功
+insert into t_subpartition_0313 values(111,111,111),(118,118,118),(205,205,205),(505,505,505);
+SQL SUCCESS
+--step6: 提交事务; expect:合理报错
+commit;
+?.*ERROR: duplicate key value violates unique constraint "t_subpartition_0313_pkey.*
+  Detail: Key (col_1, col_2)=(111, 111) already exists.
+--step7: 结束事务; expect:成功
+end;
+SQL SUCCESS
+--test2: 列约束not null
+--step8: 创建二级分区表,二级分区键包含列约束not null; expect:成功
+drop table if exists t_subpartition_00313;
+SQL SUCCESS
+create table if not exists t_subpartition_0313
+(
+    col_1 int ,
+    col_2 int  not null ,
+    col_3 int not null ,
+    col_4 int   
+)
+partition by range (col_1) subpartition by hash (col_2)
+(
+  partition p_range_1 values less than( -10 )
+  (
+    subpartition p_hash_1_1 ,
+    subpartition p_hash_1_2 ,
+     subpartition p_hash_1_3
+  ),
+  partition p_range_2 values less than( 20 ),
+  partition p_range_3 values less than( 30)
+  (
+    subpartition p_hash_3_1 ,
+    subpartition p_hash_3_2 ,
+    subpartition p_hash_3_3
+  ),
+    partition p_range_4 values less than( 50)
+  (
+    subpartition p_hash_4_1 ,
+    subpartition p_hash_4_2 ,
+    subpartition p_hash_4_3
+  ),
+  partition p_range_5 values less than( maxvalue )
+) enable row movement;
+SQL SUCCESS
+--step9: 非空约束列插入空数据; expect:合理报错
+insert into t_subpartition_0313(col_1,col_2) values(1,1),(5,5);
+?.*ERROR: null value in column "col_3" violates not-null constrain.*
+  Detail: Failing row contains (1, 1, null, null).
+--test3: 列约束null
+--step10: 创建二级分区表,二级分区键包含列约束null; expect:成功
+drop table if exists t_subpartition_00313;
+SQL SUCCESS
+create table if not exists t_subpartition_0313
+(
+    col_1 int ,
+    col_2 int  null ,
+    col_3 int ,
+    col_4 int   
+)
+partition by range (col_1) subpartition by hash (col_2)
+(
+  partition p_range_1 values less than( -10 )
+  (
+    subpartition p_hash_1_1 ,
+    subpartition p_hash_1_2 ,
+     subpartition p_hash_1_3
+  ),
+  partition p_range_2 values less than( 20 ),
+  partition p_range_3 values less than( 30)
+  (
+    subpartition p_hash_3_1 ,
+    subpartition p_hash_3_2 ,
+    subpartition p_hash_3_3
+  ),
+    partition p_range_4 values less than( 50)
+  (
+    subpartition p_hash_4_1 ,
+    subpartition p_hash_4_2 ,
+    subpartition p_hash_4_3
+  ),
+  partition p_range_5 values less than( maxvalue )
+) enable row movement;
+SQL SUCCESS
+--step11: 空约束列插入空数据; expect:合理报错
+insert into t_subpartition_0313(col_1,col_3,col_4) values(1,1,1),(5,5,5);
+?.*ERROR: null value in column "col_2" violates not-null constrain.*
+  Detail: Failing row contains (1, null, 1, 1).
+--step12: 清理环境; expect:成功
+drop table if exists t_subpartition_0313;
+SQL SUCCESS

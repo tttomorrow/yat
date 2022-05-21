@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -16,6 +16,7 @@ See the Mulan PSL v2 for more details.
 Case Type   : security-auditing
 Case Name   : 审计文件占用的磁盘空间总量大于1024GB
 Description :
+    1.登录数据库执行gs_guc reload -N all -I all -c "audit_space_limit=1073741825"
 Expect      :
     1.报错，提示超范围
 History     :
@@ -43,9 +44,12 @@ class Auditing(unittest.TestCase):
     def test_security(self):
         sql_cmd1 = f'source {self.DB_ENV_PATH};' \
                    f'gs_guc reload -N all -I all -c ' \
+                   f'"audit_space_limit=1073741825"'
         msg1 = self.userNode.sh(sql_cmd1).result()
         self.logger.info(msg1)
         self.assertTrue(msg1.find(
+            'The value 1073741825 is outside the valid range for '
+            'parameter "audit_space_limit" (1024 .. 1073741824)') > -1)
 
     def tearDown(self):
         self.logger.info(

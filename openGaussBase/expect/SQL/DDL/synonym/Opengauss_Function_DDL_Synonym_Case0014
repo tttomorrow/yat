@@ -80,6 +80,7 @@ select ACOS(SYN_FUN_SYN_014_001(SYN_FUN_SYN_014_002(SYN_FUN_SYN_014_003(SYN_FUN_
 +-------------------+
 | acos              |
 +-------------------+
+| 3.141592653589793 |
 +-------------------+
 select SYN_FUN_SYN_014_001(ACOS(SYN_FUN_SYN_014_002(SYN_FUN_SYN_014_003(SYN_FUN_SYN_014_004(-1))))) from sys_dummy;
 +---------------------+

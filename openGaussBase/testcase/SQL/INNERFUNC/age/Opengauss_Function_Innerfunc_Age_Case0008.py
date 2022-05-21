@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -21,49 +21,44 @@ Description : age(timestamp)描述：当前时间和参数相减。返回值类�
 Expect      :
     1.函数返回结果正确
     2.异常报错
-History     :
 """
 
 import unittest
-import time
-from testcase.utils.Logger import Logger
-from testcase.utils.CommonSH import CommonSH
 
-logger = Logger()
+from testcase.utils.CommonSH import CommonSH
+from testcase.utils.Logger import Logger
 
 
 class Function(unittest.TestCase):
-
     def setUp(self):
-        logger.info("---Opengauss_Function_Innerfunc_Age_Case0008开始执行---")
+        self.log = Logger()
+        self.log.info("---Opengauss_Function_Innerfunc_Age_Case0008开始执行---")
         self.commonsh = CommonSH('dbuser')
 
     def test_age(self):
-        # 测试点1：入参区分带时区、带时间
-        timestamp = ['1957-06-13', '2001-02-16 20:38:40',
-                     '2017-09-01 16:57:36.636205+08']
-        for i in range(3):
-            cmd = f"""select age(timestamp '{timestamp[i]}');"""
-            msg = self.commonsh.execut_db_sql(cmd)
-            logger.info(msg)
-            res = msg.splitlines()[2].strip()
-            # 63 years 7 mons
-            # 3 years 4 mons 6 days 07:02:23.363795
-            res_list = res.split()
-            # timestamp后面两个带时间
-            self.assertTrue(len(res_list) >= 4)
-            # 判断返回格式里的关键字
-            self.assertTrue('years' in msg or 'mons' in msg or 'days' in msg)
-            # 判断对应年月日值是否是数字
-            pre = len(res_list) - 1
-            s = [res_list[i].isdigit() for i in range(pre) if i % 2 == 0]
-            self.assertTrue(s.count(True) >= 2 and s.count(True) == len(s))
+        text = 'step1:获取前一天时间;expect:获取成功'
+        self.log.info(text)
+        get_time = self.commonsh.execut_db_sql("select current_date - "
+                                               "interval '1 day' as result;")
+        self.log.info(get_time)
+        last_day = get_time.splitlines()[2].strip().split()[0]
+        self.log.info('last_day' + last_day)
 
-        # 测试点2：错误调用
-        cmd1 = '''select age();  select age(interval '5 seconds');'''
-        msg1 = self.commonsh.execut_db_sql(cmd1)
-        logger.info(msg1)
-        self.assertTrue(msg1.count('ERROR') == 2)
+        text = 'step2:使用age函数计算当前时间与前一天时间相减;expect:计算正确'
+        self.log.info(text)
+        sql_cmd = f"select age(timestamp '{last_day}');" \
+                  f"select age(timestamp '{last_day + ' 00:00:00'}');" \
+                  f"select age(timestamp '{last_day + ' 00:00:00.00+01'}');"
+        msg = self.commonsh.execut_db_sql(sql_cmd)
+        self.log.info(msg)
+        self.assertTrue(msg.count('1 day') == 3, '执行失败:' + text)
+
+        text = 'step3:函数错误调用;expect:合理报错'
+        self.log.info(text)
+        cmd = "select age();  select age(interval '5 seconds');"
+        msg = self.commonsh.execut_db_sql(cmd)
+        self.log.info(msg)
+        self.assertTrue(msg.count('ERROR') == 2, '执行失败:' + text)
 
     def tearDown(self):
-        logger.info('---Opengauss_Function_Innerfunc_Age_Case0008执行结束---')
+        self.log.info('---Opengauss_Function_Innerfunc_Age_Case0008执行结束---')

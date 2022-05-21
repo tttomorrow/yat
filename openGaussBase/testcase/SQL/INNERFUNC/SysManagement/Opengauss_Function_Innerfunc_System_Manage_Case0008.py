@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -22,7 +22,6 @@ Description :
 Expect      :
     1.使用函数local_bgwriter_stat()显示本实例的bgwriter线程刷页信息，
     候选buffer链中页面个数，buffer淘汰信息成功
-History     : 
 """
 
 import unittest
@@ -39,6 +38,9 @@ class Tools(unittest.TestCase):
 
     def test_func_sys_manage(self):
         LOG.info(f'---步骤1.使用函数local_bgwriter_stat---')
+        sql_cmd = self.commonsh.execut_db_sql(f'select version();')
+        LOG.info(sql_cmd)
+        self.assertIn('openGauss', sql_cmd)
         sql_cmd = self.commonsh.execut_db_sql(f'select local_bgwriter_stat();')
         LOG.info(sql_cmd)
         self.assertIn('1 row', sql_cmd)
@@ -46,6 +48,7 @@ class Tools(unittest.TestCase):
         list2 = list1.split(',')
         LOG.info(len(list2))
         self.assertEqual(len(list2), 6)
+
 
     def tearDown(self):
         LOG.info('-------无需清理环境-------')

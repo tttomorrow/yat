@@ -1,4 +1,5 @@
 -- @testpoint: 指定列名，在一条insert语句中插入两列数据
+-- @modify at: 2020-11-16
 --建表
 drop table if exists zsharding_tbl;
 create table zsharding_tbl(

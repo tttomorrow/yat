@@ -1,4 +1,4 @@
---  @testpoint:使用SET CONSTRAINTS语句，设置多个约束名
+-- @testpoint: 使用SET CONSTRAINTS语句，设置多个约束名,部分step合理报错
 --建表同时定义检查约束和主键约束
 drop table if exists t4;
 create table t4 (id int check (id >5),name varchar(40) primary key);

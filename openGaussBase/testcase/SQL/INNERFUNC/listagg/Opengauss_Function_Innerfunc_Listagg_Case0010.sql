@@ -17,4 +17,5 @@ insert into emp values(10,2,7888,'Tony','Developer','4000.00','1981-09-08 00:00:
 SELECT  deptno, listagg(job,job, '/') WITHIN GROUP(ORDER BY job) AS Work_Type FROM emp GROUP BY deptno;
 SELECT  deptno, listagg() WITHIN GROUP(ORDER BY job) AS Work_Type FROM emp GROUP BY deptno;
 SELECT  deptno, listagg(job,1-1>1) WITHIN GROUP(ORDER BY job) AS Work_Type FROM emp GROUP BY deptno;
+select listagg(19223372036854775807::bigint) within group(order by 1) from sys_dummy;
 drop table emp cascade;

@@ -1,4 +1,4 @@
---  @testpoint:declare声明静态游标，指定参数和类型，for指定query；
+-- @testpoint: declare声明静态游标，指定参数和类型，for指定query；
 
 --前置条件
 drop table if exists cur_test_70;
@@ -12,10 +12,10 @@ drop procedure if exists cursor_ftest_70;
 create or replace procedure cursor_ftest_70()
 as
 declare
-    cursor c69(c_id int) for select c_name from cur_test_68 where c_id=6;
+    cursor c70(c_id int) for select c_name from cur_test_70 where c_id=6;
 begin
-    open c69(5);
-    close c69;
+    open c70(5);
+    close c70;
 end;
 /
 

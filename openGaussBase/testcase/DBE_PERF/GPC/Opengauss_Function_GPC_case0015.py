@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -92,7 +92,7 @@ class Gpcclass(unittest.TestCase):
             f"where refcount=3 and valid='t';"
         result = self.commonshpri.execut_db_sql(cmd)
         self.log.info(result)
-        self.assertIn('(1 row)', result)
+        self.assertIn('(0 rows)', result)
 
         self.log.info("-----------获取线程结果----------------")
         for i in range(3):
@@ -105,7 +105,7 @@ class Gpcclass(unittest.TestCase):
             f"where refcount=0 and valid='t';"
         result = self.commonshpri.execut_db_sql(cmd)
         self.log.info(result)
-        self.assertIn('(1 row)', result)
+        self.assertIn('(0 rows)', result)
 
     def tearDown(self):
         self.log.info('------------this is tearDown-------------')

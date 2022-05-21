@@ -1,4 +1,5 @@
 -- @testpoint: insert组合数据类型,二进制，布尔，日期型等数据，违法唯一约束，合理报错
+-- @modify at: 2020-11-16
 --建表，包含基本数据类型
 drop table if exists tbl_hash;
 create table tbl_hash(

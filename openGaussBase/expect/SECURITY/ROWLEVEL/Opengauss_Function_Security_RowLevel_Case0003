@@ -1,0 +1,22 @@
+-- @testpoint: 同一个数据表上不能有同名的行访问控制策略,合理报错
+--step1: 创建表；expect:成功
+DROP TABLE IF EXISTS t_security_RowLwvel_0003;
+SQL SUCCESS
+CREATE TABLE t_security_RowLwvel_0003(id int, role varchar(10), data varchar(10));
+SQL SUCCESS
+INSERT INTO t_security_RowLwvel_0003 VALUES(1, 'alice', 'alice data');
+SQL SUCCESS
+INSERT INTO t_security_RowLwvel_0003 VALUES(2, 'bob', 'bob data');
+SQL SUCCESS
+INSERT INTO t_security_RowLwvel_0003 VALUES(3, 'peter', 'peter data');
+SQL SUCCESS
+--step2: 同一个数据表上创建同名的行访问控制策略；expect:合理报错
+ALTER TABLE t_security_RowLwvel_0003 ENABLE ROW LEVEL SECURITY;
+SQL SUCCESS
+CREATE ROW LEVEL SECURITY POLICY rls_security_RowLwvel_0003 ON t_security_RowLwvel_0003 USING(role = CURRENT_USER);
+SQL SUCCESS
+CREATE ROW LEVEL SECURITY POLICY rls_security_RowLwvel_0003 ON t_security_RowLwvel_0003 USING(role = CURRENT_USER);
+?.*ERROR: row level policy "rls_security_rowlwvel_0003" for table "t_security_rowlwvel_0003" already exists
+--step3: 清理环境；expect:成功
+DROP TABLE t_security_RowLwvel_0003 CASCADE;
+SQL SUCCESS

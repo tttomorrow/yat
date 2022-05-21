@@ -1,4 +1,8 @@
 -- @testpoint: pg_indexes_size(regclass)附加到指定表的索引使用的总磁盘空间。
+alter system set autovacuum to off;
+SQL SUCCESS
+drop schema if exists tpcds;
+SQL SUCCESS
 create schema tpcds;
 SQL SUCCESS
 CREATE TABLE tpcds.ship_mode_t1
@@ -45,7 +49,7 @@ select pg_indexes_size('tpcds.ship_mode_t1'::regclass);
 +-----------------+
 | pg_indexes_size |
 +-----------------+
-| 32768           |
+| 24576           |
 +-----------------+
 ALTER INDEX tpcds.ds_ship_mode_t1_index2 REBUILD;
 SQL SUCCESS

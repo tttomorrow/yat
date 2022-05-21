@@ -23,4 +23,5 @@ update sales set time_id = '2017-12-10 00:00:00' where channel_id = 'a';
 select pg_stat_get_partition_tuples_updated() from PG_PARTITION a where a.relname = 'p1';
 update sales set time_id = '2019-06-01 10:00:00' where channel_id = 'b';
 select pg_stat_get_partition_tuples_updated(a.oid,a.oid) from PG_PARTITION a where a.relname = 'p1';
+select pg_stat_get_partition_tuples_updated(98887787708976687654) from PG_PARTITION a where a.relname = 'p2';
 drop table sales cascade;

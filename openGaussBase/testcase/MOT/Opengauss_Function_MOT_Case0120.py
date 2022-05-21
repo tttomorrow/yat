@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -101,6 +101,7 @@ class MotParamTest(unittest.TestCase):
         LOG.info(cat_msg)
         self.assertIn('WARNING', cat_msg)
         self.assertIn('Configuration of '
+                      'group_commit_timeout=18446744073709551615 '
                       'is out of bounds [100, 200000]', cat_msg)
 
         LOG.info("======步骤4：连接数据库，创建内存表，执行DML操作======")

@@ -17,6 +17,9 @@ select relname from pg_class where relname like 'index_114%' order by relname;
 --rename
 ALTER index IF EXISTS index_114 RENAME TO a;
 select relname from pg_class where relname ='a';
+ALTER index IF EXISTS a RENAME TO a12345678901234567890123456789012345678901234567890123456789012;
+select relname from pg_class where relname ='a12345678901234567890123456789012345678901234567890123456789012';
+ALTER index IF EXISTS a12345678901234567890123456789012345678901234567890123456789012 RENAME TO index_114_$;
 select relname from pg_class where relname ='index_114_$';
 --清理环境
 DROP TABLE if EXISTS test_index_table_114 CASCADE;

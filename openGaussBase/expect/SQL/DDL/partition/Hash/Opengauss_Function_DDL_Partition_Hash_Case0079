@@ -1,0 +1,47 @@
+-- @testpoint: Hash分区表与普通表交换数据（普通表含唯一索引）合理报错
+--step1：创建hash分区表 expect：成功
+drop table if exists t_partition_hash_0079_01;
+SQL SUCCESS
+create table t_partition_hash_0079_01(
+id int,
+name varchar(100),
+age int)
+partition by hash(id)
+(partition p1,
+ partition p2);
+SQL SUCCESS
+--step2：分区表创建唯一索引 expect：创建唯一索引成功
+create unique index p_unique_idx on t_partition_hash_0079_01(age);
+SQL SUCCESS
+--step3：插入数据 expect：成功插入四条数据
+insert into t_partition_hash_0079_01 values( 1,  '张三', 25);
+SQL SUCCESS
+insert into t_partition_hash_0079_01 values( 2,  '张三', 26);
+SQL SUCCESS
+insert into t_partition_hash_0079_01 values( 3,  '张三', 27);
+SQL SUCCESS
+insert into t_partition_hash_0079_01 values( 4,  '张三', 28);
+SQL SUCCESS
+--step4：创建普通表 expect：成功
+drop table if exists t_partition_hash_0079_02;
+SQL SUCCESS
+create table t_partition_hash_0079_02(
+id int,
+name varchar(100),
+age int);
+SQL SUCCESS
+--step5：普通表创建唯一索引 expect：创建唯一索引成功
+create unique index ex_unique_idx on t_partition_hash_0079_02(age);
+SQL SUCCESS
+--step6：交换数据 expect：合理报错
+alter table t_partition_hash_0079_01 exchange partition (p1) with table t_partition_hash_0079_02;
+?.*ERROR: tables in ALTER TABLE EXCHANGE PARTITION must have the same number of indexs
+--step7：清理环境 expect：成功
+drop index p_unique_idx;
+SQL SUCCESS
+drop index ex_unique_idx;
+SQL SUCCESS
+drop table if exists t_partition_hash_0079_01;
+SQL SUCCESS
+drop table if exists t_partition_hash_0079_02;
+SQL SUCCESS

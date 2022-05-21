@@ -30,11 +30,11 @@ EXPLAIN analyse select * from teacher;
 ?.*
 EXPLAIN analyse select * from teacher where rownum < 10;
 ?.*
-?.*QUERY PLAN?.*
+?.*QUERY PLAN.*
 ?.*
-?.*Limit?.*actual time?.*rows=9 loops=1?.*
-?.*Seq Scan on teacher?.*actual time?.*rows=9 loops=1?.*
-?.*Total runtime:?.*
+?.*Limit.*
+?.*Seq Scan on teacher.*
+?.*Total runtime.*
 ?.*
 drop procedure if exists insert_data;
 SQL SUCCESS

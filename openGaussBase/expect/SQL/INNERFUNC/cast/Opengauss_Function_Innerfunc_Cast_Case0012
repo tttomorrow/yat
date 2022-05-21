@@ -1,5 +1,4 @@
 -- @testpoint: 验证cast函数是否支持伪列
--- @modify at: 2020-11-16
 drop table if exists TEST2;
 SQL SUCCESS
 create table TEST2 (RIQI int);

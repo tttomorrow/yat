@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -17,7 +17,7 @@ Case Type   : security-user
 Case Name   : 修改普通用户为监控管理员用户，并进行DDL操作
 Description :
     1.创建普通用户
-    CREEATE USER monadmin WITH  PASSWORD 'QAZ2WSX@123'
+    CREEATE USER monadmin WITH  PASSWORD '$PASSWORD'
     2.修改用户为监控管理员用户
     ALTER USER monadmin MONADMIN;
     3.监控管理员用户登录，执行DDL语句

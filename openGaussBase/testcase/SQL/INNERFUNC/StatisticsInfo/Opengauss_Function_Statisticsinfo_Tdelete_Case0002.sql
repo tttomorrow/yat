@@ -18,4 +18,5 @@ delete  from  sales  where channel_id = 'a';
 select pg_stat_get_tuples_deleted() from PG_CLASS a where a.relname = 'sales';
 delete  from  sales  where channel_id = 'b';
 select pg_stat_get_tuples_deleted(a.oid,a.oid) from PG_CLASS a where a.relname = 'sales';
+select pg_stat_get_tuples_deleted(98887787708976687654) from PG_PARTITION a where a.relname = 'p2';
 drop table sales cascade;

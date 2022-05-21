@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -16,43 +16,31 @@ See the Mulan PSL v2 for more details.
 Case Type   : 系统信息函数
 Case Name   :  pg_is_other_temp_schema(oid) 查看是否为另一个会话的临时模式
 Description :
-    1.在同一会话中创建临时表，查看是否为另一个会话的临时模式的OID
+    1.pg_is_other_temp_schema(oid) 查看是否为另一个会话的临时模式,
+    没有创建临时表,oid为0
 Expect      :
-     1.在同一会话中创建临时表，查看是否为另一个会话的临时模式的OID，结果为f
-History     :
+     1.返回f
 """
 import unittest
-from yat.test import Node
+
 from testcase.utils.CommonSH import CommonSH
 from testcase.utils.Logger import Logger
-
-LOG = Logger()
 
 
 class Functions(unittest.TestCase):
     def setUp(self):
-        LOG.info('-Opengauss_Function_Innerfunc_System_Info_Case0008开始-')
-        self.dbuser_node = Node('dbuser')
+        self.log = Logger()
+        self.log.info('Opengauss_Function_Innerfunc_System_Info_Case0008开始')
         self.commonsh = CommonSH('dbuser')
 
     def test_func_sys_info(self):
-        LOG.info(f'-步骤1.创建临时表，再查看临时模式的OID，显示临时模式OID-')
-        sql_cmd = self.commonsh.execut_db_sql(
-            f'create  temp table tmtable(i int, info varchar(50));'
-            f'select pg_my_temp_schema();')
-        LOG.info(sql_cmd)
-        oid = int(sql_cmd.split('\n')[3].strip())
-        LOG.info(oid)
-        if oid >= 0:
-            LOG.info('查看临时模式的OID成功')
-        else:
-            raise Exception('查看异常，请检查')
-        LOG.info(f'-步骤2.pg_is_other_temp_schema(oid) 查看是否为另一个会话的临时模式-')
-        sql_cmd = self.commonsh.execut_db_sql(
-            f'select  pg_is_other_temp_schema({oid});')
-        LOG.info(sql_cmd)
+        self.log.info('-step1:pg_is_other_temp_schema(oid) 查看是否为另一个'
+                      '会话的临时模式,没有创建临时表,oid为0;expect:返回f-')
+        sql_cmd = self.commonsh.execut_db_sql('select  pg_is_other_temp_schema'
+                                              '(0);')
+        self.log.info(sql_cmd)
         self.assertIn('f', sql_cmd)
 
     def tearDown(self):
-        LOG.info('-------无需清理环境-------')
-        LOG.info('-Opengauss_Function_Innerfunc_System_Info_Case0008结束-')
+        self.log.info('-------无需清理环境-------')
+        self.log.info('Opengauss_Function_Innerfunc_System_Info_Case0008结束')

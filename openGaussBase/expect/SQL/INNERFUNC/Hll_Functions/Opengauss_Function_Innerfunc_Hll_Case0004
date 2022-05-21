@@ -1,35 +1,37 @@
 -- @testpoint: 函数hll_hash_boolean(bool, int32) ,入参为其他类型时，合理报错
 --入参1为其他类型,入参2为int类型
 select hll_hash_boolean('nihao', 10);
-?.*ERROR: invalid input syntax for type boolean: "nihao".*
+?.*ERROR: invalid input syntax for type boolean: "nihao"
 ?.*
   Where: referenced column: hll_hash_boolean
 select hll_hash_boolean('12', 0);
-?.*ERROR: invalid input syntax for type boolean: "12".*
+?.*ERROR: invalid input syntax for type boolean: "12"
 ?.*
   Where: referenced column: hll_hash_boolean
-?.*ERROR: invalid input syntax for type boolean: "你好".*
+select hll_hash_boolean('你好', 2147483647);
+?.*ERROR: invalid input syntax for type boolean: "你好"
 ?.*
   Where: referenced column: hll_hash_boolean
 select hll_hash_boolean(@,10);
-?.*ERROR: syntax error at or near ",".*
+?.*ERROR: syntax error at or near ","
 ?.*
 --入参2为其他类型，入参1为bool类型
-?.*ERROR: function hll_hash_boolean\(unknown, bigint\) does not exist.*
+select hll_hash_boolean('yes', 2147483648);
+?.*ERROR: function hll_hash_boolean\(unknown, bigint\) does not exist
   Hint: No function matches the given name and argument types. You might need to add explicit type casts.
 ?.*
   Where: referenced column: hll_hash_boolean
 select hll_hash_boolean(true, 'nihao');
-?.*ERROR: invalid input syntax for integer: "nihao".*
+?.*ERROR: invalid input syntax for integer: "nihao"
 ?.*
   Where: referenced column: hll_hash_boolean
 select hll_hash_boolean(true, @#);
-?.*ERROR: syntax error at or near "\)".*
+?.*ERROR: syntax error at or near "\)"
 ?.*
 select hll_hash_boolean(true, -1);
-?.*ERROR: negative seed values not compatible.*
+?.*ERROR: negative seed value is invalid
   Where: referenced column: hll_hash_boolean
 select hll_hash_boolean('no', 'no');
-?.*ERROR: invalid input syntax for integer: "no".*
+?.*ERROR: invalid input syntax for integer: "no"
 ?.*
   Where: referenced column: hll_hash_boolean

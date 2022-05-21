@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -19,6 +19,7 @@ Description :
         1.查询max_changes_in_memory默认值
         2.修改参数值为字符test
         3.修改参数值为超临界值0
+        4.修改参数值为超临界值2147483648
         5.修改参数值为小数500.958
         6.修改参数值为空串
         7.恢复参数默认值
@@ -53,6 +54,8 @@ class HAReplication(unittest.TestCase):
         sql_cmd = self.commonsh.execut_db_sql('show max_changes_in_memory;')
         self.log.info(sql_cmd)
         self.assertEqual('4096', sql_cmd.split('\n')[-2].strip())
+        self.log.info('--步骤2:修改参数值为test,0,2147483648,500.958,"''",--')
+        invalid_value = ['test', 0, 2147483648, 500.958, "''"]
         for i in invalid_value:
             result = self.commonsh.execute_gsguc("set",
                                                  constant.GSGUC_SUCCESS_MSG,

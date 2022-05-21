@@ -14,6 +14,9 @@ select t1 from acos_view order by t1;
 | t1                 |
 +--------------------+
 | 0.0                |
+| 0.8576719419398441 |
+| 2.2839207116499494 |
+| 3.141592653589793  |
 +--------------------+
 drop view if exists acos_view;
 SQL SUCCESS

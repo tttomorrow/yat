@@ -18,7 +18,6 @@ select regr_sxx(tel, height)from  table_test;
 +-------------------+
 | regr_sxx          |
 +-------------------+
-| 299.7483000000211 |
 +-------------------+
 select regr_sxx(height, id)from  table_test where id <5;
 +----------+

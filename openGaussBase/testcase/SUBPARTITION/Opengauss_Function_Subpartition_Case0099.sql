@@ -1,0 +1,119 @@
+-- @testpoint: list_range二级分区表修改：add字段/drop字段/add约束
+
+--step1: 创建表空间; expect:成功
+drop table if exists t_subpartition_0099;
+drop tablespace if exists ts_subpartition_0099;
+create tablespace ts_subpartition_0099 relative location 'subpartition_tablespace/subpartition_tablespace_0099';
+
+--test1: alter table add/drop --字段
+--step2: 创建表空间; expect:成功
+create table if not exists t_subpartition_0099
+(
+    col_1 int ,
+    col_2 int ,
+    col_3 int ,
+    col_4 int
+)tablespace ts_subpartition_0099
+partition by list (col_1) subpartition by range (col_2)
+(
+ partition p_list_1 values(-1,-2,-3,-4,-5,-6,-7,-8,-9,-10 )
+  (
+    subpartition p_range_1_1 values less than( -10 ),
+    subpartition p_range_1_2 values less than( 0 ),
+    subpartition p_range_1_3 values less than( 10 ),
+    subpartition p_range_1_4 values less than( 20 ),
+    subpartition p_range_1_5 values less than( 50 )
+  ),
+  partition p_list_2 values(1,2,3,4,5,6,7,8,9,10 ),
+  partition p_list_3 values(11,12,13,14,15,16,17,18,19,20)
+  (
+    subpartition p_range_3_1 values less than( 15 ),
+    subpartition p_range_3_2 values less than( maxvalue )
+  ),
+    partition p_list_4 values(21,22,23,24,25,26,27,28,29,30)
+  (
+    subpartition p_range_4_1 values less than( -10 ),
+    subpartition p_range_4_2 values less than( 0 ),
+    subpartition p_range_4_3 values less than( 10 ),
+    subpartition p_range_4_4 values less than( 20 ),
+    subpartition p_range_4_5 values less than( 50 )
+  ),
+   partition p_list_5 values(31,32,33,34,35,36,37,38,39,40)
+  (
+    subpartition p_range_5_1 values less than( maxvalue )
+  ),
+   partition p_list_6 values(41,42,43,44,45,46,47,48,49,50)
+   (
+    subpartition p_range_6_1 values less than( -10 ),
+    subpartition p_range_6_2 values less than( 0 ),
+    subpartition p_range_6_3 values less than( 10 ),
+    subpartition p_range_6_4 values less than( 20 ),
+    subpartition p_range_6_5 values less than( 50 )
+   ),
+   partition p_list_7 values(default)
+) enable row movement;
+--step3: 修改二级分区表，添加列; expect:成功
+alter table t_subpartition_0099 add column col_5 int;
+--step4: 插入数据; expect:成功
+insert into t_subpartition_0099 values(1,8,1,1,1),(4,7,4,4,4),(5,8,5,5,5),(8,9,8,8,8),(9,9,9,9,9);
+--step5: 查询二级分区数据; expect:成功，5列数据
+select * from t_subpartition_0099 subpartition(p_list_2_subpartdefault1);
+--step6: 修改二级分区表，删除指定列; expect:成功
+alter table t_subpartition_0099 drop column col_5 ;
+--step7: 查询二级分区数据数据; expect:成功，4列数据
+select * from t_subpartition_0099 subpartition(p_list_2_subpartdefault1);
+
+--test2: alter table add --约束
+--step8: 创建二级分区表; expect:成功
+drop table if exists t_subpartition_0041;
+create table if not exists t_subpartition_0099
+(
+    col_1 int ,
+    col_2 int ,
+    col_3 int ,
+    col_4 int
+)tablespace ts_subpartition_0099
+partition by list (col_1) subpartition by range (col_2)
+(
+ partition p_list_1 values(-1,-2,-3,-4,-5,-6,-7,-8,-9,-10 )
+  (
+    subpartition p_range_1_1 values less than( -10 ),
+    subpartition p_range_1_2 values less than( 0 ),
+    subpartition p_range_1_3 values less than( 10 ),
+    subpartition p_range_1_4 values less than( 20 ),
+    subpartition p_range_1_5 values less than( 50 )
+  ),
+  partition p_list_2 values(1,2,3,4,5,6,7,8,9,10 ),
+  partition p_list_3 values(11,12,13,14,15,16,17,18,19,20)
+  (
+    subpartition p_range_3_1 values less than( 15 ),
+    subpartition p_range_3_2 values less than( maxvalue )
+  ),
+    partition p_list_4 values(21,22,23,24,25,26,27,28,29,30)
+  (
+    subpartition p_range_4_1 values less than( -10 ),
+    subpartition p_range_4_2 values less than( 0 ),
+    subpartition p_range_4_3 values less than( 10 ),
+    subpartition p_range_4_4 values less than( 20 ),
+    subpartition p_range_4_5 values less than( 50 )
+  ),
+   partition p_list_5 values(31,32,33,34,35,36,37,38,39,40)
+  (
+    subpartition p_range_5_1 values less than( maxvalue )
+  ),
+   partition p_list_6 values(41,42,43,44,45,46,47,48,49,50)
+   (
+    subpartition p_range_6_1 values less than( -10 ),
+    subpartition p_range_6_2 values less than( 0 ),
+    subpartition p_range_6_3 values less than( 10 ),
+    subpartition p_range_6_4 values less than( 20 ),
+    subpartition p_range_6_5 values less than( 50 )
+   ),
+   partition p_list_7 values(default)
+) enable row movement;
+--step9: 修改二级分区表，添加check约束; expect:成功
+alter table t_subpartition_0099 add constraint constraint_check check (col_3 is not null);
+
+--step10: 清理环境; expect:成功
+drop table if exists t_subpartition_0099;
+drop tablespace if exists ts_subpartition_0099;

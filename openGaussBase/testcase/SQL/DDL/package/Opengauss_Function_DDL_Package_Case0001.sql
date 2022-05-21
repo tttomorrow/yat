@@ -1,0 +1,31 @@
+-- @testpoint: 创建package后不使用replace参数,声明重名package,合理报错
+
+--step1:声明包规格 expect:声明包规格成功
+create or replace package p_test_0001 is
+var1 int:=1;
+var2 int:=2;
+procedure p_package_0001();
+end p_test_0001;
+/
+
+--step2:定义包体 expect:定义包体成功
+create or replace package body p_test_0001 is
+procedure p_package_0001()
+is
+begin
+drop table if exists t_package_0001;
+create table t_package_0001(c_int int);
+insert into t_package_0001 values(var1),(var2);
+end;
+end p_test_0001;
+/
+
+--step3:不使用replace参数,声明重名package expect:合理报错
+create package p_test_0001 is
+var3 int:=1;
+procedure p_package_test_0001_01();
+end p_test_0001;
+/
+
+--step4:清理环境 expect:清理环境成功
+drop package p_test_0001;

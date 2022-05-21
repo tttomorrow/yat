@@ -1,0 +1,4 @@
+-- @testpoint: 使用set方法设置keep_sync_window参数，合理报错
+--step:set方法设置参数;expect:合理报错
+set keep_sync_window to 10;
+?.*ERROR: parameter "keep_sync_window" cannot be changed now

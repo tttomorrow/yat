@@ -1,0 +1,362 @@
+-- @testpoint: range_range二级分区表：执行算子/计划裁剪/rownum
+--step1: 创建表空间; expect:成功
+drop table if exists t_subpartition_0292;
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0292;
+SQL SUCCESS
+create tablespace ts_subpartition_0292 relative location 'subpartition_tablespace/subpartition_tablespace_0292';
+SQL SUCCESS
+--test1: 执行算子--seq scan
+--step2: 创建二级分区表; expect:成功
+create table if not exists t_subpartition_0292
+(
+    col_1 int ,
+    col_2 int,
+    col_3 varchar2 ( 30 ) ,
+    col_4 int
+)tablespace ts_subpartition_0292
+partition by range (col_1) subpartition by range (col_2)
+(
+  partition p_range_1 values less than( 10 )
+  (
+    subpartition p_range_1_1 values less than( 50 ),
+    subpartition p_range_1_2 values less than( maxvalue )
+  ),
+  partition p_range_2 values less than( 20 )
+  (
+    subpartition p_range_2_1 values less than( 50 ),
+    subpartition p_range_2_2 values less than( maxvalue )
+  )
+) enable row movement;
+SQL SUCCESS
+--step3: 插入数据; expect:成功
+insert into t_subpartition_0292 values(0,0,0,0);
+SQL SUCCESS
+insert into t_subpartition_0292 values(1,1,1,1),(4,1,4,4),(5,5,5,5),(8,8,8,8),(9,9,9,9);
+SQL SUCCESS
+insert into t_subpartition_0292 values(1,11,1,1),(4,41,4,4),(5,54,5,5),(8,87,8,8),(9,19,9,9);
+SQL SUCCESS
+insert into t_subpartition_0292 values(11,1,1,1),(14,1,4,4),(15,5,5,5),(18,8,8,8),(19,1,9,9);
+SQL SUCCESS
+--step4: 查看执行计划; expect:成功,有seq scan执行算子
+explain analyze select * from t_subpartition_0292;
+?.*
+?.* QUERY PLAN .*
+?.*
+?.* Partition Iterator .*
+?.*   Iterations: .*
+?.*   ->  Partitioned Seq Scan on t_subpartition_0292 .*
+?.*         Selected Partitions: .*
+?.*         Selected Subpartitions: .*
+?.* Total runtime: .*
+?.*
+--test2: 执行算子--index  scan
+--step5: 二级分区键创建索引; expect:成功
+drop index if exists i_subpartition_0292;
+SQL SUCCESS
+create index i_subpartition_0292 on t_subpartition_0292(col_2) local ;
+SQL SUCCESS
+--step6: 插入数据; expect:成功
+insert into t_subpartition_0292 values (generate_series(0, 19),generate_series(0, 1000),generate_series(0, 99));
+SQL SUCCESS
+--step7: 查看执行计划; expect:成功,有index scan执行算子
+explain analyze select * from t_subpartition_0292 where col_2 in  (select col_1 from t_subpartition_0292 subpartition(p_range_1_2) where col_1 >10);
+?.*
+?.* QUERY PLAN .*
+?.*
+?.* Nested Loop .*
+?.*   ->  HashAggregate .*
+?.*         Group By Key: public.t_subpartition_0292.col_1 .*
+?.*         ->  Partition Iterator .*
+?.*               Iterations: .*
+?.*               ->  Partitioned Seq Scan on t_subpartition_0292 .*
+?.*                     Filter: \(col_1 > 10\) .*
+?.*                     Rows Removed by Filter: .*
+?.*                     Selected Partitions: .*
+?.*                     Selected Subpartitions: .*
+?.*   ->  Partition Iterator .*
+?.*         Iterations: .*
+?.*         ->  Partitioned Index Scan using i_subpartition_0292 on t_subpartition_0292 .*
+?.*               Index Cond: \(\(col_2 = public.t_subpartition_0292.col_1\) AND \(col_2 > 10\)\) .*
+?.*               Selected Partitions: .*
+?.*               Selected Subpartitions: .*
+?.* Total runtime: .*
+?.*
+--test3: 执行算子--bitmap index scan/bitmap heap scan
+--step8: 查看执行计划; expect:成功,指定index scan
+explain analyze select *  from t_subpartition_0292 where col_2 >500 and col_2 <8000 order by col_1;
+?.*
+?.* QUERY PLAN .*
+?.*
+?.* Sort .*
+?.*   Sort Key: col_1 .*
+?.*   Sort Method: quicksort  Memory: .*
+?.*   ->  Partition Iterator .*
+?.*         Iterations: .*
+?.*         ->  Partitioned Bitmap Heap Scan on t_subpartition_0292 .*
+?.*               Recheck Cond: \(\(col_2 > 500\) AND \(col_2 < 8000\)\) .*
+?.*               Heap Blocks: .*
+?.*               Selected Partitions: .*
+?.*               Selected Subpartitions: .*
+?.*               ->  Partitioned Bitmap Index Scan on i_subpartition_0292 .*
+?.*                     Index Cond: \(\(col_2 > 500\) AND \(col_2 < 8000\)\) .*
+?.*                     Selected Partitions: .*
+?.*                     Selected Subpartitions: .*
+?.* Total runtime: .*
+?.*
+--test4: 执行算子--subquery scan
+--step9: 查看执行计划; expect:无subquery scan
+explain analyze select * from (select * from t_subpartition_0292 subpartition(p_range_1_2));
+?.*
+?.* QUERY PLAN .*
+?.*
+?.* Partition Iterator .*
+?.*   Iterations: .*
+?.*   ->  Partitioned Seq Scan on t_subpartition_0292 .*
+?.*         Selected Partitions: .*
+?.*         Selected Subpartitions: .*
+?.* Total runtime: .*
+?.*
+--step10: 查看执行计划; expect:无subquery scan
+explain analyze select * from   (select col_1 from t_subpartition_0292 subpartition(p_range_1_2) where col_1 >10) order by 1;
+?.*
+?.* QUERY PLAN .*
+?.*
+?.* Sort .*
+?.*   Sort Key: t_subpartition_0292.col_1 .*
+?.*   Sort Method: quicksort  Memory: .*
+?.*   ->  Partition Iterator .*
+?.*         Iterations: .*
+?.*         ->  Partitioned Seq Scan on t_subpartition_0292 .*
+?.*               Filter: \(col_1 > 10\) .*
+?.*               Rows Removed by Filter: .*
+?.*               Selected Partitions: .*
+?.*               Selected Subpartitions: .*
+?.* Total runtime: .*
+?.*
+--test5: 执行算子--function scan
+--step11: 创建函数; expect:成功
+create or replace function partition_func() returns boolean as
+    $$
+    declare
+    begin
+         delete from t_subpartition_0292 where col_2=8;
+         return 1;
+    end
+    $$ language plpgsql;
+    /
+SQL SUCCESS
+--step12: 查看执行计划; expect:成功,指定function scan on func
+explain (costs off) select * from partition_func ();
++---------------------------------+
+| QUERY PLAN                      |
++---------------------------------+
+| Function Scan on partition_func |
++---------------------------------+
+--step13: 创建表; expect:成功
+drop table if exists t_subpartition_0292_01;
+SQL SUCCESS
+create table t_subpartition_0292_01 (a int, b int[]);
+SQL SUCCESS
+--step14: 查看执行计划; expect:成功,指定seq scan on 表
+explain (costs off) select generate_series(1, 2) from (select col_2 from t_subpartition_0292) as res;
+?.*
+?.* QUERY PLAN .*
+?.*
+?.* Partition Iterator .*
+?.*   Iterations: .*
+?.*   ->  Partitioned Seq Scan on t_subpartition_0292 .*
+?.*         Selected Partitions: .*
+?.*         Selected Subpartitions: .*
+?.*
+--test6: 执行算子--支持plan hint调优
+drop index if exists index_01;
+SQL SUCCESS
+--step15: 查看执行计划; expect:成功,指定index scan
+explain analyze select /*+ indexscan(t_subpartition_0292 index_01)*/ *  from t_subpartition_0292 where col_2 >500 and col_2 <8000 order by col_1;
+?.*
+?.* QUERY PLAN .*
+?.*
+?.* Sort .*
+?.*   Sort Key: col_1 .*
+?.*   Sort Method: quicksort  Memory: .*
+?.*   ->  Partition Iterator .*
+?.*         Iterations: .*
+?.*         ->  Partitioned Bitmap Heap Scan on t_subpartition_0292 .*
+?.*               Recheck Cond: \(\(col_2 > 500\) AND \(col_2 < 8000\)\) .*
+?.*               Heap Blocks: .*
+?.*               Selected Partitions: .*
+?.*               Selected Subpartitions: .*
+?.*               ->  Partitioned Bitmap Index Scan on i_subpartition_0292 .*
+?.*                     Index Cond: \(\(col_2 > 500\) AND \(col_2 < 8000\)\) .*
+?.*                     Selected Partitions: .*
+?.*                     Selected Subpartitions: .*
+?.* Total runtime: .*
+?.*
+--test7: 执行算子--prepare
+--step16: 创建预备语句1; expect:成功
+prepare p_subpartition_0292_01 as select * from   (select col_1 from t_subpartition_0292 subpartition(p_range_1_2) where col_1 >10 and col_2 <8000) order by 1;
+SQL SUCCESS
+--step17: 查看预备语句1的执行计划; expect:成功,filter: ((col_1 > 10) and (col_2 < 8000))
+explain execute p_subpartition_0292_01;
+?.*
+?.* QUERY PLAN .*
+?.*
+?.* Sort .*
+?.*   Sort Key: t_subpartition_0292.col_1 .*
+?.*   ->  Partition Iterator .*
+?.*         Iterations: .*
+?.*         ->  Partitioned Bitmap Heap Scan on t_subpartition_0292 .*
+?.*               Recheck Cond: \(col_2 < 8000\) .*
+?.*               Filter: \(col_1 > 10\) .*
+?.*               Selected Partitions: .*
+?.*               Selected Subpartitions: .*
+?.*               ->  Partitioned Bitmap Index Scan on i_subpartition_0292 .*
+?.*                     Index Cond: \(col_2 < 8000\) .*
+?.*                     Selected Partitions: .*
+?.*                     Selected Subpartitions: .*
+?.*
+--step18: 创建预备语句2; expect:成功
+prepare p_subpartition_0292_02 as select * from t_subpartition_0292 where col_2 in  (select col_1 from t_subpartition_0292 subpartition(p_range_1_2) where col_1 >10);
+SQL SUCCESS
+--step19: 查看预备语句2的执行计划; expect:成功,filter: (col_1 > 10)
+explain execute p_subpartition_0292_02;
+?.*
+?.* QUERY PLAN .*
+?.*
+?.* Nested Loop .*
+?.*   ->  HashAggregate .*
+?.*         Group By Key: public.t_subpartition_0292.col_1 .*
+?.*         ->  Partition Iterator .*
+?.*               Iterations: .*
+?.*               ->  Partitioned Seq Scan on t_subpartition_0292 .*
+?.*                     Filter: \(col_1 > 10\) .*
+?.*                     Selected Partitions: .*
+?.*                     Selected Subpartitions: .*
+?.*   ->  Partition Iterator .*
+?.*         Iterations: .*
+?.*         ->  Partitioned Index Scan using i_subpartition_0292 on t_subpartition_0292 .*
+?.*               Index Cond: \(\(col_2 = public.t_subpartition_0292.col_1\) AND \(col_2 > 10\)\) .*
+?.*               Selected Partitions: .*
+?.*               Selected Subpartitions: .*
+?.*
+--step20: 创建预备语句3; expect:成功
+prepare p_subpartition_0292_03 as select * from t_subpartition_0292 where col_2 in  (select col_1 from t_subpartition_0292 subpartition(p_range_1_2) where col_1 >$1);
+SQL SUCCESS
+--step21: 查看预备语句3的执行计划; expect:成功,filter: (col_1 > $1)
+explain execute p_subpartition_0292_03(100);
+?.*
+?.* QUERY PLAN .*
+?.*
+?.* Nested Loop .*
+?.*   ->  HashAggregate .*
+?.*         Group By Key: public.t_subpartition_0292.col_1 .*
+?.*         ->  Partition Iterator .*
+?.*               Iterations: .*
+?.*               ->  Partitioned Seq Scan on t_subpartition_0292 .*
+?.*                     Filter: \(col_1 > \$1\) .*
+?.*                     Selected Partitions: .*
+?.*                     Selected Subpartitions: .*
+?.*   ->  Partition Iterator .*
+?.*         Iterations: .*
+?.*         ->  Partitioned Index Scan using i_subpartition_0292 on t_subpartition_0292 .*
+?.*               Index Cond: \(\(col_2 = public.t_subpartition_0292.col_1\) AND \(col_2 > \$1\)\) .*
+?.*               Selected Partitions: .*
+?.*               Selected Subpartitions: .*
+?.*
+--step22: 删除预备语句; expect:成功
+deallocate p_subpartition_0292_01;
+SQL SUCCESS
+deallocate p_subpartition_0292_02;
+SQL SUCCESS
+deallocate p_subpartition_0292_03;
+SQL SUCCESS
+--test8: 计划裁剪
+--step23: 查询不同的分区数据; expect:成功
+select col_1 from t_subpartition_0292 subpartition(p_range_1_2) where col_1 >10 and col_2 <8000;
++-------+
+| col_1 |
++-------+
++-------+
+select count(*) from t_subpartition_0292 subpartition(p_range_1_2) ;
++-------+
+| count |
++-------+
+| 47552 |
++-------+
+select count(*) from t_subpartition_0292 subpartition(p_range_1_1) ;
++-------+
+| count |
++-------+
+| 2509  |
++-------+
+select count(*) from t_subpartition_0292 subpartition(p_range_2_1) ;
++-------+
+| count |
++-------+
+| 2505  |
++-------+
+select count(*) from t_subpartition_0292 subpartition(p_range_2_2) ;
++-------+
+| count |
++-------+
+| 47550 |
++-------+
+--step24: 查询表数据; expect:成功,上面查询结果之和100116
+select count(*) from t_subpartition_0292 ;
++--------+
+| count  |
++--------+
+| 100116 |
++--------+
+--test9: 分区表 +rownum 
+--step25: 创建二级分区表; expect:成功
+drop table if exists t_subpartition_0292;
+SQL SUCCESS
+create table if not exists t_subpartition_0292
+(
+    col_1 int ,
+    col_2 int, 
+    col_3 varchar2 ( 30 ) ,
+    col_4 int
+)tablespace ts_subpartition_0292
+partition by range (col_1) subpartition by range (col_2)
+(
+  partition p_range_1 values less than( 10 )
+  (
+    subpartition p_range_1_1 values less than( 50 ),
+    subpartition p_range_1_2 values less than( maxvalue )
+  ),
+  partition p_range_2 values less than( 20 )
+  (
+    subpartition p_range_2_1 values less than( 50 ),
+    subpartition p_range_2_2 values less than( maxvalue )
+  )
+) enable row movement;
+SQL SUCCESS
+--step26: 插入数据; expect:成功
+insert into t_subpartition_0292 values (generate_series(0, 19),generate_series(0, 1000),generate_series(0, 99));
+SQL SUCCESS
+--step27: 查询rownum数据; expect:成功
+select rownum,* from t_subpartition_0292 where col_3 >98 limit 10;
++--------+-------+-------+-------+-------+
+| rownum | col_1 | col_2 | col_3 | col_4 |
++--------+-------+-------+-------+-------+
+| 1      | 19    | 49    | 99    |       |
+| 2      | 19    | 48    | 99    |       |
+| 3      | 19    | 47    | 99    |       |
+| 4      | 19    | 46    | 99    |       |
+| 5      | 19    | 45    | 99    |       |
+| 6      | 19    | 44    | 99    |       |
+| 7      | 19    | 43    | 99    |       |
+| 8      | 19    | 42    | 99    |       |
+| 9      | 19    | 41    | 99    |       |
+| 10     | 19    | 40    | 99    |       |
++--------+-------+-------+-------+-------+
+--step28: 清理环境; expect:成功
+drop table if exists t_subpartition_0292_01;
+SQL SUCCESS
+drop table if exists t_subpartition_0292 cascade;
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0292;
+SQL SUCCESS

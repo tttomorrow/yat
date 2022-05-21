@@ -2,6 +2,7 @@
 
 drop table if exists FVT_FUNC_BINARY_TABLE_011;
 create table FVT_FUNC_BINARY_TABLE_011(T1 INT,T2 RAW(100));
+INSERT INTO FVT_FUNC_BINARY_TABLE_011 VALUES(1,'01FABD011365489000');
 
 --创建自定义函数
 create or replace function FVT_FUNC_BINARY_011() return RAW

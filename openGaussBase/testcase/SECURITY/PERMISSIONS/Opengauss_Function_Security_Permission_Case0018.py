@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -16,7 +16,7 @@ See the Mulan PSL v2 for more details.
 Case Type   : Separation_permission
 Case Name   : 授予用户revoke权限
 Description :
-    1.初始用户执行：create user wf with password 'Qazwsx@123';
+    1.初始用户执行：create user wf with password '$PASSWORD';
                  create table security_table(id1 int,id2 int, id3 int);
                  grant revoke on security_table to wf;
 Expect      :
@@ -42,7 +42,6 @@ class Privategrant(unittest.TestCase):
         logger.info(
             '-----Opengauss_Function_Security_Permission_Case0018 start----')
         self.userNode = Node('PrimaryDbUser')
-        self.DB_ENV_PATH = macro.DB_ENV_PATH
         self.DB_INSTANCE_PATH = macro.DB_INSTANCE_PATH
         self.sh_primy = CommonSH('PrimaryDbUser')
         self.Constant = Constant()

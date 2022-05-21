@@ -14,11 +14,13 @@ IMMUTABLE
 RETURNS NULL ON NULL INPUT;
 /
 select func_add_sql(3,7);
-SELECT pg_sleep(2);
+SELECT pg_sleep(6);
+SELECT pg_sleep(6);
 select pg_stat_get_function_self_time(a.oid)=pg_stat_get_function_total_time(a.oid) from PG_PROC a where a.proname = 'func_add_sql';
 select pg_stat_reset();
 select func_add_sql(3,7);
-SELECT pg_sleep(2);
+SELECT pg_sleep(6);
+SELECT pg_sleep(6);
 select pg_stat_get_function_self_time(a.oid)<2,pg_stat_get_function_total_time(a.oid)<2 from PG_PROC a where a.proname = 'func_add_sql';
 select pg_stat_get_function_self_time(a.oid)=2,pg_stat_get_function_total_time(a.oid)=2 from PG_PROC a where a.proname = 'func_add_sql';
 
@@ -38,7 +40,8 @@ end;
 $$language plpgsql;
 /
 select  func02();
-SELECT pg_sleep(2);
+SELECT pg_sleep(6);
+SELECT pg_sleep(6);
 -- 小于整体的时间
 select pg_stat_get_function_self_time(a.oid)<pg_stat_get_function_total_time(a.oid) from PG_PROC a where a.proname = 'func02';
 select pg_stat_get_function_self_time(a.oid)<2 from PG_PROC a where a.proname = 'func02';

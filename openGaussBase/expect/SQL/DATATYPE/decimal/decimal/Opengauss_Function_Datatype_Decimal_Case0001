@@ -7,6 +7,7 @@ insert into decimal_01 values (12);
 SQL SUCCESS
 insert into decimal_01 values (1200034);
 SQL SUCCESS
+insert into decimal_01 values (9999999999);
 SQL SUCCESS
 select * from decimal_01;
 +------------+
@@ -14,6 +15,7 @@ select * from decimal_01;
 +------------+
 | 12         |
 | 1200034    |
+| 9999999999 |
 +------------+
 drop table decimal_01;
 SQL SUCCESS

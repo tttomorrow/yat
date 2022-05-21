@@ -15,6 +15,7 @@ select pg_stat_get_db_xact_commit(a.oid,a.oid,a.oid) from PG_DATABASE a where a.
   Hint: No function matches the given name and argument types. You might need to add explicit type casts.
 ?.*
   Where: referenced column: pg_stat_get_db_xact_commit
+select pg_stat_get_db_xact_commit(9999999999999) from PG_DATABASE a where a.datname = CURRENT_CATALOG;
 ?.*ERROR: OID out of range
   Where: referenced column: pg_stat_get_db_xact_commit
 select pg_stat_get_db_xact_commit('*&^%$') from PG_DATABASE a where a.datname = CURRENT_CATALOG;

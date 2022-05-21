@@ -4,10 +4,16 @@ SQL SUCCESS
 insert into t_id values(generate_series(1,10));
 SQL SUCCESS
 select  hll_add_agg(hll_hash_text(id), 10, 1, -2) from t_id ;
-?.*ERROR: expthresh = -2 is out of range, it should be in range -1 to 7.*
+?.*ERROR: log2sparse = -2 is out of range, it should be in range 0 to 14, or set -1 as default
 drop table t_id;
 SQL SUCCESS
 select hll_add_agg(hll_hash_boolean(true), 16, 5, 8);
-?.*ERROR: expthresh = 8 is out of range, it should be in range -1 to 7.*
++----------------------------------------------------------------------------+
+| hll_add_agg                                                                |
++----------------------------------------------------------------------------+
++----------------------------------------------------------------------------+
 select hll_add_agg (hll_hash_smallint(32767, 0), null, 6, null);
-?.*ERROR: regwidth = 6 is out of range, it should be in range 1 to 5.*
++----------------------------------------------------------------------------+
+| hll_add_agg                                                                |
++----------------------------------------------------------------------------+
++----------------------------------------------------------------------------+

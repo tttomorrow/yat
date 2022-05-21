@@ -14,4 +14,5 @@ INTERVAL('1 day')
 INSERT INTO sales VALUES(1, '2019-01-10 00:00:00');
 select pg_stat_get_partition_tuples_inserted() from PG_PARTITION a where a.relname = 'p1';
 select pg_stat_get_partition_tuples_inserted(a.oid,a.oid) from PG_PARTITION a where a.relname = 'p2';
+select pg_stat_get_partition_tuples_inserted(98765432198765);
 drop table sales cascade;

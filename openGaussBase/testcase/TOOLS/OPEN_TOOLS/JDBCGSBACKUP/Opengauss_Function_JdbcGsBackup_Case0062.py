@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -39,7 +39,6 @@ Expect      :
         9.导入成功
         10.表数据正确
         11.清理环境完成
-History     :
 """
 import os
 import unittest
@@ -85,7 +84,7 @@ class ToolsBackup(unittest.TestCase):
         self.log.info(result)
         self.assertTrue(result, '执行失败:' + text)
         result = self.Standby_SH.restart_db_cluster()
-        self.log.info(result, '执行失败:' + text)
+        self.log.info(result)
         result = self.s_com1.get_db_cluster_status('detail')
         self.log.info(result)
         self.assertTrue("Degraded" in result or "Normal" in result,
@@ -100,7 +99,7 @@ class ToolsBackup(unittest.TestCase):
         self.log.info(mkdir_cmd)
         result = self.Standby_Node.sh(mkdir_cmd).result()
         self.log.info(result)
-        self.assertEqual(result, '')
+        self.assertEqual(result, '',  '执行失败:' + text)
 
         text = '----step3:获取openGauss-tools-backup工具包并解压 ;' \
                'expect:解压成功----'
@@ -161,6 +160,10 @@ class ToolsBackup(unittest.TestCase):
         self.log.info(cmd)
         result = self.Standby_Node.sh(cmd).result()
         self.log.info(result)
+        restart_msg = self.Standby_SH.restart_db_cluster()
+        self.log.info(restart_msg)
+        status = self.Standby_SH.get_db_cluster_status()
+        self.assertTrue("Degraded" in status or "Normal" in status)
         self.assertIn(f'{self.Standby_Node.db_host}/32   sha256',  result,
                       '执行失败:' + text)
 

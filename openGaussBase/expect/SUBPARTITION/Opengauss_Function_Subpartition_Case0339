@@ -1,0 +1,207 @@
+-- @testpoint: range_hash二级分区表：触发器/函数/存储过程/游标
+--step1: 创建表空间; expect:成功
+drop table if exists t_subpartition_0339;
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0339;
+SQL SUCCESS
+create tablespace ts_subpartition_0339 relative location 'subpartition_tablespace/subpartition_tablespace_0339';
+SQL SUCCESS
+--test1: 触发器
+--step2: 创建二级分区表; expect:成功
+create table if not exists t_subpartition_0339
+(
+    col_1 int ,
+    col_2 int, 
+    col_3 varchar2 ( 30 ) not null ,
+    col_4 int
+)tablespace ts_subpartition_0339
+partition by range (col_1) subpartition by hash (col_2)
+(
+  partition p_range_1 values less than( -10 )
+  (
+    subpartition p_hash_1_1 ,
+    subpartition p_hash_1_2 ,
+     subpartition p_hash_1_3
+  ),
+  partition p_range_2 values less than( 20 ),
+  partition p_range_3 values less than( 30)
+  (
+    subpartition p_hash_3_1 ,
+    subpartition p_hash_3_2 ,
+    subpartition p_hash_3_3
+  ),
+    partition p_range_4 values less than( 50)
+  (
+    subpartition p_hash_4_1 ,
+    subpartition p_hash_4_2 ,
+    subpartition p_hash_4_3
+  ),
+  partition p_range_5 values less than( maxvalue )
+) enable row movement;
+SQL SUCCESS
+--step3: 创建函数,删除更新表数据; expect:成功
+drop function if exists func_tri_subpartition_0339() cascade;
+SQL SUCCESS
+create or replace function func_tri_subpartition_0339() returns trigger as
+           $$
+           declare
+           begin
+                   delete from t_subpartition_0339; 
+                   update t_subpartition_0339 set col_2 =10 where col_2=1;
+                   return new;
+           end
+           $$ language plpgsql;
+           /
+SQL SUCCESS
+--step4: 创建触发器,与二级分区表关联,执行插入语句时后执行函数; expect:成功
+create trigger tri_subpartition_0339
+          after insert on t_subpartition_0339
+          for each row
+          execute procedure func_tri_subpartition_0339();
+          /
+SQL SUCCESS
+--step5: 插入数据; expect:成功
+insert into t_subpartition_0339 values(1,1,1,1);
+SQL SUCCESS
+--step6: 查询数据; expect:成功,无数据
+select * from t_subpartition_0339;
++-------+-------+-------+-------+
+| col_1 | col_2 | col_3 | col_4 |
++-------+-------+-------+-------+
++-------+-------+-------+-------+
+--step7: 插入数据; expect:成功
+insert into t_subpartition_0339 values(1,1,1,1);
+SQL SUCCESS
+--step8: 查询数据; expect:成功,无数据
+select * from t_subpartition_0339;
++-------+-------+-------+-------+
+| col_1 | col_2 | col_3 | col_4 |
++-------+-------+-------+-------+
++-------+-------+-------+-------+
+--step9: 删除函数; expect:成功
+drop function if exists func_tri_subpartition_0339() cascade;
+SQL SUCCESS
+--test2: 函数
+--step10: 清空表数据; expect:成功
+truncate t_subpartition_0339;
+SQL SUCCESS
+--step11: 创建函数,返回boolean值; expect:成功
+drop function if exists func_subpartition_0339() cascade;
+SQL SUCCESS
+create or replace function func_subpartition_0339() returns boolean as
+    $$
+    declare
+    begin
+         delete from t_subpartition_0339 where col_2=8;
+         return 1;
+    end
+    $$ language plpgsql;
+    /
+SQL SUCCESS
+--step12: 创建函数,删除指定条件的数据,无返回值; expect:成功
+drop function if exists func_subpartition_0339() cascade;
+SQL SUCCESS
+create or replace function func_subpartition_0339() returns void as
+    $$
+    declare
+    begin
+         delete from t_subpartition_0339 where col_2=8;
+    end
+    $$ language plpgsql;
+    /
+SQL SUCCESS
+--step13: 创建函数,有返回值; expect:成功
+drop function if exists func_subpartition_0339_01() cascade;
+SQL SUCCESS
+create or replace  function func_subpartition_0339_01()
+returns table(col_1 int,col_2 int,col_3 varchar2 ( 30 ) ,col_4 int) as $$
+begin
+     return query select * from t_subpartition_0339;
+end;
+$$ language plpgsql;
+/
+SQL SUCCESS
+--step14: 插入数据; expect:成功
+insert into t_subpartition_0339 values(1,1,1,1),(4,4,4,4),(5,5,5,5),(8,8,8,8),(9,9,9,9);
+SQL SUCCESS
+--step15: 调用函数; expect:成功,无数据
+call func_subpartition_0339();
++------------------------+
+| func_subpartition_0339 |
++------------------------+
+|                        |
++------------------------+
+--step16: 调用函数; expect:成功,4条数据
+call func_subpartition_0339_01();
++-------+-------+-------+-------+
+| col_1 | col_2 | col_3 | col_4 |
++-------+-------+-------+-------+
+| 1     | 1     | 1     | 1     |
+| 4     | 4     | 4     | 4     |
+| 5     | 5     | 5     | 5     |
+| 9     | 9     | 9     | 9     |
++-------+-------+-------+-------+
+--test3: 存储过程
+--step17: 创建存储过程,删除指定数据; expect:成功
+drop function if exists pro_subpartition_0339();
+SQL SUCCESS
+create or replace procedure pro_subpartition_0339 is
+    begin
+         delete from t_subpartition_0339 where col_2=8;
+    end;
+    /
+SQL SUCCESS
+--step18: 清空表数据; expect:成功
+truncate t_subpartition_0339;
+SQL SUCCESS
+--step19: 插入数据; expect:成功
+insert into t_subpartition_0339 values(1,1,1,1),(4,4,4,4),(5,5,5,5),(8,8,8,8),(9,9,9,9);
+SQL SUCCESS
+--step20: 调用存储过程; expect:成功
+call  pro_subpartition_0339();
++-----------------------+
+| pro_subpartition_0339 |
++-----------------------+
+|                       |
++-----------------------+
+--step21: 查询数据; expect:成功,4条数据
+select * from t_subpartition_0339;
++-------+-------+-------+-------+
+| col_1 | col_2 | col_3 | col_4 |
++-------+-------+-------+-------+
+| 1     | 1     | 1     | 1     |
+| 4     | 4     | 4     | 4     |
+| 5     | 5     | 5     | 5     |
+| 9     | 9     | 9     | 9     |
++-------+-------+-------+-------+
+--test4: 游标
+--step22: 清空表数据; expect:成功
+truncate t_subpartition_0339;
+SQL SUCCESS
+--step23: 插入数据; expect:成功
+insert into t_subpartition_0339 values(1,11,1,1),(4,41,4,4),(5,54,5,5),(8,87,8,8),(9,19,9,9);
+SQL SUCCESS
+insert into t_subpartition_0339 values(11,1,1,1),(14,1,4,4),(15,5,5,5),(18,8,8,8),(19,1,9,9);
+SQL SUCCESS
+--step24: 开启事务创建游标; expect:成功
+begin;
+cursor c1 for select * from t_subpartition_0339 subpartition (p_range_2_subpartdefault1); 
+fetch c1;
+fetch c1;
+fetch c1;
+end;
+/
+SQL SUCCESS
+--step25: 清理环境; expect:成功
+drop function if exists func_subpartition_0339();
+SQL SUCCESS
+drop function if exists func_subpartition_0339_01();
+SQL SUCCESS
+drop function if exists func_tri_subpartition_0339() cascade;
+SQL SUCCESS
+drop function if exists pro_subpartition_0339();
+SQL SUCCESS
+drop table if exists t_subpartition_0339;
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0339;
+SQL SUCCESS

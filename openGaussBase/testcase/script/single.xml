@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ROOT>
+        <CLUSTER>
+        <PARAM value="gauss_openv1" name="clusterName"/>
+        <PARAM value="v_nodeNames" name="nodeNames"/>
+        <PARAM value="v_gaussdbAppPath" name="gaussdbAppPath"/>
+        <PARAM value="v_gaussdbLogPath" name="gaussdbLogPath"/>
+        <PARAM value="v_tmpMppdbPath" name="tmpMppdbPath"/>
+        <PARAM value="v_gaussdbToolPath" name="gaussdbToolPath"/>
+        <PARAM value="v_corePath" name="corePath"/>
+        <PARAM value="v_db_host" name="backIp1s"/>
+        <PARAM value="single-inst" name="clusterType"/>
+        </CLUSTER>
+<DEVICELIST>
+        <DEVICE sn="v_nodeNames">
+                <PARAM value="v_nodeNames" name="name"/>
+                <PARAM value="v_db_host" name="backIp1"/>
+                <PARAM value="v_db_host" name="sshIp1"/>
+                <PARAM value="AZ1" name="azName"/>
+                <PARAM value="1" name="azPriority"/>
+                <!-- dn -->
+                <PARAM value="1" name="dataNum"/>
+                <PARAM value="v_dataPortBase" name="dataPortBase"/>
+                <PARAM value="v_dataNode1" name="dataNode1"/>
+        </DEVICE>
+</DEVICELIST>
+</ROOT>

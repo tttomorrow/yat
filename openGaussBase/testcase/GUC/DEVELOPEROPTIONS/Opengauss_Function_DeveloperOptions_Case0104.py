@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -18,7 +18,7 @@ Case Name   : 使用gs_guc set方法设置参数advance_xlog_file_num为无效�
 Description :
         1.查询advance_xlog_file_num默认值
         2.修改参数值为test
-        3.修改参数值为101
+        3.修改参数值为1000001
         4.修改参数值为-1
         5.修改参数值为空串
         6.恢复参数默认值
@@ -29,7 +29,6 @@ Expect      :
         4.合理报错
         5.合理报错
         6.默认值恢复成功
-History     :
 """
 import unittest
 
@@ -52,8 +51,8 @@ class DeveloperOption(unittest.TestCase):
         sql_cmd = commonsh.execut_db_sql('''show advance_xlog_file_num;''')
         LOG.info(sql_cmd)
         self.assertEqual('0', sql_cmd.split('\n')[2].strip())
-        LOG.info('--步骤2:修改参数值为test，101, -1, 空串合理报错--')
-        invalid_value = ['test', 101, -1, "''"]
+        LOG.info('--步骤2:修改参数值为test，1000001, -1, 空串合理报错--')
+        invalid_value = ['test', 1000001, -1, "''"]
         for i in invalid_value:
             msg = commonsh.execute_gsguc('set',
                                          self.constant.GSGUC_SUCCESS_MSG,
@@ -62,15 +61,12 @@ class DeveloperOption(unittest.TestCase):
 
     def tearDown(self):
         LOG.info('--步骤3:恢复默认值--')
-        sql_cmd = commonsh.execut_db_sql('''show advance_xlog_file_num;''')
-        LOG.info(sql_cmd)
-        if "0" != sql_cmd.split('\n')[-2].strip():
-            msg = commonsh.execute_gsguc('set',
-                                         self.constant.GSGUC_SUCCESS_MSG,
-                                         '''advance_xlog_file_num=0''')
-            LOG.info(msg)
-            msg = commonsh.restart_db_cluster()
-            LOG.info(msg)
+        msg = commonsh.execute_gsguc('set',
+                                     self.constant.GSGUC_SUCCESS_MSG,
+                                     'advance_xlog_file_num=0')
+        LOG.info(msg)
+        msg = commonsh.restart_db_cluster()
+        LOG.info(msg)
         status = commonsh.get_db_cluster_status()
         self.assertTrue("Degraded" in status or "Normal" in status)
         sql_cmd = commonsh.execut_db_sql('''show advance_xlog_file_num;''')

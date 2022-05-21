@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -53,8 +53,10 @@ class Guctestcase(unittest.TestCase):
         LOGGER.info(sql_cmd)
         self.assertEqual("", sql_cmd.split("\n")[-2].strip())
 
+        LOGGER.info("修改{self.arg_name}为12345678912345 期望设置失败")
         result = COMMONSH.execute_gsguc("set",
                                         self.constant.GSGUC_SUCCESS_MSG,
+                                        f"{self.arg_name}='12345678912345'")
         self.assertFalse(result)
 
         LOGGER.info("期望：重启后查询结果为''")

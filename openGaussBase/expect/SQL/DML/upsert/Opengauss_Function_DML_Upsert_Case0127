@@ -206,7 +206,7 @@ select * from t_dml_upsert0127;
 +---+---+---+-----+
 --limit,muilt-set不支持，报错；single-set支持
 insert into t_dml_upsert0127 values(1,1,3) on duplicate key update (c,d) = (select c,b from t_dml_upsert_sub0127 where a>4 limit 1);
-?.* ERROR: syntax error at or near "limit"
+?.*ERROR: syntax error at or near "limit"
 ?.*
 explain (costs off, verbose) select c from t_dml_upsert_sub0127 where a>4 limit 1;
 +-----------------------------------------------+
@@ -247,7 +247,7 @@ explain (costs off, verbose) insert into t_dml_upsert0127 values(1,1,3) on dupli
 +-------------------------------------------------------+
 --limit offset，muilt-set不支持，报错；single-set支持
 insert into t_dml_upsert0127 values(1,1,3) on duplicate key update (c,d)= (select c,b from t_dml_upsert_sub0127 where a>4 limit 1 offset 5);
-?.* ERROR: syntax error at or near "limit"
+?.*ERROR: syntax error at or near "limit"
 ?.*
 explain (costs off, verbose) select c from t_dml_upsert_sub0127 where a>4 limit 1 offset 5;
 +-----------------------------------------------+
@@ -288,7 +288,7 @@ explain (costs off, verbose) insert into t_dml_upsert0127 values(1,1,3) on dupli
 +-------------------------------------------------------+
 --offset，muilt-set不支持，报错；single-set支持
 insert into t_dml_upsert0127 values(1,1,3) on duplicate key update (c,d)= (select c,b from t_dml_upsert_sub0127 where a>4 offset 5);
-?.* ERROR: syntax error at or near "offset"
+?.*ERROR: syntax error at or near "offset"
 ?.*
 explain (costs off, verbose) select b from t_dml_upsert_sub0127 where b>4 and a =10 order by b asc offset 1;
 +----------------------------------------------------------------------------------------+
@@ -335,7 +335,7 @@ select * from t_dml_upsert0127;
 +---+---+---+----+
 --FETCH，muilt-set不支持，报错；single-set支持
 insert into t_dml_upsert0127 values(1,1,3) on duplicate key update (c,d)= (select c,b from t_dml_upsert_sub0127 where b>4 offset 2 fetch next 1 row only);
-?.* ERROR: syntax error at or near "offset"
+?.*ERROR: syntax error at or near "offset"
 ?.*
 explain (costs off, verbose) select b from t_dml_upsert_sub0127 where b>4 offset 2 fetch next 1 row only;
 +-----------------------------------------------+
@@ -376,16 +376,17 @@ explain (costs off, verbose) insert into t_dml_upsert0127 values(1,1,3) on dupli
 +-------------------------------------------------------+
 --order by ，muilt-set不支持，报错；single-set支持
 insert into t_dml_upsert0127 values(2,2,3) on duplicate key update (c,d) = (select c,b from t_dml_upsert_sub0127 where b=4 order by b ASC);
-?.* ERROR: syntax error at or near "order"
+?.*ERROR: syntax error at or near "order"
 ?.*
 explain (costs off, verbose) select a from t_dml_upsert_sub0127 where b=4 order by b ASC;
-+-----------------------------------------+
-| QUERY PLAN                              |
-+-----------------------------------------+
-| Seq Scan on public.t_dml_upsert_sub0127 |
-|   Output: a, b                          |
-|   Filter: (t_dml_upsert_sub0127.b = 4)  |
-+-----------------------------------------+
++---------------------------------------------------------------------------+
+| QUERY PLAN                                                                |
++---------------------------------------------------------------------------+
+| [Bypass]                                                                  |
+| Index Scan using t_dml_upsert_sub0127_pkey on public.t_dml_upsert_sub0127 |
+|   Output: a, b                                                            |
+|   Index Cond: (t_dml_upsert_sub0127.b = 4)                                |
++---------------------------------------------------------------------------+
 insert into t_dml_upsert0127 values(2,2,3) on duplicate key update c= (select a from t_dml_upsert_sub0127 where b=4 order by b ASC);
 SQL SUCCESS
 select * from t_dml_upsert0127;
@@ -398,34 +399,32 @@ select * from t_dml_upsert0127;
 | 2 | 2 | 4 |   |
 +---+---+---+---+
 explain (costs off, verbose) insert into t_dml_upsert0127 values(2,2,3) on duplicate key update d= (select c from t_dml_upsert_sub0127 where b=4 order by b ASC);
-+------------------------------------------------------------------+
-| QUERY PLAN                                                       |
-+------------------------------------------------------------------+
-| Insert on public.t_dml_upsert0127                                |
-|   Conflict Resolution: UPDATE                                    |
-|   Conflict Arbiter Indexes: t_dml_upsert0127_pkey                |
-|   InitPlan 1 (returns $0)                                        |
-|     ->  Seq Scan on public.t_dml_upsert_sub0127                  |
-|           Output: t_dml_upsert_sub0127.c, t_dml_upsert_sub0127.b |
-|           Filter: (t_dml_upsert_sub0127.b = 4)                   |
-|   ->  Result                                                     |
-|         Output: 2, '2'::text, 3, NULL::text                      |
-+------------------------------------------------------------------+
++-----------------------------------------------------------------------------------+
+| QUERY PLAN                                                                        |
++-----------------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0127                                                 |
+|   Conflict Resolution: UPDATE                                                     |
+|   Conflict Arbiter Indexes: t_dml_upsert0127_pkey                                 |
+|   InitPlan 1 (returns $0)                                                         |
+|     ->  Index Scan using t_dml_upsert_sub0127_pkey on public.t_dml_upsert_sub0127 |
+|           Output: t_dml_upsert_sub0127.c, t_dml_upsert_sub0127.b                  |
+|           Index Cond: (t_dml_upsert_sub0127.b = 4)                                |
+|   ->  Result                                                                      |
+|         Output: 2, '2'::text, 3, NULL::text                                       |
++-----------------------------------------------------------------------------------+
 --CTE with子句，muilt-set不支持，报错；single-set支持
 insert into t_dml_upsert0127 values(3,3,4) on duplicate key update (c,d)= (with temp_tb(i,j,k) as(select a,c,b from t_dml_upsert_sub0127) select i,j from temp_tb where k = '7');
-?.* ERROR: syntax error at or near "with temp_tb"
+?.*ERROR: syntax error at or near "with temp_tb"
 ?.*
 explain (costs off, verbose) with temp_tb(i,j,k) as(select a,c,b from t_dml_upsert_sub0127) select i from temp_tb where k = '7';
-+------------------------------------------------------------------------------------------+
-| QUERY PLAN                                                                               |
-+------------------------------------------------------------------------------------------+
-| CTE Scan on temp_tb                                                                      |
-|   Output: temp_tb.i                                                                      |
-|   Filter: (temp_tb.k = 7)                                                                |
-|   CTE temp_tb                                                                            |
-|     ->  Seq Scan on public.t_dml_upsert_sub0127                                          |
-|           Output: t_dml_upsert_sub0127.a, t_dml_upsert_sub0127.c, t_dml_upsert_sub0127.b |
-+------------------------------------------------------------------------------------------+
++---------------------------------------------------------------------------+
+| QUERY PLAN                                                                |
++---------------------------------------------------------------------------+
+| [Bypass]                                                                  |
+| Index Scan using t_dml_upsert_sub0127_pkey on public.t_dml_upsert_sub0127 |
+|   Output: t_dml_upsert_sub0127.a                                          |
+|   Index Cond: (t_dml_upsert_sub0127.b = 7)                                |
++---------------------------------------------------------------------------+
 insert into t_dml_upsert0127 values(3,3,4) on duplicate key update c = (with temp_tb(i,j,k) as(select a,c,b from t_dml_upsert_sub0127) select i from temp_tb where k = '7');
 SQL SUCCESS
 select * from t_dml_upsert0127;
@@ -438,25 +437,22 @@ select * from t_dml_upsert0127;
 | 3 | 3 | 7 |   |
 +---+---+---+---+
 explain (costs off, verbose) insert into t_dml_upsert0127 values(3,3,4) on duplicate key update c = (with temp_tb(i,j,k) as(select a,c,b from t_dml_upsert_sub0127) select i from temp_tb where k = '7');
-+--------------------------------------------------------------------------------------------------+
-| QUERY PLAN                                                                                       |
-+--------------------------------------------------------------------------------------------------+
-| Insert on public.t_dml_upsert0127                                                                |
-|   Conflict Resolution: UPDATE                                                                    |
-|   Conflict Arbiter Indexes: t_dml_upsert0127_pkey                                                |
-|   InitPlan 2 (returns $1)                                                                        |
-|     ->  CTE Scan on temp_tb                                                                      |
-|           Output: temp_tb.i                                                                      |
-|           Filter: (temp_tb.k = 7)                                                                |
-|           CTE temp_tb                                                                            |
-|             ->  Seq Scan on public.t_dml_upsert_sub0127                                          |
-|                   Output: t_dml_upsert_sub0127.a, t_dml_upsert_sub0127.c, t_dml_upsert_sub0127.b |
-|   ->  Result                                                                                     |
-|         Output: 3, '3'::text, 4, NULL::text                                                      |
-+--------------------------------------------------------------------------------------------------+
++-----------------------------------------------------------------------------------+
+| QUERY PLAN                                                                        |
++-----------------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0127                                                 |
+|   Conflict Resolution: UPDATE                                                     |
+|   Conflict Arbiter Indexes: t_dml_upsert0127_pkey                                 |
+|   InitPlan 1 (returns $0)                                                         |
+|     ->  Index Scan using t_dml_upsert_sub0127_pkey on public.t_dml_upsert_sub0127 |
+|           Output: t_dml_upsert_sub0127.a                                          |
+|           Index Cond: (t_dml_upsert_sub0127.b = 7)                                |
+|   ->  Result                                                                      |
+|         Output: 3, '3'::text, 4, NULL::text                                       |
++-----------------------------------------------------------------------------------+
 --order by nulls ;muilt-set不支持，报错；single-set支持
 insert into t_dml_upsert0127 values(2,2,3) on duplicate key update (c,d) =(select a, avg(b) from t_dml_upsert_sub0127 group by a having avg(b)>10 order by a nulls last);
-?.* ERROR: syntax error at or near "order"
+?.*ERROR: syntax error at or near "order"
 ?.*
 explain (costs off, verbose) select avg(b) from t_dml_upsert_sub0127 group by a having avg(b)>13 order by a nulls last limit 1;
 +-------------------------------------------------------------------+
@@ -763,21 +759,21 @@ explain (costs off, verbose) insert into t_dml_upsert0127 values(2,2,3) on dupli
 +------------------------------------------------------------------------------+
 --window ;muilt-set不支持/single-set支持
 insert into t_dml_upsert0127 values(2,2,3) on duplicate key update (c,d) = (select b,count(c) over window1 typecount from t_dml_upsert_sub0127 where b =11 window window1 as (partition by a));
-?.* ERROR: syntax error at or near "window"
+?.*ERROR: syntax error at or near "window"
 ?.*
 explain (costs off, verbose) select count(c) over window1 typecount from t_dml_upsert_sub0127 where b =11 window window1 as (partition by a);
-+-----------------------------------------------------+
-| QUERY PLAN                                          |
-+-----------------------------------------------------+
-| WindowAgg                                           |
-|   Output: count(c) OVER (PARTITION BY a), a         |
-|   ->  Sort                                          |
-|         Output: a, c                                |
-|         Sort Key: t_dml_upsert_sub0127.a            |
-|         ->  Seq Scan on public.t_dml_upsert_sub0127 |
-|               Output: a, c                          |
-|               Filter: (t_dml_upsert_sub0127.b = 11) |
-+-----------------------------------------------------+
++---------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                            |
++---------------------------------------------------------------------------------------+
+| WindowAgg                                                                             |
+|   Output: count(c) OVER (PARTITION BY a), a                                           |
+|   ->  Sort                                                                            |
+|         Output: a, c                                                                  |
+|         Sort Key: t_dml_upsert_sub0127.a                                              |
+|         ->  Index Scan using t_dml_upsert_sub0127_pkey on public.t_dml_upsert_sub0127 |
+|               Output: a, c                                                            |
+|               Index Cond: (t_dml_upsert_sub0127.b = 11)                               |
++---------------------------------------------------------------------------------------+
 insert into t_dml_upsert0127 values(2,2,3) on duplicate key update c = (select count(c) over window1 typecount from t_dml_upsert_sub0127 where b =11 window window1 as (partition by a));
 SQL SUCCESS
 select * from t_dml_upsert0127;
@@ -802,15 +798,15 @@ explain (costs off, verbose) insert into t_dml_upsert0127 values(2,2,3) on dupli
 |           ->  Sort                                                                                                 |
 |                 Output: t_dml_upsert_sub0127.a, t_dml_upsert_sub0127.c                                             |
 |                 Sort Key: t_dml_upsert_sub0127.a                                                                   |
-|                 ->  Seq Scan on public.t_dml_upsert_sub0127                                                        |
+|                 ->  Index Scan using t_dml_upsert_sub0127_pkey on public.t_dml_upsert_sub0127                      |
 |                       Output: t_dml_upsert_sub0127.a, t_dml_upsert_sub0127.c                                       |
-|                       Filter: (t_dml_upsert_sub0127.b = 11)                                                        |
+|                       Index Cond: (t_dml_upsert_sub0127.b = 11)                                                    |
 |   ->  Result                                                                                                       |
 |         Output: 2, '2'::text, 3, NULL::text                                                                        |
 +--------------------------------------------------------------------------------------------------------------------+
 --union ;muilt-set不支持/single-set支持
 insert into t_dml_upsert0127 values(2,2,3) on duplicate key update (c,d) = (select a,b from t_dml_upsert_sub0127 where a =1 union select a,b from t_dml_upsert_sub0127 where a = 2);
-?.* ERROR: syntax error at or near "union"
+?.*ERROR: syntax error at or near "union"
 ?.*
 explain (costs off, verbose) select b from t_dml_upsert_sub0127 where a =1 union select b from t_dml_upsert_sub0127 where a = 2 order by b desc limit 1;
 +-----------------------------------------------------------------------+
@@ -871,7 +867,7 @@ explain (costs off, verbose) insert into t_dml_upsert0127 values(2,2,3) on dupli
 +-------------------------------------------------------------------------------+
 --except ;muilt-set不支持/single-set支持
 insert into t_dml_upsert0127 values(2,2,3) on duplicate key update (c,d) = (select a,c from t_dml_upsert_sub0127 where b>3 except select a,c from t_dml_upsert_sub0127 where b>4);
-?.* ERROR: syntax error at or near "except"
+?.*ERROR: syntax error at or near "except"
 ?.*
 explain (costs off, verbose) select c from t_dml_upsert_sub0127 where b>3 except select c from t_dml_upsert_sub0127 where a = 4 order by c desc limit 1;
 +-----------------------------------------------------------------------------+
@@ -938,7 +934,7 @@ explain (costs off, verbose) insert into t_dml_upsert0127 values(2,2,3) on dupli
 +-------------------------------------------------------------------------------------+
 --intersect ;muilt-set不支持/single-set支持
 insert into t_dml_upsert0127 values(2,2,3) on duplicate key update (c,d) = (select a,c from t_dml_upsert_sub0127 where b>3 intersect select a,c from t_dml_upsert_sub0127 where b>4);
-?.* ERROR: syntax error at or near "intersect"
+?.*ERROR: syntax error at or near "intersect"
 ?.*
 explain (costs off, verbose) select c from t_dml_upsert_sub0127 where b>3 intersect select c from t_dml_upsert_sub0127 where a < 4 order by c desc limit 1;
 +-----------------------------------------------------------------------------+
@@ -1007,37 +1003,37 @@ explain (costs off, verbose) insert into t_dml_upsert0127 values(2,2,3) on dupli
 insert into t_dml_upsert_sub0127 values(generate_series(1,10),generate_series(31,40),'C-'||generate_series(1,10));
 SQL SUCCESS
 explain (costs off, verbose) select b from t_dml_upsert_sub0127 order by NLSSORT( c, 'NLS_SORT = generic_m_ci') limit 1;
-+----------------------------------------------------------------------------+
-| QUERY PLAN                                                                 |
-+----------------------------------------------------------------------------+
-| Limit                                                                      |
-|   Output: b, (convert_to_nocase(c, 'gbk'::name))                           |
-|   ->  Sort                                                                 |
-|         Output: b, (convert_to_nocase(c, 'gbk'::name))                     |
-|         Sort Key: (convert_to_nocase(t_dml_upsert_sub0127.c, 'gbk'::name)) |
-|         ->  Seq Scan on public.t_dml_upsert_sub0127                        |
-|               Output: b, convert_to_nocase(c, 'gbk'::name)                 |
-+----------------------------------------------------------------------------+
++--------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                           |
++--------------------------------------------------------------------------------------+
+| Limit                                                                                |
+|   Output: b, (nlssort(c, 'NLS_SORT = generic_m_ci'::text))                           |
+|   ->  Sort                                                                           |
+|         Output: b, (nlssort(c, 'NLS_SORT = generic_m_ci'::text))                     |
+|         Sort Key: (nlssort(t_dml_upsert_sub0127.c, 'NLS_SORT = generic_m_ci'::text)) |
+|         ->  Seq Scan on public.t_dml_upsert_sub0127                                  |
+|               Output: b, nlssort(c, 'NLS_SORT = generic_m_ci'::text)                 |
++--------------------------------------------------------------------------------------+
 insert into t_dml_upsert0127 values(2,2,3) on duplicate key update d= (select b from t_dml_upsert_sub0127 order by NLSSORT( c, 'NLS_SORT = generic_m_ci') limit 1);
 SQL SUCCESS
 explain (costs off, verbose) insert into t_dml_upsert0127 values(2,2,3) on duplicate key update d= (select b from t_dml_upsert_sub0127 order by NLSSORT( c, 'NLS_SORT = generic_m_ci') limit 1);
-+--------------------------------------------------------------------------------------------------------------+
-| QUERY PLAN                                                                                                   |
-+--------------------------------------------------------------------------------------------------------------+
-| Insert on public.t_dml_upsert0127                                                                            |
-|   Conflict Resolution: UPDATE                                                                                |
-|   Conflict Arbiter Indexes: t_dml_upsert0127_pkey                                                            |
-|   InitPlan 1 (returns $0)                                                                                    |
-|     ->  Limit                                                                                                |
-|           Output: t_dml_upsert_sub0127.b, (convert_to_nocase(t_dml_upsert_sub0127.c, 'gbk'::name))           |
-|           ->  Sort                                                                                           |
-|                 Output: t_dml_upsert_sub0127.b, (convert_to_nocase(t_dml_upsert_sub0127.c, 'gbk'::name))     |
-|                 Sort Key: (convert_to_nocase(t_dml_upsert_sub0127.c, 'gbk'::name))                           |
-|                 ->  Seq Scan on public.t_dml_upsert_sub0127                                                  |
-|                       Output: t_dml_upsert_sub0127.b, convert_to_nocase(t_dml_upsert_sub0127.c, 'gbk'::name) |
-|   ->  Result                                                                                                 |
-|         Output: 2, '2'::text, 3, NULL::text                                                                  |
-+--------------------------------------------------------------------------------------------------------------+
++------------------------------------------------------------------------------------------------------------------------+
+| QUERY PLAN                                                                                                             |
++------------------------------------------------------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0127                                                                                      |
+|   Conflict Resolution: UPDATE                                                                                          |
+|   Conflict Arbiter Indexes: t_dml_upsert0127_pkey                                                                      |
+|   InitPlan 1 (returns $0)                                                                                              |
+|     ->  Limit                                                                                                          |
+|           Output: t_dml_upsert_sub0127.b, (nlssort(t_dml_upsert_sub0127.c, 'NLS_SORT = generic_m_ci'::text))           |
+|           ->  Sort                                                                                                     |
+|                 Output: t_dml_upsert_sub0127.b, (nlssort(t_dml_upsert_sub0127.c, 'NLS_SORT = generic_m_ci'::text))     |
+|                 Sort Key: (nlssort(t_dml_upsert_sub0127.c, 'NLS_SORT = generic_m_ci'::text))                           |
+|                 ->  Seq Scan on public.t_dml_upsert_sub0127                                                            |
+|                       Output: t_dml_upsert_sub0127.b, nlssort(t_dml_upsert_sub0127.c, 'NLS_SORT = generic_m_ci'::text) |
+|   ->  Result                                                                                                           |
+|         Output: 2, '2'::text, 3, NULL::text                                                                            |
++------------------------------------------------------------------------------------------------------------------------+
 select * from t_dml_upsert0127;
 +---+---+---+---+
 | a | b | c | d |
@@ -1090,10 +1086,10 @@ select * from t_dml_upsert0127;
 +---+---+---+----+
 --for update ;muilt-set不支持/single-set支持
 insert into t_dml_upsert0127 values(2) on duplicate key update (b,c) = (select b,c from t_dml_upsert_sub0127 where a = excluded.a for update);
-?.* ERROR: syntax error at or near "for"
+?.*ERROR: syntax error at or near "for"
 ?.*
 insert into t_dml_upsert0127 values(2) on duplicate key update b= (select b from t_dml_upsert_sub0127 where a = excluded.a for update);
-?.* ERROR: INSERT ON DUPLICATE KEY UPDATE don't allow update on primary key or unique key.
+?.*ERROR: INSERT ON DUPLICATE KEY UPDATE don't allow update on primary key or unique key.
 select * from t_dml_upsert0127;
 +---+---+---+----+
 | a | b | c | d  |

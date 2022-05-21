@@ -13,6 +13,7 @@ select var_pop(ceil(abs(col_1))) from t_nvl_rca_tab;
 +--------------------+
 | var_pop            |
 +--------------------+
+| 0.8888888888888888 |
 +--------------------+
 drop table if exists t_nvl_rca_tab;
 SQL SUCCESS

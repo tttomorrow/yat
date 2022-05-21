@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -31,6 +31,7 @@ Expect      :
     6.清理环境成功
 History     :
 """
+import os
 import time
 import unittest
 
@@ -43,7 +44,7 @@ from testcase.utils.Logger import Logger
 class DmlTestCase(unittest.TestCase):
     def setUp(self):
         self.log = Logger()
-        self.log.info('Opengauss_Function_DML_Lock_Case0005开始')
+        self.log.info(f'-----{os.path.basename(__file__)} start-----')
         self.constant = Constant()
         self.commonsh1 = CommonSH('PrimaryDbUser')
         self.commonsh2 = CommonSH('PrimaryDbUser')
@@ -68,13 +69,15 @@ class DmlTestCase(unittest.TestCase):
             --step3: 查看视图pg_locks，查看share锁是否添加成功
             select locktype,database,relation,transactionid,\
             classid,virtualtransaction,pid,sessionid,mode,\
-            granted,fastpath from pg_locks;
-            select pg_sleep(3);
+            granted,fastpath from pg_locks \
+            where sessionid=(select pg_current_sessid());
+            select pg_sleep(10);
             
             --step5: 查看视图pg_locks，查看share锁是否依然存在
             select locktype,database,relation,transactionid,\
-            classid,virtualtransaction,pid,sessionid,mode,\
-            granted,fastpath from pg_locks;
+            classid,virtualtransaction,pid,sessionid,granted,\
+            mode,fastpath from pg_locks \
+            where sessionid=(select pg_current_sessid());
             '''
         thread_1 = ComThread(self.commonsh1.execut_db_sql, args=(sql, ''))
         thread_1.setDaemon(True)
@@ -82,7 +85,7 @@ class DmlTestCase(unittest.TestCase):
 
         text3 = '-----step4: 开启新的事务，进行insert操作; expect: 事务阻塞-----'
         self.log.info(text3)
-        sql = '''select pg_sleep(1);
+        sql = '''select pg_sleep(5);
             start transaction;
             insert into t_lock_0005 values (001,'sk1','tt',3332);
             '''
@@ -90,7 +93,7 @@ class DmlTestCase(unittest.TestCase):
         thread_2.setDaemon(True)
         thread_2.start()
 
-        time.sleep(10)
+        time.sleep(20)
 
         thread_1.join(1)
         msg_result_1 = thread_1.get_result()
@@ -103,7 +106,7 @@ class DmlTestCase(unittest.TestCase):
         assert_eq_1 = msg_result_1.count('START TRANSACTION') is 1
         assert_eq_2 = msg_result_1.count('LOCK TABLE') is 1
         assert_eq_3 = msg_result_1.count('ShareLock       | t') is 1
-        assert_eq_4 = msg_result_1.count('ShareLock        | t') is 1
+        assert_eq_4 = msg_result_1.count('t       | ShareLock') is 1
         assert_in_1 = 'INSERT 0 1' in msg_result_2
         assert_eq_5 = msg_result_2.count('START TRANSACTION') is 1
         self.assertTrue(
@@ -112,8 +115,8 @@ class DmlTestCase(unittest.TestCase):
         self.assertTrue(assert_in_1 and assert_eq_5, '执行失败:' + text3)
 
     def tearDown(self):
-        text = '--step6: 清理环境; expect: 清理成功--'
+        text = '-----step6: 清理环境; expect: 清理成功-----'
         self.log.info(text)
         sql_cmd = self.commonsh1.execut_db_sql(f'drop table t_lock_0005;')
         self.log.info(sql_cmd)
-        self.log.info('Opengauss_Function_DML_Lock_Case0005结束')
+        self.log.info(f'-----{os.path.basename(__file__)} end-----')

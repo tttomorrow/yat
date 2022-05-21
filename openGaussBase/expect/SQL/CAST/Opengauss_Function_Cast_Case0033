@@ -10,7 +10,7 @@ SQL SUCCESS
 --testpoint:二目操作符  = ：success
 select oprname,oprkind,test_cast_fun_0032(oprleft::int),test_cast_fun_0032(oprright::int),test_cast_fun_0032(oprresult::int),proname from pg_operator o
 left join pg_proc p on p.oid=o.oprcode
-where oprname ='=' and oprkind = 'b' order by test_cast_fun_0032(oprleft::int) asc;
+where oprname ='=' and oprkind = 'b' order by test_cast_fun_0032(oprleft::int),test_cast_fun_0032(oprright::int), test_cast_fun_0032(oprresult::int) asc;
 +---------+---------+-------------------------------+-------------------------------+--------------------+---------------------------------------+
 | oprname | oprkind | test_cast_fun_0032            | test_cast_fun_0032            | test_cast_fun_0032 | proname                               |
 +---------+---------+-------------------------------+-------------------------------+--------------------+---------------------------------------+
@@ -41,16 +41,17 @@ where oprname ='=' and oprkind = 'b' order by test_cast_fun_0032(oprleft::int) a
 | =       | b       | hll_hashval                   | hll_hashval                   | bool               | hll_hashval_eq                        |
 | =       | b       | inet                          | inet                          | bool               | network_eq                            |
 | =       | b       | int1                          | int1                          | bool               | int1eq                                |
-| =       | b       | int2                          | int8                          | bool               | int28eq                               |
+| =       | b       | int16                         | int16                         | bool               | int16eq                               |
 | =       | b       | int2                          | int2                          | bool               | int2eq                                |
 | =       | b       | int2                          | int4                          | bool               | int24eq                               |
+| =       | b       | int2                          | int8                          | bool               | int28eq                               |
 | =       | b       | int2vector                    | int2vector                    | bool               | int2vectoreq                          |
 | =       | b       | int4                          | int2                          | bool               | int42eq                               |
-| =       | b       | int4                          | int8                          | bool               | int48eq                               |
 | =       | b       | int4                          | int4                          | bool               | int4eq                                |
-| =       | b       | int8                          | int8                          | bool               | int8eq                                |
+| =       | b       | int4                          | int8                          | bool               | int48eq                               |
 | =       | b       | int8                          | int2                          | bool               | int82eq                               |
 | =       | b       | int8                          | int4                          | bool               | int84eq                               |
+| =       | b       | int8                          | int8                          | bool               | int8eq                                |
 | =       | b       | interval                      | interval                      | bool               | interval_eq                           |
 | =       | b       | jsonb                         | jsonb                         | bool               | jsonb_eq                              |
 | =       | b       | line                          | line                          | bool               | line_eq                               |
@@ -69,20 +70,20 @@ where oprname ='=' and oprkind = 'b' order by test_cast_fun_0032(oprleft::int) a
 | =       | b       | text                          | text                          | bool               | texteq                                |
 | =       | b       | tid                           | tid                           | bool               | tideq                                 |
 | =       | b       | time                          | time                          | bool               | time_eq                               |
-| =       | b       | timestamp                     | timestamp                     | bool               | timestamp_eq                          |
 | =       | b       | timestamp                     | date                          | bool               | timestamp_eq_date                     |
+| =       | b       | timestamp                     | timestamp                     | bool               | timestamp_eq                          |
 | =       | b       | timestamp                     | timestamptz                   | bool               | timestamp_eq_timestamptz              |
-| =       | b       | timestamptz                   | timestamptz                   | bool               | timestamptz_eq                        |
 | =       | b       | timestamptz                   | date                          | bool               | timestamptz_eq_date                   |
 | =       | b       | timestamptz                   | timestamp                     | bool               | timestamptz_eq_timestamp              |
+| =       | b       | timestamptz                   | timestamptz                   | bool               | timestamptz_eq                        |
 | =       | b       | timetz                        | timetz                        | bool               | timetz_eq                             |
 | =       | b       | tinterval                     | tinterval                     | bool               | tintervaleq                           |
 | =       | b       | tsquery                       | tsquery                       | bool               | tsquery_eq                            |
 | =       | b       | tsvector                      | tsvector                      | bool               | tsvector_eq                           |
 | =       | b       | uuid                          | uuid                          | bool               | uuid_eq                               |
 | =       | b       | varbit                        | varbit                        | bool               | varbiteq                              |
-| =       | b       | xid                           | xid                           | bool               | xideq                                 |
 | =       | b       | xid                           | int8                          | bool               | xideqint8                             |
+| =       | b       | xid                           | xid                           | bool               | xideq                                 |
 | =       | b       | xid32                         | int4                          | bool               | xideqint4                             |
 | =       | b       | xid32                         | xid32                         | bool               | xideq4                                |
 +---------+---------+-------------------------------+-------------------------------+--------------------+---------------------------------------+
@@ -604,7 +605,7 @@ explain performance select '[105.2e3,"test",{"a":1}]'::jsonb = '[107.2e3,"test",
 --testpoint:二目操作符  <= ：success
 select oprname,oprkind,test_cast_fun_0032(oprleft::int),test_cast_fun_0032(oprright::int),test_cast_fun_0032(oprresult::int),proname from pg_operator o
 left join pg_proc p on p.oid=o.oprcode
-where oprname ='<=' and oprkind = 'b' order by test_cast_fun_0032(oprleft::int) asc;
+where oprname ='<=' and oprkind = 'b' order by test_cast_fun_0032(oprleft::int),test_cast_fun_0032(oprright::int),test_cast_fun_0032(oprresult::int) asc;
 +---------+---------+--------------------+--------------------+--------------------+--------------------------+
 | oprname | oprkind | test_cast_fun_0032 | test_cast_fun_0032 | test_cast_fun_0032 | proname                  |
 +---------+---------+--------------------+--------------------+--------------------+--------------------------+
@@ -628,14 +629,15 @@ where oprname ='<=' and oprkind = 'b' order by test_cast_fun_0032(oprleft::int) 
 | <=      | b       | float8             | float8             | bool               | float8le                 |
 | <=      | b       | inet               | inet               | bool               | network_le               |
 | <=      | b       | int1               | int1               | bool               | int1le                   |
-| <=      | b       | int2               | int8               | bool               | int28le                  |
+| <=      | b       | int16              | int16              | bool               | int16le                  |
 | <=      | b       | int2               | int2               | bool               | int2le                   |
 | <=      | b       | int2               | int4               | bool               | int24le                  |
-| <=      | b       | int4               | int8               | bool               | int48le                  |
-| <=      | b       | int4               | int4               | bool               | int4le                   |
+| <=      | b       | int2               | int8               | bool               | int28le                  |
 | <=      | b       | int4               | int2               | bool               | int42le                  |
-| <=      | b       | int8               | int4               | bool               | int84le                  |
+| <=      | b       | int4               | int4               | bool               | int4le                   |
+| <=      | b       | int4               | int8               | bool               | int48le                  |
 | <=      | b       | int8               | int2               | bool               | int82le                  |
+| <=      | b       | int8               | int4               | bool               | int84le                  |
 | <=      | b       | int8               | int8               | bool               | int8le                   |
 | <=      | b       | interval           | interval           | bool               | interval_le              |
 | <=      | b       | jsonb              | jsonb              | bool               | jsonb_le                 |
@@ -654,12 +656,12 @@ where oprname ='<=' and oprkind = 'b' order by test_cast_fun_0032(oprleft::int) 
 | <=      | b       | text               | text               | bool               | text_le                  |
 | <=      | b       | tid                | tid                | bool               | tidle                    |
 | <=      | b       | time               | time               | bool               | time_le                  |
-| <=      | b       | timestamp          | timestamp          | bool               | timestamp_le             |
 | <=      | b       | timestamp          | date               | bool               | timestamp_le_date        |
+| <=      | b       | timestamp          | timestamp          | bool               | timestamp_le             |
 | <=      | b       | timestamp          | timestamptz        | bool               | timestamp_le_timestamptz |
-| <=      | b       | timestamptz        | timestamptz        | bool               | timestamptz_le           |
 | <=      | b       | timestamptz        | date               | bool               | timestamptz_le_date      |
 | <=      | b       | timestamptz        | timestamp          | bool               | timestamptz_le_timestamp |
+| <=      | b       | timestamptz        | timestamptz        | bool               | timestamptz_le           |
 | <=      | b       | timetz             | timetz             | bool               | timetz_le                |
 | <=      | b       | tinterval          | tinterval          | bool               | tintervalle              |
 | <=      | b       | tsquery            | tsquery            | bool               | tsquery_le               |
@@ -725,7 +727,7 @@ explain performance select '[109.2e3,"test",{"a":1}]'::jsonb <= '[105.2e3,"test"
 --testpoint:二目操作符  >= ：success
 select oprname,oprkind,test_cast_fun_0032(oprleft::int),test_cast_fun_0032(oprright::int),test_cast_fun_0032(oprresult::int),proname from pg_operator o
 left join pg_proc p on p.oid=o.oprcode
-where oprname ='>=' and oprkind = 'b' order by test_cast_fun_0032(oprleft::int) asc;
+where oprname ='>=' and oprkind = 'b' order by test_cast_fun_0032(oprleft::int) ,test_cast_fun_0032(oprright::int),test_cast_fun_0032(oprresult::int)asc;
 +---------+---------+--------------------+--------------------+--------------------+--------------------------+
 | oprname | oprkind | test_cast_fun_0032 | test_cast_fun_0032 | test_cast_fun_0032 | proname                  |
 +---------+---------+--------------------+--------------------+--------------------+--------------------------+
@@ -749,14 +751,15 @@ where oprname ='>=' and oprkind = 'b' order by test_cast_fun_0032(oprleft::int) 
 | >=      | b       | float8             | float8             | bool               | float8ge                 |
 | >=      | b       | inet               | inet               | bool               | network_ge               |
 | >=      | b       | int1               | int1               | bool               | int1ge                   |
-| >=      | b       | int2               | int8               | bool               | int28ge                  |
+| >=      | b       | int16              | int16              | bool               | int16ge                  |
 | >=      | b       | int2               | int2               | bool               | int2ge                   |
 | >=      | b       | int2               | int4               | bool               | int24ge                  |
-| >=      | b       | int4               | int8               | bool               | int48ge                  |
-| >=      | b       | int4               | int4               | bool               | int4ge                   |
+| >=      | b       | int2               | int8               | bool               | int28ge                  |
 | >=      | b       | int4               | int2               | bool               | int42ge                  |
-| >=      | b       | int8               | int4               | bool               | int84ge                  |
+| >=      | b       | int4               | int4               | bool               | int4ge                   |
+| >=      | b       | int4               | int8               | bool               | int48ge                  |
 | >=      | b       | int8               | int2               | bool               | int82ge                  |
+| >=      | b       | int8               | int4               | bool               | int84ge                  |
 | >=      | b       | int8               | int8               | bool               | int8ge                   |
 | >=      | b       | interval           | interval           | bool               | interval_ge              |
 | >=      | b       | jsonb              | jsonb              | bool               | jsonb_ge                 |
@@ -775,12 +778,12 @@ where oprname ='>=' and oprkind = 'b' order by test_cast_fun_0032(oprleft::int) 
 | >=      | b       | text               | text               | bool               | text_ge                  |
 | >=      | b       | tid                | tid                | bool               | tidge                    |
 | >=      | b       | time               | time               | bool               | time_ge                  |
-| >=      | b       | timestamp          | timestamp          | bool               | timestamp_ge             |
 | >=      | b       | timestamp          | date               | bool               | timestamp_ge_date        |
+| >=      | b       | timestamp          | timestamp          | bool               | timestamp_ge             |
 | >=      | b       | timestamp          | timestamptz        | bool               | timestamp_ge_timestamptz |
-| >=      | b       | timestamptz        | timestamptz        | bool               | timestamptz_ge           |
 | >=      | b       | timestamptz        | date               | bool               | timestamptz_ge_date      |
 | >=      | b       | timestamptz        | timestamp          | bool               | timestamptz_ge_timestamp |
+| >=      | b       | timestamptz        | timestamptz        | bool               | timestamptz_ge           |
 | >=      | b       | timetz             | timetz             | bool               | timetz_ge                |
 | >=      | b       | tinterval          | tinterval          | bool               | tintervalge              |
 | >=      | b       | tsquery            | tsquery            | bool               | tsquery_ge               |
@@ -847,7 +850,7 @@ explain performance select '[101.2e3,"test",{"a":1}]'::jsonb >= '[105.2e3,"test"
 --testpoint:二目操作符  @@@ ：success
 select oprname,oprkind,test_cast_fun_0032(oprleft::int),test_cast_fun_0032(oprright::int),test_cast_fun_0032(oprresult::int),proname from pg_operator o
 left join pg_proc p on p.oid=o.oprcode
-where oprname ='@@@' and oprkind = 'b' order by test_cast_fun_0032(oprleft::int) asc;
+where oprname ='@@@' and oprkind = 'b' order by test_cast_fun_0032(oprleft::int) ,test_cast_fun_0032(oprright::int),test_cast_fun_0032(oprresult::int)asc;
 +---------+---------+--------------------+--------------------+--------------------+-------------+
 | oprname | oprkind | test_cast_fun_0032 | test_cast_fun_0032 | test_cast_fun_0032 | proname     |
 +---------+---------+--------------------+--------------------+--------------------+-------------+

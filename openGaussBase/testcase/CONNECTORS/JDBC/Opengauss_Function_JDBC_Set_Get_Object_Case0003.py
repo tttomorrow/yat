@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -24,6 +24,7 @@ History     :
 """
 import unittest
 import os
+import time
 from datetime import date, timedelta
 from yat.test import Node
 from yat.test import macro
@@ -103,6 +104,12 @@ class Jdbcisreadonly(unittest.TestCase):
         self.assertTrue("password=" in result and "port=" in result
                         and "hostname=" in result and "user=" in result
                         and "dbname=" in result)
+        result = self.commsh.stop_db_cluster()
+        self.assertTrue(result)
+        result = self.commsh.start_db_cluster(True)
+        flg = self.constant.START_SUCCESS_MSG in result \
+              or 'Degraded' in result
+        self.assertTrue(flg)
 
         self.log.info('--------------3. 编译java工具------------------')
         self.db_primary_root_node.scp_put(macro.JDBC_PATH,
@@ -121,7 +128,9 @@ class Jdbcisreadonly(unittest.TestCase):
         self.log.info(cmd)
         result = self.db_primary_root_node.sh(cmd).result()
         self.log.info(result)
+        self.assertIn('第1行结果：+999999999-12-31', result)
 
+        self.assertIn('第2行结果：-999999999-01-01', result)
         self.assertIn('第3行结果：1970-01-01', result)
         today = date.today().strftime("%Y-%m-%d")
         self.assertIn(f'第4行结果：{today}', result)
@@ -132,6 +141,8 @@ class Jdbcisreadonly(unittest.TestCase):
         self.assertIn(f'第5行结果：{tomorrow}', result)
         yesterday = (date.today() + timedelta(days=-1)).strftime("%Y-%m-%d")
         self.assertIn(f'第6行结果：{yesterday}', result)
+        self.assertIn('第7行结果：+999999999-12-31', result)
+        self.assertIn('第8行结果：-999999999-01-01', result)
         self.assertIn('第9行结果：null', result)
         self.assertIn('第11行结果：1970-01-02', result)
         self.assertIn('第12行结果：2021-01-02', result)
@@ -151,7 +162,12 @@ class Jdbcisreadonly(unittest.TestCase):
             f"{os.path.join(macro.DB_INSTANCE_PATH, 'pg_hba.conf')}"
         self.log.info(cmd)
         self.db_primary_user_node.sh(cmd)
-
+        self.log.info('------------------重启数据库-------------')
+        result = self.commsh.stop_db_cluster()
+        self.log.info(result)
+        result = self.commsh.start_db_cluster(True)
+        self.log.info(result)
+        time.sleep(3)
         result = self.commsh.execut_db_sql(
             f"drop database if exists {self.db_name};")
         self.log.info(result)

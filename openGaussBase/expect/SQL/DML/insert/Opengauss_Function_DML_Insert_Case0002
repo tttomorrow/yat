@@ -1,4 +1,5 @@
 -- @testpoint: insert组合数据类型,二进制，布尔，日期型等数据，违法唯一约束，合理报错
+-- @modify at: 2020-11-16
 --建表，包含基本数据类型
 drop table if exists tbl_hash;
 SQL SUCCESS
@@ -57,7 +58,6 @@ SQL SUCCESS
 insert into tbl_hash(col_raw1,col_timestamp1,col_timestamp2,col_bool,col_interval1,col_interval2,col_nvarchar2_1,col_real,col_bigint)values('1001111111111111111111111111111','2018-01-07 08:08:08','2018-01-07 08:08:08',100,'1-1',
 '1 2:2:2',100,100,100);
 ?.*ERROR: duplicate key value violates unique constraint "idx_tbl_hash_2"
-  Detail: Key (col_raw1, col_timestamp1, col_timestamp2, col_bool, col_interval1, col_interval2, col_nvarchar2_1, col_real, col_bigint)=(01001111111111111111111111111111, 2018-01-07 08:08:08, 2018-01-07 08:08:08, t, 1 year 1 mon, 1 day 02:02:02, 100, 100, 100) already exists.
 --删除表
 drop table if exists tbl_hash cascade;
 SQL SUCCESS

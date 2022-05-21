@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -30,7 +30,7 @@ Expect      :
         4.修改成功
         5.合理报错
         6.清理环境完成
-              用例复制postgresql.jar包步骤
+              用例复制postgresql.jar包步骤;
 """
 import os
 import unittest
@@ -52,19 +52,29 @@ class ToolsBackup(unittest.TestCase):
         self.DB_ENV_PATH = macro.DB_ENV_PATH
         self.Primary_Node = Node('PrimaryDbUser')
         self.Root_Node = Node('PrimaryRoot')
-        self.tb_name = "t_02"
-        self.user = "us_02"
+        self.tb_name = "tb_jdbcgsbackup_case0002"
+        self.user = "us_jdbcgsbackup_case0002"
         self.package = os.path.join(
             os.path.dirname(macro.DB_INSTANCE_PATH), 'package_zh')
-        self.log.info('---备份pg_hba.conf文件---')
-        cmd = f"cp {os.path.join(macro.DB_INSTANCE_PATH, 'pg_hba.conf')}  " \
-              f"{os.path.join(macro.DB_INSTANCE_PATH, 'pg_hba.conf_t_bak')}"
+        self.pg_hba_path = os.path.join(macro.DB_INSTANCE_PATH, 'pg_hba.conf')
+        self.pg_hba_path_bak = os.path.join(macro.DB_INSTANCE_PATH,
+                                            'pg_hba.conf_t_bak')
+        text = '---备份主节点pg_hba.conf文件---'
+        self.log.info(text)
+        cmd = f'''if [ -f "{self.pg_hba_path}" ]
+                  then
+                      cp {self.pg_hba_path} {self.pg_hba_path_bak}
+                  else
+                      echo 'ERROR: 执行失败:文件不存在，请检查'
+                  fi
+                '''
         self.log.info(cmd)
         msg = self.Primary_Node.sh(cmd).result()
         self.log.info(msg)
 
     def test_tools_backup(self):
-        self.log.info('---创建工具所在目录---')
+        text = '---step1:创建工具所在目录;expect:创建成功--'
+        self.log.info(text)
         mkdir_cmd = f'''if [ ! -d "{self.package}" ]
                         then 
                             mkdir -p {self.package}
@@ -72,15 +82,16 @@ class ToolsBackup(unittest.TestCase):
         self.log.info(mkdir_cmd)
         result = self.Root_Node.sh(mkdir_cmd).result()
         self.log.info(result)
-        self.assertEqual(result, '')
+        self.assertEqual(result, '', '执行失败:' + text)
 
-        self.log.info('---获取openGauss-tools-backup工具包---')
+        text = '--step2:获取openGauss-tools-backup工具包;expect获取完成---'
+        self.log.info(text)
         sql_cmd = f'''wget -P {self.package} {macro.PACKAGE_URL}; '''
         self.log.info(sql_cmd)
         result = self.Root_Node.sh(sql_cmd).result()
         self.log.info(result)
         self.assertIn(f"‘{self.package}/openGauss-tools-backup.tar.gz’ saved"
-                      , result)
+                      , result, '执行失败:' + text)
         self.log.info('---解压工具包---')
         sql_cmd = f'''cd {self.package};
             tar -zxvf openGauss-tools-backup.tar.gz; '''
@@ -89,7 +100,8 @@ class ToolsBackup(unittest.TestCase):
         self.log.info(result)
         self.assertIn('openGauss-tools-backup', result)
 
-        self.log.info('---postgres数据库下建表并创建用户---')
+        text = '--step3:postgres数据库下建表并创建用户;expect:创建成功---'
+        self.log.info(text)
         sql_cmd = f'''drop table if exists {self.tb_name};
             create table {self.tb_name} (id int ,name varchar(10));
             insert into {self.tb_name} values (1,'aa'),(2,'bb');
@@ -100,10 +112,13 @@ class ToolsBackup(unittest.TestCase):
         sql_result = self.pri_sh.execut_db_sql(sql=sql_cmd,
                                                dbname=f'postgres')
         self.log.info(sql_result)
-        self.assertIn(self.constant.TABLE_CREATE_SUCCESS, sql_result)
-        self.assertIn(self.constant.CREATE_ROLE_SUCCESS_MSG, sql_result)
+        self.assertIn(self.constant.TABLE_CREATE_SUCCESS, sql_result,
+                      '执行失败:' + text)
+        self.assertIn(self.constant.CREATE_ROLE_SUCCESS_MSG, sql_result,
+                      '执行失败:' + text)
 
-        self.log.info('---修改信任方式为sha256---')
+        text = '--step4:---修改信任方式为sha256;expect:修改成功---'
+        self.log.info(text)
         cmd = f"grep -nr '127.0.0.1/32' " \
               f"{os.path.join(macro.DB_INSTANCE_PATH, 'pg_hba.conf')}"
         self.log.info(cmd)
@@ -117,8 +132,14 @@ class ToolsBackup(unittest.TestCase):
         self.log.info(cmd)
         result = self.Primary_Node.sh(cmd).result()
         self.log.info(result)
+        restart_msg = self.pri_sh.restart_db_cluster()
+        self.log.info(restart_msg)
+        status = self.pri_sh.get_db_cluster_status()
+        self.assertTrue("Degraded" in status or "Normal" in status,
+                        '执行失败:' + text)
 
-        self.log.info('---导出---')
+        text = '---step5:导出;expect:导出完成---'
+        self.log.info(text)
         sql_cmd = f'''cd {self.package}/openGauss-tools-backup;
             java -jar openGauss-tools-backup.jar  \
             -m dump  \
@@ -130,25 +151,37 @@ class ToolsBackup(unittest.TestCase):
         self.log.info(sql_cmd)
         msg = self.Root_Node.sh(sql_cmd).result()
         self.log.info(msg)
-        self.assertIn(f'FATAL: database "{self.user}" does not exist', msg)
+        self.assertIn(f'FATAL: database "{self.user}" does not exist', msg,
+                      '执行失败:' + text)
 
     def tearDown(self):
-        self.log.info('---清理环境---')
+        text = '---step6:清理环境;expect:清理环境完成---'
+        self.log.info(text)
         sql_cmd = f'''rm -rf {self.package};'''
         self.log.info(sql_cmd)
         result = self.Root_Node.sh(sql_cmd).result()
         self.log.info(result)
-        cmd = f"rm -rf " \
-              f"{os.path.join(macro.DB_INSTANCE_PATH, 'pg_hba.conf')};" \
-              f"mv " \
-              f"{os.path.join(macro.DB_INSTANCE_PATH, 'pg_hba.conf_t_bak')} " \
-              f"{os.path.join(macro.DB_INSTANCE_PATH, 'pg_hba.conf')}"
+        cmd = f'''if [ -f "{self.pg_hba_path_bak}" ]
+                  then
+                      if [ -f "{self.pg_hba_path}" ]
+                      then
+                          rm -rf {self.pg_hba_path}
+                          mv {self.pg_hba_path_bak}  {self.pg_hba_path}
+                      else
+                          echo "原pg_hba.conf文件不存在"
+                          mv {self.pg_hba_path_bak}  {self.pg_hba_path}
+                      fi
+                  else
+                      echo 'ERROR: 执行失败:文件不存在，请检查'
+                  fi'''
         self.log.info(cmd)
-        self.Primary_Node.sh(cmd)
+        msg = self.Primary_Node.sh(cmd).result()
+        self.log.info(msg)
         sql_cmd = f'''drop table if exists {self.tb_name} cascade;
             drop user if exists {self.user} cascade;'''
         self.log.info(sql_cmd)
         sql_result = self.pri_sh.execut_db_sql(sql=sql_cmd,
                                                dbname=f'postgres')
         self.log.info(sql_result)
+        self.assertIn('DROP TABLE', sql_result, '执行失败:' + text)
         self.log.info('---Opengauss_Function_JdbcGsBackup_Case0002finish---')

@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -17,6 +17,7 @@ Case Type   : 数据库系统
 Case Name   : 设置recovery_min_apply_delay为非法值
 Description :
     1.设置recovery_min_apply_delay参数为-1
+    2.设置recovery_min_apply_delay参数为4294967295
     3.设置recovery_min_apply_delay参数为小数
     4.设置recovery_min_apply_delay参数为字母符号
 Expect      :
@@ -50,8 +51,10 @@ class RecoveryDelay(unittest.TestCase):
             'recovery_min_apply_delay=-1')
         self.assertFalse(result)
 
+        self.log.info('-----设置recovery_min_apply_delay参数为2147483648----')
         result = self.commshpri.execute_gsguc(
             'reload', self.constant.GSGUC_SUCCESS_MSG,
+            'recovery_min_apply_delay=2147483648')
         self.assertFalse(result)
 
         self.log.info('-----设置recovery_min_apply_delay参数为小数----')

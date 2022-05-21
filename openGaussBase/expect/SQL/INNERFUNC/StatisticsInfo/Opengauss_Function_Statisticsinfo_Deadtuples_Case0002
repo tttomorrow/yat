@@ -22,6 +22,7 @@ select pg_stat_get_dead_tuples(a.oid,a.oid) from PG_CLASS a where a.relname = 's
   Hint: No function matches the given name and argument types. You might need to add explicit type casts.
 ?.*
   Where: referenced column: pg_stat_get_dead_tuples
+select pg_stat_get_dead_tuples(98765432198765);
 ?.*ERROR: OID out of range
   Where: referenced column: pg_stat_get_dead_tuples
 select pg_stat_get_dead_tuples('*&^%^&*');

@@ -1,0 +1,19 @@
+-- @testpoint: 测试创建哈希索引时，是否支持对指定列进行排序
+
+--创建表
+drop table if exists t_hash_index_0062;
+create table t_hash_index_0062
+(
+    id01 varchar,
+    id02 char(20) not null
+) 
+with(orientation=row);
+
+--创建哈希索引(是否支持排序)
+create index i_hash_index_0062 on t_hash_index_0062 using hash(id01 collate "POSIX");
+
+--删除哈希索引
+drop index if exists i_hash_index_0062;
+
+--表、表空间
+drop table t_hash_index_0062 cascade;

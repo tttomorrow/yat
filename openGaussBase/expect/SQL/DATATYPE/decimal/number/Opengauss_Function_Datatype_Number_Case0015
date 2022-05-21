@@ -12,6 +12,7 @@ insert into number_15 values (1234.1234);
 SQL SUCCESS
 insert into number_15 values (9999.99);
 SQL SUCCESS
+insert into number_15 values (1.11223344566);
 SQL SUCCESS
 select * from number_15;
 +---------+

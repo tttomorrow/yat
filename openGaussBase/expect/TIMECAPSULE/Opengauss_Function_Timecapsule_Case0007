@@ -1,0 +1,94 @@
+-- @testpoint: 执行drop闪回,合理报错
+--step1: 查询enable_recyclebin默认值; expect:显示默认值off
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+
+--step2: 修改enable_recyclebin为on; expect:修改成功
+alter system set enable_recyclebin to on;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| on                |
++-------------------+
+--step3: 清除回收站; expect:回收站清除成功
+purge recyclebin;
+SQL SUCCESS
+--step4: 创建表、插入数据; expect:表创建成功、数据插入成功
+drop table if exists t_timecapsule_0007;
+SQL SUCCESS
+create table t_timecapsule_0007(a int);
+SQL SUCCESS
+insert into t_timecapsule_0007 values(1);
+SQL SUCCESS
+--step5: 创建唯一索引; expect:索引创建成功
+create unique index i_timecapsule_0007 on t_timecapsule_0007(a);
+SQL SUCCESS
+--step6: 删除drop表; expect:删除成功
+drop table t_timecapsule_0007;
+SQL SUCCESS
+--step7: 在回收站中统计原始对象名称%_timecapsule_0007%和操作类型为drop; expect:预期结果为2
+select count(*) from gs_recyclebin where rcyoriginname like '%_timecapsule_0007%' and rcyoperation = 'd';
++-------+
+| count |
++-------+
+| 2     |
++-------+
+--step8: 执行闪回drop语法错误; expect:闪回失败
+timecapsule idx i_timecapsule_0007 to before drop;
+?.*ERROR: syntax error at or near "idx.*
+?.*
+--step9: 执行闪回drop表名错误; expect:闪回失败
+timecapsule table i_timecapsule_0007 to before drop;
+?.*ERROR: recycle object "i_timecapsule_0007" desired does not exis.*
+--step10: 执行闪回drop; expect:闪回成功
+timecapsule table t_timecapsule_0007 to before drop;
+SQL SUCCESS
+--step11: 查询闪回后的表; expect:成功显示数据1
+select * from t_timecapsule_0007;
++---+
+| a |
++---+
+| 1 |
++---+
+--step12: 向闪回后的表中插入已有的数据; expect:插入失败
+insert into t_timecapsule_0007 values(1);
+?.*ERROR: duplicate key value violates unique constraint ".*
+  Detail: Key (a)=(1) already exists.
+--step13: 在回收站中统计原始对象名称%_timecapsule_0007%和操作类型为drop; expect:预期结果为0
+select count(*) from gs_recyclebin where rcyoriginname like '%_timecapsule_0007%' and rcyoperation = 'd';
++-------+
+| count |
++-------+
+| 0     |
++-------+
+--step14: 清理环境; expect:清理成功
+drop table if exists t_timecapsule_0007 purge;
+SQL SUCCESS
+purge recyclebin;
+SQL SUCCESS
+--step14: 恢复默认值; expect:默认值恢复成功
+alter system set enable_recyclebin to off;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+

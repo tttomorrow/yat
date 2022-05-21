@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -31,7 +31,6 @@ Expect      :
         5.导入成功
         6.导入表为分区表且数据正确
         7.清理环境完成
-History     :
 """
 import os
 import unittest
@@ -54,7 +53,7 @@ class ToolsBackup(unittest.TestCase):
         self.Primary_Node = Node('PrimaryDbUser')
         self.Root_Node = Node('PrimaryRoot')
         self.package = os.path.join(
-            os.path.dirname(macro.DB_INSTANCE_PATH), 'package_zh')
+            os.path.dirname(macro.DB_INSTANCE_PATH), 'package_backup')
         self.db_name = "gs_db03"
         self.user = "us_03"
         self.tb_name = "range_t"
@@ -153,6 +152,7 @@ class ToolsBackup(unittest.TestCase):
               loop
                 i:=i+1;
             insert into {self.tb_name} \
+            values(256,10000000,123.3212,123456.123,12345633333,'b','957',
             '简自豪',lpad('345abc',50,'abc'),'151515',null,\
             '2010-09-11 00:00:00','2012-11-11 00:00:00',interval '2' day,\
             '2016-12-11 00:00:00', '2011-12-11 00:00:00','true',null,null);
@@ -255,6 +255,10 @@ class ToolsBackup(unittest.TestCase):
         self.log.info(cmd)
         result = self.Primary_Node.sh(cmd).result()
         self.log.info(result)
+        restart_msg = self.pri_sh.restart_db_cluster()
+        self.log.info(restart_msg)
+        status = self.pri_sh.get_db_cluster_status()
+        self.assertTrue("Degraded" in status or "Normal" in status)
 
         self.log.info('---导出--')
         sql_cmd = f'''cd {self.package}/openGauss-tools-backup;\
@@ -322,14 +326,14 @@ class ToolsBackup(unittest.TestCase):
         self.assertIn('Range partition by(field12)' and
                       'Interval partition by(time_id)'
                       and 'Hash partition by(p_id)' and
-                      'List partition by(p_id)', sql_result)
+                      'Partition By LIST(p_id)', sql_result)
 
     def tearDown(self):
         self.log.info('---清理环境---')
-        sql_cmd = f'''rm -rf {self.package};'''
-        self.log.info(sql_cmd)
-        result = self.Root_Node.sh(sql_cmd).result()
-        self.log.info(result)
+        rm_cmd = f'''rm -rf {self.package};'''
+        self.log.info(rm_cmd)
+        rm_result = self.Root_Node.sh(rm_cmd).result()
+        self.log.info(rm_result)
         cmd = f"rm -rf " \
               f"{os.path.join(macro.DB_INSTANCE_PATH, 'pg_hba.conf')};" \
               f"mv " \
@@ -337,13 +341,18 @@ class ToolsBackup(unittest.TestCase):
               f"{os.path.join(macro.DB_INSTANCE_PATH, 'pg_hba.conf')}"
         self.log.info(cmd)
         self.Primary_Node.sh(cmd)
-        sql_cmd = self.pri_sh.execut_db_sql(f'''drop database if exists \
+        drop_cmd = self.pri_sh.execut_db_sql(f'''drop database if exists \
             {self.db_name};
             drop user if exists {self.user} cascade;
             drop tablespace if exists part_tabspace;
             drop tablespace if exists jdbcpgbackup_tabspace01;
             drop tablespace if exists jdbcpgbackup_tabspace02;
             drop tablespace if exists jdbcpgbackup_tabspace03;''')
-        self.log.info(sql_cmd)
+        self.log.info(drop_cmd)
+        self.assertEqual('',  rm_result)
+        self.assertIn(self.constant.DROP_DATABASE_SUCCESS, drop_cmd)
+        self.assertIn(self.constant.DROP_ROLE_SUCCESS_MSG, drop_cmd)
+        self.assertTrue(drop_cmd.count(self.constant.TABLESPCE_DROP_SUCCESS)
+                        == 4)
         self.log.info(
             '---Opengauss_Function_JdbcGsBackup_Case0035finish---')

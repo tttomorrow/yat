@@ -4,5 +4,6 @@ drop table if exists number_18;
 create table number_18 (name number(6,2));
 insert into number_18 values (0.123);
 insert into number_18 values (123.12656);
+insert into number_18 values (999.999999999);
 select * from number_18;
 drop table number_18;

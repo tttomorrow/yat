@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -35,24 +35,23 @@ class Tools(unittest.TestCase):
         self.userNode = Node('PrimaryDbUser')
         self.DB_ENV_PATH = macro.DB_ENV_PATH
         self.dir_path = os.path.join(macro.DB_INSTANCE_PATH, 'datadir')
-
+    
     def test_systools(self):
         self.logger.info('--------执行gs_initdb命令--------')
         excute_cmd1 = f'source {self.DB_ENV_PATH};gs_initdb -D ' \
-                      f'{self.dir_path} --nodename=01single -w ' \
-                      f'{self.userNode.ssh_password}'
+            f'{self.dir_path} --nodename=01single -w ' \
+            f'{self.userNode.ssh_password}'
         self.logger.info(excute_cmd1)
         msg1 = self.userNode.sh(excute_cmd1).result()
         self.logger.info(msg1)
         self.assertTrue(
-            msg1.find('Postgres-XC node name:01single is invalid') > -1)
+            msg1.find('01single is invalid') > -1)
         self.logger.info('-------未生成datadir目录-------')
         excute_cmd2 = f'ls {self.dir_path}'
         self.logger.info(excute_cmd2)
         msg2 = self.userNode.sh(excute_cmd2).result()
         self.logger.info(msg2)
         self.assertTrue(msg2.find('No such file or directory') > -1)
-
+    
     def tearDown(self):
         self.logger.info('---Opengauss_Function_gs_initdb_Case0005 finish---')
-

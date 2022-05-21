@@ -1,0 +1,81 @@
+-- @testpoint: 验证enable_recyclebin 边界值异常值-1,2-1,1*1,'abc',on*,$on,合理报错
+--step1: 查询enable_recyclebin值; expect:显示默认值为off
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+
+--step2: 修改enable_recyclebin值为-1; expect:修改失败，合理报错
+alter system set enable_recyclebin to -1;
+?.*ERROR: parameter "enable_recyclebin" requires a Boolean valu.*
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+--step3: 修改enable_recyclebin值为2-1; expect:修改失败，合理报错
+alter system set enable_recyclebin to 2-1;
+?.*ERROR: syntax error at or near "-.*
+?.*
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+--step4: 修改enable_recyclebin值为1*1; expect:修改失败，合理报错
+alter system set enable_recyclebin to 1*1;
+?.*ERROR: syntax error at or near "*.*
+?.*
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+--step5: 修改enable_recyclebin值为'abc'; expect:修改失败，合理报错
+alter system set enable_recyclebin to 'abc';
+?.*ERROR: parameter "enable_recyclebin" requires a Boolean valu.*
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+--step6: 修改enable_recyclebin值为on*; expect:修改失败，合理报错
+alter system set enable_recyclebin to on*;
+?.*ERROR: syntax error at or near "*.*
+?.*
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+--step7: 修改enable_recyclebin值为$on; expect:修改失败，合理报错
+alter system set enable_recyclebin to $on;
+?.*ERROR: syntax error at or near ".*
+?.*
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+--step8: 恢复默认值; expect:默认值恢复成功
+alter system set enable_recyclebin to off;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+

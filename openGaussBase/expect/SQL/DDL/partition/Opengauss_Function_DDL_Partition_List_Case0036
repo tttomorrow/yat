@@ -1,0 +1,45 @@
+-- @testpoint: list分区表创建多个索引
+--step1:创建list分区表,expect成功
+drop table if exists t_partition_list_0036;
+SQL SUCCESS
+create table t_partition_list_0036(p_id int,p_name varchar,p_age int)
+partition by list(p_id)
+(partition p1 values(10),
+ partition p2 values(20),
+ partition p3 values(30),
+ partition p4 values(40));
+SQL SUCCESS
+--step2:插入数据,expect成功
+BEGIN
+  for i in 1..20 LOOP
+    insert into t_partition_list_0036 values(10),(20),(30),(40);
+  end LOOP;
+end;
+/
+SQL SUCCESS
+--step3:并行创建索引,expect成功
+drop index if exists partition_index_01;
+SQL SUCCESS
+create index partition_index_01 on t_partition_list_0036(p_id);
+SQL SUCCESS
+drop index if exists partition_index_02;
+SQL SUCCESS
+create index partition_index_02 on t_partition_list_0036(p_id);
+SQL SUCCESS
+--step4:通过索引检索表中数据,expect成功
+explain select * from t_partition_list_0036 where p_id =10 ;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*Bitmap Heap Scan on t_partition_list_0036.*
+?.*Recheck Cond: \(p_id = 10\).*
+?.*Bitmap Index Scan on partition_index_02.*
+?.*Index Cond: \(p_id = 10\).*
+?.*
+--step4:清理数据,expect成功
+drop index if exists partition_index_01;
+SQL SUCCESS
+drop index if exists partition_index_02;
+SQL SUCCESS
+drop table if exists t_partition_list_0036;
+SQL SUCCESS

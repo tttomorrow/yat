@@ -7,6 +7,7 @@ select char_length(pg_stat_get_role_name(00000))=0;
 +----------+
 | true     |
 +----------+
+select pg_stat_get_role_name(9999999999999);
 ?.*ERROR: OID out of range
   Where: referenced column: pg_stat_get_role_name
 DROP USER if exists kim cascade;

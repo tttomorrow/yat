@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -87,6 +87,7 @@ class Security(unittest.TestCase):
         sql_cmd4 = f'''drop table if exists {self.table};
                 create table {self.table}(id int,name char(10),string
                 varchar(25),address varchar(60));
+                insert into {self.table} values(1,'张三','640521189505211815',
                 'Shanxi,Xian,yuhuazhai'),(2,'李四','xinlang@163.com',
                 'Fujian');'''
         excute_cmd4 = f'source {macro.DB_ENV_PATH};' \
@@ -130,6 +131,7 @@ class Security(unittest.TestCase):
         msg6 = self.userNode.sh(excute_cmd6).result()
         logger.info(msg6)
         msg6_list = msg6.splitlines()
+        assert_1 = msg6_list[2].strip() != '640521189505211815' and \
                    msg6_list[3].strip() != 'xinlang@163.com'
         self.assertTrue(assert_1, '执行失败:' + text)
         text = '---step4：登录用户2查看表的string字段脱敏 expect:未脱敏---'
@@ -143,6 +145,7 @@ class Security(unittest.TestCase):
         msg6 = self.userNode.sh(excute_cmd6).result()
         logger.info(msg6)
         msg6_list = msg6.splitlines()
+        assert_1 = msg6_list[2].strip() == '640521189505211815' and \
                    msg6_list[3].strip() == 'xinlang@163.com'
         self.assertTrue(assert_1, '执行失败:' + text)
     

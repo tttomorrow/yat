@@ -1,0 +1,84 @@
+-- @testpoint: Hash分区表与普通表交换数据（对应信息严格一致）（验证表空间）
+--step1：创建表空间 expect：成功
+drop tablespace if exists partition_tablespace;
+SQL SUCCESS
+drop tablespace if exists exchange_tablespace;
+SQL SUCCESS
+create tablespace partition_tablespace relative location 'tablespace/tablespace_2';
+SQL SUCCESS
+create tablespace exchange_tablespace relative location 'tablespace/tablespace_3';
+SQL SUCCESS
+--step2：创建hash分区表 expect：成功
+drop table if exists t_partition_hash_0078_01;
+SQL SUCCESS
+create table t_partition_hash_0078_01(
+id int,
+name varchar(100),
+age int)
+tablespace partition_tablespace
+partition by hash(id)
+(partition p1,
+ partition p2);
+SQL SUCCESS
+--step3：插入数据 expect：成功插入四条数据
+insert into t_partition_hash_0078_01 values( 1,  '张三', 25);
+SQL SUCCESS
+insert into t_partition_hash_0078_01 values( 2,  '张三', 26);
+SQL SUCCESS
+insert into t_partition_hash_0078_01 values( 3,  '张三', 27);
+SQL SUCCESS
+insert into t_partition_hash_0078_01 values( 4,  '张三', 28);
+SQL SUCCESS
+--step4：创建普通表 expect：成功
+drop table if exists t_partition_hash_0078_02;
+SQL SUCCESS
+create table t_partition_hash_0078_02(
+id int,
+name varchar(100),
+age int)
+tablespace exchange_tablespace;
+SQL SUCCESS
+--step5：验证表空间信息 expect：表空间partition_tablespace包含分区表
+select relname from pg_class t1 where relkind='r' and reltablespace=(
+    select oid from pg_tablespace where spcname ='partition_tablespace');
++--------------------------+
+| relname                  |
++--------------------------+
+| t_partition_hash_0078_01 |
++--------------------------+
+--step6：验证表空间信息 expect：表空间exchange_tablespace包含普通表
+select relname from pg_class t1 where relkind='r' and reltablespace=(
+    select oid from pg_tablespace where spcname ='exchange_tablespace');
++--------------------------+
+| relname                  |
++--------------------------+
+| t_partition_hash_0078_02 |
++--------------------------+
+--step7：交换数据 expect：分区表p1分区与普通表交换信息成功
+alter table t_partition_hash_0078_01 exchange partition (p1) with table t_partition_hash_0078_02;
+SQL SUCCESS
+--step8：验证表空间信息 expect：表空间partition_tablespace中包含普通表
+select relname from pg_class t1 where relkind='r' and reltablespace=(
+    select oid from pg_tablespace where spcname ='partition_tablespace') order by relname asc;
++--------------------------+
+| relname                  |
++--------------------------+
+| t_partition_hash_0078_01 |
+| t_partition_hash_0078_02 |
++--------------------------+
+--step9：验证表空间信息 expect：表空间exchange_tablespace不包含普通表
+select relname from pg_class t1 where relkind='r' and reltablespace=(
+    select oid from pg_tablespace where spcname ='exchange_tablespace');
++---------+
+| relname |
++---------+
++---------+
+--step10：清理环境 expect：成功
+drop table if exists t_partition_hash_0078_01;
+SQL SUCCESS
+drop table if exists t_partition_hash_0078_02;
+SQL SUCCESS
+drop tablespace partition_tablespace;
+SQL SUCCESS
+drop tablespace exchange_tablespace;
+SQL SUCCESS

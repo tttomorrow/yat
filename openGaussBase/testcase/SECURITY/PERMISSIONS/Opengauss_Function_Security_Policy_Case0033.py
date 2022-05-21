@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -17,7 +17,7 @@ Case Type   : policy
 Case Name   : 密码为A-Z大写字母的最少要求个数password_min_uppercase=999
 Description :
     1.设置password_min_uppercase=999,数据库重启
-    2.初始用户执行：create user wf with password 'Qazwsx@123';
+    2.初始用户执行：create user wf with password '$PASSWORD';
 Expect      :
     1.设置成功，数据库重启成功
     2.提示密码至少包含999个大写字母

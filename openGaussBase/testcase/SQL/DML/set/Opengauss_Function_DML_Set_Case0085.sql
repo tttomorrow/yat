@@ -1,4 +1,4 @@
---  @testpoint:约束默认是no deferable的，使用SET CONSTRAINTS语句设置当前事务检查行为的约束条件（检查约束）
+-- @testpoint: 约束默认是no deferable的，使用SET CONSTRAINTS语句设置当前事务检查行为的约束条件（检查约束）,部分step合理报错
 --建表同时定义检查约束
 drop table if exists t4;
 create table t4 (id int check (id >5),name varchar(40));

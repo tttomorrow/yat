@@ -24,5 +24,6 @@ insert into partition_table_001 values (2,'bbb',2,null,false,'bbb',2.2);
 ?.*ERROR: null value in column "col_4" violates not-null constraint
 insert into partition_table_001 values (3,'ccc',3,'',true,'ccc',3.3);
 ?.*ERROR: null value in column "col_4" violates not-null constraint
+  Detail: Failing row contains (3, ccc                           , 3, null, t, ccc                           , 3.29999999999999982).
 drop table if exists partition_table_001;
 SQL SUCCESS

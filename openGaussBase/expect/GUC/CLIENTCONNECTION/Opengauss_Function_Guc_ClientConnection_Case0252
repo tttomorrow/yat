@@ -7,17 +7,24 @@ show update_lockwait_timeout;
 | 2min                    |
 +-------------------------+
 --设置，成功
+set update_lockwait_timeout to 2147483647;
 SQL SUCCESS
 show update_lockwait_timeout;
 +-------------------------+
 | update_lockwait_timeout |
 +-------------------------+
+| 2147483647ms            |
 +-------------------------+
 --设置，报错
 set update_lockwait_timeout to 'test';
 ?.*ERROR: invalid value for parameter "update_lockwait_timeout": "test"
+set update_lockwait_timeout to '2147483647%$#';
+?.*ERROR: invalid value for parameter "update_lockwait_timeout": "2147483647\%\$\#"
   Hint: Valid units for this parameter are "ms", "s", "min", "h", and "d".
 set update_lockwait_timeout to '-1';
+?.*ERROR: -1 is outside the valid range for parameter "update_lockwait_timeout" \(0 .. 2147483647\)
+set update_lockwait_timeout to '2147483648';
+?.*ERROR: invalid value for parameter "update_lockwait_timeout": "2147483648"
   Hint: Value exceeds integer range.
 set update_lockwait_timeout to 1582.256;
 ?.*ERROR: invalid value for parameter "update_lockwait_timeout": "1582.256"

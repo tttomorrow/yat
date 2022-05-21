@@ -1,0 +1,235 @@
+-- @testpoint: list_hash二级分区表：rownum/视图/物化视图,部分测试点合理报错
+--step1: 创建表空间; expect:成功
+drop table if exists t_subpartition_0176 cascade;
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0176;
+SQL SUCCESS
+create tablespace ts_subpartition_0176 relative location 'subpartition_tablespace/subpartition_tablespace_0176';
+SQL SUCCESS
+--test1: 分区表 + rownum
+--step2: 创建二级分区表; expect:成功
+create table if not exists t_subpartition_0176
+(
+    col_1 int ,
+    col_2 int, 
+    col_3 varchar2 ( 30 ) ,
+    col_4 int
+)tablespace ts_subpartition_0176
+partition by list (col_1) subpartition by hash (col_2)
+(
+  partition p_list_1 values (-1,-2,-3,-4,-5,-6,-7,-8,-9,-10 )
+  (
+    subpartition p_hash_1_1 ,
+    subpartition p_hash_1_2 ,
+    subpartition p_hash_1_3 
+  ),
+  partition p_list_2 values (1,2,3,4,5,6,7,8,9,10 )
+  (
+    subpartition p_hash_2_1 ,
+    subpartition p_hash_2_2 ,
+    subpartition p_hash_2_3 ,
+    subpartition p_hash_2_4 ,
+    subpartition p_hash_2_5 
+  ),
+  partition p_list_3 values (11,12,13,14,15,16,17,18,19,20),
+  partition p_list_4 values (21,22,23,24,25,26,27,28,29,30 )
+  (
+    subpartition p_hash_4_1 
+  ),
+  partition p_list_5 values (default)
+  (
+    subpartition p_hash_5_1 
+  ),
+  partition p_list_6 values (31,32,33,34,35,36,37,38,39,40)
+  (
+    subpartition p_hash_6_1 ,
+    subpartition p_hash_6_2 ,
+    subpartition p_hash_6_3 
+  )
+) enable row movement ;
+SQL SUCCESS
+--step3: generate_series插入大量数据; expect:成功
+insert into t_subpartition_0176 values (generate_series(0, 19),generate_series(0, 1000),generate_series(0, 99));
+SQL SUCCESS
+--step4: 查询数据：rownum; expect:成功
+select rownum,* from t_subpartition_0176 where col_3 > 98 and rownum <10;
++--------+-------+-------+-------+-------+
+| rownum | col_1 | col_2 | col_3 | col_4 |
++--------+-------+-------+-------+-------+
+| 1      | 19    | 99    | 99    |       |
+| 2      | 19    | 199   | 99    |       |
+| 3      | 19    | 299   | 99    |       |
+| 4      | 19    | 399   | 99    |       |
+| 5      | 19    | 499   | 99    |       |
+| 6      | 19    | 599   | 99    |       |
+| 7      | 19    | 699   | 99    |       |
+| 8      | 19    | 799   | 99    |       |
+| 9      | 19    | 899   | 99    |       |
++--------+-------+-------+-------+-------+
+--step5: 查询数据：rownum/order by/desc/limit; expect:成功
+select rownum,* from t_subpartition_0176 where col_3 > 98 order by rownum desc limit 2,18;
++--------+-------+-------+-------+-------+
+| rownum | col_1 | col_2 | col_3 | col_4 |
++--------+-------+-------+-------+-------+
+| 999    | 19    | 800   | 99    |       |
+| 998    | 19    | 700   | 99    |       |
+| 997    | 19    | 600   | 99    |       |
+| 996    | 19    | 500   | 99    |       |
+| 995    | 19    | 400   | 99    |       |
+| 994    | 19    | 300   | 99    |       |
+| 993    | 19    | 200   | 99    |       |
+| 992    | 19    | 100   | 99    |       |
+| 991    | 19    | 0     | 99    |       |
+| 990    | 19    | 901   | 99    |       |
+| 989    | 19    | 801   | 99    |       |
+| 988    | 19    | 701   | 99    |       |
+| 987    | 19    | 601   | 99    |       |
+| 986    | 19    | 501   | 99    |       |
+| 985    | 19    | 401   | 99    |       |
+| 984    | 19    | 301   | 99    |       |
+| 983    | 19    | 201   | 99    |       |
+| 982    | 19    | 101   | 99    |       |
++--------+-------+-------+-------+-------+
+--test2: 视图
+--step6: 创建视图：rownum; expect:成功
+drop view if exists v_subpartition_0176;
+SQL SUCCESS
+create view v_subpartition_0176 as select * from t_subpartition_0176;
+SQL SUCCESS
+--step7: 查询视图数据; expect:成功
+select * from v_subpartition_0176 limit 10;
++-------+-------+-------+-------+
+| col_1 | col_2 | col_3 | col_4 |
++-------+-------+-------+-------+
+| 0     | 0     | 0     |       |
+| 0     | 20    | 20    |       |
+| 0     | 40    | 40    |       |
+| 0     | 60    | 60    |       |
+| 0     | 80    | 80    |       |
+| 0     | 100   | 0     |       |
+| 0     | 120   | 20    |       |
+| 0     | 140   | 40    |       |
+| 0     | 160   | 60    |       |
+| 0     | 180   | 80    |       |
++-------+-------+-------+-------+
+--step8: count函数查询视图数据; expect:成功,100100条
+select  count(*) from v_subpartition_0176;
++--------+
+| count  |
++--------+
+| 100100 |
++--------+
+--step9: 删除表中指定条件的数据; expect:成功
+delete t_subpartition_0176 where col_1 = 4;
+SQL SUCCESS
+--step10: 查询视图数据; expect:成功,数据减少,95095条
+select  count(*) from v_subpartition_0176;
++-------+
+| count |
++-------+
+| 95095 |
++-------+
+--step11: 查询表数据; expect:成功,数据减少,95095条
+select  count(*) from t_subpartition_0176;
++-------+
+| count |
++-------+
+| 95095 |
++-------+
+--step12: 更新表中指定条件的数据; expect:成功
+update t_subpartition_0176 set col_1 = 4 where col_1 = 1;
+SQL SUCCESS
+--step13: 查询指定条件的视图数据; expect:成功,0条
+select * from v_subpartition_0176 where col_1 = 1;
++-------+-------+-------+-------+
+| col_1 | col_2 | col_3 | col_4 |
++-------+-------+-------+-------+
++-------+-------+-------+-------+
+--step14: 更新视图中指定条件的数据; expect:合理报错
+update v_subpartition_0176 set col_1 = 4 where col_1 = 8;
+?.*ERROR: cannot update view "v_subpartition_0176.*
+  Hint: You need an unconditional ON UPDATE DO INSTEAD rule or an INSTEAD OF UPDATE trigger.
+--test3: 物化视图
+--step15: 创建物化视图; expect:成功
+drop materialized view if exists vm_subpartition_0176;
+SQL SUCCESS
+create materialized view vm_subpartition_0176 as select * from t_subpartition_0176;
+SQL SUCCESS
+--step16: 查询物化视图数据; expect:成功
+select  count(*) from vm_subpartition_0176;
++-------+
+| count |
++-------+
+| 95095 |
++-------+
+--step17: 删除表中指定条件的数据; expect:成功
+delete t_subpartition_0176 where col_1 = 4;
+SQL SUCCESS
+--step18: 查询物化视图数据; expect:成功,数据条数没变
+select  count(*) from vm_subpartition_0176;
++-------+
+| count |
++-------+
+| 95095 |
++-------+
+--step19: 刷新物化视图数据; expect:成功
+refresh materialized view vm_subpartition_0176;
+SQL SUCCESS
+--step20: 查询物化视图数据; expect:成功,数据条数减少
+select  count(*) from vm_subpartition_0176;
++-------+
+| count |
++-------+
+| 90090 |
++-------+
+--step21: count查询指定条件的物化视图数据; expect:成功
+select count(*) from vm_subpartition_0176 where col_1 = 11;
++-------+
+| count |
++-------+
+| 5005  |
++-------+
+--step22: count查询指定条件的物化视图数据; expect:成功
+select count(*) from vm_subpartition_0176 where col_1 = 4;
++-------+
+| count |
++-------+
+| 0     |
++-------+
+--step23: 更新表中指定条件的数据; expect:成功
+update t_subpartition_0176 set col_1 = 18 where col_1 = 11;
+SQL SUCCESS
+--step24: 查询数据; expect:成功,数据条数没变
+select count(*) from vm_subpartition_0176 where col_1 = 11;
++-------+
+| count |
++-------+
+| 5005  |
++-------+
+--step25: 刷新物化视图数据; expect:成功
+refresh materialized view vm_subpartition_0176;
+SQL SUCCESS
+--step26: 查询数据; expect:成功,0条数据
+select count(*) from vm_subpartition_0176 where col_1 = 11;
++-------+
+| count |
++-------+
+| 0     |
++-------+
+--step27: 更新物化视图中指定条件的数据; expect:合理报错
+update vm_subpartition_0176 set col_1 = 4 where col_1 = 8;
+?.*ERROR: Unsupported featur.*
+  Detail: Materialized view doesn't allow UPDATE
+--step28: 清理环境; expect:成功
+drop view if exists v_subpartition_0176;
+SQL SUCCESS
+drop materialized view if exists vm_subpartition_0176;
+SQL SUCCESS
+drop table if exists t_subpartition_0176 cascade;
+SQL SUCCESS
+drop table if exists t_subpartition_0176_01 cascade;
+SQL SUCCESS
+drop table if exists t_subpartition_0176_02 cascade;
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0176;
+SQL SUCCESS

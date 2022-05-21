@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -48,6 +48,7 @@ class Auditing(unittest.TestCase):
         self.logger.info(msg1)
         self.assertTrue(msg1.find(
             'The value 1023 is outside the valid range for parameter '
+            '"audit_space_limit" (1024 .. 1073741824)') > -1)
 
     def tearDown(self):
         self.logger.info(

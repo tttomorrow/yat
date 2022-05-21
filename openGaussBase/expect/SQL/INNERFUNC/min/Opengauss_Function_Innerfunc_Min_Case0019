@@ -1,0 +1,101 @@
+-- @testpoint: inet类型取最小值，结果类型转换
+--step1:创建表; expect:成功
+drop table if exists t_min_case0019;
+SQL SUCCESS
+create table t_min_case0019(c inet);
+SQL SUCCESS
+create table t_min_case0019_text(t text);
+SQL SUCCESS
+create table t_min_case0019_clob(c clob);
+SQL SUCCESS
+create table t_min_case0019_varchar(c varchar);
+SQL SUCCESS
+create table t_min_case0019_bpchar(c bpchar);
+SQL SUCCESS
+create table t_min_case0019_nvarchar2(c nvarchar2);
+SQL SUCCESS
+create table t_min_case0019_cidr(c cidr);
+SQL SUCCESS
+--step2:输出转换为text; expect:192.168.0.1/24
+insert into t_min_case0019 values('192.168.0.1/24'),('192.168.0.0/25'),('192.168.1.0'),('192.168.1.0/25');
+SQL SUCCESS
+insert into t_min_case0019_text select min(c) from  t_min_case0019;
+SQL SUCCESS
+select * from t_min_case0019_text;
++----------------+
+| t              |
++----------------+
+| 192.168.0.1/24 |
++----------------+
+--step3:输出转换为clob; expect:192.168.255.1/14
+delete from t_min_case0019;
+SQL SUCCESS
+insert into t_min_case0019 values('192.168.255.1/14'),('192.169.0.0/14');
+SQL SUCCESS
+insert into t_min_case0019_clob select min(c) from  t_min_case0019;
+SQL SUCCESS
+select * from t_min_case0019_clob;
++------------------+
+| c                |
++------------------+
+| 192.168.255.1/14 |
++------------------+
+--step4:输出转换为varchar; expect:::
+delete from t_min_case0019;
+SQL SUCCESS
+insert into t_min_case0019 values('::ffff'),('::'),('ff::ab/128');
+SQL SUCCESS
+insert into t_min_case0019_varchar select min(c) from  t_min_case0019;
+SQL SUCCESS
+select * from t_min_case0019_varchar;
++--------+
+| c      |
++--------+
+| ::/128 |
++--------+
+--step5:输出转换为bpchar类型; expect:::
+insert into t_min_case0019_bpchar select min(c) from  t_min_case0019;
+SQL SUCCESS
+select * from t_min_case0019_bpchar;
++--------+
+| c      |
++--------+
+| ::/128 |
++--------+
+--step6:输出转换为nvarchar2; expect:::
+insert into t_min_case0019_nvarchar2 select min(c) from  t_min_case0019;
+SQL SUCCESS
+select * from t_min_case0019_nvarchar2;
++--------+
+| c      |
++--------+
+| ::/128 |
++--------+
+--step7:cidr类型转换为inet; expect:::/127
+delete from t_min_case0019;
+SQL SUCCESS
+insert into t_min_case0019 values('::fff0/127'),('::/127'),('ff::ab/127');
+SQL SUCCESS
+insert into t_min_case0019_cidr select cidr(min(c)) from  t_min_case0019;
+SQL SUCCESS
+select * from t_min_case0019_cidr;
++--------+
+| c      |
++--------+
+| ::/127 |
++--------+
+--tearDown
+drop table if exists t_min_case0019;
+SQL SUCCESS
+drop table if exists t_min_case0019_text;
+SQL SUCCESS
+drop table if exists t_min_case0019_clob;
+SQL SUCCESS
+drop table if exists t_min_case0019_varchar;
+SQL SUCCESS
+drop table if exists t_min_case0019_bpchar;
+SQL SUCCESS
+drop table if exists t_min_case0019_nvarchar2;
+SQL SUCCESS
+drop table if exists t_min_case0019_cidr;
+SQL SUCCESS

@@ -63,31 +63,31 @@ INSERT INTO test_gin_2 VALUES(13, 'Mexico, officially the United Mexican States,
 SQL SUCCESS
 --query
 SELECT * FROM test_gin_2 WHERE to_tsvector('english', first_name) @@ to_tsquery('english', 'formed');
-+----+-------------------------------------------------------------------------------------------------------------------------+-----------+
+?.*
 | id | first_name                                                                                                              | last_name |
-+----+-------------------------------------------------------------------------------------------------------------------------+-----------+
+?.*
 | 2  | America is a rock band, formed in England in 1970 by multi-instrumentalists Dewey Bunnell, Dan Peek, and Gerry Beckley. | America   |
-+----+-------------------------------------------------------------------------------------------------------------------------+-----------+
+?.*
 explain SELECT * FROM test_gin_2 WHERE to_tsvector('english', first_name) @@ to_tsquery('english', 'formed');
 ?.*
 ?.*QUERY PLAN.*
 ?.*
 ?.*| Row Adapter.*
-?.*|   ->  CStore Index Heap Scan on test_gin_2  .*
-|         Recheck Cond: (to_tsvector('english'::regconfig, first_name) @@ '''form'''::tsquery)       |
-?.*|         ->  CStore Index Ctid Scan on test_gin_2_first_name_idx .*
+?.*CStore Index Heap Scan on test_gin_2.*
+?.*Recheck Cond: (to_tsvector('english'::regconfig, first_name) @@ '''form'''::tsquery)?.*
+?.*CStore Index Ctid Scan on test_gin_2_first_name_idx.*
 ?.*Index Cond: (to_tsvector('english'::regconfig, first_name) @@ '''form'''::tsquery)?.*
 ?.*
 explain SELECT * FROM test_gin_2 WHERE to_tsvector('english', first_name) @@ to_tsquery('english', 'test') ORDER BY id, first_name, last_name;
 ?.*
-| QUERY PLAN                                                                                               |
+?.*QUERY PLAN.*
 ?.*
-?.*| Row Adapter.*
-?.*|   ->  Vector Sort  .*
+?.*Row Adapter.*
+?.*Vector Sort.*
 ?.*Sort Key: id, first_name, last_name.*
-?.*|         ->  CStore Index Heap Scan on test_gin_2 .*
+?.*CStore Index Heap Scan on test_gin_2 .*
 ?.*Recheck Cond: (to_tsvector('english'::regconfig, first_name) @@ '''test'''::tsquery)?.*
-?.*|               ->  CStore Index Ctid Scan on test_gin_2_first_name_idx.*
+?.*CStore Index Ctid Scan on test_gin_2_first_name_idx.*
 ?.*Index Cond: (to_tsvector('english'::regconfig, first_name) @@ '''test'''::tsquery)?.*
 ?.*
 SELECT * FROM test_gin_2 WHERE to_tsvector('english', first_name) @@ to_tsquery('english', 'test') ORDER BY id, first_name, last_name;
@@ -105,34 +105,34 @@ SELECT * FROM test_gin_2 WHERE to_tsvector('english', first_name) @@ to_tsquery(
 +----+------------+-----------+
 explain SELECT * FROM test_gin_2 WHERE to_tsvector('english', first_name) @@ to_tsquery('english', 'formed');
 ?.*
-| QUERY PLAN                                                                                         |
+?.*QUERY PLAN.*
 ?.*
-?.*| Row Adapter.*
-?.*|   ->  CStore Index Heap Scan on test_gin_2  .*
+?.*Row Adapter.*
+?.*CStore Index Heap Scan on test_gin_2.*
 ?.*Recheck Cond: (to_tsvector('english'::regconfig, first_name) @@ '''form'''::tsquery)?.*
-?.*|         ->  CStore Index Ctid Scan on test_gin_2_first_name_idx .*
+?.*CStore Index Ctid Scan on test_gin_2_first_name_idx .*
 ?.*Index Cond: (to_tsvector('english'::regconfig, first_name) @@ '''form'''::tsquery)?.*
 ?.*
 --delete data
 delete from test_gin_2 where to_tsvector('english', last_name) @@ to_tsquery('english', 'America');
 SQL SUCCESS
 SELECT * FROM test_gin_2 WHERE to_tsvector('english', first_name) @@ to_tsquery('english', 'America');
-+----+-----------------------------------------------------------------------------------------------------------------------+-----------+
+?.*
 | id | first_name                                                                                                            | last_name |
-+----+-----------------------------------------------------------------------------------------------------------------------+-----------+
+?.*
 | 11 | Brazil, officially the Federative Republic of Brazil, is the largest country in both South America and Latin America. | Brazil    |
 | 12 | Canada is a country in the northern half of North America.                                                            | Canada    |
 | 13 | Mexico, officially the United Mexican States, is a federal republic in the southern part of North America.            | Mexico    |
-+----+-----------------------------------------------------------------------------------------------------------------------+-----------+
+?.*
 explain SELECT * FROM test_gin_2 WHERE to_tsvector('english', first_name) @@ to_tsquery('english', 'America');
 ?.*
-| QUERY PLAN                                                                                          |
+?.*QUERY PLAN.*
 ?.*
-?.*| Row Adapter .*
-?.*|   ->  CStore Index Heap Scan on test_gin_2  .*
-|         Recheck Cond: (to_tsvector('english'::regconfig, first_name) @@ '''america'''::tsquery)     |
-?.*|         ->  CStore Index Ctid Scan on test_gin_2_first_name_idx .*
-|               Index Cond: (to_tsvector('english'::regconfig, first_name) @@ '''america'''::tsquery) |
+?.*Row Adapter.*
+?.*CStore Index Heap Scan on test_gin_2.*
+?.*Recheck Cond: (to_tsvector('english'::regconfig, first_name) @@ '''america'''::tsquery)?.*
+?.*CStore Index Ctid Scan on test_gin_2_first_name_idx.*
+?.*Index Cond: (to_tsvector('english'::regconfig, first_name) @@ '''america'''::tsquery)?.*
 ?.*
 --tearDown drop table
 DROP TABLE IF EXISTS test_gin_2;

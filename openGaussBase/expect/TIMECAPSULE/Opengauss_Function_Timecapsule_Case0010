@@ -1,0 +1,70 @@
+-- @testpoint: truncate后物理删除不可闪回,合理报错
+--step1: 查询enable_recyclebin默认值; expect:显示默认值off
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+
+--step2: 修改enable_recyclebin为on; expect:修改成功
+alter system set enable_recyclebin to on;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| on                |
++-------------------+
+--step3: 清除回收站; expect:回收站清除成功
+purge recyclebin;
+SQL SUCCESS
+--step4: 创建表; expect:表创建成功
+drop table if exists  t_timecapsule_0010;
+SQL SUCCESS
+create table t_timecapsule_0010(a int);
+SQL SUCCESS
+--step5: 向表中插入数据; expect:数据插入成功
+insert into t_timecapsule_0010 values(1);
+SQL SUCCESS
+--step6: 清空表数据; expect:表数据清空成功
+truncate table t_timecapsule_0010;
+SQL SUCCESS
+--step7: 在回收站中统计原始对象名称t_timecapsule_0010和操作类型为truncate; expect:预期结果为1
+select count(*) from gs_recyclebin where rcyoriginname = 't_timecapsule_0010' and rcyoperation = 't';
++-------+
+| count |
++-------+
+| 1     |
++-------+
+--step8: 清除表; expect:清除成功
+drop table t_timecapsule_0010 purge;
+SQL SUCCESS
+--step9: 闪回到truncate之前; expect:闪回失败
+timecapsule table t_timecapsule_0010 to before truncate;
+?.*ERROR: relation "t_timecapsule_0010" does not exis.*
+--step10: 清理环境; expect:清理成功
+drop table if exists t_timecapsule_0010 purge;
+SQL SUCCESS
+purge recyclebin;
+SQL SUCCESS
+--step11: 恢复默认值; expect:默认值恢复成功
+alter system set enable_recyclebin to off;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+

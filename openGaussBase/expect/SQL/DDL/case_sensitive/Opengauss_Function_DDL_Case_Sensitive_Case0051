@@ -1,4 +1,4 @@
---  @testpoint: --创建序列名称验证大小写
+-- @testpoint: --创建序列名称验证大小写 合理报错
 drop TABLE IF EXISTS customer_address CASCADE;
 SQL SUCCESS
 CREATE TABLE customer_address
@@ -24,7 +24,8 @@ SQL SUCCESS
 CREATE SEQUENCE ss OWNED BY customer_address.ca_address_sk;
 SQL SUCCESS
 CREATE SEQUENCE SS OWNED BY customer_address.ca_street_number;
-?.*ERROR: relation "ss" already exists
+?.*ERROR: relation "ss" already exists.*
+?.*
 CREATE SEQUENCE "SS" OWNED BY customer_address.ca_street_number;
 SQL SUCCESS
 --清理

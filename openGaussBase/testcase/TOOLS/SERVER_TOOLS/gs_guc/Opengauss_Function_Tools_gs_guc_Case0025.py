@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -16,14 +16,14 @@ See the Mulan PSL v2 for more details.
 Case Type   : 服务端工具
 Case Name   : reload 方式设置认证参数：HOSTTYPE DATABASE USERNAME HOSTNAME
 Description :
-    1.设置认证参数
-    2.查看是否设置成功
-    3.删除已经设置的客户端认证策略
+    1.设置认证参数并查看是否设置成功
+    2.注释已设置的认证策略
+    3.重启数据库
 Expect      :
-    1.设置认证参数成功
-    2.查看成功
-    3.删除已经设置的客户端认证策略成功
-History     : 
+    1.设置认证参数并查看是否设置成功
+    2.注释已设置的认证策略成功
+    3.重启数据库成功
+History     :
 """
 
 import unittest
@@ -33,38 +33,43 @@ from testcase.utils.CommonSH import CommonSH
 from testcase.utils.Constant import Constant
 from testcase.utils.Logger import Logger
 
-LOG = Logger()
-
 
 class Tools(unittest.TestCase):
     def setUp(self):
-        LOG.info('-----Opengauss_Function_Tools_gs_guc_Case0025开始执行-----')
-        self.dbuser_node = Node('dbuser')
+        self.log = Logger()
+        self.log.info('-Opengauss_Function_Tools_gs_guc_Case0025开始执行-')
+        self.dbuser_node = Node('PrimaryDbUser')
         self.constant = Constant()
         self.commonsh = CommonSH()
 
     def test_server_tools(self):
-        LOG.info('-----设置认证参数并查看是否设置成功-----')
+        text = "--step1:设置认证参数并查看是否设置成功;expect:执行成功--"
+        self.log.info(text)
         check_cmd = f'''source {macro.DB_ENV_PATH};
         gs_guc reload -N all -I all -h "hostssl all all ctupopenga00011  md5";
         cat {macro.DB_INSTANCE_PATH}/pg_hba.conf | grep 'hostssl'|\
         grep 'ctupopenga00011';'''
-        LOG.info(check_cmd)
+        self.log.info(check_cmd)
         msg = self.dbuser_node.sh(check_cmd).result()
-        LOG.info(msg)
-        self.assertIn('Success to perform gs_guc!', msg)
-        self.assertIn('hostssl all all ctupopenga00011  md5', msg)
+        self.log.info(msg)
+        self.assertIn('Success to perform gs_guc!', msg, '执行失败:' + text)
+        self.assertIn('hostssl all all ctupopenga00011  md5', msg,
+                      '执行失败:' + text)
 
     def tearDown(self):
-        LOG.info('---------删除的认证策略---------')
+        text = "--step2:注释已设置的认证策略;expect:执行成功"
+        self.log.info(text)
         check_cmd = f'''source {macro.DB_ENV_PATH};
-        sed -i 's/\hostssl all all ctupopenga00011  \
-md5/\ /g' {macro.DB_INSTANCE_PATH}/pg_hba.conf;
-        cat {macro.DB_INSTANCE_PATH}/pg_hba.conf | grep 'hostssl'|\
-        grep 'ctupopenga00011';'''
-        LOG.info(check_cmd)
+        gs_guc reload -N all -I all -h "hostssl all all ctupopenga00011 ";'''
+        self.log.info(check_cmd)
         msg = self.dbuser_node.sh(check_cmd).result()
-        LOG.info(msg)
-        self.assertIn('', msg)
+        self.log.info(msg)
+        self.assertIn('Success to perform gs_guc!', msg, '执行失败:' + text)
 
-        LOG.info('-----Opengauss_Function_Tools_gs_guc_Case0025执行结束-----')
+        text = "--step3:重启数据库;expect:执行成功"
+        self.log.info(text)
+        self.commonsh.restart_db_cluster()
+        status = self.commonsh.get_db_cluster_status()
+        self.assertTrue("Normal" in status or 'Degraded' in status,
+                        '执行失败:' + text)
+        self.log.info('-Opengauss_Function_Tools_gs_guc_Case0025执行结束-')

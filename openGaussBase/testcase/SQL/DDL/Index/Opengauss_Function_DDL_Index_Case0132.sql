@@ -1,4 +1,4 @@
---  @testpoint: UNUSABLE：自动拓展分区表设置索引不可用
+-- @testpoint: UNUSABLE：自动拓展分区表设置索引不可用,合理报错
 
 --建自动拓展分区表
 DROP TABLE if EXISTS test_index_table_132 CASCADE;

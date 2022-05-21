@@ -1,4 +1,18 @@
 """
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
+
+openGauss is licensed under Mulan PSL v2.
+You can use this software according to the terms and conditions of the Mulan PSL v2.
+You may obtain a copy of Mulan PSL v2 at:
+
+          http://license.coscl.org.cn/MulanPSL2
+
+THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+See the Mulan PSL v2 for more details.
+"""
+"""
 Case Type   : 功能测试
 Case Name   : trim函数对bytea进行截取
 Description : trim([both] bytes from string)从string的开头和结尾删除只包含bytes中字节的最长字符串。

@@ -7,4 +7,4 @@ CREATE FUNCTION u_testfun1 (c_int int) RETURNS int  AS $$
 $$ LANGUAGE plpgsql
 fenced ;
 /
-?.*ERROR: FENCED mode function is not yet supported in current version.
+?.*fencedmode could not be fenced

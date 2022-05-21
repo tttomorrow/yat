@@ -2,6 +2,7 @@
 
 drop table if exists proc_binary_table_008;
 create table proc_binary_table_008(t1 int,t2 raw(100));
+insert into proc_binary_table_008 values(1,'01affb6710114657895500101');
 
 --创建存储过程
 create or replace procedure proc_binary_008() is

@@ -14,6 +14,7 @@ where castsource= (select oid from pg_type where typname='oid'));
 +---------------+---------+-------------+------------+
 | typname       | proname | castcontext | castmethod |
 +---------------+---------+-------------+------------+
+| int16         | int16   | i           | f          |
 | int8          | int8    | a           | f          |
 | int4          |         | a           | b          |
 | regproc       |         | i           | b          |

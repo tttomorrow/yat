@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -61,7 +61,7 @@ class GucTest(unittest.TestCase):
                     + self.db_user_node.db_port \
                     + " -c \"ALTER SYSTEM set ssl_ciphers to ' ';\""
         res1 = self.db_user_node.sh(altersql1).result()
-        self.assertIn('unrecognized ssl ciphers name', res1)
+        self.assertIn('ERROR:  invalid value', res1)
 
     def tearDown(self):
         self.log.info("恢复默认值")

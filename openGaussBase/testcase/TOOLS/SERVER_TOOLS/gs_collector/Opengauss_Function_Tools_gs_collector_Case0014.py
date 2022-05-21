@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -28,6 +28,7 @@ History     :
 
 import unittest
 import time
+import os
 from yat.test import Node
 from yat.test import macro
 from testcase.utils.Constant import Constant
@@ -39,9 +40,10 @@ class Tools(unittest.TestCase):
         self.log = Logger()
         self.primary_dbuser = Node('PrimaryDbUser')
         self.constant = Constant()
+        self.logpath = os.path.join(os.path.dirname(macro.PG_LOG_PATH))
 
     def test_server_tools1(self):
-        self.log.info('-Opengauss_Function_Tools_gs_collector_Case0014开始-')
+        self.log.info(f'-----{os.path.basename(__file__)}start-----')
         self.log.info('----若为单机环境，后续不执行，直接通过----')
         excute_cmd = f' source {macro.DB_ENV_PATH};' \
             f'gs_om -t status --detail;'
@@ -80,7 +82,7 @@ class Tools(unittest.TestCase):
 
             self.log.info('----查看日志是否生成--------')
             collector_cmd = f'source {macro.DB_ENV_PATH};' \
-                f'cd {macro.DB_INSTANCE_PATH}/../tmp;ls;' \
+                f'cd {self.logpath};ls;' \
                 f'tar -zxvf collector*.tar.gz;'
             self.log.info(collector_cmd)
             collector_msg = self.primary_dbuser.sh(collector_cmd).result()
@@ -102,9 +104,9 @@ class Tools(unittest.TestCase):
 
     def tearDown(self):
         self.log.info('------清理环境，删除生成的collector日志文件------')
-        rm_cmd = f'cd \'{macro.DB_INSTANCE_PATH}\'/../tmp;' \
+        rm_cmd = f'cd {self.logpath};' \
             f'rm -rf collector_*'
         self.log.info(rm_cmd)
         rm_msg = self.primary_dbuser.sh(rm_cmd).result()
         self.log.info(rm_msg)
-        self.log.info('-Opengauss_Function_Tools_gs_collector_Case0014结束-')
+        self.log.info(f'-----{os.path.basename(__file__)}finish-----')

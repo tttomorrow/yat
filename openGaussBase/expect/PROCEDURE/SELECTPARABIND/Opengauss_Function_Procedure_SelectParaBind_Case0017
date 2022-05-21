@@ -6,6 +6,7 @@ as
 	v1 blob;
 	r1 blob;
 begin
+    v1 := '10101111111111';
     sqlstat := 'select :p1';
     execute immediate sqlstat into r1 using v1;
     raise info 'result:%',v1;

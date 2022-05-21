@@ -13,6 +13,7 @@ create table table_003(
 
 create unique index  indx_t31 on table_003(t1);
 create index indx_t32 on table_003(t2);
+insert into table_003 values(2147483647,-2147483648,1234567890123,-21474836480,2147483647.001,2147483647.00,2147483646.5);
 
 --创建存储过程
 create or replace procedure proc_return_value_007  as

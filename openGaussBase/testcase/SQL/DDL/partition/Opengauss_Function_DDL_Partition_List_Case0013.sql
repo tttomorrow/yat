@@ -1,5 +1,4 @@
--- @testpoint: list分区表，不支持的功能 row movement，合理报错
-
+-- @testpoint: list分区表，支持的功能 row movement
 --创建list分区表,指定参数row movement
 drop table if exists partition_list_tab;
 create table partition_list_tab(p_id int,p_name varchar,p_age int)

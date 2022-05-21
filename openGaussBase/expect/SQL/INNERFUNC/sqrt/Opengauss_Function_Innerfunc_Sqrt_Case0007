@@ -8,10 +8,10 @@ SELECT  sqrt(Ture) AS RESULT;
 ?.*
   Where: referenced column: result
 SELECT  sqrt(4>3) AS RESULT;
-?.*ERROR: function sqrt\(boolean\) does not exist
-  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
-?.*
-  Where: referenced column: result
++-------------------+
+| result            |
++-------------------+
++-------------------+
 SELECT  sqrt(4.00,0) AS RESULT;
 ?.*ERROR: function sqrt\(numeric, integer\) does not exist
   Hint: No function matches the given name and argument types. You might need to add explicit type casts.

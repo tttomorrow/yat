@@ -1,5 +1,4 @@
 -- @testpoint: 创建序列同义词，创建成功，使用时合理报错
--- @modify at: 2020-11-26
 --创建序列
 drop SEQUENCE if exists s_SYN_061 cascade;
 SQL SUCCESS
@@ -19,7 +18,7 @@ SQL SUCCESS
 --调用nextval函数，报错
 SELECT nextval('SYN_061');
 ?.*ERROR: relation "syn_061" does not exist
-  Detail: Maybe you want to use synonym to reference a sequence object, but it is not yet supported.
+  Detail: Maybe you want to use synonym to reference a (large) sequence object, but it is not yet supported.
 ?.*
   Where: referenced column: nextval
 --清理环境

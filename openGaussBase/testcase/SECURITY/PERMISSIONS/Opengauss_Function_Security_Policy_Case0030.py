@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -17,8 +17,8 @@ Case Type   : policy
 Case Name   : 密码为A-Z大写字母的最少要求个数password_min_uppercase=1
 Description :
     1.在postgres.conf中设置password_min_uppercase=1，重启数据库生效
-    2.初始用户执行：create user wf with password 'Qazwsx@123';
-    create user user001 with password 'qazwsx@123';
+    2.初始用户执行：create user $user! with password '$passwd1';(密码含一个大写字母)
+    create user $user2 with password '$passwd2';(密码无大写字母)
 Expect      :
     1.设置成功，数据库重启成功
     2.CREATE ROLE
@@ -27,6 +27,7 @@ History     :
 """
 import unittest
 from yat.test import macro
+from yat.test import Node
 from testcase.utils.Common import Common
 from testcase.utils.CommonSH import CommonSH
 from testcase.utils.Constant import Constant
@@ -40,24 +41,27 @@ class Policy(unittest.TestCase):
         logger.info('pengauss_Function_Security_Policy_Case0030 start')
         self.common = Common()
         self.sh_primy = CommonSH('PrimaryDbUser')
-        self.DB_ENV_PATH = macro.DB_ENV_PATH
         self.new_password1 = macro.COMMON_PASSWD.capitalize()
         self.new_password2 = macro.COMMON_PASSWD.lower()
         self.Constant = Constant()
-        self.configure = 'password_min_uppercase=1'
-        msg0 = self.common.config_set_modify(self.configure)
-        logger.info(msg0)
-        status_msg = self.sh_primy.get_db_cluster_status()
-        logger.info(status_msg)
-        self.assertTrue("Degraded" in status_msg or "Normal" in status_msg)
+        self.user = 'u_security_policy_0030'
+        self.userNode = Node(node='PrimaryDbUser')
 
     def test_policy(self):
+        logger.info('----修改password_min_uppercase参数为1----')
+        exe_cmd0 = f'source {macro.DB_ENV_PATH};' \
+            f'gs_guc reload -D {macro.DB_INSTANCE_PATH} -c ' \
+            f'"password_min_uppercase=1"'
+        msg0 = self.userNode.sh(exe_cmd0).result()
+        logger.info(msg0)
         logger.info('------------create user ---------------')
-        sql_cmd1 = f'create user wf with password \'{self.new_password1}\';'
+        sql_cmd1 = f'drop user if exist {self.user};' \
+            f'create user {self.user} password \'{self.new_password1}\';' \
+            f'drop user {self.user};'
         msg1 = self.sh_primy.execut_db_sql(sql_cmd1)
         logger.info(msg1)
         self.assertIn(self.Constant.CREATE_ROLE_SUCCESS_MSG, msg1)
-        sql_cmd2 = f'create user user001 with password ' \
+        sql_cmd2 = f'create user {self.user} with password ' \
                    f'\'{self.new_password2}\';'
         msg2 = self.sh_primy.execut_db_sql(sql_cmd2)
         logger.info(msg2)
@@ -65,14 +69,12 @@ class Policy(unittest.TestCase):
 
     def tearDown(self):
         logger.info('-----------恢复配置，并清理环境-----------')
-        self.configitem = 'password_min_uppercase=0'
-        msg0 = self.common.config_set_modify(self.configure)
+        exe_cmd0 = f'source {macro.DB_ENV_PATH};' \
+            f'gs_guc reload -D {macro.DB_INSTANCE_PATH} -c ' \
+            f'"password_min_uppercase=3"'
+        msg0 = self.userNode.sh(exe_cmd0).result()
         logger.info(msg0)
-        status_msg = self.sh_primy.get_db_cluster_status()
-        logger.info(status_msg)
-        self.assertTrue("Degraded" in status_msg or "Normal" in status_msg)
-        sql_cmd1 = 'drop user if exists wf cascade;' \
-                   'drop user user001;'
+        sql_cmd1 = f'drop user {self.user} cascade;'
         msg1 = self.sh_primy.execut_db_sql(sql_cmd1)
         logger.info(msg1)
         logger.info('Opengauss_Function_Security_Policy_Case0030 finish')

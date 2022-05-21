@@ -3,6 +3,7 @@
 
 drop table if exists test_varchar2_10;
 create table test_varchar2_10 (name varchar2(20));
+insert into test_varchar2_10 values ('123456789789456123123456789');
 insert into test_varchar2_10 values ('QWERTSGYUOEOCMLW;PEIOPEUIEYUDGSS');
 insert into test_varchar2_10 values ('高斯开源数据库');
 drop table test_varchar2_10;

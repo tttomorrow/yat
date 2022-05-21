@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -30,6 +30,7 @@ Expect      :
 History     :
 """
 import time
+import os
 import unittest
 
 from testcase.utils.ComThread import ComThread
@@ -41,18 +42,18 @@ from testcase.utils.Logger import Logger
 class DmlTestCase(unittest.TestCase):
     def setUp(self):
         self.log = Logger()
-        self.log.info('Opengauss_Function_DML_Lock_Case0001开始')
+        self.log.info(f'------{os.path.basename(__file__)}执行开始------')
         self.constant = Constant()
         self.commonsh1 = CommonSH('PrimaryDbUser')
-        self.commonsh2 = CommonSH('PrimaryDbUser')
+        self.table = 't_lock_0001'
 
     def test_dml_lock(self):
         text1 = '-----step1: 创建测试表; expect: 创建成功-----'
         self.log.info(text1)
         sql_cmd = self.commonsh1.execut_db_sql(
-            'drop table if exists t_lock_0001;'
-            'create table t_lock_0001(sk integer,id char(16),'
-            'name varchar(20),sq_ft integer);')
+            f'''drop table if exists {self.table};
+            create table {self.table}(sk integer,id char(16),
+            name varchar(20),sq_ft integer);''')
         self.log.info(sql_cmd)
         assert_in_1 = self.constant.CREATE_TABLE_SUCCESS in sql_cmd
         self.assertTrue(assert_in_1, '执行失败:' + text1)
@@ -60,16 +61,17 @@ class DmlTestCase(unittest.TestCase):
         text2 = 'step2: 开启事务，为测试表加share row exclusive锁，不做提交,' \
                 'session2中step3执行完之后，session1中执行step4; expect: 成功'
         self.log.info(text2)
-        sql = '''start transaction;
-            lock table t_lock_0001 in share row exclusive mode;
+        sql = f'''start transaction;
+            lock table {self.table} in share row exclusive mode;
             select pg_sleep(5);
             
             --step4: 查看视图pg_thread_wait_status与pg_locks，\
             查看share row exclusive锁是否添加成功，插入事务是否阻塞
-            select * from pg_locks;
+            select mode,granted from pg_locks where 
+            relation=(select oid from pg_class where relname='{self.table}');
             select * from pg_thread_wait_status;
             --未提交事务前查看表数据，查看数据数据为空
-            select * from t_lock_0001;
+            select * from {self.table};
             '''
         thread_1 = ComThread(self.commonsh1.execut_db_sql, args=(sql, ''))
         thread_1.setDaemon(True)
@@ -77,9 +79,9 @@ class DmlTestCase(unittest.TestCase):
 
         text3 = '-----step3: 在session2中，对测试表进行插入操作; expect: 事务阻塞-----'
         self.log.info(text3)
-        sql = "select pg_sleep(1);" \
-              "insert into t_lock_0001 values (001,'sk1','tt',3332);"
-        thread_2 = ComThread(self.commonsh2.execut_db_sql, args=(sql, ''))
+        sql = f'''select pg_sleep(1);
+            insert into {self.table} values (001,'sk1','tt',3332);'''
+        thread_2 = ComThread(self.commonsh1.execut_db_sql, args=(sql, ''))
         thread_2.setDaemon(True)
         thread_2.start()
 
@@ -96,7 +98,8 @@ class DmlTestCase(unittest.TestCase):
         assert_eq_1 = msg_result_1.count('START TRANSACTION') is 1
         assert_eq_2 = msg_result_1.count('LOCK TABLE') is 1
         assert_eq_3 = msg_result_2.count('INSERT 0 1') is 1
-        assert_in_1 = "ShareRowExclusiveLock | t" in msg_result_1
+        assert_in_1 = "ShareRowExclusiveLock" in msg_result_1 \
+                      and "t\n" in msg_result_1
         self.assertTrue(assert_eq_1 and assert_eq_2 and assert_in_1,
                         '执行失败:' + text2)
         self.assertTrue(assert_eq_3, '执行失败:' + text2)
@@ -104,6 +107,8 @@ class DmlTestCase(unittest.TestCase):
     def tearDown(self):
         text = '--step5: 清理环境; expect: 清理成功--'
         self.log.info(text)
-        sql_cmd = self.commonsh1.execut_db_sql(f'drop table t_lock_0001;')
+        sql_cmd = self.commonsh1.execut_db_sql(f'drop table {self.table};')
         self.log.info(sql_cmd)
-        self.log.info('Opengauss_Function_DML_Lock_Case0001结束')
+        self.assertIn(self.constant.DROP_TABLE_SUCCESS, sql_cmd,
+                      '执行失败' + text)
+        self.log.info(f'------{os.path.basename(__file__)}执行结束------')

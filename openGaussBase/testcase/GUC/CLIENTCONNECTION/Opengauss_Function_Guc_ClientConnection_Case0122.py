@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -21,6 +21,7 @@ Description :
         2.修改参数值为63
         3.修改参数值为test
         4.修改参数值为-64
+        5.修改参数值为2147483648
         6.恢复参数默认值
 Expect      :
         1.显示默认值为4MB
@@ -86,8 +87,10 @@ class ClientConnection(unittest.TestCase):
             f'''show gin_pending_list_limit;''')
         LOG.info(sql_cmd)
         self.assertIn('4MB', sql_cmd)
+        # 设置参数值为2147483648，报错
         msg = commonsh.execute_gsguc('set',
                                      self.constant.GSGUC_SUCCESS_MSG,
+                                        'gin_pending_list_limit = 2147483648')
         LOG.info(msg)
         self.assertFalse(msg)
         # 查询

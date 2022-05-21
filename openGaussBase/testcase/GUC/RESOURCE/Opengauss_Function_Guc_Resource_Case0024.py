@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -18,6 +18,7 @@ Case Name   : 修改参数shared_buffers为无效值
 Description :
               1、查看shared_buffers默认值；
               show shared_buffers;
+              2、修改shared_buffers分别为15、1073741824、1024.25、
               'test'校验其预期结果；
 Expect      :
               1、显示默认值为1GB；
@@ -47,6 +48,7 @@ class GucTest(unittest.TestCase):
         self.log.info(sql_cmd)
         self.assertEqual('1GB', sql_cmd.split('\n')[2].strip())
         self.log.info("修改shared_buffers为无效值")
+        invalid_value = ['15', '1073741824', '1024.25', 'test']
         for i in invalid_value:
             result = COMMONSH.execute_gsguc('set',
                                             self.constant.GSGUC_SUCCESS_MSG,

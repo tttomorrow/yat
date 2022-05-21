@@ -4,4 +4,5 @@ select pg_stat_get_function_self_time('')  from PG_PROC a where a.proname = 'fun
 select pg_stat_get_function_self_time(a.oid,a.oid,a.oid)  from PG_PROC a where a.proname = 'func_add_sql';
 select pg_stat_get_function_self_time()  from PG_PROC a where a.proname = 'func_add_sql';
 select pg_stat_get_function_self_time('&^%^&*')  from PG_PROC a where a.proname = 'func_add_sql';
+select pg_stat_get_function_self_time(99999999999998789)  from PG_PROC a where a.proname = 'func_add_sql';
 select pg_stat_get_function_self_time(a.oid) from PG_PROC a where a.proname = 'func_add_sql';

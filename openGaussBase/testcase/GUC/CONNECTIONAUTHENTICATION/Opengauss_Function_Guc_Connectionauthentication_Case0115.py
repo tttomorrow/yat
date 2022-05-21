@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -159,7 +159,7 @@ class Guctestcase(unittest.TestCase):
             -W {self.user_node.ssh_password} \
             -c "select 1"''').result()
         self.log.info(result)
-        self.assertTrue("failed to connect Unknown" in result, "执行失败" + text)
+        self.assertIn(self.constant.CONN_FAIL, result, "执行失败" + text)
 
     def tearDown(self):
         text = "--step6:恢复默认值;expect:成功"

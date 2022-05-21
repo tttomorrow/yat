@@ -1,5 +1,4 @@
 -- @testpoint: 创建相同表名的临时表，合理报错
--- @modify at: 2020-11-24
 --建表1
 drop table if exists temp_table_038;
 create temporary table temp_table_038(c_id int,c_d_id int NOT NULL,c_w_id int NOT NULL,c_first varchar(16) NOT NULL,

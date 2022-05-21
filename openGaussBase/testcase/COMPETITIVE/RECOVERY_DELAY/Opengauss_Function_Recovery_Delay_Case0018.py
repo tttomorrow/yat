@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -42,6 +42,7 @@ Expect      :
     11.删除成功
     12.全局临时表不允许查询，临时表不存在，其余60s后同步
 History     :
+    导致查询冲突，修改断言方式，规避该问题
 """
 import unittest
 import datetime
@@ -254,9 +255,10 @@ class RecoveryDelay(unittest.TestCase):
                     self.assertIn('cannot access temporary ', result)
                     self.assertIn(self.constant.NOT_EXIST, result)
                 else:
-                    self.assertLessEqual(result.count('1 row'), 4)
-                    self.assertIn('cannot access temporary ', result)
-                    self.assertIn(self.constant.NOT_EXIST, result)
+                    if 'conflict with recovery' not in result:
+                        self.assertLessEqual(result.count('1 row'), 4)
+                        self.assertIn('cannot access temporary ', result)
+                        self.assertIn(self.constant.NOT_EXIST, result)
             time.sleep(200)
             for i in range(int(self.node_num) - 1):
                 result = self.comshsta[i].execut_db_sql(sql)

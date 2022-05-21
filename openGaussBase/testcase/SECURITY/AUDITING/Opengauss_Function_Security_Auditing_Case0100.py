@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -17,14 +17,14 @@ Case Type   : security-auditing
 Case Name   : 查看审计记录，start_time=end_time
 Description :
     1.创建auditadmin属性的用户，CREATE USER audit_admin WITH AUDITADMIN
-    password "Qazwsx@123";
+    password "$PASSWORD";
     2.登录数据库，查看审计记录， SELECT * FROM pg_query_audit('$start_time',
     'end_time');其中start time>endtime
     3.删除用户
 Expect      :
-            1.创建成功
-            2.无法查询到审计记录
-            3.删除成功
+    1.创建成功
+    2.无法查询到审计记录
+    3.删除成功
 History     :
 """
 import unittest

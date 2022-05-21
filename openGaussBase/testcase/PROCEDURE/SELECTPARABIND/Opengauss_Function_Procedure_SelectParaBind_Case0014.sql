@@ -18,6 +18,7 @@ as
     sqlstat varchar(500);
 	v1 blob;
 begin
+    v1 := '10101111111111';
     sqlstat := 'insert into all_datatype_tbl(c_blob) select :p1 ';
     execute immediate sqlstat using v1;
 end;

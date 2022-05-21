@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -22,10 +22,12 @@ Expect      :
     1.查看系统表PG_NAMESPACE的表结构成功
     2.该表字段与字段数据类型对应正确
 History     :
+    modified：2021/10/12 by 5318639 优化用例适配新代码
 """
 
 import sys
 import unittest
+
 from yat.test import Node
 from yat.test import macro
 
@@ -34,30 +36,35 @@ from testcase.utils.Logger import Logger
 from testcase.utils.Common import Common
 from testcase.utils.CommonSH import CommonSH
 
-logger = Logger()
 
-
-class IndexFileDamaged(unittest.TestCase):
+class SystemTable(unittest.TestCase):
     def setUp(self):
-        logger.info('----------------this is setup-----------------------')
-        logger.info('--------------Opengauss_Function_System_Table_Case0041开始执行--------------')
+        self.log = Logger()
+        self.log.info(
+            '------Opengauss_Function_System_Table_Case0041start-------')
         self.userNode = Node('dbuser')
         self.DB_ENV_PATH = macro.DB_ENV_PATH
         self.com = Common()
         self.comsh = CommonSH('dbuser')
-        self.expect_result_dict = {'Column': ['nspname', 'nspowner', 'nsptimeline', 'nspacl', 'in_redistribution'],
-                                   'Type': ['name', 'oid', 'bigint', 'aclitem[]', '"char"']}
+        self.expect_result_dict = {
+            'Column': ['nspname', 'nspowner', 'nsptimeline', 'nspacl',
+                       'in_redistribution', 'nspblockchain'],
+            'Type': ['name', 'oid', 'bigint', 'aclitem[]', '"char"',
+                     'boolean']}
 
-    def test_Index_file_damaged(self):
-        logger.info('----------------------------查看表结构-----------------------------')
+    def test_systable(self):
+        text = '----------step1:查看表结构;expect:查看成功-------------'
+        self.log.info(text)
         msg = self.comsh.execut_db_sql('\d PG_NAMESPACE')
-        logger.info(msg)
+        self.log.info(msg)
         result_dict = self.com.format_sql_result(msg)
-        logger.info(result_dict)
+        self.log.info(result_dict)
+        text = '------step2:查看表字段与对应字段数据类型是否正确;expect:对应正确-------'
+        self.log.info(text)
         del result_dict['Modifiers']
-        self.assertDictEqual(self.expect_result_dict, result_dict)
+        self.assertDictEqual(self.expect_result_dict, result_dict,
+                             '执行失败' + text)
 
     def tearDown(self):
-        logger.info('----------------this is tearDown-----------------------')
-        # 无须清理环境
-        logger.info('-----------------------Opengauss_Function_System_Table_Case0041执行完成-------------------')
+        self.log.info(
+            '-------Opengauss_Function_System_Table_Case0041finish-------')

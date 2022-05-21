@@ -11,6 +11,7 @@ select * from test_timestamp01;
 +-------------------------------+
 | name                          |
 +-------------------------------+
+| 9999-12-31 23:59:59.999999000 |
 +-------------------------------+
 drop table if exists test_timestamp01;
 SQL SUCCESS

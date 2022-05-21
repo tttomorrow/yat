@@ -1,0 +1,20 @@
+-- @testpoint: 测试表名存在与否对创建哈希索引的影响，部分step合理报错
+--创建表
+drop table if exists t_hash_index_0057;
+SQL SUCCESS
+create table t_hash_index_0057(id01 int, id02 int) with(orientation=row);
+SQL SUCCESS
+--创建哈希索引(表名存在)
+create index i_hash_index_0057_01 on t_hash_index_0057 using hash(id01);
+SQL SUCCESS
+--创建哈希索引(表名不存在)
+create index i_hash_index_0057_02 on row_tab02 using hash(id02);
+?.*ERROR: relation "row_tab02" does not exist
+--删除哈希索引
+drop index if exists i_hash_index_0057_01;
+SQL SUCCESS
+drop index if exists i_hash_index_0057_02;
+SQL SUCCESS
+--删除表、表空间
+drop table t_hash_index_0057 cascade;
+SQL SUCCESS

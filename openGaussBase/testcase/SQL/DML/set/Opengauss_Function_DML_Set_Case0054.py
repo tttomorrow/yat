@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -13,7 +13,6 @@ MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 See the Mulan PSL v2 for more details.
 """
 '''
---  @date:2020/11/11
 --  @testpoint:参数checkpoint_segments测试，无效值，合理报错
 '''
 import sys
@@ -44,6 +43,7 @@ class SYS_Operation(unittest.TestCase):
         logger.info(sql_cmd1)
         self.assertIn('64', sql_cmd1)
         self.assertIn(constant.ALTER_SYSTEM_SUCCESS_MSG, sql_cmd1)
+        self.assertIn('ERROR:  0 is outside the valid range for parameter "checkpoint_segments" (1 .. 2147483646)', sql_cmd1)
         self.assertIn('ERROR:  invalid value for parameter "checkpoint_segments": "63.5"', sql_cmd1)
         time.sleep(3)
         # 查看参数值

@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -26,7 +26,8 @@ History     :
 """
 import unittest
 import os
-from datetime import date, timedelta, datetime
+import datetime
+from datetime import timedelta
 import time
 from yat.test import Node
 from yat.test import macro
@@ -34,7 +35,6 @@ from testcase.utils.Logger import Logger
 from testcase.utils.Common import Common
 from testcase.utils.CommonSH import CommonSH
 from testcase.utils.Constant import Constant
-from testcase.utils.ComThread import ComThread
 
 
 class Jdbcisreadonly(unittest.TestCase):
@@ -109,6 +109,12 @@ class Jdbcisreadonly(unittest.TestCase):
         self.assertTrue("password=" in result and "port=" in result
                         and "hostname=" in result and "user=" in result
                         and "dbname=" in result)
+        result = self.commonshpri.stop_db_cluster()
+        self.assertTrue(result)
+        result = self.commonshpri.start_db_cluster(True)
+        flg = self.constant.START_SUCCESS_MSG in result \
+              or 'Degraded' in result
+        self.assertTrue(flg)
 
         self.log.info('--------------3. 编译java工具------------------')
         self.db_primary_root_node.scp_put(macro.JDBC_PATH,
@@ -137,19 +143,29 @@ class Jdbcisreadonly(unittest.TestCase):
         result = self.commonshpri.execut_db_sql(cmd, dbname=self.db_name)
         self.log.info(result)
         self.assertIn(self.constant.CREATE_TABLE_SUCCESS, result)
-        date_now = [(datetime.now() + timedelta(hours=-16) +
+
+        result_time = self.db_primary_root_node.sh(
+            "date '+%Y-%m-%d %H:%M'").result()
+        self.log.info(result_time)
+        date_tmp = (datetime.datetime.strptime(result_time, '%Y-%m-%d %H:%M'))
+        date_now = [(date_tmp + timedelta(hours=-16) +
                      timedelta(minutes=1)).strftime("%Y-%m-%d %H:%M"),
-               (datetime.now() +
-                timedelta(hours=-16)).strftime("%Y-%m-%d %H:%M")]
-        date_now_prc = [(datetime.now() + timedelta(minutes=1)
+                    (date_tmp +
+                     timedelta(hours=-16)).strftime("%Y-%m-%d %H:%M"),
+                    (date_tmp + timedelta(hours=-17) +
+                     timedelta(minutes=1)).strftime("%Y-%m-%d %H:%M"),
+                    (date_tmp +
+                     timedelta(hours=-17)).strftime("%Y-%m-%d %H:%M")
+                    ]
+        self.log.info(date_now)
+
+        date_now_prc = [(date_tmp + timedelta(minutes=1)
                          ).strftime("%Y-%m-%d %H:%M"),
-               (datetime.now()).strftime("%Y-%m-%d %H:%M")]
+               (date_tmp).strftime("%Y-%m-%d %H:%M")]
         self.log.info(f"date is {date_now}")
         self.log.info(f"date_now_prc is {date_now_prc}")
 
         self.log.info("-------------5.运行java工具---------------------")
-        today = date.today().strftime("%Y-%m-%d")
-        self.log.info(f"today is {today}")
         cmd = f" java -cp {os.path.join(self.targetpath, 'postgresql.jar')}" \
             f":{self.targetpath} " \
             f"{self.java_name} -F {self.properties}"
@@ -172,7 +188,9 @@ class Jdbcisreadonly(unittest.TestCase):
                         or f"{date_now_prc[1].split(' ')[1]}"
                         in select_result.splitlines()[7])
         self.assertTrue(f"{date_now[0]}" in select_result.splitlines()[12]
-                        or f"{date_now[1]}" in select_result.splitlines()[12])
+                        or f"{date_now[1]}" in select_result.splitlines()[12]
+                        or f"{date_now[2]}" in select_result.splitlines()[12]
+                        or f"{date_now[3]}" in select_result.splitlines()[12])
         self.assertTrue(f"{date_now_prc[0]}" in select_result.splitlines()[17]
                         or f"{date_now_prc[1]}"
                         in select_result.splitlines()[17])
@@ -202,4 +220,10 @@ class Jdbcisreadonly(unittest.TestCase):
         cmd = f"rm -rf {self.targetpath}"
         self.log.info(cmd)
         self.db_primary_root_node.sh(cmd)
+        self.log.info('------------------重启数据库-------------')
+        result = self.commonshpri.stop_db_cluster()
+        self.log.info(result)
+        result = self.commonshpri.start_db_cluster(True)
+        self.log.info(result)
+        time.sleep(3)
         self.log.info("-Opengauss_Function_JDBC_Set_Get_Object_Case0023 end-")

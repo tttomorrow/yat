@@ -1,0 +1,119 @@
+-- @testpoint: 清空回收站中的对象
+--step1: 查询enable_recyclebin默认值; expect:显示默认值off
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+
+--step2: 修改enable_recyclebin为on; expect:修改成功
+alter system set enable_recyclebin to on;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| on                |
++-------------------+
+--step3: 清除回收站; expect:回收站清除成功
+purge recyclebin;
+SQL SUCCESS
+--step4: 创建表、插入数据并删除表; expect:表创建成功、数据插入成功且表删除成功
+drop table if exists t_timecapsule_0006;
+SQL SUCCESS
+create table t_timecapsule_0006(a int);
+SQL SUCCESS
+insert into t_timecapsule_0006 values(1);
+SQL SUCCESS
+drop table t_timecapsule_0006;
+SQL SUCCESS
+--step5: 在回收站中统计原始对象名称t_timecapsule_0006和操作类型为drop; expect:预期结果为1
+select count(*) from gs_recyclebin where rcyoriginname = 't_timecapsule_0006' and rcyoperation = 'd';
++-------+
+| count |
++-------+
+| 1     |
++-------+
+--step6: 清除回收站; expect:回收站清除成功
+purge recyclebin;
+SQL SUCCESS
+purge recyclebin;
+SQL SUCCESS
+purge recyclebin;
+SQL SUCCESS
+purge recyclebin;
+SQL SUCCESS
+--step7: 创建表、插入数据并删除表; expect:表创建成功、数据插入成功且表删除成功
+drop table if exists t_timecapsule_0006;
+SQL SUCCESS
+create table t_timecapsule_0006(a int);
+SQL SUCCESS
+insert into t_timecapsule_0006 values(1);
+SQL SUCCESS
+drop table t_timecapsule_0006;
+SQL SUCCESS
+--step8: 在回收站中统计原始对象名称t_timecapsule_0006和操作类型为drop; expect:预期结果为1
+select count(*) from gs_recyclebin where rcyoriginname = 't_timecapsule_0006' and rcyoperation = 'd';
++-------+
+| count |
++-------+
+| 1     |
++-------+
+--step9: 清除回收站; expect:回收站清除成功
+purge recyclebin;
+SQL SUCCESS
+purge recyclebin;
+SQL SUCCESS
+purge recyclebin;
+SQL SUCCESS
+purge recyclebin;
+SQL SUCCESS
+--step10: 创建表、插入数据并删除表; expect:表创建成功、数据插入成功且表删除成功
+drop table if exists t_timecapsule_0006;
+SQL SUCCESS
+create table t_timecapsule_0006(a int);
+SQL SUCCESS
+insert into t_timecapsule_0006 values(1);
+SQL SUCCESS
+drop table t_timecapsule_0006;
+SQL SUCCESS
+--step11: 在回收站中统计原始对象名称t_timecapsule_0006和操作类型为drop; expect:预期结果为1
+select count(*) from gs_recyclebin where rcyoriginname = 't_timecapsule_0006' and rcyoperation = 'd';
++-------+
+| count |
++-------+
+| 1     |
++-------+
+--step12: 清除回收站; expect:回收站清除成功
+purge recyclebin;
+SQL SUCCESS
+purge recyclebin;
+SQL SUCCESS
+purge recyclebin;
+SQL SUCCESS
+--step13: 清理环境; expect:清理成功
+drop table if exists t_timecapsule_0006 purge;
+SQL SUCCESS
+purge recyclebin;
+SQL SUCCESS
+--step14: 恢复默认值; expect:默认值恢复成功
+alter system set enable_recyclebin to off;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+

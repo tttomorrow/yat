@@ -1,3 +1,17 @@
+"""
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
+
+openGauss is licensed under Mulan PSL v2.
+You can use this software according to the terms and conditions of the Mulan PSL v2.
+You may obtain a copy of Mulan PSL v2 at:
+
+          http://license.coscl.org.cn/MulanPSL2
+
+THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+See the Mulan PSL v2 for more details.
+"""
 '''
 Case Type： 功能
 Case Name：使用concurrently创建部分索引，部分索引为不存在数据范围
@@ -38,14 +52,12 @@ class Concurrently(unittest.TestCase):
         self.assertIn(self.Constant.INSERT_SUCCESS_MSG, result)
 
         self.log.info('-----------------create index-----------------------------')
-        sql = f'select current_time;create index concurrently {self.idxname} on {self.tblname}(id) where id > 800000000000;select current_time;'
         create_index_thread = ComThread(self.primary_sh.execut_db_sql, args=(sql, ''))
         create_index_thread.setDaemon(True)
         create_index_thread.start()
 
         self.log.info('-----------------insert table-----------------------------')
         before_time = self.dbPrimaryDbUser.sh("date +'%s'").result()
-        result = self.primary_sh.execut_db_sql(f'INSERT INTO {self.tblname} SELECT * FROM  generate_series(200000000,200000999) ;')
         after_time = self.dbPrimaryDbUser.sh("date +'%s'").result()
         self.log.info(result)
         self.assertIn(self.Constant.INSERT_SUCCESS_MSG, result)
@@ -82,13 +94,11 @@ class Concurrently(unittest.TestCase):
         self.log.info(result)
         self.assertNotIn(self.idxname, result)
         result = self.primary_sh.execut_db_sql(
-            f'SET ENABLE_SEQSCAN=off;explain SELECT * FROM {self.tblname} where id = 800000000001;')
         self.log.info(result)
         self.assertIn(self.idxname, result)
 
         self.log.info('-----------------check insert date-----------------------------')
         result = self.primary_sh.execut_db_sql(
-            f'SET ENABLE_SEQSCAN=off;SELECT count(*) FROM {self.tblname} where id>200000000;')
         self.log.info(result)
         self.assertIn('999', result)
 

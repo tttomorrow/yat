@@ -5,6 +5,7 @@ create table fvt_func_blob_table_006(
   t1 int,
   t2 blob
   );
+insert into fvt_func_blob_table_006 values(1,'01010101111100000100000010000000100111111111');
 
 --创建自定义函数
 create or replace function fvt_func_blob_006() return binary

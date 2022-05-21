@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -16,12 +16,17 @@ See the Mulan PSL v2 for more details.
 Case Type   : GUC
 Case Name   : 修改参数log_min_duration_statement的值为非法值
 Description :
+    1.修改参数log_min_duration_statement的值为2147483648：gs_guc reload -N all -I
+    all -c "log_min_duration_statement=2147483648"
     2.修改参数log_min_duration_statement的值为-2：gs_guc reload -N all -I all -c
     "log_min_duration_statement=-2"
     3.修改参数log_min_duration_statement的值为5.5：gs_guc reload -N all -I all -c
     "log_min_duration_statement=5.5"
 Expect      :
+    1.返回报错信息ERROR: The value 2147483648 is outside the valid range for
+    parameter "log_min_duration_statement" (-1 .. 2147483647)
     2.返回报错信息ERROR: The value -2 is outside the valid range for parameter
+    "log_min_duration_statement" (-1 .. 2147483647)
     3.返回报错信息ERROR: The parameter "log_min_duration_statement" requires an
     integer value
 History     :
@@ -46,12 +51,16 @@ class Errorlog(unittest.TestCase):
         self.common = Common()
 
     def test_errorlog(self):
+        self.logger.info('--修改参数log_min_duration_statement值为2147483648--')
         excute_cmd1 = f'source {self.DB_ENV_PATH};' \
                       f'gs_guc set -N all -I all -c ' \
+                      f'"log_min_duration_statement=2147483648"'
         self.logger.info(excute_cmd1)
         msg1 = self.userNode.sh(excute_cmd1).result()
         self.logger.info(msg1)
         self.assertTrue(msg1.find(
+            "The value 2147483648 is outside the valid range for parameter "
+            "\"log_min_duration_statement\" (-1 .. 2147483647)") > -1)
         self.logger.info('-----修改参数log_min_duration_statement值为-2------')
         excute_cmd2 = f'source {self.DB_ENV_PATH};' \
                       f'gs_guc reload -N all -I all -c ' \
@@ -61,6 +70,7 @@ class Errorlog(unittest.TestCase):
         self.logger.info(msg2)
         self.assertTrue(msg2.find(
             "The value -2 is outside the valid range for parameter "
+            "\"log_min_duration_statement\" (-1 .. 2147483647)") > -1)
         self.logger.info('----修改参数log_min_duration_statement值为5.5------')
         excute_cmd2 = f'source {self.DB_ENV_PATH};' \
                       f'gs_guc reload -N all -I all -c ' \

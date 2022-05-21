@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -71,6 +71,7 @@ class TransactionFile(unittest.TestCase):
             sql_cmd = f'''  declare 
                               a money;
                             begin
+                              a := 92233720368547758.07;
                               insert into testzl values (a);
                             end;
                           '''

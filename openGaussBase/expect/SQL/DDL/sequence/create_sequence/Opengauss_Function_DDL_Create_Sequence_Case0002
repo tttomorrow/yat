@@ -1,4 +1,4 @@
---  @testpoint:序列名与同一模式下的对象名相同，合理报错
+-- @testpoint: 序列名与同一模式下的对象名相同，合理报错
 --testpoint1:建表
 drop table if exists test_t1;
 SQL SUCCESS
@@ -6,7 +6,8 @@ create table test_t1(id int);
 SQL SUCCESS
 --创建序列，序列名与同一模式下的表名相同，合理报错
 CREATE SEQUENCE test_t1;
-?.*ERROR: relation "test_t1" already exists
+?.*ERROR: relation "test_t1" already exists.*
+?.*
 --删表
 drop table test_t1;
 SQL SUCCESS
@@ -17,7 +18,8 @@ CREATE SEQUENCE test_t2;
 SQL SUCCESS
 --再次创建同名序列
 CREATE SEQUENCE test_t2;
-?.*ERROR: relation "test_t2" already exists
+?.*ERROR: relation "test_t2" already exists.*
+?.*
 --删除序列
 drop SEQUENCE test_t2;
 SQL SUCCESS
@@ -27,7 +29,8 @@ CREATE VIEW test_myView AS
 SQL SUCCESS
 --创建序列
 CREATE SEQUENCE test_myView;
-?.*ERROR: relation "test_myview" already exists
+?.*ERROR: relation "test_myview" already exists.*
+?.*
 --删除序列
 drop view test_myView;
 SQL SUCCESS
@@ -50,7 +53,8 @@ CREATE UNIQUE INDEX ds_ship_mode_t1_index1 ON ship_mode_t1(SM_SHIP_MODE_SK);
 SQL SUCCESS
 --创建于索引名同名的序列
 CREATE SEQUENCE ds_ship_mode_t1_index1;
-?.*ERROR: relation "ds_ship_mode_t1_index1" already exists
+?.*ERROR: relation "ds_ship_mode_t1_index1" already exists.*
+?.*
 --删除表
 drop table ship_mode_t1;
 SQL SUCCESS

@@ -1,112 +1,250 @@
 default:
-  host: '主机ip'
+  host: 'ip'
   db:
-    url: 'jdbc:postgresql://${host}:${port}/${name}'
+    url: 'jdbc:postgresql://ip:port/yat'
     driver: 'org.postgresql.Driver'
-    username: 'tpccuser'
-    password: '*******'
-    port: 30830
-    name: 'tpccdb'
+    username: 'yat'
+    password: ''
+    port: 16333
+  ssh:
+    port: 22
+    username: yat
+    password: ''
+sys:
+  host: 'ip1'
+  db:
+    type: 'zenith'
+    username: '*****'
+    password: '*****'
+    port: 2700
   ssh:
     port: 22
     username: root
-    password: '*******'
-
+    password: '*****'
 dbuser:
-  host: 'ip'
+  host: 'ip2'
   db:
-    url: 'jdbc:postgresql://${host}:${port}/${name}'
+    url: 'jdbc:postgresql://ip2:2700/db'
     driver: 'org.postgresql.Driver'
-    username: 'tpccuser'
-    password: '*******'
-    port: 30830
-    name: 'tpccdb'
+    username: 'tpcc'
+    password: '*****'
+    port: 2700
+    name: 'postgres'
   ssh:
     port: 22
-    username: function0830
-    password: '*******'
+    username: user
+    password: '*****'
 
+# 一主多备，主节点root
 PrimaryRoot:
-  host: 'ip'
+  host: 'ip3'
   db:
-    url: 'jdbc:postgresql://${host}:${port}/${name}'
+    url: 'jdbc:postgresql://ip3:15000/postgres'
     driver: 'org.postgresql.Driver'
-    username: 'tpccuser'
-    password: '*******'
-    port: 30830
-    name: 'tpccdb'
+    username: 'nyl'
+    password: '*****'
+    port: 15000
+    name: 'postgres'
   ssh:
     port: 22
-    username: root
-    password: '*******'
+    username: xmg
+    password: '*****'
 
+
+# 一主多备，主节点dbuser
 PrimaryDbUser:
-  host: 'ip'
+  host: 'ip3'
   db:
-    url: 'jdbc:postgresql://${host}:${port}/${name}'
+    url: 'jdbc:postgresql://ip3:15000/postgres'
     driver: 'org.postgresql.Driver'
-    username: 'tpccuser'
-    password: '*******'
-    port: 30830
-    name: 'tpccdb'
+    username: 'nyl'
+    password: '*****'
+    port: 15000
+    name: 'postgres'
   ssh:
     port: 22
-    username: function0830
-    password: '*******'
+    username: xmg
+    password: '*****'
 
+# 一主多备，备节点1 root
 Standby1Root:
-  host: 'ip'
+  host: 'ip4'
   db:
-    url: 'jdbc:postgresql://${host}:${port}/${name}'
+    url: 'jdbc:postgresql://ip4:15000/postgres'
     driver: 'org.postgresql.Driver'
-    username: 'tpccuser'
-    password: '*******'
-    port: 30830
-    name: 'tpccdb'
+    username: 'nyl'
+    password: '*****'
+    port: 15000
+    name: 'postgres'
   ssh:
     port: 22
-    username: root
-    password: '*******'
+    username: xmg
+    password: '*****'
 
+# 一主多备，备节点1 dbuser
 Standby1DbUser:
-  host: 'ip'
+  host: 'ip4'
   db:
-    url: 'jdbc:postgresql://${host}:${port}/${name}'
+    url: 'jdbc:postgresql://ip4:15000/postgres'
     driver: 'org.postgresql.Driver'
-    username: 'tpccuser'
-    password: '*******'
-    port: 30830
-    name: 'tpccdb'
+    username: 'nyl'
+    password: '*****'
+    port: 15000
+    name: 'postgres'
   ssh:
     port: 22
-    username: function0830
-    password: '*******'
+    username: xmg
+    password: '*****'
 
+# 一主多备，备节点2 root
 Standby2Root:
-  host: 'ip'
+  host: 'ip4'
+  db:
+    url: 'jdbc:postgresql://ip4:15000/postgres'
+    driver: 'org.postgresql.Driver'
+    username: 'nyl'
+    password: '*****'
+    port: 15000
+    name: 'postgres'
+  ssh:
+    port: 22
+    username: xmg
+    password: '*****'
+
+# 一主多备，备节点2 dbuser
+Standby2DbUser:
+  host: 'ip4'
+  db:
+    url: 'jdbc:postgresql://ip4:15000/postgres'
+    driver: 'org.postgresql.Driver'
+    username: 'nyl'
+    password: '*****'
+    port: 15000
+    name: 'postgres'
+  ssh:
+    port: 22
+    username: xmg
+    password: '*****'
+
+
+# 远程连接节点信息
+# 远程root信息，单节点
+remote_root:
+  host: 'ip3'
   db:
     url: 'jdbc:postgresql://${host}:${port}/${name}'
     driver: 'org.postgresql.Driver'
-    username: 'tpccuser'
-    password: '*******'
-    port: 30830
-    name: 'tpccdb'
+    username: 'nyl'
+    password: '*****'
+    port: 15000
+    name: 'postgres'
   ssh:
     port: 22
     username: root
-    password: '*******'
+    password: '*****'
 
-Standby2DbUser:
-  host: 'ip'
+# 远程dbuser信息，单节点
+remote_dbuser:
+  host: 'ip3'
   db:
-    url: 'jdbc:postgresql://${host}:${port}/${name}'
+    url: 'jdbc:postgresql://ip3:15000/postgres'
     driver: 'org.postgresql.Driver'
-    username: 'tpccuser'
-    password: '*******'
-    port: 30830
-    name: 'tpccdb'
+    username: 'nyl'
+    password: '*****'
+    port: 15000
+    name: 'postgres'
   ssh:
     port: 22
-    username: function0830
-    password: '*******'
+    username: xmg
+    password: '*****'
 
+# 远程一主多备，主节点root
+remote_PrimaryRoot:
+  host: 'ip3'
+  db:
+    url: 'jdbc:postgresql://ip3:15000/postgres'
+    driver: 'org.postgresql.Driver'
+    username: 'nyl'
+    password: '*****'
+    port: 15000
+    name: 'postgres'
+  ssh:
+    port: 22
+    username: xmg
+    password: '*****'
+
+
+# 远程一主多备，主节点dbuser
+remote_PrimaryDbUser:
+  host: 'ip3'
+  db:
+    url: 'jdbc:postgresql://ip3:15000/postgres'
+    driver: 'org.postgresql.Driver'
+    username: 'nyl'
+    password: '*****'
+    port: 15000
+    name: 'postgres'
+  ssh:
+    port: 22
+    username: xmg
+    password: '*****'
+
+# 远程一主多备，备节点1 root
+remote_Standby1Root:
+  host: 'ip4'
+  db:
+    url: 'jdbc:postgresql://ip4:15000/postgres'
+    driver: 'org.postgresql.Driver'
+    username: 'nyl'
+    password: '*****'
+    port: 15000
+    name: 'postgres'
+  ssh:
+    port: 22
+    username: xmg
+    password: '*****'
+
+# 远程一主多备，备节点1 dbuser
+remote_Standby1DbUser:
+  host: 'ip4'
+  db:
+    url: 'jdbc:postgresql://ip4:15000/postgres'
+    driver: 'org.postgresql.Driver'
+    username: 'nyl'
+    password: '*****'
+    port: 15000
+    name: 'postgres'
+  ssh:
+    port: 22
+    username: xmg
+    password: '*****'
+
+# 远程一主多备，备节点2 root
+remote_Standby2Root:
+  host: 'ip4'
+  db:
+    url: 'jdbc:postgresql://ip4:15000/postgres'
+    driver: 'org.postgresql.Driver'
+    username: 'nyl'
+    password: '*****'
+    port: 15000
+    name: 'postgres'
+  ssh:
+    port: 22
+    username: xmg
+    password: '*****'
+
+# 远程一主多备，备节点2 dbuser
+remote_Standby2DbUser:
+  host: 'ip4'
+  db:
+    url: 'jdbc:postgresql://ip4:15000/postgres'
+    driver: 'org.postgresql.Driver'
+    username: 'nyl'
+    password: '*****'
+    port: 15000
+    name: 'postgres'
+  ssh:
+    port: 22
+    username: xmg
+    password: '*****'

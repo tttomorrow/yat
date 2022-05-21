@@ -1,0 +1,32 @@
+-- @testpoint: 创建hash索引后，查询表的ctid后进行聚簇排序，合理报错
+--创建哈希索引
+drop table if exists t_hash_index_0013;
+SQL SUCCESS
+create table t_hash_index_0013 (id int, sex varchar default 'male');
+SQL SUCCESS
+insert into t_hash_index_0013 values(10,default),(8,default),(9,default),(7,default),(6,default),(3,default),(4,default),(5,default);
+SQL SUCCESS
+drop index if exists i_hash_index_0013 ;
+SQL SUCCESS
+create index i_hash_index_0013 on t_hash_index_0013 using hash (id);
+SQL SUCCESS
+--查询,数据的原始ctid是插入数据的顺序
+select ctid,* from  t_hash_index_0013;
++-------+----+------+
+| ctid  | id | sex  |
++-------+----+------+
+| (0,1) | 10 | male |
+| (0,2) | 8  | male |
+| (0,3) | 9  | male |
+| (0,4) | 7  | male |
+| (0,5) | 6  | male |
+| (0,6) | 3  | male |
+| (0,7) | 4  | male |
+| (0,8) | 5  | male |
++-------+----+------+
+--执行聚簇排序，合理报错（目前只有btree索引支持聚簇排序）
+cluster t_hash_index_0013 using i_hash_index_0013;
+?.*ERROR: cannot cluster on index "i_hash_index_0013" because access method does not support clustering
+--清理环境
+drop table if exists t_hash_index_0013;
+SQL SUCCESS

@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -21,6 +21,9 @@ Description :
               gs_guc check -D {cluster/dn1} -c ssl_renegotiation_limit
               2、在gsql中分别设置数据库、用户、会话级别ssl_renegotiation_limit；
               alter database postgres set ssl_renegotiation_limit
+              to 2147483648;
+              alter user env109 set ssl_renegotiation_limit to 2147483648;
+              set ssl_renegotiation_limit to 2147483648;
 Expect      :
               1、显示默认值；
               2、参数修改成功；
@@ -61,13 +64,16 @@ class GucTest(unittest.TestCase):
         self.log.info("设置ssl_renegotiation_limit为超边界值，校验结果")
         sql_cmd = COMMONSH.execut_db_sql(
             f'''alter database postgres 
+            set ssl_renegotiation_limit to  2147483648;''')
         self.log.info(sql_cmd)
         self.assertIn("ERROR", sql_cmd)
         sql_cmd1 = COMMONSH.execut_db_sql(
             f'''alter user {self.db_user_node.db_user} 
+            set ssl_renegotiation_limit to  2147483648;''')
         self.log.info(sql_cmd1)
         self.assertIn("ERROR", sql_cmd1)
         sql_cmd2 = COMMONSH.execut_db_sql(
+            f'''set ssl_renegotiation_limit to  2147483648;''')
         self.log.info(sql_cmd2)
         self.assertIn("ERROR", sql_cmd2)
 

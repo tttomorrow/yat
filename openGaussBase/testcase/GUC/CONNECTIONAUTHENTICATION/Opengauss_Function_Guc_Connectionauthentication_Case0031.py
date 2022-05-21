@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -19,7 +19,7 @@ Description : 1、查看local_bind_address默认值；
               source /opt/opengauss810/env
               gs_guc check -D {cluster/dn1} -c local_bind_address
               2、使用ALTER SYSTEM SET修改数据库参数local_bind_address;
-              ALTER SYSTEM SET  local_bind_address to 'ip';
+              ALTER SYSTEM SET  local_bind_address to '100.99.81.59';
               3、重启使其生效；
               gs_om -t stop && gs_om -t start
               4、恢复默认值

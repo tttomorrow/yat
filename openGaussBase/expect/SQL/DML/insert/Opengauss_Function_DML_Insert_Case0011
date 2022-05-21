@@ -1,4 +1,5 @@
 -- @testpoint: 插入数据，数据类型不兼容，合理报错
+-- @modify at: 2020-11-16
 --建表
 drop table if exists zsharding_tbl;
 SQL SUCCESS

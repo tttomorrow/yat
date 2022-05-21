@@ -18,7 +18,9 @@ select relname from pg_class where relname like 'index_139_%' order by relname;
 
 --rename
 select relname from PG_PARTITION where parentid=(select relfilenode from pg_class where relname='index_139_01') order by relname asc;
+ALTER INDEX if exists index_139_01 RENAME PARTITION p1 TO p12345678901324567890132456789012345678901234567890123456789012;
 select relname from PG_PARTITION where parentid=(select relfilenode from pg_class where relname='index_139_01') order by relname asc;
+ALTER INDEX if exists index_139_01 RENAME PARTITION p12345678901324567890132456789012345678901234567890123456789012 TO p1;
 select relname from PG_PARTITION where parentid=(select relfilenode from pg_class where relname='index_139_01') order by relname asc;
 
 --清理环境

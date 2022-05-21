@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -29,6 +29,7 @@ Expect      :
     4、互信文件存在，不存在映射关系
     5、清理环境成功
 History     :
+    删除备机ssh文件及断言
 """
 
 import os
@@ -41,6 +42,7 @@ from testcase.utils.CommonSH import CommonSH
 logger = Logger()
 primary_sh = CommonSH('PrimaryDbUser')
 etc = '/etc/hosts'
+etc_backup = '/etc/hosts_bak'
 mapping = '#Gauss OM IP Hosts Mapping'
 
 
@@ -58,48 +60,51 @@ class ToolsTestCase(unittest.TestCase):
         self.ssh_file = os.path.join('/home',
                                      self.primary_node.ssh_user,
                                      'hostfile')
-        self.ssh_backup = os.path.join('/home',
-                                       self.primary_node.ssh_user,
-                                       'ssh_backup')
+        self.conf_path = os.path.join(macro.DB_INSTANCE_PATH,
+                                      macro.DB_PG_CONFIG_NAME)
         logger.info("======SetUp：检查数据库状态是否正常======")
         status = self.commonsh.get_db_cluster_status()
         self.assertTrue("Degraded" in status or "Normal" in status)
+        logger.info("======获取备节点ip======")
+        shell_cmd = f"cat {self.conf_path} | " \
+            f"grep 'replconninfo' | " \
+            f"grep -Ev '^#' | " \
+            f"tr -s ' '| " \
+            f"cut -d ' ' -f 7 | " \
+            f"cut -d '=' -f 2"
+        logger.info(shell_cmd)
+        msg = self.primary_node.sh(shell_cmd).result()
+        logger.info(msg)
+        self.standby_ip_list = msg.splitlines()
 
     def test_gs_sshexkey(self):
-        logger.info("Opengauss_Function_Tools_gs_sshexkey_Case0006开始执行")
-        logger.info("======创建备份目录======")
-        mk_cmd = f'''mkdir {self.ssh_backup}'''
-        mk_res1 = self.primary_node.sh(mk_cmd).result()
-        mk_res2 = self.standby_node.sh(mk_cmd).result()
-        logger.info(mk_res1)
-        logger.info(mk_res2)
-
-        logger.info("======查看是否已存在互信文件，如有则备份======")
-        check_cmd = 'ls ~/.ssh'
-        check_res = self.primary_node.sh(check_cmd).result()
-        logger.info(check_res)
-        if check_res is not None:
-            mv_cmd = f'''mv ~/.ssh/* {self.ssh_backup};ls {self.ssh_backup}'''
-            self.primary_node.sh(mv_cmd)
-            self.standby_node.sh(mv_cmd)
-        check_res = self.primary_node.sh(check_cmd).result()
-        logger.info(check_res)
-
+        logger.info(f"====={os.path.basename(__file__)}开始执行=====")
         logger.info("======步驟1：普通用户下创建hostfile文件，添加主备IP信息======")
-        add_cmd = f'''touch {self.ssh_file}
-            echo -e '{self.IP1}\n{self.IP2}' > {self.ssh_file}
-            cat {self.ssh_file} | grep {self.IP1}
-            cat {self.ssh_file} | grep {self.IP2}
-            '''
-        logger.info(add_cmd)
-        add_res = self.primary_node.sh(add_cmd).result()
-        logger.info(add_res)
-        self.assertTrue(self.IP1 in add_res and self.IP2 in add_res)
+        add_cmd1 = f'''touch {self.ssh_file}
+                       echo -e '{self.IP1}' > {self.ssh_file}
+                       cat {self.ssh_file} | grep {self.IP1}'''
+        logger.info(add_cmd1)
+        add_res1 = self.primary_node.sh(add_cmd1).result()
+        self.assertTrue(self.IP1 in add_res1)
 
-        logger.info("======清理/etc/hosts文件中的映射关系======")
-        clear_cmd = f'''sed -i "/{self.IP2}/d" {etc}'''
-        clear_res1 = self.root_primary_node.sh(clear_cmd).result()
-        logger.info(clear_res1)
+        for i in self.standby_ip_list:
+            add_cmd2 = f'''echo -e '{i}' >> {self.ssh_file}
+                           cat {self.ssh_file}'''
+            logger.info(add_cmd2)
+            add_res2 = self.primary_node.sh(add_cmd2).result()
+            logger.info(add_res2)
+            self.assertTrue(i in add_res2)
+
+        logger.info("======备份/etc/hosts,且清理/etc/hosts文件中的映射关系======")
+        backup_etc = f'''cp {etc} {etc_backup}'''
+        logger.info(backup_etc)
+        back_res = self.root_primary_node.sh(backup_etc).result()
+        logger.info(back_res)
+
+        for i in self.standby_ip_list:
+            clear_cmd = f'''sed -i "/{i}/d" {etc}'''
+            clear_res1 = self.root_primary_node.sh(clear_cmd).result()
+            logger.info(clear_res1)
 
         logger.info("======步驟2：执行gs_sshexkey命令======")
         gs_cmd = f'''gs_sshexkey -f {self.ssh_file} --skip-hostname-set'''
@@ -124,10 +129,11 @@ class ToolsTestCase(unittest.TestCase):
         self.assertEqual(self.standby_hostname, ssh_res.split('\n')[-1])
 
         logger.info("======步驟4：查看/etc/hosts文件中是否存在IP与hostname映射关系======")
-        cat_cmd = f'''cat {etc} | grep {self.IP2}'''
-        cat_res = self.primary_node.sh(cat_cmd).result()
-        logger.info(cat_res)
-        self.assertEqual('', cat_res)
+        for i in self.standby_ip_list:
+            cat_cmd = f'''cat {etc} | grep {i}'''
+            cat_res = self.primary_node.sh(cat_cmd).result()
+            logger.info(cat_res)
+            self.assertEqual('', cat_res)
 
         logger.info("======查看互信文件是否存在======")
         check_cmd = 'cd ~/.ssh;ls'
@@ -136,26 +142,28 @@ class ToolsTestCase(unittest.TestCase):
         self.assertTrue(self.check_res)
 
     def tearDown(self):
-        logger.info("======步驟5：清理环境，删除hostfile文件======")
-        rm_cmd1 = f'''rm -rf ~/.ssh/*;rm -rf {self.ssh_file}'''
-        rm_res1 = self.primary_node.sh(rm_cmd1).result()
-        rm_res2 = self.standby_node.sh(rm_cmd1).result()
-        self.assertNotIn('bash', rm_res1)
-        self.assertNotIn('bash', rm_res2)
-
-        logger.info("======恢复环境原有互信关系======")
-        gs_cmd = f'''cp {self.ssh_backup}/* ~/.ssh/
-            rm -rf {self.ssh_backup}'''
-        logger.info(gs_cmd)
-        gs_res1 = self.primary_node.sh(gs_cmd).result()
-        gs_res2 = self.standby_node.sh(gs_cmd).result()
-        self.assertNotIn('bash', gs_res1)
-        self.assertNotIn('bash', gs_res2)
-
+        logger.info("======步驟5：清理环境======")
         logger.info("======恢复环境原有映射关系======")
-        rec_cmd = f'''echo -e "{self.IP2} {self.standby_hostname} \
-            {mapping}" >> {etc}'''
-        logger.info(rec_cmd)
-        rec_res = self.root_primary_node.sh(rec_cmd).result()
-        self.assertNotIn('bash', rec_res)
-        logger.info("===Opengauss_Function_Tools_gs_sshexkey_Case0006执行结束===")
+        backup_etc = f'''mv {etc_backup} {etc};ls {etc};chmod 755 {etc};'''
+        logger.info(backup_etc)
+        back_res = self.root_primary_node.sh(backup_etc).result()
+        logger.info(back_res)
+        logger.info("======重新建立用户互信======")
+        gs_cmd = f'''gs_sshexkey -f {self.ssh_file} --skip-hostname-set'''
+        execute_cmd = f'''source {macro.DB_ENV_PATH}
+                    expect <<EOF
+                    set timeout 300
+                    spawn {gs_cmd}
+                    expect "*assword:"
+                    send "{self.primary_node.ssh_password}\\n"
+                    expect eof\n''' + '''EOF'''
+        logger.info(execute_cmd)
+        gs_res = self.primary_node.sh(execute_cmd).result()
+        logger.info(gs_res)
+        logger.info("======删除hostfile文件======")
+        rm_cmd1 = f'''rm -rf {self.ssh_file}'''
+        rm_res1 = self.primary_node.sh(rm_cmd1).result()
+        self.assertIn('Successfully created SSH trust', gs_res)
+        self.assertNotIn('bash', rm_res1)
+        self.assertIn(etc, back_res)
+        logger.info(f"====={os.path.basename(__file__)}执行结束=====")

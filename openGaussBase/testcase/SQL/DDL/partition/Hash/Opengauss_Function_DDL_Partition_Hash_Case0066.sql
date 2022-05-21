@@ -1,0 +1,14 @@
+-- @testpoint: Hash分区表结合 with 子句（ORIENTATION=COLUMN）合理报错
+
+--step1：创建hash分区表 expect：合理报错
+drop table if exists t_partition_hash_0066_01;
+create table t_partition_hash_0066_01
+(id                         number(7)
+   constraint t_partition_hash_0066_01_id_nn not null,
+ use_filename               varchar2(20),
+ filename                   varchar2(255),
+ text                       varchar2(2000)
+  )with(orientation=column)
+partition by hash(id)
+(partition p1,
+ partition p2);

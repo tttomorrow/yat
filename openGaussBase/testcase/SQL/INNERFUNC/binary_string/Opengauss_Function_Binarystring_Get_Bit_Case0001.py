@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -61,6 +61,7 @@ class Bit_string_function(unittest.TestCase):
         Normal_SqlMdg = self.commonsh.execut_db_sql("""SELECT get_bit(E'josejosejose'::bytea, 94) AS RESULT;""")
         logger.info(Normal_SqlMdg)
         self.assertTrue(Normal_SqlMdg.splitlines()[2].strip(' ') == '1')
+        Normal_SqlMdg = self.commonsh.execut_db_sql("""SELECT get_bit(E'\\x5402036d6173'::bytea, 28)  AS RESULT; """)
         logger.info(Normal_SqlMdg)
         self.assertTrue(Normal_SqlMdg.splitlines()[2].strip(' ') == '1')
         Normal_SqlMdg = self.commonsh.execut_db_sql("""SELECT get_bit(E'jose\\\\\\000\\\\\\000\\\\\\0000jose\\\\\\00000\\\\\\000000jose'::bytea, 58) AS RESULT;""")

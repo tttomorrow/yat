@@ -16,7 +16,6 @@ select FVT_FUNC_BINARY_023('0012200');
 +---------------------+
 | fvt_func_binary_023 |
 +---------------------+
-| 00012200            |
 +---------------------+
 --恢复环境
 drop function if exists FVT_FUNC_BINARY_023;

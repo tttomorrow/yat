@@ -1,4 +1,5 @@
 -- @testpoint: 修改表数据，同一字段，执行多次alter操作
+-- @modify at: 2020-11-23
 --建表
 drop table if exists temp_table_alter_020;
 SQL SUCCESS

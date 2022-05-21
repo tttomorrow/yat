@@ -1,0 +1,142 @@
+-- @testpoint: range_hash二级分区表：rename约束/字段/分区,部分测试点合理报错
+--step1: 创建表空间; expect:成功
+drop table if exists t_subpartition_0330;
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0330;
+SQL SUCCESS
+create tablespace ts_subpartition_0330 relative location 'subpartition_tablespace/subpartition_tablespace_0330';
+SQL SUCCESS
+--test1: alter table rename --约束
+--step2: 创建表空间; expect:成功
+create   table if not exists t_subpartition_0330
+(
+    col_1 int ,
+    col_2 int  ,
+	col_3 int ,
+    col_4 int 
+	check (col_4 is not null)
+)tablespace ts_subpartition_0330
+partition by range (col_1) subpartition by hash (col_2)
+(
+  partition p_range_1 values less than( -10 )
+  (
+    subpartition p_hash_1_1 ,
+    subpartition p_hash_1_2 ,
+	 subpartition p_hash_1_3
+  ),
+  partition p_range_2 values less than( 20 ),
+  partition p_range_3 values less than( 30)
+  (
+    subpartition p_hash_3_1 ,
+    subpartition p_hash_3_2 ,
+	subpartition p_hash_3_3
+  ),
+    partition p_range_4 values less than( 50)
+  (
+    subpartition p_hash_4_1 ,
+    subpartition p_hash_4_2 ,
+	subpartition t_subpartition_0330
+  ),
+  partition p_range_5 values less than( maxvalue )
+) enable row movement;
+SQL SUCCESS
+--step3: 修改二级分区表，重命名约束; expect:成功
+alter table t_subpartition_0330 rename  constraint t_subpartition_0330_col_4_check to drop_check;
+SQL SUCCESS
+--step4: 插入数据; expect:合理报错
+insert into t_subpartition_0330 values(1,1,1,null);
+?.*ERROR: new row for relation "t_subpartition_0330" violates check constraint "drop_check.*
+  Detail: N/A
+--test2: alter table rename --字段
+--step5: 创建二级分区表; expect:成功
+drop table if exists t_subpartition_0330;
+SQL SUCCESS
+create   table if not exists t_subpartition_0330
+(
+    col_1 int ,
+    col_2 int  ,
+	col_3 int ,
+    col_4 int 
+	check (col_4 is not null)
+)tablespace ts_subpartition_0330
+partition by range (col_1) subpartition by hash (col_2)
+(
+  partition p_range_1 values less than( -10 )
+  (
+    subpartition p_hash_1_1 ,
+    subpartition p_hash_1_2 ,
+	 subpartition p_hash_1_3
+  ),
+  partition p_range_2 values less than( 20 ),
+  partition p_range_3 values less than( 30)
+  (
+    subpartition p_hash_3_1 ,
+    subpartition p_hash_3_2 ,
+	subpartition p_hash_3_3
+  ),
+    partition p_range_4 values less than( 50)
+  (
+    subpartition p_hash_4_1 ,
+    subpartition p_hash_4_2 ,
+	subpartition p_hash_4_3
+  ),
+  partition p_range_5 values less than( maxvalue )
+) enable row movement;
+SQL SUCCESS
+--step6: 修改二级分区表，重命名非分区键; expect:成功
+alter table t_subpartition_0330 rename column col_4 to col_4444;
+SQL SUCCESS
+--step7: 修改二级分区表，重命名分区键; expect:成功
+alter table t_subpartition_0330 rename column col_2 to col_22222;
+SQL SUCCESS
+--step8: 原二级分区键创建唯一索引; expect:合理报错
+create unique index on t_subpartition_0330(col_2);
+?.*ERROR: column "col_2" does not exis.*
+--test3: alter table rename --分区
+--step9: 修改二级分区表，重命名二级分区; expect:合理报错
+alter table t_subpartition_0330 rename partition p_range_2 to p_range_2_2222222;
+?.*ERROR: Un-support featur.*
+  Detail: For subpartition table, ALTER TABLE ... RENAME PARTITION/SUBPARTITION is not yet supported.
+--step10: 修改二级分区表，重命名一级分区; expect:合理报错
+alter table t_subpartition_0330 rename partition p_range_2 to p_range_222222222_2;
+?.*ERROR: Un-support featur.*
+  Detail: For subpartition table, ALTER TABLE ... RENAME PARTITION/SUBPARTITION is not yet supported.
+--step11: 查看分区数据; expect:成功
+select relname, parttype, partstrategy, boundaries from pg_partition where partstrategy !='n' and parentid = (select oid from pg_class where relname = 't_subpartition_0330') order by relname;
++---------------------+----------+--------------+------------+
+| relname             | parttype | partstrategy | boundaries |
++---------------------+----------+--------------+------------+
+| p_range_1           | p        | r            | {-10}      |
+| p_range_2           | p        | r            | {20}       |
+| p_range_3           | p        | r            | {30}       |
+| p_range_4           | p        | r            | {50}       |
+| p_range_5           | p        | r            | {}         |
+| t_subpartition_0330 | r        | r            |            |
++---------------------+----------+--------------+------------+
+select a.relname,a.parttype,a.partstrategy,a.indisusable from pg_partition a,(select oid from pg_partition
+where parentid = (select oid from pg_class where relname = 't_subpartition_0330')) b where a.parentid = b.oid order by a.relname;
++---------------------------+----------+--------------+-------------+
+| relname                   | parttype | partstrategy | indisusable |
++---------------------------+----------+--------------+-------------+
+| p_hash_1_1                | s        | h            | true        |
+| p_hash_1_2                | s        | h            | true        |
+| p_hash_1_3                | s        | h            | true        |
+| p_hash_3_1                | s        | h            | true        |
+| p_hash_3_2                | s        | h            | true        |
+| p_hash_3_3                | s        | h            | true        |
+| p_hash_4_1                | s        | h            | true        |
+| p_hash_4_2                | s        | h            | true        |
+| p_hash_4_3                | s        | h            | true        |
+| p_range_2_subpartdefault1 | s        | h            | true        |
+| p_range_5_subpartdefault1 | s        | h            | true        |
++---------------------------+----------+--------------+-------------+
+--test4: alter table rename --表
+--step12: 修改二级分区表，重命名表名; expect:合理报错
+alter table t_subpartition_0330 rename to hahahahahah;
+?.*ERROR: Un-support featur.*
+  Detail: For subpartition table, ALTER TABLE ... RENAME is not yet supported.
+--step13: 清理环境; expect:成功
+drop table if exists t_subpartition_0330;
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0330;
+SQL SUCCESS

@@ -1,0 +1,71 @@
+"""
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
+
+openGauss is licensed under Mulan PSL v2.
+You can use this software according to the terms and conditions of the Mulan PSL v2.
+You may obtain a copy of Mulan PSL v2 at:
+
+          http://license.coscl.org.cn/MulanPSL2
+
+THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+See the Mulan PSL v2 for more details.
+"""
+"""
+Case Type   : 服务端工具
+Case Name   : gs_encrypt工具单独使用--key-base64参数加密明文字符串
+Description :
+    1.生成输入口令以base64方式编码的密钥:
+      base64.b64encode([用户输入的口令].encode(encoding='utf-8'))
+    2.执行命令:
+      gs_encrypt --key-base64=[用户输入口令编码后的密钥]   [待加密明文字符串]
+      单独使用--key-base64参数加密明文字符串
+Expect      :
+    1.成功生成密钥；
+    2.执行失败，报错提示-B参数不能单独使用
+History     :
+"""
+
+import os
+import unittest
+import base64
+from yat.test import Node
+from yat.test import macro
+from testcase.utils.Constant import Constant
+from testcase.utils.Common import Common
+from testcase.utils.Logger import Logger
+
+
+class GsEncrypt60(unittest.TestCase):
+    def setUp(self):
+        self.logger = Logger()
+        self.logger.info(f'-----{os.path.basename(__file__)} start-----')
+        self.dbuserNode = Node('PrimaryDbUser')
+        self.common = Common()
+        self.Constant = Constant()
+
+    def test_gs_encrypt(self):
+        self.logger.info('-----进行加密操作-----')
+        step = "step1:生成输入口令以base64方式编码的密钥  except:成功生成密钥"
+        self.logger.info(step)
+        str1 = 'test'
+        encrypt = '123@;HHl'
+        enc = encrypt.encode(encoding='utf-8')
+        key = base64.b64encode(enc)
+        self.assertEqual(type(key), bytes, "生成失败" + step)
+
+        step = "step2:执行命令,单独使用参数--key-base64加密明文字符串 " \
+               "except:执行失败，报错提示参数--key-base64不能单独使用"
+        self.logger.info(step)
+        key_spl = str(key).split("'")[1]
+        check_cmd1 = f'''source {macro.DB_ENV_PATH};
+            gs_encrypt --key-base64={key_spl} {str1}'''
+        self.logger.info(check_cmd1)
+        self.logger.info("-----加密结果-----")
+        msg1 = self.common.get_sh_result(self.dbuserNode, check_cmd1)
+        self.assertIn(self.Constant.secure_false, msg1, "执行失败" + step)
+
+    def tearDown(self):
+        self.logger.info('-----无需清理环境-----')
+        self.logger.info(f'-----{os.path.basename(__file__)} end-----')

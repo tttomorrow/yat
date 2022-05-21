@@ -19,16 +19,19 @@ select sequence_name,min_value,start_value from test_seq3 where sequence_name = 
 select nextval('test_seq3');
 --删除序列
 drop SEQUENCE test_seq3;
+--创建递减序列，没有声明minvalue，查询序列的最小值(-9223372036854775807)
 drop SEQUENCE if exists test_seq4;
 create SEQUENCE test_seq4 INCREMENT -2;
 select sequence_name,min_value from test_seq4 where sequence_name = 'test_seq4';
 --删除序列
 drop SEQUENCE test_seq4;
+--创建递减序列，声明NO MINVALUE，查询序列的最小值(-9223372036854775807)
 drop SEQUENCE if exists test_seq5;
 create SEQUENCE test_seq5 INCREMENT -2 NO MINVALUE;
 select sequence_name,min_value from test_seq5 where sequence_name = 'test_seq5';
 --删除序列
 drop SEQUENCE test_seq5;
+--创建递减序列，声明NOMINVALUE，查询序列的最小值(-9223372036854775807)
 drop SEQUENCE if exists test_seq6;
 create SEQUENCE test_seq6 INCREMENT -2 NOMINVALUE;
 select sequence_name,min_value from test_seq6 where sequence_name = 'test_seq6';

@@ -15,6 +15,7 @@ select acos(c_decimal) t1 from acos_test_01 where c_decimal in (1,-1) order by t
 | t1                |
 +-------------------+
 | 0.0               |
+| 3.141592653589793 |
 +-------------------+
 drop table if exists acos_test_01;
 SQL SUCCESS

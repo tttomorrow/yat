@@ -20,6 +20,7 @@ INTERVAL ('1 month')
 SQL SUCCESS
 insert into partition_table_001 values (1,'aaa',1,'2018-02-23',true,'aaa',1.1);
 ?.*ERROR: new row for relation "partition_table_001" violates check constraint "partition_table_001_col_4_check"
+  Detail: N/A
 insert into partition_table_001 values (2,'bbb',2,'2020-03-23',false,'bbb',2.2);
 SQL SUCCESS
 drop table if exists partition_table_001;

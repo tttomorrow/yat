@@ -47,6 +47,7 @@ SELECT id, title, ts_rank(to_tsvector(body), query) AS rank FROM tsearch.pgweb, 
 +----+---------+-------------+
 | id | title   | rank        |
 +----+---------+-------------+
+| 11 | Brazil  | 0.075990885 |
 | 2  | America | 0.06079271  |
 | 12 | Canada  | 0.06079271  |
 | 13 | Mexico  | 0.06079271  |

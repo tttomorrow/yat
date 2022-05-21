@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -32,11 +32,10 @@ LOG = Logger()
 
 class Tools(unittest.TestCase):
     def setUp(self):
-        LOG.info('--Opengauss_Function_Tools_gs_collector_Case0011start--')
+        LOG.info(f'-----{os.path.basename(__file__)}start-----')
         self.dbuserNode = Node('dbuser')
         self.Constant = Constant()
-        self.tmp_dir_path = os.path.join(
-            os.path.dirname(macro.DB_INSTANCE_PATH), 'tmp')
+        self.tmp_dir_path = os.path.join(os.path.dirname(macro.PG_LOG_PATH))
 
     def test_server_tools1(self):
         LOG.info('---收集日志信息时指定开始和结束时间---')
@@ -82,4 +81,4 @@ class Tools(unittest.TestCase):
         LOG.info(rm_cmd)
         rm_msg = self.dbuserNode.sh(rm_cmd).result()
         LOG.info(rm_msg)
-        LOG.info('--Opengauss_Function_Tools_gs_collector_Case0011finish--')
+        LOG.info(f'-----{os.path.basename(__file__)}finish-----')

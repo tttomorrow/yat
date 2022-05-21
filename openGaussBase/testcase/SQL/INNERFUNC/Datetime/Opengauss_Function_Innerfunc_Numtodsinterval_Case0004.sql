@@ -1,4 +1,4 @@
---  @testpoint: numtodsinterval interval_unit? 扢INUTE??????
+--  @testpoint: numtodsinterval interval_unit? ’MINUTE‘??????
 
 drop table if exists test_date01;
 create table test_date01 (clo1 date);

@@ -2,4 +2,5 @@
 select pg_stat_get_xact_tuples_deleted() from PG_CLASS a where a.relname = 'sales';
 select pg_stat_get_xact_tuples_deleted(a.oid,a.oid,a.oid) from PG_CLASS a where a.relname = 'sales';
 select pg_stat_get_xact_tuples_deleted('') from PG_CLASS a where a.relname = 'sales';
+select pg_stat_get_xact_tuples_deleted(9999999999999) from PG_CLASS a where a.relname = 'sales';
 select pg_stat_get_xact_tuples_deleted('**&&^') from PG_CLASS a where a.relname = 'sales';

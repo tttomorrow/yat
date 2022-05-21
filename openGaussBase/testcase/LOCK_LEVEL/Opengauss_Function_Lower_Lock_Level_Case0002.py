@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -28,6 +28,7 @@ Expect      :
     4、查看分区数据成功;
     5、清理环境成功;
 History     :
+    优化用例，减少分区数据，控制用例执行时长，不影响功能验证
 """
 
 import unittest
@@ -79,9 +80,9 @@ class LockLevel(unittest.TestCase):
 
         text = '------step2:session1中向分区1插入数据; expect:成功------'
         self.log.info(text)
-        insert_cmd1 = f'''select {insert_func}(19999);
-            select count(*) from {self.table_name} partition for (19999);
-            select pg_sleep(15);'''
+        insert_cmd1 = f'''select {insert_func}(100);
+            select count(*) from {self.table_name} partition for (100);
+            select pg_sleep(12);'''
         session_1 = ComThread(self.comsh.execut_db_sql, args=(insert_cmd1,))
         session_1.setDaemon(True)
         session_1.start()
@@ -90,25 +91,25 @@ class LockLevel(unittest.TestCase):
         text = '------step3 & step4:session2中向分区3插入数据,查看分区数据; ' \
                'expect:插入数据成功,查看分区数据成功------'
         self.log.info(text)
-        insert_cmd2 = f'''select {insert_func}(59999);
-            select count(*) from {self.table_name} partition for (59999);'''
+        insert_cmd2 = f'''select {insert_func}(40100);
+            select count(*) from {self.table_name} partition for (40100);'''
         session_2 = ComThread(self.comSQL.execut_db_sql, args=(insert_cmd2,))
         session_2.setDaemon(True)
         session_2.start()
 
         self.log.info('------session2执行结果------')
-        session_2.join(10)
+        session_2.join(50)
         session_2_result = session_2.get_result()
         self.log.info(session_2_result)
-        self.assertTrue('20000' in session_2_result.splitlines()[-2],
+        self.assertTrue('101' in session_2_result.splitlines()[-2],
                         "执行失败:" + text)
 
         text = '------session1执行结果------'
         self.log.info(text)
-        session_1.join(30)
+        session_1.join(60)
         session_1_result = session_1.get_result()
         self.log.info(session_1_result)
-        self.assertTrue('20000' in session_1_result, "执行失败:" + text)
+        self.assertTrue('101' in session_1_result, "执行失败:" + text)
 
     def tearDown(self):
         text = '------step5:清理环境; expect:成功------'
@@ -117,4 +118,6 @@ class LockLevel(unittest.TestCase):
             drop function {self.function_name};'''
         drop_msg = self.comsh.execut_db_sql(drop_cmd)
         self.log.info(drop_msg)
+        self.assertTrue(self.constant.DROP_TABLE_SUCCESS in drop_msg and
+                        self.constant.DROP_FUNCTION_SUCCESS_MSG in drop_msg)
         self.log.info('--Opengauss_Function_Lower_Lock_Level_Case0002执行完成--')

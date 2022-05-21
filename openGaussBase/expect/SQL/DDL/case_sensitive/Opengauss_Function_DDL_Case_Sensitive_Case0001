@@ -1,4 +1,4 @@
---  @testpoint: --创建表验证表名大小写敏感：报错
+-- @testpoint: --创建表验证表名大小写敏感：合理报错
 drop table if exists false_1 cascade;
 SQL SUCCESS
 drop table if exists falsE_1 cascade;
@@ -6,4 +6,5 @@ SQL SUCCESS
 create table false_1(a int);
 SQL SUCCESS
 create table falsE_1(a int);
-?.*ERROR: relation "false_1" already exists
+?.*ERROR: relation "false_1" already exists.*
+?.*

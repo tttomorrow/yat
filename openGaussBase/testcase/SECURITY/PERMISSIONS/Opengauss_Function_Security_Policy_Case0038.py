@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -17,8 +17,8 @@ Case Type   : policy
 Case Name   : 密码为0-9数字的最少要求个数password_min_digital=1
 Description :
     1.在postgres.conf中设置password_min_digital=3，重启数据库生效
-    2.初始用户执行：create user user001 with password 'Qazwsx@123';
-    create user wf with password 'Qazwsx@h12';
+    2.初始用户执行：create user user001 with password '$PASSWORD';
+    create user wf with password '$PASSWORD';
 Expect      :
     1.设置成功，数据库重启成功
     2.user001创建成功
@@ -42,7 +42,8 @@ class Policy(unittest.TestCase):
         self.common = Common()
         self.sh_primy = CommonSH('PrimaryDbUser')
         self.DB_ENV_PATH = macro.DB_ENV_PATH
-        self.new_password1 = macro.COMMON_PASSWD.upper() + "qaz"
+        self.password1 = 'Xiaxia@hu3'
+        self.password2 = 'Xiaxia@hau'
         self.Constant = Constant()
         self.configure = 'password_min_digital=1'
         msg0 = self.common.config_set_modify(self.configure)
@@ -53,8 +54,8 @@ class Policy(unittest.TestCase):
 
     def test_policy(self):
         logger.info('----------------create user ---------------')
-        sql_cmd1 = 'create user user001 with password \'Xiaxia@hu3\';'
-        sql_cmd2 = 'create user wf with password \'Xiaxia@hau\';'
+        sql_cmd1 = f'create user user001 with password \'{self.password1}\';'
+        sql_cmd2 = f'create user wf with password \'{self.password2}\';'
         msg1 = self.sh_primy.execut_db_sql(sql_cmd1)
         logger.info(msg1)
         self.assertIn(self.Constant.CREATE_ROLE_SUCCESS_MSG, msg1)

@@ -9,6 +9,7 @@ insert into t_casewhen_002 values (1,2018,6,30);
 declare
     v_int int;
 begin
+    select (select case id when 1 then '1530331200' end from t_casewhen_002) into v_int from sys_dummy;
      raise info 'result:% ',v_int;
 end;
 /

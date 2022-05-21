@@ -33,8 +33,11 @@ CREATE INDEX  test_gin_row1_idx ON test_gin_row1 USING GIN(info) with (FASTUPDAT
 --fail(row)
 CREATE INDEX  test_gin_row2_first_name_idx  ON test_gin_row2 USING GIN(to_tsvector('english', first_name)) with (FASTUPDATE=on,GIN_PENDING_LIST_LIMIT=63);
 --fail(COLUMN)
+CREATE INDEX  test_gin_2_first_name_idx  ON test_gin_2 USING GIN(to_tsvector('english', first_name)) with (FASTUPDATE=on,GIN_PENDING_LIST_LIMIT=2147483648);
 --fail (row)
+CREATE INDEX  test_gin_row1_idx ON test_gin_row1 USING GIN(info) with (FASTUPDATE=on, GIN_PENDING_LIST_LIMIT=2147483648);
 --fail(row)
+CREATE INDEX  test_gin_row2_first_name_idx  ON test_gin_row2 USING GIN(to_tsvector('english', first_name)) with (FASTUPDATE=on,GIN_PENDING_LIST_LIMIT=2147483648);
 --successfully (COLUMN)
 CREATE INDEX  test_gin_2_first_name_idx  ON test_gin_2 USING GIN(to_tsvector('english', first_name)) with (FASTUPDATE=on,GIN_PENDING_LIST_LIMIT=64);
 --successfully (row)

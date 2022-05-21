@@ -3,6 +3,7 @@ select power(3,-1) as result from sys_dummy;
 +--------------------+
 | result             |
 +--------------------+
+| 0.3333333333333333 |
 +--------------------+
 select power(4.00,-1) as result from sys_dummy;
 +--------------------+

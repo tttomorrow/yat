@@ -1,0 +1,26 @@
+-- @testpoint: 测试create index unique关键字是否支持哈希索引，部分step合理报错
+--创建普通行存表
+drop table if exists t_hash_index_0070;
+SQL SUCCESS
+create table t_hash_index_0070(id01 varchar,id02 int) with(orientation=row);
+SQL SUCCESS
+--索引名重复
+create index i_hash_index_0070_01 on t_hash_index_0070 using hash(id01);
+SQL SUCCESS
+create unique index i_hash_index_0070_01 on t_hash_index_0070 using hash(id01);
+?.*ERROR: access method "hash" does not support unique indexes
+--索引名未重复
+create index i_hash_index_0070_02 on t_hash_index_0070 using hash(id02);
+SQL SUCCESS
+drop index i_hash_index_0070_02;
+SQL SUCCESS
+create unique index i_hash_index_0070_02 on t_hash_index_0070 using hash(id02);
+?.*ERROR: access method "hash" does not support unique indexes
+--删除索引
+drop index if exists i_hash_index_0070_01;
+SQL SUCCESS
+drop index if exists i_hash_index_0070_02;
+SQL SUCCESS
+--删除表、表空间        
+drop table t_hash_index_0070 cascade;
+SQL SUCCESS

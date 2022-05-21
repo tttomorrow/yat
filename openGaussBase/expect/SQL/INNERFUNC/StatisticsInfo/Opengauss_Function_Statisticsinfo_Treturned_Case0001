@@ -61,7 +61,13 @@ SELECT * FROM sales;
 | prod_id | cust_id | time_id                       | channel_id | promo_id | quantity_sold | amount_sold |
 +---------+---------+-------------------------------+------------+----------+---------------+-------------+
 +---------+---------+-------------------------------+------------+----------+---------------+-------------+
-SELECT pg_sleep(1);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -83,7 +89,13 @@ select pg_stat_get_tuples_returned(a.oid) from PG_CLASS a where a.relname = 'tes
 -- 进入索引 也返回两行2 2  2 4
 update sales set time_id = '2019-06-02 10:00:00' where prod_id = 1;
 SQL SUCCESS
-SELECT pg_sleep(1);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -103,7 +115,13 @@ select pg_stat_get_tuples_returned(a.oid) from PG_CLASS a where a.relname = 'tes
 +-----------------------------+
 update sales set time_id = '2020-06-02 10:00:00' where prod_id = 1;
 SQL SUCCESS
-SELECT pg_sleep(1);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -124,7 +142,13 @@ select pg_stat_get_tuples_returned(a.oid) from PG_CLASS a where a.relname = 'tes
 -- testpoint:创建索引引起全局扫描 8 4 0  10 4 0
 create index test_index2 on sales (cust_id);
 SQL SUCCESS
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -150,7 +174,13 @@ select pg_stat_get_tuples_returned(a.oid) from PG_CLASS a where a.relname = 'tes
 +-----------------------------+
 update sales set channel_id = 'H' where cust_id = 12;
 SQL SUCCESS
-SELECT pg_sleep(3);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -185,7 +215,13 @@ SELECT * FROM sales where prod_id = 1;
 | prod_id | cust_id | time_id                       | channel_id | promo_id | quantity_sold | amount_sold |
 +---------+---------+-------------------------------+------------+----------+---------------+-------------+
 +---------+---------+-------------------------------+------------+----------+---------------+-------------+
-SELECT pg_sleep(2);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -220,7 +256,13 @@ SELECT * FROM sales where channel_id = 'g';
 | prod_id | cust_id | time_id | channel_id | promo_id | quantity_sold | amount_sold |
 +---------+---------+---------+------------+----------+---------------+-------------+
 +---------+---------+---------+------------+----------+---------------+-------------+
-SELECT pg_sleep(1);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+

@@ -1,0 +1,34 @@
+-- @testpoint: 测试创建哈希索引时，索引模式名与表的模式名是否相同对创建哈希索引的影响，部分step合理报错
+--创建模式
+drop schema if exists sch1;
+SQL SUCCESS
+create schema sch1;
+SQL SUCCESS
+drop schema if exists sch2;
+SQL SUCCESS
+create schema sch2;
+SQL SUCCESS
+--创建表
+drop table if exists sch1.t_hash_index_0054;
+SQL SUCCESS
+create table sch1.t_hash_index_0054(id01 int, id02 int) with(orientation=row);
+SQL SUCCESS
+--创建哈希索引(索引模式名与表相同)
+create index sch1.i_hash_index_0054_01 on sch1.t_hash_index_0054 using hash(id01);
+SQL SUCCESS
+--创建哈希索引(索引模式名与表不相同)
+create index sch2.i_hash_index_0054_02 on sch1.t_hash_index_0054 using hash(id02);
+?.*ERROR: index and table must be in the same schema
+--删除哈希索引
+drop index if exists sch1.i_hash_index_0054_01;
+SQL SUCCESS
+drop index if exists sch2.i_hash_index_0054_02;
+SQL SUCCESS
+--删除模式
+drop schema if exists sch1 cascade;
+SQL SUCCESS
+drop schema if exists sch2 cascade;
+SQL SUCCESS
+--删除表、表空间
+drop table sch1.t_hash_index_0054 cascade;
+?.*ERROR: schema "sch1" does not exist

@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -43,20 +43,18 @@ Expect      :
     11.主机建表并执行DML操作成功
     12.解码文件解析DML操作成功
     13.清理环境完成
-History     :
 """
 
 import os
 import time
 import unittest
 
-from yat.test import Node
-from yat.test import macro
-
 from testcase.utils.ComThread import ComThread
 from testcase.utils.CommonSH import CommonSH
 from testcase.utils.Constant import Constant
 from testcase.utils.Logger import Logger
+from yat.test import Node
+from yat.test import macro
 
 Primary_SH = CommonSH('PrimaryDbUser')
 constant = Constant()
@@ -67,8 +65,7 @@ constant = Constant()
 class SystemInternalTools(unittest.TestCase):
     def setUp(self):
         self.log = Logger()
-        self.log.info(
-            '-Opengauss_Function_Standby_Logical_Replication_Case0023fnish-')
+        self.log.info(f'-----{os.path.basename(__file__)} start-----')
         self.Standby_SH = CommonSH('Standby1DbUser')
         self.PrimaryNode = Node('PrimaryDbUser')
         self.StandbyNode = Node('Standby1DbUser')
@@ -117,7 +114,7 @@ class SystemInternalTools(unittest.TestCase):
         self.log.info(status_msg)
         self.assertTrue("Degraded" in status_msg or "Normal" in status_msg)
         self.node_msg = status_msg.splitlines()[10].strip()
-        self.assertIn('Standby',  status_msg)
+        self.assertIn('Standby', status_msg)
         self.log.info('--修改wal_level为logical;enable_slot_log为on--')
         mod_msg = self.Standby_SH.execute_gsguc('set',
                                                 constant.GSGUC_SUCCESS_MSG,
@@ -171,6 +168,10 @@ class SystemInternalTools(unittest.TestCase):
         self.log.info(mod_msg)
         msg = self.StandbyNode.sh(mod_msg).result()
         self.log.info(msg)
+        restart_msg = Primary_SH.restart_db_cluster()
+        self.log.info(restart_msg)
+        status = Primary_SH.get_db_cluster_status()
+        self.assertTrue("Degraded" in status or "Normal" in status)
         self.log.info('--备升主后创建逻辑复制槽--')
         check_res = self.Standby_SH.execut_db_sql('select slot_name from '
                                                   'pg_replication_slots;')
@@ -259,11 +260,17 @@ class SystemInternalTools(unittest.TestCase):
         self.log.info(result)
         time.sleep(3)
         self.log.info('备机查看解码文件')
-        cat_cmd = f"cat {self.decode_file}| grep 'old_keys_name';"
+        cat_cmd = f"cat {self.decode_file};"
         self.log.info(cat_cmd)
         result = self.PrimaryNode.sh(cat_cmd).result()
         self.log.info(result)
-        self.assertIn('"old_keys_name":[]', result)
+        du_cmd = f"du -h {self.decode_file};"
+        self.log.info(du_cmd)
+        du_msg = self.PrimaryNode.sh(du_cmd).result()
+        self.log.info(du_msg)
+        dumsg_list = du_msg.split()[0]
+        self.log.info(dumsg_list)
+        self.assertTrue(float(dumsg_list[:-1]) > 0)
         self.log.info('--主机删除复制槽--')
         del_cmd = self.Standby_SH.execut_db_sql("select * from "
                                                 "pg_drop_replication_slot"
@@ -318,5 +325,4 @@ class SystemInternalTools(unittest.TestCase):
             self.log.info(recover_msg)
         else:
             return '主备节点正常'
-        self.log.info(
-            '--Opengauss_Function_Standby_Logical_Replication_Case0023end--')
+        self.log.info(f'-----{os.path.basename(__file__)} end-----')

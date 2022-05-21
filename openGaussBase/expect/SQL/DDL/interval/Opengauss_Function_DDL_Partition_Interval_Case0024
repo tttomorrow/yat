@@ -42,8 +42,10 @@ order by relname;
 -- 而其他类型的约束则永远也不会被复制。此规则同时适用于表约束和列约束。）
 insert into partition_table_001 values (3,'ccc',3,'2018-04-23',true,null,3.3);
 ?.*ERROR: null value in column "col_6" violates not-null constraint
+  Detail: Failing row contains (3, ccc                           , 3, 2018-04-23 00:00:00, t, null, 3.29999999999999982).
 insert into partition_table_001 values (-3,'ccc',3,'2018-04-23',true,'ccc',3.3);
 ?.*ERROR: new row for relation "partition_table_001" violates check constraint "common_table_001_col_1_check"
+  Detail: N/A
 select * from partition_table_001;
 +-------+-------+-------+-------+-------+-------+-------+
 | col_1 | col_2 | col_3 | col_4 | col_5 | col_6 | col_7 |

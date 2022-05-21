@@ -19,7 +19,6 @@ select to_char(0::bigint, '999');
 select to_char(9223372036854775807::bigint, '99999999999999999999999');
 
 -- 0
-select to_char(32767::smallint, '0000099999');
 select to_char(32767::smallint, '000');
 select to_char(32767::smallint, '000009');
 select to_char(32767::smallint, '00000');

@@ -162,7 +162,6 @@ where a.parentid = b.oid and b.relname = 'test_ugi_060' and a.reloptions[3] like
 +--------------+----------+---------------------------------------------------+
 | relname      | parttype | reloptions                                        |
 +--------------+----------+---------------------------------------------------+
-| p3           | p        | {orientation=row,compression=no,wait_clean_gpi=y} |
 | test_ugi_060 | r        | {orientation=row,compression=no,wait_clean_gpi=y} |
 +--------------+----------+---------------------------------------------------+
 --执行清理

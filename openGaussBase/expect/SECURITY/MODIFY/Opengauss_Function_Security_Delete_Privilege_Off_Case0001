@@ -1,0 +1,53 @@
+-- @testpoint: 三权分立关闭时验证超级用户对其他用户(普通用户)创建的表有DELETE权限
+--step1: 查询三权分立参数enableSeparationOfDuty; expect:显示默认值off
+show enableSeparationOfDuty;
++------------------------+
+| enableSeparationOfDuty |
++------------------------+
+| off                    |
++------------------------+
+--step2: 创建普通用户; expect:用户创建成功
+drop user if exists u_delete_privilege_off_0001;
+SQL SUCCESS
+create user u_delete_privilege_off_0001  password 'test@123';
+SQL SUCCESS
+--step3: 切换用户; expect:用户切换成功
+set session authorization u_delete_privilege_off_0001 password 'test@123';
+SQL SUCCESS
+select session_user,current_user;
++-----------------------------+-----------------------------+
+| session_user                | current_user                |
++-----------------------------+-----------------------------+
+| u_delete_privilege_off_0001 | u_delete_privilege_off_0001 |
++-----------------------------+-----------------------------+
+--step4: 创建表; expect:表创建成功
+drop table if exists t_delete_privilege_off_0001;
+SQL SUCCESS
+create table u_delete_privilege_off_0001.t_delete_privilege_off_0001(id int,name varchar(100));
+SQL SUCCESS
+--step5: 向表中插入数据; expect:数据插入成功
+insert into u_delete_privilege_off_0001.t_delete_privilege_off_0001 values(1,'beijing');
+SQL SUCCESS
+--step6: 重置当前用户; expect:重置成功
+reset session authorization;
+SQL SUCCESS
+select session_user,current_user;
++--------------+--------------+
+| session_user | current_user |
++--------------+--------------+
+?.*            |           |.*
++--------------+--------------+
+--step7: 管理员权限delete表记录; expect:表记录清除成功
+delete from u_delete_privilege_off_0001.t_delete_privilege_off_0001;
+SQL SUCCESS
+--step8: 查询清空的表; expect:查询结果为空
+select *  from u_delete_privilege_off_0001.t_delete_privilege_off_0001;
++----+------+
+| id | name |
++----+------+
++----+------+
+--step9: 清理环境; expect:环境清理成功
+drop table u_delete_privilege_off_0001.t_delete_privilege_off_0001;
+SQL SUCCESS
+drop user u_delete_privilege_off_0001;
+SQL SUCCESS

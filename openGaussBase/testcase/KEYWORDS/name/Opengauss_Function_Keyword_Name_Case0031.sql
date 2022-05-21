@@ -1,16 +1,20 @@
---  @testpoint:opengauss关键字name(非保留)，作为字段数据类型(合理报错)
+-- @testpoint: opengauss关键字name(非保留)，作为字段数据类型(部分测试点合理报错)
 
---前置条件
-drop table if exists explain_test cascade;
+--step1：关键字不带引号; expect: 执行成功
+drop table if exists name_test cascade;
+create table name_test(id int,name name);
 
---关键字不带引号-合理报错
-create table explain_test(id int,name name);
+--step2：清理环境; expect: 执行成功
+drop table if exists name_test cascade;
 
---关键字带双引号-合理报错
-create table explain_test(id int,name "name");
+--step3：关键字带双引号; expect: 执行成功
+create table name_test(id int,name "name");
 
---关键字带单引号-合理报错
-create table explain_test(id int,name 'name');
+--step4：清理环境; expect: 执行成功
+drop table if exists name_test cascade;
 
---关键字带反引号-合理报错
-create table explain_test(id int,name `name`);
+--step5：关键字带单引号; expect: 合理报错
+create table name_test(id int,name 'name');
+
+--step6：关键字带反引号; expect: 合理报错
+create table name_test(id int,name `name`);

@@ -1,4 +1,3 @@
---  @testpoint:函数名长度测试
 drop function if exists "abcdefghijklmnopqrstuvwxyz1234567891234567891234567891234567891a";
 CREATE FUNCTION "abcdefghijklmnopqrstuvwxyz1234567891234567891234567891234567891a"(integer, integer) RETURNS integer
     AS 'select $1 + $2;'

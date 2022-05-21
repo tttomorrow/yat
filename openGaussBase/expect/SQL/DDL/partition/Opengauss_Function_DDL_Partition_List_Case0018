@@ -1,0 +1,11 @@
+-- @testpoint: 创建分区表指定表空间为PG_GLOBAL,合理报错
+--step1:创建list分区表， 指定表空间为PG_GLOBAL，expect失败
+drop table if exists t_partition_list_0018;
+SQL SUCCESS
+create table t_partition_list_0018(p_id int,p_name varchar,p_age int)
+tablespace PG_GLOBAL
+partition by list(p_id)
+(partition p1 values(10),
+ partition p2 values(20),
+ partition p3 values(30));
+?.*ERROR: only shared relations can be placed in pg_global tablespac.*

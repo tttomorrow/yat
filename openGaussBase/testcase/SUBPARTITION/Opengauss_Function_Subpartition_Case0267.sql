@@ -1,0 +1,37 @@
+-- @testpoint: range_range二级分区表：表空间
+
+--test1: tablespace
+--step1: 创建二级分区表，指定表空间，一级分区主键using index tablespace; expect:成功
+drop table if exists t_subpartition_0267;
+drop tablespace if exists ts_subpartition_0267;
+create tablespace ts_subpartition_0267 relative location 'subpartition_tablespace/subpartition_tablespace_0267';
+drop tablespace if exists ts_subpartition_0267_01;
+create tablespace ts_subpartition_0267_01 relative location 'subpartition_tablespace/subpartition_tablespace_0267_01';
+create   table if not exists t_subpartition_0267
+(
+    col_1 int primary key   using index tablespace ts_subpartition_0267_01,
+    col_2 int  ,
+	col_3 int ,
+    col_4 int 
+)
+tablespace ts_subpartition_0267
+partition by range (col_1) subpartition by range (col_2)
+(
+  partition p_range_1 values less than( 10 )
+  (
+    subpartition p_range_1_1 values less than( 5 ),
+    subpartition p_range_1_2 values less than( maxvalue )
+  ),
+  partition p_range_2 values less than( 20 )
+  (
+    subpartition p_range_2_1 values less than( 5 ),
+    subpartition p_range_2_2 values less than( 10 )
+  )
+) enable row movement;
+--step2: 查询指定一级分区表空间; expect:成功
+select p.relname, t.spcname from pg_partition p, pg_tablespace t where p.reltablespace=t.oid and p.relname='p_range_2';
+
+--step3: 清理环境; expect:成功
+drop table if exists t_subpartition_0267;
+drop tablespace if exists ts_subpartition_0267;
+drop tablespace if exists ts_subpartition_0267_01;

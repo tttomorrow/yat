@@ -2,7 +2,13 @@
 --记录的是更新和删除的行数
 alter system set autovacuum to off;
 SQL SUCCESS
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -16,7 +22,13 @@ select pg_stat_reset();
 +---------------+
 |               |
 +---------------+
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -54,7 +66,13 @@ select pg_stat_get_dead_tuples(a.oid) from PG_CLASS a where a.relname = 'sales';
 -- 更新一行数据,旧的其实还在，只是指针指向了新数据，因此dead记录1
 update sales set time_id = '2019-06-02 10:00:00' where channel_id = 'b';
 SQL SUCCESS
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -73,7 +91,13 @@ INSERT INTO sales VALUES(1, 12, '2019-02-03 00:00:00', 'd', 1, 1, 1);
 SQL SUCCESS
 INSERT INTO sales VALUES(1, 12, '2019-02-05 00:00:00', 'e', 1, 1, 1);
 SQL SUCCESS
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -92,7 +116,13 @@ update sales set time_id = '2013-06-02 10:00:00' where channel_id = 'd';
 SQL SUCCESS
 update sales set time_id = '2012-06-02 10:00:00' where channel_id = 'e';
 SQL SUCCESS
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -107,7 +137,13 @@ select pg_stat_get_dead_tuples(a.oid) from PG_CLASS a where a.relname = 'sales';
 -- 删除一行 5
 delete from sales where channel_id = 'b';
 SQL SUCCESS
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -126,7 +162,13 @@ delete from sales where channel_id = 'd';
 SQL SUCCESS
 delete from sales where channel_id = 'e';
 SQL SUCCESS
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+

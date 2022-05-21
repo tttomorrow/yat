@@ -1,0 +1,77 @@
+-- @testpoint: 列存普通表结合like子句复制源表(复制约束索引)，部分step合理报错
+--测试点一:创建普通列存表，指定主键约束，插入数据，使用like子句复制源表(复制约束)
+--step1:测试点一,创建列存普通表,指定主键约束和唯一约束   expect:成功
+drop table if exists t_columns_unique_index_0070_01;
+SQL SUCCESS
+create table t_columns_unique_index_0070_01(id1 int primary key,id2 int unique) with(orientation=column);
+SQL SUCCESS
+--step2:测试点一,插入数据   expect:成功
+insert into t_columns_unique_index_0070_01 values(generate_series(1,100),generate_series(1,100));
+SQL SUCCESS
+--step3:测试点一,查看数据   expect:成功
+select count(*) from t_columns_unique_index_0070_01;
++-------+
+| count |
++-------+
+| 100   |
++-------+
+--step4:测试点一,使用like子句复制源表,并且复制约束   expect:成功
+drop table if exists t_columns_unique_index_0070_01_copy;
+SQL SUCCESS
+create table t_columns_unique_index_0070_01_copy (like t_columns_unique_index_0070_01 including indexes) with(orientation=column);
+SQL SUCCESS
+--step5:测试点一,将原始表数据复制到子表中   expect:成功
+insert into t_columns_unique_index_0070_01_copy (select * from t_columns_unique_index_0070_01);
+SQL SUCCESS
+--step6:测试点一,查看子表是否有主键or唯一约束   expect:存在约束
+select hasindexes from pg_tables where tablename='t_columns_unique_index_0070_01_copy';
++------------+
+| hasindexes |
++------------+
+| true       |
++------------+
+--step7:测试点一,向复制表中插入已存在数据  expect:插入失败
+insert into t_columns_unique_index_0070_01_copy values(generate_series(1,100),generate_series(1,100));
+?.*ERROR: duplicate key value violates unique constraint "t_columns_unique_index_0070_01_copy_pkey".*
+?.*Detail: Key \(id1\)=\(1\) already exists.*
+--step8:测试点一,清理环境   expect:成功
+drop table t_columns_unique_index_0070_01 cascade;
+SQL SUCCESS
+drop table t_columns_unique_index_0070_01_copy cascade;
+SQL SUCCESS
+--测试点二:创建普通列存表，创建索引，使用like子句复制源表(复制索引)
+--step1:测试点一,创建列存普通表   expect:成功
+drop table if exists t_columns_unique_index_0070_02;
+SQL SUCCESS
+create table t_columns_unique_index_0070_02(id1 int,id2 int) with(orientation=column);
+SQL SUCCESS
+--step2:测试点二,创建唯一索引   expect:成功
+create unique index i_columns_unique_index_0070_01 on t_columns_unique_index_0070_02 using btree(id1,id2);
+SQL SUCCESS
+--step3:测试点二,插入数据   expect:成功
+insert into t_columns_unique_index_0070_02 values (generate_series(1,100),generate_series(1,100));
+SQL SUCCESS
+--step4:测试点二,使用like子句复制源表,并且复制索引   expect:成功
+drop table if exists t_columns_unique_index_0070_02_copy;
+SQL SUCCESS
+create table t_columns_unique_index_0070_02_copy (like t_columns_unique_index_0070_02 including indexes) with(orientation=column);
+SQL SUCCESS
+--step5:测试点二,查看子表是否有主键or唯一约束   expect:存在索引
+select hasindexes from pg_tables where tablename='t_columns_unique_index_0070_02_copy';
++------------+
+| hasindexes |
++------------+
+| true       |
++------------+
+--step6:测试点二,将原始表数据复制到子表中   expect:成功
+insert into t_columns_unique_index_0070_02_copy (select * from t_columns_unique_index_0070_02);
+SQL SUCCESS
+--step7:测试点二,向复制表中插入已存在数据  expect:插入失败
+insert into t_columns_unique_index_0070_02_copy values(generate_series(1,100),generate_series(1,100));
+?.*ERROR: duplicate key value violates unique constraint "t_columns_unique_index_0070_02_copy_id1_id2_idx".*
+?.*Detail: Key \(id1, id2\)=\(1, 1\) already exists.*
+--step8:测试点二,清理环境   expect:成功
+drop table t_columns_unique_index_0070_02 cascade;
+SQL SUCCESS
+drop table t_columns_unique_index_0070_02_copy cascade;
+SQL SUCCESS

@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -41,7 +41,6 @@ from testcase.utils.CommonSH import CommonSH
 logger = Logger()
 primary_sh = CommonSH('PrimaryDbUser')
 ssh_file = os.path.join(macro.DB_INSTANCE_PATH, 'hostfile')
-ssh_backup = os.path.join(macro.DB_INSTANCE_PATH, 'ssh_backup')
 conf_path = os.path.join(macro.DB_INSTANCE_PATH, macro.DB_PG_CONFIG_NAME)
 
 
@@ -68,64 +67,14 @@ class ToolsTestCase(unittest.TestCase):
         self.standby_ip_list = msg.splitlines()
 
     def test_gs_sshexkey(self):
-        logger.info("Opengauss_Function_Tools_gs_sshexkey_Case0018开始执行")
+        logger.info(f"====={os.path.basename(__file__)}开始执行=====")
         logger.info("======步驟1：检查当前环境SELinux状态======")
         selinux_cmd = f'''getenforce'''
         selinux_res = self.primary_node.sh(selinux_cmd).result()
         logger.info(selinux_res)
         self.assertEqual('Disabled', selinux_res)
 
-        logger.info("======步骤2：创建备份目录======")
-        logger.info("======主节点创建备份文件夹======")
-        cmd = f'''mkdir {ssh_backup};ls {macro.DB_INSTANCE_PATH}'''
-        logger.info(cmd)
-        res = self.primary_node.sh(cmd).result()
-        logger.info(res)
-        self.assertIn('ssh_backup', res)
-
-        logger.info("======备节点创建备份文件夹======")
-        for i in self.standby_ip_list:
-            mk_cmd = f'''ssh {i} <<-EOF mkdir {ssh_backup}\n''' + "EOF"
-            logger.info(mk_cmd)
-            mk_res = self.primary_node.sh(mk_cmd).result()
-            logger.info(mk_res)
-            logger.info("======查看备份文件夹是否创建成功=====")
-            ls_cmd = f'''ssh {i} <<-EOF ls {macro.DB_INSTANCE_PATH}\n''' \
-                     + "EOF"
-            logger.info(ls_cmd)
-            ls_res = self.primary_node.sh(ls_cmd).result()
-            logger.info(mk_res)
-            self.assertIn('ssh_backup', ls_res)
-
-        logger.info("======查看是否已存在互信文件，如有则备份======")
-        check_cmd = f'''ls ~/.ssh'''
-        check_res = self.primary_node.sh(check_cmd).result()
-        logger.info(check_res)
-
-        logger.info("=====主节点备份原有互信文件=====")
-        backup_cmd = f'''cp ~/.ssh/* {ssh_backup}'''
-        logger.info(backup_cmd)
-        backup_res = self.primary_node.sh(backup_cmd).result()
-        self.assertFalse(backup_res)
-
-        logger.info("=====备节点备份原有互信文件=====")
-        if check_res is not None:
-            for i in self.standby_ip_list:
-                mv_cmd = f'''ssh {i} <<-EOF cp ~/.ssh/* {ssh_backup}\n''' \
-                         + "EOF"
-                logger.info(mv_cmd)
-                mv_res = self.primary_node.sh(mv_cmd).result()
-                logger.info(mv_res)
-                logger.info("======查看互信文件是否备份成功======")
-                ls_cmd = f'''ssh {i} <<-EOF ls {ssh_backup}\n''' + "EOF"
-                logger.info(ls_cmd)
-                ls_res = self.primary_node.sh(ls_cmd).result()
-                logger.info(ls_res)
-                self.assertTrue(ls_res)
-        check_res = self.primary_node.sh(check_cmd).result()
-        logger.info(check_res)
-
-        logger.info("======步驟3：root用户下创建hostfile文件，添加主备IP信息======")
+        logger.info("======步驟2：root用户下创建hostfile文件，添加主备IP信息======")
         add_cmd1 = f'''touch {ssh_file}
             echo -e '{self.IP1}' > {ssh_file}
             cat {ssh_file} | grep {self.IP1}'''
@@ -141,7 +90,7 @@ class ToolsTestCase(unittest.TestCase):
             logger.info(add_res2)
             self.assertTrue(i in add_res2)
 
-        logger.info("======步驟4：执行gs_sshexkey命令======")
+        logger.info("======步驟3：执行gs_sshexkey命令======")
         gs_cmd = f'''gs_sshexkey -f {ssh_file}'''
         execute_cmd = f'''source {macro.DB_ENV_PATH}
             expect <<EOF
@@ -165,39 +114,9 @@ class ToolsTestCase(unittest.TestCase):
             rm_res1 = self.primary_node.sh(rm_cmd1).result()
             logger.info(rm_res1)
 
-            logger.info("======拷贝原有互信文件======")
-            cp_cmd1 = f'''ssh {i} <<EOF \\cp -r {ssh_backup}/* ~/.ssh/ \n''' \
-                      + "EOF"
-            logger.info(cp_cmd1)
-            cp_res1 = self.primary_node.sh(cp_cmd1).result()
-            logger.info(cp_res1)
-
-            logger.info("=====查看原有互信文件是否拷贝成功======")
-            ls_cmd = f'''ssh {i} << EOF ls ~/.ssh/ \n''' + "EOF"
-            logger.info(ls_cmd)
-            ls_res = self.primary_node.sh(ls_cmd).result()
-            logger.info(ls_res)
-            self.assertTrue(ls_res)
-
-            logger.info("======删除备份文件夹======")
-            rm_cmd2 = f'''ssh {i} <<EOF rm -rf {ssh_backup}\n''' + "EOF"
-            logger.info(rm_cmd2)
-            rm_res2 = self.primary_node.sh(rm_cmd2).result()
-            logger.info(rm_res2)
-
         logger.info("======主节点清理环境======")
         rm_cmd3 = f'''rm -rf {ssh_file}'''
         logger.info(rm_cmd3)
         rm_res3 = self.primary_node.sh(rm_cmd3).result()
         logger.info(rm_res3)
-
-        cp_cmd2 = f'''\\cp -r {ssh_backup}/* ~/.ssh/'''
-        logger.info(cp_cmd2)
-        cp_res2 = self.primary_node.sh(cp_cmd2).result()
-        logger.info(cp_res2)
-
-        rm_cmd4 = f'''rm -rf {ssh_backup}'''
-        logger.info(rm_cmd4)
-        rm_res4 = self.primary_node.sh(rm_cmd4).result()
-        logger.info(rm_res4)
-        logger.info("===Opengauss_Function_Tools_gs_sshexkey_Case0019执行结束===")
+        logger.info(f"====={os.path.basename(__file__)}执行结束=====")

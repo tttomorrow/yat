@@ -4,4 +4,5 @@ select pg_stat_get_xact_partition_tuples_updated('') from pg_partition  a, pg_cl
 select pg_stat_get_xact_partition_tuples_updated(a.oid,a.oid,a.oid) from pg_partition  a, pg_class b where a.relname = 'p2' and b.oid=a.parentid and b.relname='sales';
 select pg_stat_get_xact_partition_tuples_updated() from pg_partition  a, pg_class b where a.relname = 'sys_p1' and b.oid=a.parentid and b.relname='sales';
 select pg_stat_get_xact_partition_tuples_updated('&^%^&*') from pg_partition  a, pg_class b where a.relname = 'sys_p2' and b.oid=a.parentid and b.relname='sales';
+select pg_stat_get_xact_partition_tuples_updated(99999999999998789) from pg_partition  a, pg_class b where a.relname = 'sys_p2' and b.oid=a.parentid and b.relname='sales';
 select pg_stat_get_xact_partition_tuples_updated(a.oid) from pg_partition  a, pg_class b where a.relname = 'sys_p2' and b.oid=a.parentid and b.relname='sales';

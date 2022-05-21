@@ -1,5 +1,4 @@
 -- @testpoint: 创建视图的同义词，修改同义词属主（属主为存在+不存在+存在无create权限）,不存在+存在无create权限,合理报错
--- @modify at: 2020-11-26
 --建表
 drop table if EXISTS test_synonym cascade;
 SQL SUCCESS
@@ -20,11 +19,12 @@ SQL SUCCESS
 --创建用户
 drop user if exists syn006;
 SQL SUCCESS
-create user syn006 password "mima@123";
+create user syn006 password "Mima@123";
 SQL SUCCESS
 --修改为存在的属主：新属主无create权限：报错
 alter synonym synview owner to syn006;
 ?.*ERROR: permission denied for schema public
+  Detail: N/A
 --修改为不存在的属主：报错
 drop user if exists test_syn05;
 SQL SUCCESS

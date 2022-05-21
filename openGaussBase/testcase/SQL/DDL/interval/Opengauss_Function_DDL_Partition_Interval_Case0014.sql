@@ -1,4 +1,4 @@
--- @testpoint: interval分区,分区表包含唯一键，但唯一键不是分区键，合理报错
+-- @testpoint: interval分区,分区表包含唯一键，但唯一键不是分区键
 -- @DETAIL:  Columns of PRIMARY KEY/UNIQUE constraint Must contain partition KEY
 drop table if exists partition_table_001;
 

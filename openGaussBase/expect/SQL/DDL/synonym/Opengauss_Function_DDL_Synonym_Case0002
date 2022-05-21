@@ -1,4 +1,5 @@
 -- @testpoint: 创建同义词，同义词名称测试
+-- @modify at: 2020-11-25
 --建表
 drop table if exists syn_tab_002 cascade;
 SQL SUCCESS

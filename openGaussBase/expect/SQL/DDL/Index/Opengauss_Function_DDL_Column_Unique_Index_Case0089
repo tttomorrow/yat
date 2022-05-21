@@ -1,0 +1,55 @@
+-- @testpoint: 创建列存表,验证其他类型对主键/唯一约束/唯一索引的支持,部分step合理报错
+--测试点一:创建列存普通表，字段类型为货币/大对象类型，指定主键约束
+--step1:测试点一,创建列存普通表,字段类型为货币/大对象类型,指定主键约束   expect:成功
+drop table if exists t_columns_unique_index_0089_01;
+SQL SUCCESS
+create table t_columns_unique_index_0089_01(
+salary money,name clob,primary key(salary,name)) with(orientation=column);
+SQL SUCCESS
+--step2:测试点一,插入数据   expect:成功
+insert into t_columns_unique_index_0089_01 values(5000.00,'hathyweii');
+SQL SUCCESS
+--step3:测试点一,再次插入重复数据   expect:失败
+insert into t_columns_unique_index_0089_01 values(5000.00,'hathyweii');
+?.*ERROR: duplicate key value violates unique constraint "t_columns_unique_index_0089_01_pkey".*
+?.*Detail: Key \(salary, name\)=\(\$5,000.00, hathyweii\) already exists.*
+--step4:测试点一,清理环境    expect:成功
+drop table t_columns_unique_index_0089_01;
+SQL SUCCESS
+--测试点二:创建列存普通表，字段类型为货币/大对象类型，指定唯一约束
+--step1:测试点二,创建列存普通表,字段类型为货币/大对象类型,指定唯一约束   expect:成功
+drop table if exists t_columns_unique_index_0089_02;
+SQL SUCCESS
+create table t_columns_unique_index_0089_02(
+salary money,name clob,constraint const_87 unique(salary,name)) with(orientation=column);
+SQL SUCCESS
+--step2:测试点二,插入数据   expect:成功
+insert into t_columns_unique_index_0089_02 values(5000.00,'hathyweii');
+SQL SUCCESS
+--step3:测试点二,再次插入重复数据   expect:失败
+insert into t_columns_unique_index_0089_02 values(5000.00,'hathyweii');
+?.*ERROR: duplicate key value violates unique constraint "const_87".*
+?.*Detail: Key \(salary, name\)=\(\$5,000.00, hathyweii\) already exists.*
+--step4:测试点二,清理环境    expect:成功
+drop table t_columns_unique_index_0089_02;
+SQL SUCCESS
+--测试点三:创建列存普通表，字段类型为货币/大对象类型，创建唯一索引
+--step1:测试点三,创建列存普通表,字段类型为货币/大对象类型   expect:成功
+drop table if exists t_columns_unique_index_0089_03;
+SQL SUCCESS
+create table t_columns_unique_index_0089_03(
+salary money,name clob) with(orientation=column);
+SQL SUCCESS
+--step2:创建唯一索引   expect:成功
+create unique index i_columns_unique_index_0089 on t_columns_unique_index_0089_03 using btree(salary,name);
+SQL SUCCESS
+--step2:测试点三,插入数据   expect:成功
+insert into t_columns_unique_index_0089_03 values(5000.00,'hathyweii');
+SQL SUCCESS
+--step3:测试点三,再次插入重复数据   expect:失败
+insert into t_columns_unique_index_0089_03 values(5000.00,'hathyweii');
+?.*ERROR: duplicate key value violates unique constraint "i_columns_unique_index_0089".*
+?.*Detail: Key \(salary, name\)=\(\$5,000.00, hathyweii\) already exists.*
+--step4:测试点三,清理环境    expect:成功
+drop table t_columns_unique_index_0089_03;
+SQL SUCCESS

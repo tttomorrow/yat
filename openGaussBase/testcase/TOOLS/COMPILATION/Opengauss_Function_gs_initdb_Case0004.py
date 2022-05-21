@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -45,7 +45,7 @@ class Tools(unittest.TestCase):
         msg1 = self.userNode.sh(excute_cmd1).result()
         self.logger.info(msg1)
         self.assertTrue(
-            msg1.find('Postgres-XC node name:SINGLE is invalid') > -1)
+            msg1.find('SINGLE is invalid') > -1)
         self.logger.info('------未生成datadir目录-------')
         excute_cmd2 = f'ls {self.dir_path}'
         self.logger.info(excute_cmd2)

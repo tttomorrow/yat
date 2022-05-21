@@ -4,6 +4,7 @@ declare
    v_real real;
    v_number number(12,3);
 begin
+    v_real:=9.999999999999999999999999999999999e+127;
     select v_real into v_number from sys_dummy;
     raise info 'result:%',v_number;
 end;

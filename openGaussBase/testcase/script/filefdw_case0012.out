@@ -1,0 +1,210 @@
+-- @testpoint: 创建file_fdw外表相关options相关参数校验规则验证，异常情况合理报错，满足条件正常创建
+
+--step1: 创建服务; expect:成功
+create server file_server0002 foreign data wrapper file_fdw;
+CREATE SERVER
+--step2: filename不指定，异常报错; expect:成功
+create foreign table t_filefdw_0002 (id int) server file_server0002;
+ERROR:  filename is required for file_fdw foreign tables
+
+----format
+--step3: format指定非正常格式; expect:失败
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (format 'xml');
+ERROR:  COPY format "xml" not recognized
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (format 'err');
+ERROR:  COPY format "err" not recognized
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (filename '', format 'fixed'  );
+ERROR:  file_fdw doesn't support fixed option in format
+--step4: format正常格式不指定filename; expect:失败
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (format 'text');
+ERROR:  filename is required for file_fdw foreign tables
+--step5: format正常场景; expect:成功
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (filename '', format 'text');
+CREATE FOREIGN TABLE
+drop foreign table t_filefdw_0002;
+DROP FOREIGN TABLE
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (filename '', format 'binary');
+CREATE FOREIGN TABLE
+drop foreign table t_filefdw_0002;
+DROP FOREIGN TABLE
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (filename '', format 'csv');
+CREATE FOREIGN TABLE
+drop foreign table t_filefdw_0002;
+DROP FOREIGN TABLE
+
+----header
+--step6: 指定header，不指定format; expect:失败
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (filename '', header 'true');
+ERROR:  COPY HEADER available only in CSV mode
+--step7: 指定header，指定format不符合条件，header为true; expect:失败
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (filename '',format 'text', header 'true');
+ERROR:  COPY HEADER available only in CSV mode
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (filename '',format 'binary', header 'on');
+ERROR:  COPY HEADER available only in CSV mode
+--step8: 指定header，指定format不符合条件，header为false; expect:成功
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (filename '',format 'text', header 'false');
+CREATE FOREIGN TABLE
+drop foreign table t_filefdw_0002;
+DROP FOREIGN TABLE
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (filename '',format 'binary', header 'off');
+CREATE FOREIGN TABLE
+drop foreign table t_filefdw_0002;
+DROP FOREIGN TABLE
+--step9: 指定header不符合条件; expect:失败
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (filename '',format 'text', header 'err');
+ERROR:  header requires a Boolean value
+--step10: 指定header，指定format符合条件，header为true; expect:成功
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (filename '',format 'csv', header 'true');
+CREATE FOREIGN TABLE
+drop foreign table t_filefdw_0002;
+DROP FOREIGN TABLE
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (filename '',format 'csv', header 'on');
+CREATE FOREIGN TABLE
+drop foreign table t_filefdw_0002;
+DROP FOREIGN TABLE
+
+----quote
+--step11: 指定quote，不指定format; expect:失败
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (filename '', quote ':');
+ERROR:  COPY quote available only in CSV mode
+--step12: 指定quote非单字节; expect:失败
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (format 'csv', quote ':"');
+ERROR:  COPY quote must be a single one-byte character
+--step13: 指定quote时与format类型不符; expect:失败
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (format 'text', quote ':');
+ERROR:  COPY quote available only in CSV mode
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (format 'binary', quote ':');
+ERROR:  COPY quote available only in CSV mode
+--step14: 指定quote与null参数包含; expect:失败
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (format 'csv', quote '-', null '=-=');
+ERROR:  CSV quote character must not appear in the NULL specification
+--step15: 指定quote与delimiter参数包含; expect:失败
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (format 'csv', quote '-', delimiter '=-=');
+ERROR:  delimiter cannot contain quote character
+--step16: 指定quote与null参数非包含关系; expect:成功
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (filename '', format 'csv', quote '-', null '==');
+CREATE FOREIGN TABLE
+drop foreign table t_filefdw_0002;
+DROP FOREIGN TABLE
+--step17: 指定quote与delimiter参数非包含关系; expect:成功
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (filename '', format 'csv', quote '-', null '==');
+CREATE FOREIGN TABLE
+drop foreign table t_filefdw_0002;
+DROP FOREIGN TABLE
+
+----escape
+--step18: 指定escape，不指定format，指定escape; expect:失败
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (filename '', escape '"');
+ERROR:  COPY escape available only in CSV mode
+--step19: 指定escape，指定format非csv格式; expect:失败
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (format 'text', escape ':');
+ERROR:  COPY escape available only in CSV mode
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (format 'binary', escape ':');
+ERROR:  COPY escape available only in CSV mode
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (format 'text', escape '-');
+ERROR:  COPY escape available only in CSV mode
+--step20: 指定escape多字节; expect:失败
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (format 'csv', escape ':"');
+ERROR:  COPY escape must be a single one-byte character
+--step21: 指定escape、format正确; expect:成功
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (filename '', format 'csv', escape ':');
+CREATE FOREIGN TABLE
+drop foreign table t_filefdw_0002;
+DROP FOREIGN TABLE
+
+
+--delimiter
+--step22: 指定delimiter，不指定format; expect:成功
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (filename '', delimiter '');
+CREATE FOREIGN TABLE
+drop foreign table t_filefdw_0002;
+DROP FOREIGN TABLE
+--step23: delimiter超出10个字符; expect:失败
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (format 'text', delimiter '           ');
+ERROR:  COPY delimiter must be less than 10 bytes
+--step24: 指定delimiter，delimiter不符合要求; expect:失败
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (format 'text', delimiter 'a');
+ERROR:  delimiter "a" cannot contain any characters in"\.abcdefghijklmnopqrstuvwxyz0123456789"
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (format 'text', delimiter '8');
+ERROR:  delimiter "8" cannot contain any characters in"\.abcdefghijklmnopqrstuvwxyz0123456789"
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (format 'text', delimiter '\');
+ERROR:  delimiter "\" cannot contain any characters in"\.abcdefghijklmnopqrstuvwxyz0123456789"
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (format 'text', delimiter '.');
+ERROR:  delimiter "." cannot contain any characters in"\.abcdefghijklmnopqrstuvwxyz0123456789"
+--step25: delimiter与quote参数相同; expect:失败
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (format 'csv', delimiter '-', quote '-');
+ERROR:  delimiter cannot contain quote character
+--step26: delimiter与quote参数不相同; expect:成功
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (filename '',format 'csv', delimiter '-', quote '`');
+CREATE FOREIGN TABLE
+drop foreign table t_filefdw_0002;
+DROP FOREIGN TABLE
+--step27: delimiter与null参数相同或者包含; expect:失败
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (format 'csv', delimiter '-', null '=-=');
+ERROR:  COPY delimiter must not appear in the NULL specification
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (format 'csv', delimiter '-', null '-');
+ERROR:  COPY delimiter must not appear in the NULL specification
+--step28: delimiter与null参数不相同或者不包含; expect:成功
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (filename '', format 'csv', delimiter '-', null '空');
+CREATE FOREIGN TABLE
+drop foreign table t_filefdw_0002;
+DROP FOREIGN TABLE
+--step29: delimiter 为换行符; expect:失败
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (format 'csv', delimiter '
+');
+ERROR:  COPY delimiter cannot be newline or carriage return
+
+----null
+--step30: null值指定为换行符; expect:失败
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (format 'csv', null '
+');
+ERROR:  COPY null representation cannot use newline or carriage return
+--step31: null值指定为101个字符串; expect:失败
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (format 'csv', null 'qqweewqqqqqqqqqqqqqqqvxcvxcvxcvxcvqqweewqqqqqcvxcvxcvxcvqqqqqqqqqqvxcvxcvxcvxcvqqqqqqqqqqqvxcvxcvxcvx');
+ERROR:  null value string is too long
+--step32: null值指定为100个字符串; expect:成功
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (filename '', null 'qqweewqqqqqqqqqqqqqqqvxcvxcvxcvxcvqqweewqqqqqcvxcvxcvxcvqqqqqqqqqqvxcvxcvxcvxcvqqqqqqqqqqqvxcvxcvxcv');
+CREATE FOREIGN TABLE
+drop foreign table t_filefdw_0002;
+DROP FOREIGN TABLE
+
+----encoding
+--step33: 指定编码格式不正确和为空场景; expect:失败
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (filename '', encoding '');
+ERROR:  argument to option "encoding" must be a valid encoding name
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (filename '', encoding 'err');
+ERROR:  argument to option "encoding" must be a valid encoding name
+--step34: 指定编码格式正确; expect:成功
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (filename '', encoding 'utf-8');
+CREATE FOREIGN TABLE
+drop foreign table t_filefdw_0002;
+DROP FOREIGN TABLE
+
+----force_not_null
+--step35: force_not_null外部对象创建引用; expect:失败
+alter foreign data wrapper file_fdw options (add force_not_null '*');
+ERROR:  invalid option "force_not_null"
+HINT:  There are no valid options in this context.
+alter server file_server0002 options (add force_not_null '*');
+ERROR:  invalid option "force_not_null"
+HINT:  There are no valid options in this context.
+create user mapping for public server file_server0002 options (force_not_null '*');
+ERROR:  file_fdw doesn't support in USER MAPPING.
+create foreign table t_filefdw_0002 (id int) server file_server0002 options (force_not_null '*');
+ERROR:  invalid option "force_not_null"
+HINT:  Valid options in this context are: filename, format, header, delimiter, quote, escape, null, encoding
+--step36：创建外表列使用force_not_nulloption并select外表; expect:创建成功，select失败
+create foreign table t_filefdw_0002 (id int options (force_not_null 'true')) server file_server0002 options (filename '');
+CREATE FOREIGN TABLE
+select * from t_filefdw_0002;
+ERROR:  COPY force not null available only in CSV mode
+--step37：alter 外表 format 'csv'; expect:成功
+alter foreign table t_filefdw_0002 options (add format 'csv');
+ALTER FOREIGN TABLE
+select * from t_filefdw_0002;
+ERROR:  could not open file "" for reading: No such file or directory
+drop foreign table t_filefdw_0002;
+DROP FOREIGN TABLE
+--step38：处理测试数据; expect:成功
+drop server file_server0002 cascade;
+DROP SERVER

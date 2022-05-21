@@ -14,21 +14,25 @@ select covar_samp(abs(COL_1)+ceil(COL_3)*floor(COL_2),abs(COL_1)+ceil(COL_3)*flo
 +---------------+
 | covar_samp    |
 +---------------+
+| 4.124681138E9 |
 +---------------+
 select covar_samp(cos(COL_1)*exp(COL_3/100)/ln(COL_2),cos(COL_1)*exp(COL_3/100)/ln(COL_3)) from T_VAR_POP_SAMP_VARIANCE01 order by 1;
 +--------------------+
 | covar_samp         |
 +--------------------+
+| 23.854708625819967 |
 +--------------------+
 select covar_samp(sign(COL_1-COL_2)-sin(COL_3)/floor(COL_3),sign(COL_1-COL_2)-sin(COL_3)/floor(COL_2)) from T_VAR_POP_SAMP_VARIANCE01 order by 1;
 +----------------------+
 | covar_samp           |
 +----------------------+
+| 5.631785159110336E-6 |
 +----------------------+
 select covar_samp(tan(COL_1)+ceil(COL_3)*sqrt(COL_2),tan(COL_1)+ceil(COL_3)*sqrt(COL_2)) from T_VAR_POP_SAMP_VARIANCE01 order by 1;
 +-------------------+
 | covar_samp        |
 +-------------------+
+| 5225795.156656727 |
 +-------------------+
 drop table if exists T_VAR_POP_SAMP_VARIANCE01;
 SQL SUCCESS

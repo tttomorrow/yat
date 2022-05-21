@@ -3,6 +3,7 @@ declare
    v_real real;
    v_bigint bigint;
 begin
+    v_real:=9223372036854775800.7898765;
     select v_real into v_bigint from sys_dummy;
     raise info 'result:% ',v_bigint;
 end;

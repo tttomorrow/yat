@@ -1,0 +1,228 @@
+-- @testpoint: list_hash二级分区表：select 聚合函数/其他组合
+--step1: 创建表空间; expect:成功
+drop table if exists t_subpartition_0168;
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0168;
+SQL SUCCESS
+create tablespace ts_subpartition_0168 relative location 'subpartition_tablespace/subpartition_tablespace_0168';
+SQL SUCCESS
+--step2: 创建二级分区表; expect:成功
+create table if not exists t_subpartition_0168
+(
+    col_1 int ,
+    col_2 int ,
+    col_3 varchar2 ( 30 ) not null ,
+    col_4 int 
+)tablespace ts_subpartition_0168
+partition by list (col_1) subpartition by hash (col_2)
+(
+  partition p_list_1 values (-1,-2,-3,-4,-5,-6,-7,-8,-9,-10 )
+  (
+    subpartition p_hash_1_1 ,
+    subpartition p_hash_1_2 ,
+    subpartition p_hash_1_3 
+  ),
+  partition p_list_2 values (1,2,3,4,5,6,7,8,9,10 )
+  (
+    subpartition p_hash_2_1 ,
+    subpartition p_hash_2_2 ,
+    subpartition p_hash_2_3 ,
+    subpartition p_hash_2_4 ,
+    subpartition p_hash_2_5 
+  ),
+  partition p_list_3 values (11,12,13,14,15,16,17,18,19,20),
+  partition p_list_4 values (21,22,23,24,25,26,27,28,29,30 )
+  (
+    subpartition p_hash_4_1 
+  ),
+  partition p_list_5 values (default)
+  (
+    subpartition p_hash_5_1 
+  ),
+  partition p_list_6 values (31,32,33,34,35,36,37,38,39,40)
+  (
+    subpartition p_hash_6_1 ,
+    subpartition p_hash_6_2 ,
+    subpartition p_hash_6_3 
+  )
+) enable row movement ;
+SQL SUCCESS
+--step3: 插入数据; expect:成功
+insert into t_subpartition_0168 values(-15,1,1,1),(-4,1,4,4),(15,5,5,5),(18,8,8,8),(199,9,9,9);
+SQL SUCCESS
+insert into t_subpartition_0168 values(1,1,1,1),(4,1,4,4),(5,5,5,5),(8,8,8,8),(9,9,9,9);
+SQL SUCCESS
+insert into t_subpartition_0168 values(1,11,1,1),(4,41,4,4),(5,54,5,5),(8,87,8,8),(9,19,9,9);
+SQL SUCCESS
+insert into t_subpartition_0168 values(11,1,1,1),(14,1,4,4),(15,5,5,5),(18,8,8,8),(19,1,9,9);
+SQL SUCCESS
+--test1: select 聚合函数：count/min/max/length/median...
+--step4: 查询count一级分区数据; expect:成功
+select count(*) from t_subpartition_0168 partition(p_list_1);
++-------+
+| count |
++-------+
+| 1     |
++-------+
+--step5: 查询count二级分区数据; expect:成功
+select count(*) from t_subpartition_0168 subpartition(p_hash_2_1);
++-------+
+| count |
++-------+
+| 3     |
++-------+
+--step6: 查询max/count/min/median二级分区数据; expect:成功
+select max(col_2),count(*),min(col_1),median(col_4) from t_subpartition_0168 subpartition(p_hash_2_1);
++-----+-------+-----+--------+
+| max | count | min | median |
++-----+-------+-----+--------+
+| 41  | 3     | 1   | 4.0    |
++-----+-------+-----+--------+
+--step7: 查询length二级分区数据; expect:成功
+select *,length(col_2),length(col_1) from t_subpartition_0168 subpartition(p_hash_2_1);
++-------+-------+-------+-------+--------+--------+
+| col_1 | col_2 | col_3 | col_4 | length | length |
++-------+-------+-------+-------+--------+--------+
+| 9     | 9     | 9     | 9     | 1      | 1      |
+| 1     | 11    | 1     | 1     | 2      | 1      |
+| 4     | 41    | 4     | 4     | 2      | 1      |
++-------+-------+-------+-------+--------+--------+
+--step8: 查询order by rownum desc limit一级分区数据; expect:成功
+select rownum,* from t_subpartition_0168 partition(p_list_2) order by rownum desc limit 2,8;
++--------+-------+-------+-------+-------+
+| rownum | col_1 | col_2 | col_3 | col_4 |
++--------+-------+-------+-------+-------+
+| 8      | 9     | 9     | 9     | 9     |
+| 7      | 8     | 87    | 8     | 8     |
+| 6      | 5     | 5     | 5     | 5     |
+| 5      | 5     | 54    | 5     | 5     |
+| 4      | 8     | 8     | 8     | 8     |
+| 3      | 9     | 19    | 9     | 9     |
+| 2      | 4     | 1     | 4     | 4     |
+| 1      | 1     | 1     | 1     | 1     |
++--------+-------+-------+-------+-------+
+--test2: select 其他组合
+--step9: 查询二级分区数据:where/group by/order by/limit; expect:成功
+select col_1 from t_subpartition_0168 subpartition(p_hash_2_2) where col_2 >5  group by col_1 order by col_1 limit 10;
++-------+
+| col_1 |
++-------+
+| 8     |
++-------+
+--step10: 查询二级分区数据:upper/order by/limit; expect:成功
+select col_1,upper(col_3) from t_subpartition_0168 subpartition(p_hash_2_2)   order by col_1 limit 10;
++-------+-------+
+| col_1 | upper |
++-------+-------+
+| 5     | 5     |
+| 8     | 8     |
++-------+-------+
+--step11: 查询表数据：count/as; expect:成功
+select count(8) as "count" from  t_subpartition_0168;
++-------+
+| count |
++-------+
+| 20    |
++-------+
+--step12: 查询二级分区数据：order by/limit/for update; expect:成功
+select col_1,upper(col_3) from t_subpartition_0168 subpartition(p_hash_2_2)   order by col_1 limit 10 for update;
++-------+-------+
+| col_1 | upper |
++-------+-------+
+| 5     | 5     |
+| 8     | 8     |
++-------+-------+
+--step13: 查询二级分区数据：case/sum/group by; expect:成功
+select case when col_1=1 then '男' else '女' end as "性别",sum(case when col_1<10 then 1 else 0 end) as "未成年",sum(case when col_1>=10 then 1 else 0 end) as "成年" from t_subpartition_0168 group by col_2,t_subpartition_0168.col_1;
++----+-----+----+
+| 性别 | 未成年 | 成年 |
++----+-----+----+
+| 女  | 0   | 1  |
+| 女  | 1   | 0  |
+| 女  | 1   | 0  |
+| 男  | 1   | 0  |
+| 女  | 1   | 0  |
+| 女  | 1   | 0  |
+| 女  | 0   | 2  |
+| 女  | 0   | 1  |
+| 女  | 1   | 0  |
+| 女  | 1   | 0  |
+| 女  | 1   | 0  |
+| 女  | 1   | 0  |
+| 男  | 1   | 0  |
+| 女  | 1   | 0  |
+| 女  | 1   | 0  |
+| 女  | 0   | 1  |
+| 女  | 0   | 1  |
+| 女  | 0   | 2  |
++----+-----+----+
+--step14: 查询数据：where/子查询/max(定值); expect:成功
+select * from t_subpartition_0168 where col_1=(select max(1) from t_subpartition_0168);
++-------+-------+-------+-------+
+| col_1 | col_2 | col_3 | col_4 |
++-------+-------+-------+-------+
+| 1     | 1     | 1     | 1     |
+| 1     | 11    | 1     | 1     |
++-------+-------+-------+-------+
+--step16: 查询数据：where/子查询/max(列); expect:成功
+select * from t_subpartition_0168 where col_1 in (select max(col_1) from t_subpartition_0168);
++-------+-------+-------+-------+
+| col_1 | col_2 | col_3 | col_4 |
++-------+-------+-------+-------+
+| 199   | 9     | 9     | 9     |
++-------+-------+-------+-------+
+--step17: 查询数据：子查询/order by/group by; expect:成功
+select col_1,col_2 from (select * from t_subpartition_0168 order by col_2, col_3 desc) as tmp group by col_1,col_2;
++-------+-------+
+| col_1 | col_2 |
++-------+-------+
+| 15    | 5     |
+| 18    | 8     |
+| 14    | 1     |
+| 19    | 1     |
+| 4     | 41    |
+| 9     | 19    |
+| 9     | 9     |
+| 11    | 1     |
+| -4    | 1     |
+| 4     | 1     |
+| 5     | 5     |
+| 8     | 8     |
+| 1     | 1     |
+| 8     | 87    |
+| 5     | 54    |
+| 1     | 11    |
+| 199   | 9     |
+| -15   | 1     |
++-------+-------+
+--step18: 查询数据：表达式; expect:成功
+select col_1< 60 from t_subpartition_0168;
++----------+
+| ?column? |
++----------+
+| true     |
+| false    |
+| true     |
+| true     |
+| true     |
+| true     |
+| true     |
+| true     |
+| true     |
+| true     |
+| true     |
+| true     |
+| true     |
+| true     |
+| true     |
+| true     |
+| true     |
+| true     |
+| true     |
+| true     |
++----------+
+--step19: 清理环境; expect:成功
+drop table if exists t_subpartition_0168;
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0168;
+SQL SUCCESS

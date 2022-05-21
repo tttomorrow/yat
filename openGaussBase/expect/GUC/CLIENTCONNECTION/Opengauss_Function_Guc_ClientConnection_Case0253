@@ -8,6 +8,9 @@ show max_locks_per_transaction;
 +---------------------------+
 --设置，报错
 ALTER SYSTEM SET max_locks_per_transaction to 9;
+?.*ERROR: 9 is outside the valid range for parameter "max_locks_per_transaction" \(10 .. 2147483647\)
+ALTER SYSTEM SET max_locks_per_transaction to 2147483648;
+?.*ERROR: invalid value for parameter "max_locks_per_transaction": "2147483648"
   Hint: Value exceeds integer range.
 ALTER SYSTEM SET max_locks_per_transaction to 'test';
 ?.*ERROR: invalid value for parameter "max_locks_per_transaction": "test"

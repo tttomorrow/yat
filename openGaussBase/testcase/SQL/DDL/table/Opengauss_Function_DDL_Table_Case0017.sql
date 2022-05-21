@@ -10,6 +10,7 @@ c_clob clob,
 c_blob blob,
 c_date date
 );
+insert into table_alter_017 values(1,1.0002,'dghg','jjjsdfghjhjui','010101101',date_trunc('hour', timestamp  '2001-02-16 20:38:40'));
 delete from table_alter_017;
 --rename
 alter table table_alter_017  rename COLUMN c_real to c_2;

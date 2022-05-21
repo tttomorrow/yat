@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -20,6 +20,7 @@ Description :
         2.修改参数值为test
         3.修改参数值为-1
         4.修改参数值为123.859
+        5.修改参数值为2147483648
         6.修改参数值为空串
         7.恢复参数默认值
 Expect      :
@@ -85,8 +86,10 @@ class ClientConnection(unittest.TestCase):
         sql_cmd = commonsh.execut_db_sql('show lockwait_timeout;')
         LOG.info(sql_cmd)
         self.assertIn('20min', sql_cmd)
+        # 设置参数为2147483648
         msg = commonsh.execute_gsguc('set',
                                      self.constant.GSGUC_SUCCESS_MSG,
+                                    'lockwait_timeout = 2147483648')
         LOG.info(msg)
         self.assertFalse(msg)
         # 查询

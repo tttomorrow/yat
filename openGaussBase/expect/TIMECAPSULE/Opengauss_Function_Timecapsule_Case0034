@@ -1,0 +1,135 @@
+-- @testpoint: 验证enable_recyclebin 为true和false,值为false时合理报错
+--step1: 查询enable_recyclebin 默认值; expect:显示默认值
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+
+--step2: 修改enable_recyclebin为true; expect:显示值为on
+alter system set enable_recyclebin to true;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| on                |
++-------------------+
+--step3: 清空回收站; expect:回收站清空成功
+drop table if exists t_timecapsule_0034 purge;
+SQL SUCCESS
+purge recyclebin;
+SQL SUCCESS
+--step4: 创建表、插入数据且清空表数据; expect:表创建成功、数据插入成功且清空表数据成功
+create table t_timecapsule_0034(a int);
+SQL SUCCESS
+insert into t_timecapsule_0034 values(1);
+SQL SUCCESS
+insert into t_timecapsule_0034 values(2);
+SQL SUCCESS
+insert into t_timecapsule_0034 values(3);
+SQL SUCCESS
+truncate table t_timecapsule_0034;
+SQL SUCCESS
+--step5: 执行truncate闪回; expect:闪回成功
+timecapsule table t_timecapsule_0034 to before truncate;
+SQL SUCCESS
+--step6: 查询闪回的表数据; expect:查询结果为3条数据与预期结果一致
+select * from  t_timecapsule_0034;
++---+
+| a |
++---+
+| 1 |
+| 2 |
+| 3 |
++---+
+--step7: 删除表; expect:表删除成功
+drop table t_timecapsule_0034;
+SQL SUCCESS
+--step8: 执行drop闪回; expect:闪回成功
+timecapsule table t_timecapsule_0034 to before drop;
+SQL SUCCESS
+--step9: 查询闪回的表数据; expect:查询结果为3条数据与预期结果一致
+select * from  t_timecapsule_0034;
++---+
+| a |
++---+
+| 1 |
+| 2 |
+| 3 |
++---+
+--step10: 清理环境; expect:清理成功
+drop table if exists t_timecapsule_0034 purge;
+SQL SUCCESS
+purge recyclebin;
+SQL SUCCESS
+--step11: 查询enable_recyclebin值; expect:预期结果为on
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| on                |
++-------------------+
+--step12: 修改enable_recyclebin为false; expect:显示值为off
+alter system set enable_recyclebin to false;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+
+--step13: 创建表、插入数据且清空表数据; expect:表创建成功、数据插入成功且清空表数据成功
+drop table if exists t_timecapsule_0034;
+SQL SUCCESS
+create table t_timecapsule_0034(a int);
+SQL SUCCESS
+insert into t_timecapsule_0034 values(1);
+SQL SUCCESS
+insert into t_timecapsule_0034 values(2);
+SQL SUCCESS
+insert into t_timecapsule_0034 values(3);
+SQL SUCCESS
+truncate table t_timecapsule_0034;
+SQL SUCCESS
+--step14: 执行truncate闪回; expect:闪回失败，合理报错
+timecapsule table t_timecapsule_0034 to before truncate;
+?.*ERROR: recycle object "t_timecapsule_0034" desired does not exis.*
+--step15: 删除表; expect:表删除成功
+drop table t_timecapsule_0034;
+SQL SUCCESS
+--step16: 执行drop闪回; expect:闪回失败，合理报错
+timecapsule table t_timecapsule_0034 to before drop;
+?.*ERROR: recycle object "t_timecapsule_0034" desired does not exis.*
+--step17: 清理环境; expect:清理环境成功
+drop table if exists t_timecapsule_0034 purge;
+SQL SUCCESS
+purge recyclebin;
+SQL SUCCESS
+--step18: 恢复默认值; expect:默认值恢复成功
+alter system set enable_recyclebin to off;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+

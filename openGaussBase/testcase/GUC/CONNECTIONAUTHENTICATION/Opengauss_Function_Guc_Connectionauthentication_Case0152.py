@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -19,6 +19,7 @@ Description : 1、查看auth_iteration_count默认值；
               source /opt/opengauss810/env
               gs_guc check -D {cluster/dn1} -c auth_iteration_count
               2、使用ALTER SYSTM SET修改参数auth_iteration_count为超边界值;
+              ALTER SYSTEM set auth_iteration_count to '134217729';
 Expect      : 1、显示默认值；
               2、参数修改失败；
 History     :
@@ -58,6 +59,7 @@ class GucTest(unittest.TestCase):
                     + f";gsql -d {self.db_user_node.db_name} -p " \
                     + self.db_user_node.db_port \
                     + " -c \"ALTER SYSTEM set " \
+                      "auth_iteration_count to '134217729';\""
         res1 = self.db_user_node.sh(altersql1).result()
         self.assertIn('ERROR', res1)
 

@@ -1,0 +1,263 @@
+-- @testpoint: hash_range创建和修改二级分区表,查询数据,执行操作analyzevacuum/cluster,部分测试点合理报错
+--test1: 创建二级分区表,分区名和分区键约束
+--step1: 创建二级分区表,没有一级分区名和二级分区名; expect:合理报错
+drop table if exists t_subpartition_0015 cascade;
+SQL SUCCESS
+create table t_subpartition_0015(jid int,jn int,name varchar2)partition by hash (jid) subpartition by range(jn)();
+?.*ERROR: syntax error at or near "\).*
+?.*
+--step2: 创建二级分区表,有一个一级分区名和一个二级分区名; expect:成功
+drop table if exists t_subpartition_0015 cascade;
+SQL SUCCESS
+create table t_subpartition_0015(jid int,jn int,name varchar2)partition by hash (jid) subpartition by range(jn)
+(partition hr1(subpartition hr11 values less than(6)));
+SQL SUCCESS
+--step3: 创建二级分区表,有两个一级分区键; expect:合理报错
+drop table if exists t_subpartition_0015 cascade;
+SQL SUCCESS
+create table t_subpartition_0015(jid int,jn int,name varchar2)partition by hash (jid,jn) subpartition by range(jn)
+(partition hr1(subpartition hr11 values less than(6)));
+?.*ERROR: Un-support featur.*
+  Detail: The partition key's length should be 1.
+--step4: 创建二级分区表,有两个二级分区键; expect:合理报错
+drop table if exists t_subpartition_0015 cascade;
+SQL SUCCESS
+create table t_subpartition_0015(jid int,jn int,name varchar2)partition by hash (jid) subpartition by range(jid,jn)
+(partition hr1(subpartition hr11 values less than(6)));
+?.*ERROR: Un-support featur.*
+  Detail: The partition key's length should be 1.
+--step5: 创建二级分区表,有两个一级分区键,没有二级分区键; expect:合理报错
+drop table if exists t_subpartition_0015 cascade;
+SQL SUCCESS
+create table t_subpartition_0015(jid int,jn int,name varchar2)partition by hash (jid) partition by range(jn)
+(partition hr1(subpartition hr11 values less than(6)));
+?.*ERROR: syntax error at or near "partition by.*
+?.*
+--step6: 创建二级分区表,一级分区键和二级分区键相同; expect:合理报错
+drop table if exists t_subpartition_0015 cascade;
+SQL SUCCESS
+create table t_subpartition_0015(jid int,jn int,name varchar2)partition by hash (jn) subpartition by range(jn)
+(partition hr1(subpartition hr11 values less than(6),subpartition hr12 values less than(maxvalue)),partition hr2(subpartition hr21 values less than(6),subpartition hr22 values less than(maxvalue)))disable row movement;
+?.*ERROR: The two partition keys of a subpartition partition table are the same.*
+  Detail: N/A
+--step7: 创建二级分区表,一级分区名和二级分区名相同; expect:合理报错
+drop table if exists t_subpartition_0015 cascade;
+SQL SUCCESS
+create table t_subpartition_0015(jid int,jn int,name varchar2)partition by hash (jid) subpartition by range(jn)
+(partition hr1(subpartition hr1 values less than(6),subpartition hr12 values less than(maxvalue)),partition hr2(subpartition hr21 values less than(6),subpartition hr22 values less than(maxvalue)))disable row movement;
+?.*ERROR: duplicate subpartition name: "hr1.*
+--test2: 创建分区表,使用关键字like源表是分区表
+--step8: 创建一级分区表; expect:成功
+drop table if exists like_t_subpartition_0015 cascade;
+SQL SUCCESS
+create table if not exists like_t_subpartition_0015(jid int,jn int,name varchar2)partition by hash (jid)(partition hr1,partition hr2);
+SQL SUCCESS
+--step9: 创建一级分区表,关键字like源表是一级分区表; expect:合理报错
+drop table if exists t_subpartition_0015 cascade;
+SQL SUCCESS
+create table if not exists t_subpartition_0015(like like_t_subpartition_0015 including partition);
+?.*ERROR: Un-support featur.*
+  Detail: The Like feature is not supported currently for List and Hash.
+--step10: 创建二级分区表; expect:成功
+drop table if exists like_t_subpartition_0015 cascade;
+SQL SUCCESS
+create table like_t_subpartition_0015(jid int,jn int,name varchar2)partition by hash (jid) subpartition by range(jn)
+(partition hr1(subpartition hr11 values less than(6),subpartition hr12 values less than(maxvalue)),partition hr2(subpartition hr21 values less than(6),subpartition hr22 values less than(maxvalue)))disable row movement;
+SQL SUCCESS
+--step11: 创建二级分区表,关键字like源表是二级分区表; expect:合理报错
+drop table if exists t_subpartition_0015 cascade;
+SQL SUCCESS
+create table if not exists t_subpartition_0015(like like_t_subpartition_0015 including partition);
+?.*ERROR: Un-support feature
+  Detail: The Like feature is not supported currently for List and Hash.
+--test3: 修改分区表,添加分区
+--step12: 创建二级分区表; expect:成功
+drop table if exists t_subpartition_0015 cascade;
+SQL SUCCESS
+create table t_subpartition_0015(jid int,jn int ,name varchar2)partition by hash (jid) subpartition by range(jn)
+(partition hr1(subpartition hr11 values less than(6),subpartition hr12 values less than(maxvalue)),partition hr2(subpartition hr21 values less than(6),subpartition hr22 values less than(maxvalue)));
+SQL SUCCESS
+--step13: 修改分区表,添加二级分区; expect:合理报错
+alter table if exists t_subpartition_0015 add subpartition hr13 values less than(maxvalue);
+?.*ERROR: syntax error at or near.*
+?.*
+--step14: 修改分区表,添加一级分区; expect:合理报错
+alter table if exists t_subpartition_0015 add partition hr3;
+?.*ERROR: syntax error at end of inpu.*
+?.*
+--test4: 使用rownum/order by/group by/subquery查询数据
+--step15: 创建二级分区表且插入数据; expect:成功
+drop table if exists t_subpartition_0015 cascade;
+SQL SUCCESS
+create table t_subpartition_0015(jid int,jn int ,name varchar2)partition by hash (jid) subpartition by range(jn)
+(partition hr1(subpartition hr11 values less than(6),subpartition hr12 values less than(maxvalue)),partition hr2(subpartition hr21 values less than(6),subpartition hr22 values less than(maxvalue)));
+SQL SUCCESS
+insert into t_subpartition_0015 values(0,0,'jade'),(0,1,'jade'),(0,2,'jade'),(0,3,'jade'),(0,4,'jade');
+SQL SUCCESS
+insert into t_subpartition_0015 values(1,10,'jade'),(1,11,'jade'),(1,12,'jade'),(1,13,'jade'),(1,14,'jade');
+SQL SUCCESS
+--step16: 使用rownum和order by查询数据; expect:成功
+select * from t_subpartition_0015 where rownum<6 order by jn;
++-----+----+------+
+| jid | jn | name |
++-----+----+------+
+| 1   | 10 | jade |
+| 1   | 11 | jade |
+| 1   | 12 | jade |
+| 1   | 13 | jade |
+| 1   | 14 | jade |
++-----+----+------+
+--step17: 使用order by查询数据; expect:成功
+select * from t_subpartition_0015 order  by jn;
++-----+----+------+
+| jid | jn | name |
++-----+----+------+
+| 0   | 0  | jade |
+| 0   | 1  | jade |
+| 0   | 2  | jade |
+| 0   | 3  | jade |
+| 0   | 4  | jade |
+| 1   | 10 | jade |
+| 1   | 11 | jade |
+| 1   | 12 | jade |
+| 1   | 13 | jade |
+| 1   | 14 | jade |
++-----+----+------+
+--step18: 使用group by查询数据; expect:成功
+select name,sum(jn) from t_subpartition_0015 group  by name;
++------+-----+
+| name | sum |
++------+-----+
+| jade | 70  |
++------+-----+
+--step19: 使用subquery查询数据; expect:成功
+select * from t_subpartition_0015 where name in(select name from t_subpartition_0015 where jn>=11);
++-----+----+------+
+| jid | jn | name |
++-----+----+------+
+| 1   | 10 | jade |
+| 1   | 11 | jade |
+| 1   | 12 | jade |
+| 1   | 13 | jade |
+| 1   | 14 | jade |
+| 0   | 0  | jade |
+| 0   | 1  | jade |
+| 0   | 2  | jade |
+| 0   | 3  | jade |
+| 0   | 4  | jade |
++-----+----+------+
+--test5: analyze verbose操作
+--step20: 创建二级分区表; expect:成功
+drop table if exists t_subpartition_0015 cascade;
+SQL SUCCESS
+create table t_subpartition_0015(jid int,jn int ,name varchar2)partition by hash (jid) subpartition by range(jn)
+(partition hr1(subpartition hr11 values less than(6),subpartition hr12 values less than(maxvalue)),partition hr2(subpartition hr21 values less than(6),subpartition hr22 values less than(maxvalue)));
+SQL SUCCESS
+--step21: 分析表统计信息,并输出相关信息; expect:成功
+analyze verbose t_subpartition_0015;
+SQL SUCCESS
+--step22: 分析表(列)的统计信息,并输出相关信息; expect:成功
+analyze verbose t_subpartition_0015(jn);
+SQL SUCCESS
+--step23: 查询系统表; expect:成功,系统表未记录
+select * from pg_statistic where starelid=(select oid from pg_class where relname='t_subpartition_0015');
++----------+------------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------+---------------+------------+
+| starelid | starelkind | staattnum | stainherit | stanullfrac | stawidth | stadistinct | stakind1 | stakind2 | stakind3 | stakind4 | stakind5 | staop1 | staop2 | staop3 | staop4 | staop5 | stanumbers1 | stanumbers2 | stanumbers3 | stanumbers4 | stanumbers5 | stavalues1 | stavalues2 | stavalues3 | stavalues4 | stavalues5 | stadndistinct | staextinfo |
++----------+------------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------+---------------+------------+
++----------+------------+-----------+------------+-------------+----------+-------------+----------+----------+----------+----------+----------+--------+--------+--------+--------+--------+-------------+-------------+-------------+-------------+-------------+------------+------------+------------+------------+------------+---------------+------------+
+select * from pg_stats  where tablename='t_subpartition_0015';
++------------+-----------+---------+-----------+-----------+-----------+------------+--------------+------------------+-------------------+------------------+-------------+-------------------+------------------------+----------------------+
+| schemaname | tablename | attname | inherited | null_frac | avg_width | n_distinct | n_dndistinct | most_common_vals | most_common_freqs | histogram_bounds | correlation | most_common_elems | most_common_elem_freqs | elem_count_histogram |
++------------+-----------+---------+-----------+-----------+-----------+------------+--------------+------------------+-------------------+------------------+-------------+-------------------+------------------------+----------------------+
++------------+-----------+---------+-----------+-----------+-----------+------------+--------------+------------------+-------------------+------------------+-------------+-------------------+------------------------+----------------------+
+--step24: 分析的一级分区统计信息,并输出相关信息; expect:成功
+analyze verbose t_subpartition_0015 partition(hr1);
+SQL SUCCESS
+--step25: 分析表的二级分区统计信息,并输出相关信息; expect:合理报错
+analyze verbose t_subpartition_0015 subpartition(hr11);
+?.*ERROR: syntax error at or near "subpartition.*
+?.*
+--test6: vacuum verbose操作
+--step26: 创建二级分区表; expect:成功
+drop table if exists t_subpartition_0015 cascade;
+SQL SUCCESS
+create table t_subpartition_0015(jid int,jn int ,name varchar2)partition by hash (jid) subpartition by range(jn)
+(partition hr1(subpartition hr11 values less than(6),subpartition hr12 values less than(maxvalue)),partition hr2(subpartition hr21 values less than(6),subpartition hr22 values less than(maxvalue)));
+SQL SUCCESS
+--step27: 对表执行vacuum操作,并输出相关信息; expect:成功
+vacuum verbose t_subpartition_0015;
+SQL SUCCESS
+--step28: 对表(列)执行vacuum操作,并输出相关信息; expect:合理报错
+vacuum verbose t_subpartition_0015(jn);
+?.*ERROR: syntax error at or near "\(.*
+?.*
+--step29: 插入数据; expect:成功
+insert into t_subpartition_0015 values(0,0,'jade'),(0,1,'jade'),(0,2,'jade'),(0,3,'jade'),(0,4,'jade');
+SQL SUCCESS
+insert into t_subpartition_0015 values(1,10,'jade'),(1,11,'jade'),(1,12,'tjade'),(1,13,'tjade'),(1,14,'tjade');
+SQL SUCCESS
+--step30: 对一级分区执行vacuum操作,并输出相关信息; expect:成功
+vacuum verbose t_subpartition_0015 partition(hr1);
+SQL SUCCESS
+--step31: 对二级分区执行vacuum操作,并输出相关信息; expect:成功
+vacuum verbose t_subpartition_0015 subpartition(hr11);
+SQL SUCCESS
+--step32: 查看系统表; expect:成功
+select schemaname,relname,last_analyze,analyze_count,last_data_changed from pg_stat_all_tables where relname='t_subpartition_0015';
++------------+---------------------+--------------+---------------+-------------------+
+| schemaname | relname             | last_analyze | analyze_count | last_data_changed |
++------------+---------------------+--------------+---------------+-------------------+
+| public     | t_subpartition_0015 |              | 0             |                   |
++------------+---------------------+--------------+---------------+-------------------+
+--test7: vaccum analyze verbose操作
+--step33: 创建二级分区表; expect:成功
+drop table if exists t_subpartition_0015 cascade;
+SQL SUCCESS
+create table t_subpartition_0015(jid int,jn int ,name varchar2)partition by hash (jid) subpartition by range(jn)
+(partition hr1(subpartition hr11 values less than(6),subpartition hr12 values less than(maxvalue)),partition hr2(subpartition hr21 values less than(6),subpartition hr22 values less than(maxvalue)));
+SQL SUCCESS
+--step34: 对表(列)执行vacuum analyze操作,并输出相关信息; expect:成功
+vacuum analyze verbose t_subpartition_0015(jn);
+SQL SUCCESS
+--test8: cluster操作(不支持)
+--step35: 创建二级分区表并创建二级分区键索引; expect:成功
+drop table if exists t_subpartition_0015 cascade;
+SQL SUCCESS
+create table t_subpartition_0015(jid int,jn int unique ,name varchar2)partition by hash (jid) subpartition by range(jn)
+(partition hr1(subpartition hr11 values less than(6),subpartition hr12 values less than(maxvalue)),partition hr2(subpartition hr21 values less than(6),subpartition hr22 values less than(maxvalue)));
+SQL SUCCESS
+create unique index idxjade on t_subpartition_0015(jn);
+SQL SUCCESS
+--step36: 对二级分区表执行cluster操作; expect:合理报错
+cluster verbose t_subpartition_0015 using idxjade;
+?.*ERROR: cannot cluster a subpartition tabl.*
+--step37: 重建索引; expect:成功
+reindex index idxjade;
+SQL SUCCESS
+--step38: 执行cluster操作; expect:合理报错
+cluster verbose t_subpartition_0015;
+?.*ERROR: there is no previously clustered index for table "t_subpartition_0015.*
+--step39: 创建二级分区表; expect:成功
+drop table if exists t_subpartition_0015 cascade;
+SQL SUCCESS
+create table t_subpartition_0015(jid int,jn int unique ,name varchar2)partition by hash (jid) subpartition by range(jn)
+(partition hr1(subpartition hr11 values less than(6),subpartition hr12 values less than(maxvalue)),partition hr2(subpartition hr21 values less than(6),subpartition hr22 values less than(maxvalue)));
+SQL SUCCESS
+--step40: 对一级分区执行cluster操作; expect:合理报错
+cluster verbose t_subpartition_0015 partition(hr1);
+?.*ERROR: there is no previously clustered index for table "t_subpartition_0015.*
+--step41: 对二级分区执行cluster操作; expect:合理报错
+cluster verbose t_subpartition_0015 subpartition(hr11);
+?.*ERROR: syntax error at or near "subpartition.*
+?.*
+--step42: 对表(列)执行cluster analyze操作; expect:合理报错
+cluster analyze verbose t_subpartition_0015(jn);
+?.*ERROR: syntax error at or near "analyze.*
+?.*
+--step43: 对表(列,列)执行cluster操作; expect:合理报错
+cluster verbose t_subpartition_0015(jid,jn);
+?.*ERROR: syntax error at or near "\(.*
+?.*
+--step44: 删除表; expect:成功
+drop table if exists t_subpartition_0015 cascade;
+SQL SUCCESS

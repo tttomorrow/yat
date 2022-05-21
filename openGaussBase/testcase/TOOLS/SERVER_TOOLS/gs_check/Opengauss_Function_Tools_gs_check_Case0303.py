@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -24,65 +24,82 @@ Expect      :
 History     :
 """
 
+import os
+import time
 import unittest
-from yat.test import Node
-from yat.test import macro
+
 from testcase.utils.Constant import Constant
 from testcase.utils.Logger import Logger
+from yat.test import Node
+from yat.test import macro
 
-logger = Logger()
 
 class Tools(unittest.TestCase):
     def setUp(self):
-        logger.info('--------------Opengauss_Function_Tools_gs_check_Case0303start-------------------')
+        self.log = Logger()
+        self.log.info(
+            '-----Opengauss_Function_Tools_gs_check_Case0303_start-----')
         self.dbuserNode = Node('dbuser')
         self.rootNode = Node('default')
+        self.clear_path = os.path.join(
+            os.path.dirname(macro.DB_INSTANCE_PATH), 'tool', 'script',
+            'gspylib', 'inspection', 'output', 'CheckReport*')
+        self.error_result1 = f'does not have root privileges'
+        self.error_result2 = f'ERROR: Verify password failed'
         self.Constant = Constant()
 
     def test_server_tools1(self):
-        logger.info('------------------运行openGauss的用户检查防火墙状态（输入无root权限的用户名）------------------')
-        logger.info(vars(self.dbuserNode))
-        check_cmd1 = f'''
-                        source {macro.DB_ENV_PATH}
-                        expect <<EOF
-                        set timeout -1
-                        spawn gs_check -i CheckFirewall -U {self.dbuserNode.ssh_user}
-                        expect "*]:"
-                        send "{self.dbuserNode.ssh_user}\r"
-                        expect "*]:"
-                        send "{self.rootNode.db_password}\r"
-                        expect eof
-                        '''
-        logger.info(check_cmd1)
-        msg1 = self.dbuserNode.sh(check_cmd1).result()
-        logger.info(msg1)
-        self.assertIn('does not have root privileges',msg1)
+        text = '-----step1:运行openGauss的用户检查防火墙状态（输入无root权限的用户名）;' \
+               'expect:检查失败-----'
+        self.log.info(text)
+        check_cmd = f'''su - {self.dbuserNode.ssh_user} -c "
+                    source {macro.DB_ENV_PATH};
+                    expect -c \\\"set timeout -1
+                    spawn gs_check -i CheckFirewall -U \
+                    {self.dbuserNode.ssh_user}
+                    expect *]:
+                    send {self.dbuserNode.ssh_user}\\n
+                    expect *]:
+                    send {self.dbuserNode.ssh_password}\\n
+                    expect eof\\\""'''
+        self.log.info(check_cmd)
+        check_res = self.rootNode.sh(check_cmd).result()
+        self.log.info(check_res)
+        self.assertIn(self.error_result1, check_res, '执行失败:' + text)
 
     def test_server_tools2(self):
-        logger.info('------------------运行openGauss的用户检查防火墙状态(root权限的用户密码输入错误）------------------')
-        logger.info(vars(self.dbuserNode))
-        check_cmd2 = f'''
-                        source {macro.DB_ENV_PATH}
-                        expect <<EOF
-                        set timeout -1
-                        spawn gs_check -i CheckFirewall -U {self.dbuserNode.ssh_user}
-                        expect "*]:"
-                        send "{self.rootNode.ssh_user}\r"
-                        expect "*]:"
-                        send "{self.rootNode.db_host}\r"
-                        expect "*]:"
-                        send "{self.rootNode.db_host}\r"
-                        expect "*]:"
-                        send "{self.rootNode.db_host}\r"
-                        expect "*]:"
-                        send "{self.rootNode.db_host}\r"
-                        expect eof
-                        '''
-        logger.info(check_cmd2)
-        msg2 = self.dbuserNode.sh(check_cmd2).result()
-        logger.info(msg2)
-        self.assertIn('ERROR: Verify password failed',msg2)
+        text = '-----step2:运行openGauss的用户检查防火墙状态（有root权限的用户密码输入错误）;' \
+               'expect:检查失败-----'
+        self.log.info(text)
+        check_cmd = f'''su - {self.dbuserNode.ssh_user} -c "
+                    source {macro.DB_ENV_PATH};
+                    expect -c \\\"set timeout 60
+                    spawn gs_check -i CheckFirewall -U \
+                    {self.dbuserNode.ssh_user}
+                    expect *]:
+                    send {self.rootNode.ssh_user}\\n
+                    expect *]:
+                    send {self.rootNode.ssh_user}\\n
+                    expect *]:
+                    send {self.rootNode.ssh_user}\\n
+                    expect *]:
+                    send {self.rootNode.ssh_user}\\n
+                    expect *]:
+                    send {self.rootNode.ssh_user}\\n
+                    expect eof\\\""'''
+        self.log.info(check_cmd)
+        check_res = self.rootNode.sh(check_cmd).result()
+        self.log.info(check_res)
+        self.assertIn(self.error_result2, check_res, '执行失败:' + text)
+        time.sleep(65)
 
     def tearDown(self):
-        logger.info('--------------无需清理环境-------------------')
-        logger.info('------------------Opengauss_Function_Tools_gs_check_Case0303finish------------------')
+        text = '----------清理环境----------'
+        self.log.info(text)
+        clear_cmd = f'rm -rf {self.clear_path};'
+        self.log.info(clear_cmd)
+        clear_msg = self.rootNode.sh(clear_cmd).result()
+        self.log.info(clear_msg)
+        self.assertEqual('', clear_msg, '执行失败:' + text)
+        self.log.info(
+            '----Opengauss_Function_Tools_gs_check_Case0303_finish----')

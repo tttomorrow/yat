@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -20,7 +20,7 @@ Description : 1、查看local_bind_address默认值；
               gs_guc check -D {cluster/dn1} -c local_bind_address
               2、使用设置gs_guc set设置local_bind_address
               gs_guc set -D {cluster/dn1}
-              -c "local_bind_address='ip'"
+              -c "local_bind_address='100.99.81.59'"
               3、在相应配置文件中查看校验配置，重启使其生效；
               cat {cluster/dn1}/postgresql.conf | grep local_bind_address
               gs_om -t stop && gs_om -t start

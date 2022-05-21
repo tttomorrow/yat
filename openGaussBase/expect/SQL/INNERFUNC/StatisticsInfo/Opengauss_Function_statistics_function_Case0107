@@ -1,0 +1,26 @@
+-- @testpoint: reset_unique_sql(text, text, bigint),入参为无效值（为空、特殊字符、多参、少参、null）时，合理报错
+----step1：入参为空; expect:合理报错
+select reset_unique_sql();
+?.*ERROR: function reset_unique_sql\(\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: reset_unique_sql
+----step2：入参为特殊字符; expect:合理报
+select reset_unique_sql('#','@','1');
+?.*ERROR: First parameter is wrong.*
+  Where: referenced column: reset_unique_sql
+----step3：多参; expect:合理报错
+select reset_unique_sql('global','all',2,1);
+?.*ERROR: function reset_unique_sql\(unknown, unknown, integer, integer\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: reset_unique_sql
+----step4：少参; expect:合理报错
+select reset_unique_sql('global','all',);
+?.*ERROR: syntax error at or near "\).*
+?.*
+----step5：入参有null值; expect:合理报错
+select reset_unique_sql('global','all','null');
+?.*ERROR: invalid input syntax for type bigint: "null.*
+?.*
+  Where: referenced column: reset_unique_sql

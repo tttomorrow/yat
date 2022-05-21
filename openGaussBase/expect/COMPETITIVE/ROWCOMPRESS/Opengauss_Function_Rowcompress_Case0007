@@ -1,0 +1,63 @@
+-- @testpoint: 修改行存压缩表参数，部分step合理报错
+
+--step1: 创建行存压缩表：使用参数compresstype=1
+drop table if exists t_rowcompress_0007 cascade;
+SQL SUCCESS
+create table t_rowcompress_0007(cid int, name varchar2) with (compresstype=1);
+SQL SUCCESS
+--step2: 修改行存压缩参数，parameter compresstype=2;
+alter table t_rowcompress_0007 set (compresstype=2);
+?.*ERROR: change compresstype OPTION is not supported
+--step3: 修改行存压缩参数，parameter compress_level=7;
+alter table t_rowcompress_0007 set (compress_level=7);
+?.*ERROR: compress_level should be used with ZSTD algorithm.
+--step4: 修改行存压缩参数，parameter compress_chunk_size=1/4BLCKSZ;
+alter table t_rowcompress_0007 set (compress_chunk_size=2048);
+?.*ERROR: change compress_chunk_size OPTION is not supported
+--step5: 修改行存压缩参数，parameter compress_prealloc_chunks=1;
+alter table t_rowcompress_0007 set (compress_prealloc_chunks=1);
+SQL SUCCESS
+--step6: 修改行存压缩参数，parameter compress_prealloc_chunks=5;
+alter table t_rowcompress_0007 set (compress_prealloc_chunks=5);
+?.*ERROR: invalid compress_prealloc_chunks 5 , must be less than 2 for t_rowcompress_0007
+--step7: 修改行存压缩参数，parameter compress_diff_convert=true;
+alter table t_rowcompress_0007 set (compress_diff_convert=true);
+?.*ERROR: compress_diff_convert should be used with compress_byte_convert.
+--step8: 修改行存压缩参数，parameter compress_byte_convert=true;
+alter table t_rowcompress_0007 set (compress_byte_convert=true);
+SQL SUCCESS
+--step9: 修改行存压缩参数，parameter compress_diff_convert=true;
+alter table t_rowcompress_0007 set (compress_diff_convert=true);
+SQL SUCCESS
+
+--step10: 删除行存压缩表
+drop table if exists t_rowcompress_0007 cascade;
+SQL SUCCESS
+--step11: 创建行存压缩表：使用参数compresstype=2, compress_chunk_size=1/4BLCKSZ);
+create table t_rowcompress_0007(cid int, name varchar2) with (compresstype=2, compress_chunk_size=2048);
+SQL SUCCESS
+--step12: 修改行存压缩参数，parameter compresstype=1;
+alter table t_rowcompress_0007 set (compresstype=1);
+?.*ERROR: change compresstype OPTION is not supported
+--step13: 修改行存压缩参数，parameter compress_level=3;
+alter table t_rowcompress_0007 set (compress_level=3);
+SQL SUCCESS
+--step14: 修改行存压缩参数，parameter compress_chunk_size=1/2BLCKSZ;
+alter table t_rowcompress_0007 set (compress_chunk_size=4096);
+?.*ERROR: change compress_chunk_size OPTION is not supported
+--step15: 修改行存压缩参数，parameter compress_prealloc_chunks=3;
+alter table t_rowcompress_0007 set (compress_prealloc_chunks=3);
+SQL SUCCESS
+--step16: 修改行存压缩参数，parameter compress_diff_convert=true;
+alter table t_rowcompress_0007 set (compress_diff_convert=true);
+?.*ERROR: compress_diff_convert should be used with compress_byte_convert.
+--step17: 修改行存压缩参数，parameter compress_byte_convert=true;
+alter table t_rowcompress_0007 set (compress_byte_convert=true);
+SQL SUCCESS
+--step18: 修改行存压缩参数，parameter compress_diff_convert=true;
+alter table t_rowcompress_0007 set (compress_diff_convert=true);
+SQL SUCCESS
+
+--step19: 删除行存压缩表
+drop table if exists t_rowcompress_0007 cascade;
+SQL SUCCESS

@@ -4,3 +4,4 @@ select char_length('jj          slf');
 select char_length('jj''slf');
 select char_length('jjslf'::text);
 select char_length(123.45);
+select char_length('123456123');

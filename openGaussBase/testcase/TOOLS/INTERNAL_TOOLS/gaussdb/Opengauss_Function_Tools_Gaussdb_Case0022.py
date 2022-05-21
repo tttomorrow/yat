@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -21,7 +21,7 @@ Description :
     2.查看进程，确定关闭成功
     ps -ef|grep zl
     3.使用gaussdb工具后台运行进程
-    gaussdb -D /opt/openGauss_zl/cluster/dn1 -p 19701 -h ip -M
+    gaussdb -D /opt/openGauss_zl/cluster/dn1 -p 19701 -h 11.187.183.94 -M
     primary &
     4.恢复-重启数据库
     gs_ctl restart -D /opt/openGauss_zl/cluster/dn1 -M primary
@@ -29,10 +29,11 @@ Expect      :
     1.关闭正在运行的数据库成功
     2.查看进程，数据库连接进程不存在，数据库关闭成功
     3.使用gaussdb工具指定未知host启动数据库进程失败，提示信息为：FATAL:
-    could not create listen socket for "ip:port"
+    could not create listen socket for "11.187.183.94:19701"
     4.重启数据库成功
 History     :
 """
+import os
 import unittest
 from multiprocessing import Process
 from testcase.utils.ComThread import ComThread
@@ -45,7 +46,7 @@ from testcase.utils.Logger import Logger
 class Tools(unittest.TestCase):
     def setUp(self):
         self.logger = Logger()
-        self.logger.info('--Opengauss_Function_Tools_Gaussdb_Case0022 start--')
+        self.logger.info(f'-----{os.path.basename(__file__)} start-----')
         self.userNode = Node(node='PrimaryDbUser')
         self.DB_ENV_PATH = macro.DB_ENV_PATH
         self.DB_INSTANCE_PATH = macro.DB_INSTANCE_PATH
@@ -90,7 +91,7 @@ class Tools(unittest.TestCase):
             sql_cmd4 = 'drop user if exists user006 cascade;'
             msg4 = self.sh_primy.execut_db_sql(sql_cmd4)
             self.logger.info(msg4)
-            self.assertTrue(msg4.find('failed to connect Unknown') > -1)
+            self.assertTrue(msg4.find('failed to connect') > -1)
             self.logger.info('-----------主机重启-----------')
             execute_cmd5 = f'source {self.DB_ENV_PATH};gs_ctl restart -D ' \
                            f'{self.DB_INSTANCE_PATH} -M primary'
@@ -105,4 +106,5 @@ class Tools(unittest.TestCase):
                 'P Primary Normal' in msg6 and 'S Standby Normal' in msg6)
 
     def tearDown(self):
-        self.logger.info('-Opengauss_Function_Tools_Gaussdb_Case0022 finish-')
+        # 无须清理环境
+        self.logger.info(f'-----{os.path.basename(__file__)} end-----')

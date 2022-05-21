@@ -15,7 +15,8 @@ set session session authorization u_dml_upsert0124 password 'Test@123';
 SQL SUCCESS
 --普通用户没有子查询表的读权限
 select * from t_dml_upsert_sub0124;
-?.* ERROR: permission denied for relation t_dml_upsert_sub0124
+?.*ERROR: permission denied for relation t_dml_upsert_sub0124
+?.*
 --普通用户创建upsert表并插入数据
 drop table if exists t_dml_upsert0124;
 SQL SUCCESS
@@ -34,7 +35,8 @@ select * from t_dml_upsert0124;
 +---+---+---+
 --普通用户进行upsert子查询语句执行，报错没有权限
 insert into t_dml_upsert0124 values(1,5) on duplicate key update b = (select min(a) from t_dml_upsert_sub0124 where a > excluded.b);
-?.* ERROR: permission denied for relation t_dml_upsert_sub0124
+?.*ERROR: permission denied for relation t_dml_upsert_sub0124
+?.*
 --进行普通用户子查询表读权限赋权
 reset session authorization;
 SQL SUCCESS

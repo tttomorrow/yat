@@ -4,6 +4,7 @@ SQL SUCCESS
 create table tb_1(id int);
 SQL SUCCESS
 create table tb_1(id char);
-?.*ERROR: relation "tb_1" already exists
+?.*ERROR: relation "tb_1" already exists.*
+?.*
 drop table if exists tb_1;
 SQL SUCCESS

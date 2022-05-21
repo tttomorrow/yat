@@ -1,4 +1,5 @@
 -- @testpoint: 子查询为嵌套查询，与union结合并且引用主表的列
+-- @modify at: 2020-11-24
 --建表
 drop table if exists temp_table_060;
 SQL SUCCESS

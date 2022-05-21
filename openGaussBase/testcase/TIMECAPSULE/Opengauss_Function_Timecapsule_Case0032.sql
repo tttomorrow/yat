@@ -1,0 +1,53 @@
+-- @testpoint: 不支持闪回drop,truncate 列存表,合理报错
+
+--step1: 查询enable_recyclebin 默认值; expect:显示默认值
+show enable_recyclebin;
+
+--step2: 修改enable_recyclebin为off; expect:显示值为off
+alter system set enable_recyclebin to on;
+select pg_sleep(2);
+show enable_recyclebin;
+
+--step3: 如果表存在清除表且清除回收站; expect:表清除成功且回收站清除成功
+drop table if exists t_timecapsule_0032;
+purge recyclebin;
+
+--step4: 创建列存表; expect:列存表创建成功
+create table t_timecapsule_0032
+(
+    w_warehouse_sk            integer               not null,
+    w_warehouse_id            char(16)              not null,
+    w_warehouse_name          varchar(20)                   ,
+    w_warehouse_sq_ft         integer                       ,
+    w_street_number           char(10)                      ,
+    w_street_name             varchar(60)                   ,
+    w_street_type             char(15)                      ,
+    w_suite_number            char(10)                      ,
+    w_city                    varchar(60)                   ,
+    w_county                  varchar(30)                   ,
+    w_state                   char(2)                       ,
+    w_zip                     char(10)                      ,
+    w_country                 varchar(20)                   ,
+    w_gmt_offset              decimal(5,2)
+) with (orientation = column);
+
+--step5: 清空表; expect:表清空成功
+truncate table t_timecapsule_0032;
+
+--step6: 执行truncate闪回; expect:闪回失败，合理报错
+timecapsule table t_timecapsule_0032 to before truncate;
+
+--step7: 删除表; expect:表删除成功
+drop table t_timecapsule_0032;
+
+--step8: 执行drop闪回; expect:闪回失败，合理报错
+timecapsule table t_timecapsule_0032 to before drop;
+
+--step9: 清理环境; expect:清理成功
+drop table if exists t_timecapsule_0032 purge;
+purge recyclebin;
+
+--step10: 恢复默认值; expect:默认值恢复成功
+alter system set enable_recyclebin to off;
+select pg_sleep(2);
+show enable_recyclebin;

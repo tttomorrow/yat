@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -45,7 +45,7 @@ class DCL_Do_test(unittest.TestCase):
         self.constant = Constant()
 
     def test_dcl_do(self):
-        logger.info("------------------Opengauss_Function_DCL_Do_Case0001开始执行-----------------")
+        logger.info("-----Opengauss_Function_DCL_Do_Case0001开始执行-----")
         logger.info("======前置条件，创建表，并查看指定语言是否支持内联块======")
         sql_cmd1 = f'''
                     drop table if exists do_test;
@@ -56,7 +56,7 @@ class DCL_Do_test(unittest.TestCase):
         msg1 = self.sh_primysh.execut_db_sql(sql_cmd1)
         logger.info(msg1)
         self.assertIn(self.constant.CREATE_TABLE_SUCCESS, msg1)
-        self.assertNotIn('0', msg1)
+        self.assertNotEqual('0', msg1.splitlines()[-2])
 
         logger.info("======指定解析代码的程序语言为plpgsql，利用do执行代码块======")
         sql_cmd2 = f'''
@@ -69,7 +69,8 @@ class DCL_Do_test(unittest.TestCase):
                         for i in 0..5 loop
                             insert into do_test values(i,'case' || i);
                         end loop;
-                        sql_str = 'select * into new_do_test from do_test where id<3;';
+                        sql_str = 'select * into new_do_test 
+                        from do_test where id<3;';
                         execute immediate sql_str;
                     end
                     \$\$;
@@ -96,4 +97,6 @@ class DCL_Do_test(unittest.TestCase):
                    '''
         msg4 = self.sh_primysh.execut_db_sql(sql_cmd4)
         logger.info(msg4)
-        logger.info('---------------Opengauss_Function_DCL_Do_Case0001执行结束---------------')
+        logger.info('-----Opengauss_Function_DCL_Do_Case0001执行结束-----')
+        self.assertTrue(msg4.count(self.constant.DROP_TABLE_SUCCESS) == 2,
+                        '清理环境失败')

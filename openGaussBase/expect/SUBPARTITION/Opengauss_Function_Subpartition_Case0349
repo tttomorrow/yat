@@ -1,0 +1,139 @@
+-- @testpoint: range_hash二级分区表：强制转换/cluster,部分测试点合理报错
+--step1: 创建表空间; expect:成功
+drop table if exists t_subpartition_0349;
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0349;
+SQL SUCCESS
+create tablespace ts_subpartition_0349 relative location 'subpartition_tablespace/subpartition_tablespace_0349';
+SQL SUCCESS
+--test1: 强制转换
+--step2: 创建二级分区表; expect:成功
+create table if not exists t_subpartition_0349
+(
+    col_1 int ,
+    col_2 int, 
+    col_3 varchar2 ( 30 ) ,
+    col_4 int
+)tablespace ts_subpartition_0349
+partition by range (col_1) subpartition by hash (col_2)
+(
+  partition p_range_1 values less than( -10 )
+  (
+    subpartition p_hash_1_1 ,
+    subpartition p_hash_1_2 ,
+     subpartition p_hash_1_3
+  ),
+  partition p_range_2 values less than( 20 ),
+  partition p_range_3 values less than( 30)
+  (
+    subpartition p_hash_3_1 ,
+    subpartition p_hash_3_2 ,
+    subpartition p_hash_3_3
+  ),
+    partition p_range_4 values less than( 50)
+  (
+    subpartition p_hash_4_1 ,
+    subpartition p_hash_4_2 ,
+    subpartition t_subpartition_0349
+  ),
+  partition p_range_5 values less than( maxvalue )
+) enable row movement;
+SQL SUCCESS
+--step3: 插入数据; expect:成功
+insert into t_subpartition_0349 values(5.89,6.48,738.8,564.8);
+SQL SUCCESS
+--step4: 查询数据; expect:成功,小数转换为整数
+select * from t_subpartition_0349;
++-------+-------+-------+-------+
+| col_1 | col_2 | col_3 | col_4 |
++-------+-------+-------+-------+
+| 6     | 6     | 738.8 | 565   |
++-------+-------+-------+-------+
+--step5: 插入超长数据; expect:合理报错
+insert into t_subpartition_0349 values(58888888888888888888888888888888888885484848484888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888.89,6.48,738.8,564.8);
+?.*ERROR: integer out of rang.*
+  Where: referenced column: col_1
+--step6: 创建普通表; expect:成功
+drop table if exists t_subpartition_0349_01;
+SQL SUCCESS
+create table if not exists t_subpartition_0349_01
+(
+    col_1 int ,
+    col_2 int, 
+    col_3 varchar2 ( 30 ) ,
+    col_4 int
+)tablespace ts_subpartition_0349;
+SQL SUCCESS
+--step7: 插入超长数据; expect:合理报错
+insert into t_subpartition_0349_01 values(58888888888888888888888888888888888885484848484888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888.89,6.48,738.8,564.8);
+?.*ERROR: integer out of rang.*
+  Where: referenced column: col_1
+--step8: 插入数据; expect:成功
+insert into t_subpartition_0349_01 values(5.89,6.48,738.8,564.8);
+SQL SUCCESS
+--step9: 查询数据; expect:成功,小数转换为整数
+select * from t_subpartition_0349_01;
++-------+-------+-------+-------+
+| col_1 | col_2 | col_3 | col_4 |
++-------+-------+-------+-------+
+| 6     | 6     | 738.8 | 565   |
++-------+-------+-------+-------+
+--test2:  cluster(不支持)
+--step10: 创建二级分区表; expect:成功
+drop table if exists t_subpartition_0349;
+SQL SUCCESS
+create table if not exists t_subpartition_0349
+(
+    col_1 int ,
+    col_2 int, 
+    col_3 varchar2 ( 30 ) ,
+    col_4 int
+)tablespace ts_subpartition_0349
+partition by range (col_1) subpartition by hash (col_2)
+(
+  partition p_range_1 values less than( -10 )
+  (
+    subpartition p_hash_1_1 ,
+    subpartition p_hash_1_2 ,
+     subpartition p_hash_1_3
+  ),
+  partition p_range_2 values less than( 20 ),
+  partition p_range_3 values less than( 30)
+  (
+    subpartition p_hash_3_1 ,
+    subpartition p_hash_3_2 ,
+    subpartition p_hash_3_3
+  ),
+    partition p_range_4 values less than( 50)
+  (
+    subpartition p_hash_4_1 ,
+    subpartition p_hash_4_2 ,
+    subpartition t_subpartition_0349
+  ),
+  partition p_range_5 values less than( maxvalue )
+) enable row movement;
+SQL SUCCESS
+--step11: 插入数据; expect:成功
+insert into t_subpartition_0349 values(5.89,6.48,738.8,564.8);
+SQL SUCCESS
+insert into t_subpartition_0349 values(10.89,6.48,738.8,564.8);
+SQL SUCCESS
+--step12: 创建索引; expect:成功
+create index  index_01 on t_subpartition_0349(col_1,col_2);
+SQL SUCCESS
+--step13: cluster聚簇排序; expect:合理报错
+cluster t_subpartition_0349;
+?.*ERROR: there is no previously clustered index for table "t_subpartition_0349.*
+--step14: cluster聚簇排序; expect:合理报错
+cluster t_subpartition_0349 using index_01;
+?.*ERROR: cannot cluster a subpartition tabl.*
+--step15: cluster聚簇排序; expect:合理报错
+cluster verbose t_subpartition_0349 using index_01;
+?.*ERROR: cannot cluster a subpartition tabl.*
+--step16: 清理环境; expect:成功
+drop table if exists t_subpartition_0349_01;
+SQL SUCCESS
+drop table if exists t_subpartition_0349;
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0349;
+SQL SUCCESS

@@ -77,7 +77,7 @@ explain analyse select * from test_ugi_002 where c_id = 10;
 +-----------------------------------------------------------------------------------------------------------------------------------+
 --交换分区p4，破坏全局索引
 alter table test_ugi_002 exchange partition (p4) with table test_ugi_002_temp;
-?.*ERROR: can not exchange LIST/HASH partition table
+SQL SUCCESS
 --清理表
 drop table test_ugi_002;
 SQL SUCCESS

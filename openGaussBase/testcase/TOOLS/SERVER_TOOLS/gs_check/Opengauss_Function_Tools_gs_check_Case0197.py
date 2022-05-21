@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -16,72 +16,84 @@ See the Mulan PSL v2 for more details.
 Case Type   : 服务端工具
 Case Name   : omm用户检查网卡多队列
 Description :
-    1.由root用户切换到omm用户下
-    2.在非本地模式下检查： gs_check -i CheckMultiQueue并交互输入root权限的用户及其密码
-    3.在本地模式下检查： gs_check -i CheckMultiQueue -L并交互输入root权限的用户及其密码
+    1.在非本地模式下检查： gs_check -i CheckMultiQueue并交互输入root权限的用户及其密码
+    2.在本地模式下检查： gs_check -i CheckMultiQueue -L并交互输入root权限的用户及其密码
 Expect      :
-    1.切换到omm用户下
+    1.输入密码完成，检查完成
     2.输入密码完成，检查完成
-    3.输入密码完成，检查完成
 History     :
 """
 
+import os
 import unittest
-from yat.test import Node
-from yat.test import macro
+
 from testcase.utils.Constant import Constant
 from testcase.utils.Logger import Logger
+from yat.test import Node
+from yat.test import macro
 
-logger = Logger()
 
 class Tools(unittest.TestCase):
     def setUp(self):
-        logger.info('--------------Opengauss_Function_Tools_gs_check_Case0197start-------------------')
+        self.log = Logger()
+        self.log.info(
+            '-----Opengauss_Function_Tools_gs_check_Case0197_start-----')
         self.dbuserNode = Node('dbuser')
-        self.Constant = Constant()
         self.rootNode = Node('default')
+        self.clear_path = os.path.join(
+            os.path.dirname(macro.DB_INSTANCE_PATH), 'tool', 'script',
+            'gspylib', 'inspection', 'output', 'CheckReport*')
+        self.Constant = Constant()
 
     def test_server_tools(self):
-        logger.info('------------------omm用户在非本地模式下检查网卡多队列------------------')
-        check_cmd1 = f'''
-                            source {macro.DB_ENV_PATH}
-                            expect <<EOF
-                            set timeout -1
-                            spawn gs_check -i CheckMultiQueue
-                            expect "*]:"
-                            send "{self.rootNode.ssh_user}\r"
-                            expect "*]:"
-                            send "{self.rootNode.ssh_password}\r"
-                            expect eof
-                            '''
+        text = '-----step1:omm用户在非本地模式下检查网卡多队列;expect:检查完成-----'
+        self.log.info(text)
+        check_cmd1 = f'''su - {self.dbuserNode.ssh_user} -c "
+                    source {macro.DB_ENV_PATH};
+                    expect -c \\\"set timeout -1
+                    spawn gs_check -i CheckMultiQueue
+                    expect *]:
+                    send {self.rootNode.ssh_user}\\n
+                    expect *]:
+                    send {self.rootNode.ssh_password}\\n
+                    expect eof\\\""'''
+        self.log.info(check_cmd1)
+        shell_res1 = os.popen(check_cmd1)
+        str_res1 = ''.join(shell_res1.readlines())
+        self.log.info(str_res1)
+        flag = (self.Constant.GS_CHECK_SUCCESS_MSG2[0] in str_res1 or
+                self.Constant.GS_CHECK_SUCCESS_MSG2[1] in str_res1) and \
+               self.Constant.GS_CHECK_SUCCESS_MSG2[2] in str_res1
+        self.assertTrue(flag, '执行失败:' + text)
 
-        logger.info(check_cmd1)
-        msg1 = self.dbuserNode.sh(check_cmd1).result()
-        logger.info(msg1)
-        flag = (self.Constant.GS_CHECK_SUCCESS_MSG2[0] in msg1 or self.Constant.GS_CHECK_SUCCESS_MSG2[1] in msg1) and \
-               self.Constant.GS_CHECK_SUCCESS_MSG2[2] in msg1
-        self.assertTrue(flag)
-        logger.info('------------------omm用户在本地模式下检查网卡多队列------------------')
-        check_cmd2 = f'''
-                            source {macro.DB_ENV_PATH}
-                            expect <<EOF
-                            set timeout -1
-                            spawn gs_check -i CheckMultiQueue -L
-                            expect "*]:"
-                            send "{self.rootNode.ssh_user}\r"
-                            expect "*]:"
-                            send "{self.rootNode.ssh_password}\r"
-                            expect eof
-                            '''
-        logger.info(check_cmd2)
-        msg2 = self.dbuserNode.sh(check_cmd2).result()
-        logger.info(msg2)
+        text = '-----step2:omm用户在本地模式下检查网卡多队列;expect:检查完成-----'
+        self.log.info(text)
+        check_cmd2 = f'''su - {self.dbuserNode.ssh_user} -c "
+                   source {macro.DB_ENV_PATH};
+                   expect -c \\\"set timeout -1
+                   spawn gs_check -i CheckMultiQueue -L
+                   expect *]:
+                   send {self.rootNode.ssh_user}\\n
+                   expect *]:
+                   send {self.rootNode.ssh_password}\\n
+                   expect eof\\\""'''
+        self.log.info(check_cmd2)
+        shell_res2 = os.popen(check_cmd2)
+        str_res2 = ''.join(shell_res2.readlines())
+        self.log.info(str_res2)
         check_result_flag = False
         for single_msg in self.Constant.GS_CHECK_SUCCESS_MSG1:
-            if single_msg in msg2:
+            if single_msg in str_res2:
                 check_result_flag = True
-        self.assertTrue(check_result_flag)
+        self.assertTrue(check_result_flag, '执行失败:' + text)
 
     def tearDown(self):
-        logger.info('--------------无需清理环境-------------------')
-        logger.info('------------------Opengauss_Function_Tools_gs_check_Case0197finish------------------')
+        text = '----------清理环境----------'
+        self.log.info(text)
+        clear_cmd = f'rm -rf {self.clear_path};'
+        self.log.info(clear_cmd)
+        clear_msg = self.rootNode.sh(clear_cmd).result()
+        self.log.info(clear_msg)
+        self.assertEqual('', clear_msg, '执行失败:' + text)
+        self.log.info(
+            '----Opengauss_Function_Tools_gs_check_Case0197_finish----')

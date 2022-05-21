@@ -1,0 +1,15 @@
+-- @testpoint: 声明package时定义存储过程,合理报错
+
+--step1:声明包规格,定义存储过程 expect:合理报错
+create or replace package p_test_0013 is
+var1 int:=1;
+var2 int:=2;
+procedure p_package_0013()
+is
+begin
+  drop table if exists t_package_0013;
+  create table t_package_0013(col_int int);
+  insert into t_package_0013 values (1);
+end;
+end p_test_0013;
+/

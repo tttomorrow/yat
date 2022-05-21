@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -16,7 +16,7 @@ See the Mulan PSL v2 for more details.
 Case Type   : Separation_permission
 Case Name   : 支持EXECUTE权限赋予
 Description :
-    1.初始用户执行：create user wf with password 'Qazwsx@123';
+    1.初始用户执行：create user wf with password '$PASSWORD';
                 DROP FUNCTION IF EXISTS func_add_sql() CASCADE;
                 CREATE FUNCTION func_add_sql(integer, integer) RETURNS integer
                 AS 'select $1 + $2' LANGUAGE SQL

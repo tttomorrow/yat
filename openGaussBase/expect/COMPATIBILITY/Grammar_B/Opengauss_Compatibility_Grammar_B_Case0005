@@ -1,0 +1,16 @@
+-- @testpoint: 修改表的压缩参数，合理报错
+--step1:创建表;expect:成功
+drop table if exists tb_grammar0005_01;
+SQL SUCCESS
+create table tb_grammar0005_01 (a double);
+SQL SUCCESS
+--step2:修改压缩参数;expect:报错，error:  syntax error
+alter table tb_grammar0005_01 compression = zstd;
+?.*ERROR: syntax error at or near "compression"
+?.*
+alter table tb_grammar0005_01 compression = pglz;
+?.*ERROR: syntax error at or near "compression"
+?.*
+--step3:清理环境;expect:成功
+drop table if exists tb_grammar0005_01;
+SQL SUCCESS

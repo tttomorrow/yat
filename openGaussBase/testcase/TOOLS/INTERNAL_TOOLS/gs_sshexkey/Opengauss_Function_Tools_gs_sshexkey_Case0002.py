@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -25,6 +25,7 @@ History     :
 """
 
 import unittest
+import os
 from yat.test import Node
 from yat.test import macro
 from testcase.utils.Logger import Logger
@@ -42,10 +43,10 @@ class ToolsTestCase(unittest.TestCase):
         self.assertTrue("Degraded" in status or "Normal" in status)
 
     def test_gs_sshexkey(self):
-        logger.info("===Opengauss_Function_Tools_gs_sshexkey_Case0002开始执行===")
+        logger.info(f"==={os.path.basename(__file__)}开始执行===")
 
         num_list = []
-        result = ['-f', '-h', '-l', '--skip-hostname-set',
+        result = ['-f', '-l', '--skip-hostname-set',
                   '-?', '--help', '-V', '--version']
 
         logger.info("======普通用户下执行gs_sshexkey --help命令======")
@@ -57,7 +58,7 @@ class ToolsTestCase(unittest.TestCase):
         logger.info(gs_res)
 
         logger.info("======提取结果，检查选项和用法======")
-        for i in gs_res.split('\n')[9:]:
+        for i in gs_res.split('\n')[8:]:
             for j in i.split():
                 if j.strip().startswith('-'):
                     num_list.append(j.strip().strip(','))
@@ -65,4 +66,4 @@ class ToolsTestCase(unittest.TestCase):
 
     def tearDown(self):
         logger.info("======No Need Clean && No Need Recovery======")
-        logger.info("===Opengauss_Function_Tools_gs_sshexkey_Case0002执行结束===")
+        logger.info(f"==={os.path.basename(__file__)}执行结束===")

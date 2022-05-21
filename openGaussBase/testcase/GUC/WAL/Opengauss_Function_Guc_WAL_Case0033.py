@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -18,11 +18,14 @@ Case Name   : 修改参数full_page_writes为其他数据类型及超边界值�
 Description :
     1、查看full_page_writes默认值 期望：on；
     show full_page_writes;
+    2、修改full_page_writes为test,'test'、9999999999等，期望：合理报错
     gs_guc set -D {cluster/dn1} -c "full_page_writes=test";
     gs_guc set -D {cluster/dn1} -c "full_page_writes='test'";
+    gs_guc set -D {cluster/dn1} -c "full_page_writes=9999999999";
     3、恢复默认值 无需恢复
 Expect      :
     1、查看full_page_writes默认值 期望：on；
+    2、修改full_page_writes为test,'test'、9999999999等，期望：合理报错
     3、恢复默认值 无需恢复
 History     :
 """
@@ -55,6 +58,7 @@ class Guctestcase(unittest.TestCase):
         logger.info(sql_cmd)
         self.assertIn(self.Constant.OPEN_STATUS_MSG[0], sql_cmd)
 
+        logger.info("-----------修改full_page_writes为test,'test'、9999999999等，期望：合理报错-------------")
         logger.info("-----------修改full_page_writes为test，期望：修改失败，show参数为默认值-------------")
         sql_cmd = f'''source {self.DB_ENV_PATH};gs_guc reload -D {self.DB_INSTANCE_PATH} -c "full_page_writes=test"'''
         logger.info(sql_cmd)
@@ -75,6 +79,8 @@ class Guctestcase(unittest.TestCase):
         logger.info(sql_cmd)
         self.assertIn(self.Constant.OPEN_STATUS_MSG[0], sql_cmd)
 
+        logger.info("-----------修改full_page_writes为9999999999，期望：修改失败-------------")
+        sql_cmd = f'''source {self.DB_ENV_PATH};gs_guc reload -D {self.DB_INSTANCE_PATH} -c "full_page_writes=9999999999"'''
         logger.info(sql_cmd)
         msg = self.userNode.sh(sql_cmd).result()
         logger.info(msg)

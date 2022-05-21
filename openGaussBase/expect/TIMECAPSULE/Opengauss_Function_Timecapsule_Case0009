@@ -1,0 +1,118 @@
+-- @testpoint: 执行闪回truncate,合理报错
+--step1: 查询enable_recyclebin默认值; expect:显示默认值off
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+
+--step2: 修改enable_recyclebin为on; expect:修改成功
+alter system set enable_recyclebin to on;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| on                |
++-------------------+
+--step3: 清除回收站; expect:回收站清除成功
+purge recyclebin;
+SQL SUCCESS
+--step4: 创建表; expect:表创建成功
+drop table if exists t_timecapsule_0009;
+SQL SUCCESS
+create table t_timecapsule_0009(a int);
+SQL SUCCESS
+--step5: 创建唯一索引; expect:索引创建成功
+create unique index i_timecapsule_0009 on t_timecapsule_0009(a);
+SQL SUCCESS
+--step6: 向表中插入数据; expect:数据插入成功
+insert into t_timecapsule_0009 values(1);
+SQL SUCCESS
+insert into t_timecapsule_0009 values(2);
+SQL SUCCESS
+insert into t_timecapsule_0009 values(3);
+SQL SUCCESS
+--step7: 向表中插入已有数据; expect:数据插入失败
+insert into t_timecapsule_0009 values(1);
+?.*ERROR: duplicate key value violates unique constraint "i_timecapsule_0009.*
+  Detail: Key (a)=(1) already exists.
+--step7: 清空表数据; expect:表数据清空成功
+truncate table t_timecapsule_0009;
+SQL SUCCESS
+--step8: 向表中插入数据; expect:数据插入成功
+insert into t_timecapsule_0009 values(1);
+SQL SUCCESS
+--step9: 在回收站中统计原始对象名称%_timecapsule_0009%和操作类型为truncate; expect:预期结果为2
+select count(*) from gs_recyclebin where rcyoriginname like '%_timecapsule_0009%' and rcyoperation = 't';
++-------+
+| count |
++-------+
+| 2     |
++-------+
+--step10: 闪回语句语法错误闪回到truncate之前; expect:闪回失败
+timecapsule idx i_timecapsule_0009 to before truncate;
+?.*ERROR: syntax error at or near "idx.*
+?.*
+--step11: 闪回语句表名错误闪回到truncate之前; expect:闪回失败
+timecapsule table i_timecapsule_0009 to before truncate;
+?.*ERROR: recycle object "i_timecapsule_0009" desired does not exis.*
+--step12: 闪回到truncate之前; expect:闪回成功
+timecapsule table t_timecapsule_0009 to before truncate;
+SQL SUCCESS
+--step13: 在回收站中统计原始对象名称%_timecapsule_0009%和操作类型为truncate; expect:预期结果为2
+select count(*) from gs_recyclebin where rcyoriginname like '%_timecapsule_0009%' and rcyoperation = 't';
++-------+
+| count |
++-------+
+| 2     |
++-------+
+--step14: 查询闪回后的表数据; expect:显示3条数据
+select * from t_timecapsule_0009 order by a;
++---+
+| a |
++---+
+| 1 |
+| 2 |
+| 3 |
++---+
+--step15: 向闪回后的表中插入已有的数据; expect:插入数据失败
+insert into t_timecapsule_0009 values(1);
+?.*ERROR: duplicate key value violates unique constraint "i_timecapsule_0009.*
+  Detail: Key (a)=(1) already exists.
+--step16: 删除索引; expect:索引删除成功
+drop index i_timecapsule_0009;
+SQL SUCCESS
+--step17: 在回收站中统计原始对象名称%_timecapsule_0009%和操作类型为truncate; expect:预期结果为2
+select count(*) from gs_recyclebin where rcyoriginname like '%_timecapsule_0009%' and rcyoperation = 't';
++-------+
+| count |
++-------+
+| 2     |
++-------+
+--step18: 清理环境; expect:清理成功
+drop table t_timecapsule_0009 purge;
+SQL SUCCESS
+purge recyclebin;
+SQL SUCCESS
+--step19: 恢复默认值; expect:默认值恢复成功
+alter system set enable_recyclebin to off;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+

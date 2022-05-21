@@ -5,5 +5,6 @@ select to_timestamp(0);
 select to_timestamp(1);
 select to_timestamp(10);
 select to_timestamp(1111);
+select to_timestamp(1284352325);
 select to_timestamp(12346789.12);
 select to_timestamp(-9998);

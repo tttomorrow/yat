@@ -14,10 +14,10 @@ insert into tab_12 values(10,'zhang','gongfu','大师');
 SQL SUCCESS
 insert into tab_12 values(0,'zhang','gongfu','大师');
 ?.*ERROR: new row for relation "tab_12" violates check constraint "tab_12_id_check".*
-  Detail: Failing row contains (0, zhang, gongfu, 大师).
+  Detail: N/A
 insert into tab_12 values(-10,'zhang','gongfu','大师');
 ?.*ERROR: new row for relation "tab_12" violates check constraint "tab_12_id_check".*
-  Detail: Failing row contains (-10, zhang, gongfu, 大师).
+  Detail: N/A
 select * from tab_12;
 +----+--------------+----------+------+
 | id | use_filename | filename | text |
@@ -28,7 +28,7 @@ create table long (like  tab_12 INCLUDING CONSTRAINTS);
 SQL SUCCESS
 insert into long values(0,'wanh','ni','大lao师');
 ?.*ERROR: new row for relation "long" violates check constraint "tab_12_id_check".*
-  Detail: Failing row contains (0, wanh, ni, 大lao师).
+  Detail: N/A
 select * from long;
 +----+--------------+----------+------+
 | id | use_filename | filename | text |

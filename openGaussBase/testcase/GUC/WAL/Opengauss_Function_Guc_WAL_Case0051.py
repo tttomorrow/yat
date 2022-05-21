@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -18,11 +18,14 @@ Case Name   : 修改参数checkpoint_wait_timeout为其他数据类型及超边�
 Description :
     1、查看checkpoint_wait_timeout默认值 期望：5min；
     show checkpoint_wait_timeout;
+    2、修改checkpoint_wait_timeout为test,'test'、9999999999等，期望：合理报错
     gs_guc set -D {cluster/dn1} -c "checkpoint_wait_timeout=test";
     gs_guc set -D {cluster/dn1} -c "checkpoint_wait_timeout='test'";
+    gs_guc set -D {cluster/dn1} -c "checkpoint_wait_timeout=9999999999";
     3、恢复默认值 无需恢复
 Expect      :
     1、查看checkpoint_wait_timeout默认值 期望：5min；
+    2、修改checkpoint_wait_timeout为test,'test'、9999999999等，期望：合理报错
     3、恢复默认值 无需恢复
 History     :
 """
@@ -48,6 +51,7 @@ class Guctestcase(unittest.TestCase):
         logger.info(sql_cmd)
         self.assertIn("1min", sql_cmd)
 
+        logger.info("-----------修改checkpoint_wait_timeout为test,'test'、9999999999等，期望：合理报错-------------")
         logger.info("-----------修改checkpoint_wait_timeout为test，期望：修改失败，show参数为默认值-------------")
         result = commonsh.execute_gsguc('set', self.Constant.GSGUC_SUCCESS_MSG, "checkpoint_wait_timeout=test")
         self.assertFalse(result)
@@ -62,6 +66,8 @@ class Guctestcase(unittest.TestCase):
         logger.info(sql_cmd)
         self.assertIn("1min", sql_cmd)
 
+        logger.info("-----------修改checkpoint_wait_timeout为9999999999，期望：修改失败-------------")
+        result = commonsh.execute_gsguc('set', self.Constant.GSGUC_SUCCESS_MSG, 'checkpoint_wait_timeout=9999999999')
         self.assertFalse(result)
         sql_cmd = commonsh.execut_db_sql(f'''show checkpoint_wait_timeout;''')
         logger.info(sql_cmd)

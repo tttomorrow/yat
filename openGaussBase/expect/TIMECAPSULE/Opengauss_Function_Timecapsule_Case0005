@@ -1,0 +1,100 @@
+-- @testpoint: 清空回收站中指定的索引,部分测试点合理报错
+--step1: 查询enable_recyclebin默认值; expect:显示默认值off
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+
+--step2: 修改enable_recyclebin为on; expect:修改成功
+alter system set enable_recyclebin to on;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| on                |
++-------------------+
+--step3: 清除回收站; expect:回收站清除成功
+purge recyclebin;
+SQL SUCCESS
+--step4: 创建表、插入数据; expect:表创建成功、数据插入成功
+drop table if exists t_timecapsule_0005;
+SQL SUCCESS
+create table t_timecapsule_0005(a int);
+SQL SUCCESS
+insert into t_timecapsule_0005 values(1);
+SQL SUCCESS
+insert into t_timecapsule_0005 values(2);
+SQL SUCCESS
+insert into t_timecapsule_0005 values(3);
+SQL SUCCESS
+--step5: 创建唯一索引; expect:索引创建成功
+create unique index  i_timecapsule_0005 on t_timecapsule_0005(a);
+SQL SUCCESS
+--step6: 向表插入已有的值; expect:数据插入失败
+insert into t_timecapsule_0005 values(3);
+?.*ERROR: duplicate key value violates unique constraint "i_timecapsule_0005.*
+  Detail: Key (a)=(3) already exists.
+--step7: 删除表; expect:删除成功
+drop table t_timecapsule_0005;
+SQL SUCCESS
+--step8: 在回收站中统计原始对象名称t_timecapsule_0005%和操作类型为drop; expect:预期结果为2
+select count(*) from gs_recyclebin where rcyoriginname like '%_timecapsule_0005%' and rcyoperation = 'd';
++-------+
+| count |
++-------+
+| 2     |
++-------+
+--step9: 清除回收站中指定索引; expect:索引清除成功
+purge index i_timecapsule_0005;
+SQL SUCCESS
+--step10: 在回收站中统计原始对象名称t_timecapsule_0005和操作类型为drop; expect:预期结果为1
+select count(*) from gs_recyclebin where rcyoriginname like '%_timecapsule_0005%' and rcyoperation = 'd';
++-------+
+| count |
++-------+
+| 1     |
++-------+
+--step11: 执行闪回drop; expect:闪回成功
+timecapsule table t_timecapsule_0005 to before drop;
+SQL SUCCESS
+--step12: 向表插入已有的值; expect:数据插入成功
+insert into t_timecapsule_0005 values(3);
+SQL SUCCESS
+--step13: 查询闪回后的表; expect:成功显示四条数据
+select * from t_timecapsule_0005 order by a;
++---+
+| a |
++---+
+| 1 |
+| 2 |
+| 3 |
+| 3 |
++---+
+--step14: 清理环境; expect:清理成功
+drop table if exists t_timecapsule_0005 purge;
+SQL SUCCESS
+purge recyclebin;
+SQL SUCCESS
+--step15: 恢复默认值; expect:默认值恢复成功
+alter system set enable_recyclebin to off;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+

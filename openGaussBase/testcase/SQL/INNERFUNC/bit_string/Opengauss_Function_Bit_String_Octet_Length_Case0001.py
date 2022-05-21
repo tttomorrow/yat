@@ -1,3 +1,17 @@
+"""
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
+
+openGauss is licensed under Mulan PSL v2.
+You can use this software according to the terms and conditions of the Mulan PSL v2.
+You may obtain a copy of Mulan PSL v2 at:
+
+          http://license.coscl.org.cn/MulanPSL2
+
+THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+See the Mulan PSL v2 for more details.
+"""
 '''
 
 Case Type： 功能测试
@@ -32,15 +46,12 @@ class Bit_string_function(unittest.TestCase):
 
     def test_bit_string_in_octet_length(self):
         logger.info("-----------B可以省略-----------")
-        sql_cmd = '''SELECT octet_length('11110011111001111100'::bit);'''
         Normal_SqlMdg = self.commonsh.execut_db_sql(sql_cmd)
         self.assertTrue(int(Normal_SqlMdg.splitlines()[2]) == 1)
-        sql_cmd = '''SELECT octet_length('11110011111001111100');'''
         Normal_SqlMdg = self.commonsh.execut_db_sql(sql_cmd)
         self.assertTrue(int(Normal_SqlMdg.splitlines()[2]) == 20)
 
         logger.info("-----------全0、全1-----------")
-        sql_cmd = '''SELECT octet_length(B'0000000000000000000000000');'''
         Normal_SqlMdg1 = self.commonsh.execut_db_sql(sql_cmd)
         self.assertTrue(int(Normal_SqlMdg1.splitlines()[2]) == 4)
         sql_cmd = '''SELECT octet_length(B'11111111111111111111111111111');'''
@@ -56,24 +67,18 @@ class Bit_string_function(unittest.TestCase):
         self.assertTrue(int(Normal_SqlMdg21.splitlines()[2]) == 5)
 
         logger.info("-----------varying(n)-----------")
-        sql_cmd = '''SELECT octet_length(B'111111111111111111111111111110000000000000000000'::bit varying(1));'''
         Normal_SqlMdg321 = self.commonsh.execut_db_sql(sql_cmd)
         self.assertTrue(int(Normal_SqlMdg321.splitlines()[2]) == 1)
-        sql_cmd = '''SELECT octet_length(B'11110011111001111100'::bit varying(37));'''
         Normal_SqlMdg321 = self.commonsh.execut_db_sql(sql_cmd)
         self.assertTrue(int(Normal_SqlMdg321.splitlines()[2]) == 3)
-        sql_cmd = '''SELECT octet_length(B'11110011111001111100'::bit varying);'''
         Normal_SqlMdg321 = self.commonsh.execut_db_sql(sql_cmd)
         self.assertTrue(int(Normal_SqlMdg321.splitlines()[2]) == 3)
 
         logger.info("-----------bit(n)-----------")
-        sql_cmd = '''SELECT octet_length(B'111111111111111111111111111110000000000000000000'::bit(1));'''
         Normal_SqlMdg321 = self.commonsh.execut_db_sql(sql_cmd)
         self.assertTrue(int(Normal_SqlMdg321.splitlines()[2]) == 1)
-        sql_cmd = '''SELECT octet_length(B'11110011111001111100'::bit(37));'''
         Normal_SqlMdg321 = self.commonsh.execut_db_sql(sql_cmd)
         self.assertTrue(int(Normal_SqlMdg321.splitlines()[2]) == 5)
-        sql_cmd = '''SELECT octet_length(B'11110011111001111100'::bit);'''
         Normal_SqlMdg321 = self.commonsh.execut_db_sql(sql_cmd)
         self.assertTrue(int(Normal_SqlMdg321.splitlines()[2]) == 1)
 

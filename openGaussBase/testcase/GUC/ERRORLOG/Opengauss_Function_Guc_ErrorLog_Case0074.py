@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -16,8 +16,11 @@ See the Mulan PSL v2 for more details.
 Case Type   : GUC_ErrorLog
 Case Name   : 参数log_min_duration_statement的值设置设为2min，24h
 Description :
+    1.修改参数log_min_duration_statement的值为2147483647：gs_guc reload -N all -I
+    all -c "log_min_duration_statement=2147483647"
     查看值：show log_min_duration_statement;
 Expect      :
+    1.参数设置成功,返回2147483647ms
 History     :
 """
 import unittest
@@ -46,8 +49,10 @@ class Errorlog(unittest.TestCase):
         self.logger.info(msg0)
         self.common.equal_sql_mdg(msg0, 'log_min_duration_statement', '30min',
                                 '(1 row)', flag='1')
+        self.logger.info('--设置参数log_min_duration_statement值为2147483647--')
         excute_cmd1 = f'source {self.DB_ENV_PATH};' \
                       f'gs_guc reload -N all -I all -c ' \
+                      f'"log_min_duration_statement=2147483647"'
         self.logger.info(excute_cmd1)
         msg1 = self.userNode.sh(excute_cmd1).result()
         self.logger.info(msg1)
@@ -56,6 +61,7 @@ class Errorlog(unittest.TestCase):
         msg2 = self.sh_primy.execut_db_sql(sql_cmd2)
         self.logger.info(msg2)
         self.common.equal_sql_mdg(msg2, 'log_min_duration_statement',
+                                '2147483647ms', '(1 row)', flag='1')
 
     def tearDown(self):
         self.logger.info('--------------恢复配置----------')

@@ -40,9 +40,9 @@ select relname from pg_class where relname like 'index_112_%' order by relname;
 +--------------+
 --调用索引
 explain select distinct c_int from test_index_table_112_01 where c_int >5 group by c_int;
-+-------------------------------------------------------------------------------------------------+
-| QUERY PLAN                                                                                      |
-+-------------------------------------------------------------------------------------------------+
+?.*
+?.*QUERY PLAN.*
+?.*
 ?.*HashAggregate.*
 ?.*
 ?.*HashAggregate.*
@@ -51,11 +51,11 @@ explain select distinct c_int from test_index_table_112_01 where c_int >5 group 
 ?.*
 ?.*Bitmap.*
 ?.*
-+-------------------------------------------------------------------------------------------------+
+?.*
 explain analyze select * from test_index_table_112_01 a join  test_index_table_112_02  b on a.c_int=b.c_int where a.c_int > 500 group by a.c_int,b.c_int;
-+------------------------------------------------------------------------------------------------------------------------------------------------------+
-| QUERY PLAN                                                                                                                                           |
-+------------------------------------------------------------------------------------------------------------------------------------------------------+
+?.*
+?.*QUERY PLAN.*
+?.*
 ?.*HashAggregate.*
 ?.*
 ?.*Hash.*
@@ -67,10 +67,11 @@ explain analyze select * from test_index_table_112_01 a join  test_index_table_1
 ?.*
 ?.*Bitmap.*
 ?.*
-?.*Bitmap.*
+?.*
+?.*Bitmap Index Scan on index_112_01.*
 ?.*
 ?.*Total runtime.*
-+------------------------------------------------------------------------------------------------------------------------------------------------------+
+?.*
 --清理环境
 DROP TABLE if EXISTS test_index_table_112_01 CASCADE;
 SQL SUCCESS

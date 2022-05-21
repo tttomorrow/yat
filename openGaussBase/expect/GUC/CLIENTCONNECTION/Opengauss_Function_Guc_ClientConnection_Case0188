@@ -7,6 +7,7 @@ show max_locks_per_transaction;
 | 256                       |
 +---------------------------+
 --设置，报错
+set max_locks_per_transaction to 2147483647;
 ?.*ERROR: parameter "max_locks_per_transaction" cannot be changed without restarting the server
 set max_locks_per_transaction to 10;
 ?.*ERROR: parameter "max_locks_per_transaction" cannot be changed without restarting the server

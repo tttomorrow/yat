@@ -19,6 +19,7 @@ where castsource= (select oid from pg_type where typname='float8'));
 | int2      | int2            | i           | f          |
 | int4      | int4            | i           | f          |
 | float4    | float4          | i           | f          |
+| int16     | int16           | i           | f          |
 | numeric   | numeric         | i           | f          |
 | interval  | float8_interval | i           | f          |
 | text      | float8_text     | i           | f          |

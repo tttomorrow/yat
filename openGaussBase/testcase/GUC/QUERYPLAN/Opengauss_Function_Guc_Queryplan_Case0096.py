@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -17,10 +17,12 @@ Case Type   : GUC
 Case Name   : 使用gs_guc set方法设置参数codegen_cost_threshold为无效值,合理报错
 Description :
         1.查询codegen_cost_threshold默认值
+        2.依次修改参数值为test,-1,空串,500.985,2147483648
         2.1修改参数值为字符test
         2.2修改参数值为超临界值-1
         2.3修改参数值为空串
         2.4.修改参数值为小数500.985
+        2.5修改参数值为超临界值2147483648
         3.恢复参数默认值
 Expect      :
         1.显示默认值为10000
@@ -50,6 +52,8 @@ class QueryPlan(unittest.TestCase):
         sql_cmd = commonsh.execut_db_sql('''show codegen_cost_threshold;''')
         LOG.info(sql_cmd)
         self.res = sql_cmd.splitlines()[-2].strip()
+        LOG.info('--步骤2:依次修改参数值为test,-1,"''",500.985,2147483648--')
+        invalid_value = ['test', -1, "''", 500.985, 2147483648]
         for i in invalid_value:
             result = commonsh.execute_gsguc("set",
                                             self.constant.GSGUC_SUCCESS_MSG,

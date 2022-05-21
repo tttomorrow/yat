@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -103,6 +103,7 @@ class MotParamTest(unittest.TestCase):
         self.assertIn('WARNING', cmd_msg)
         self.assertIn(
             'Configuration of'
+            ' session_large_buffer_store_max_object_size=17592186044415'
             ' is out of bounds [0, 1024]', cmd_msg)
 
         LOG.info("======步骤4：连接数据库，创建内存表，执行DML操作======")

@@ -22,6 +22,7 @@ SQL SUCCESS
 --修改为存在的属主：新属主无create权限：报错
 alter synonym SYN_PROC_SYN_001 owner to syn004_test004;
 ?.*ERROR: permission denied for schema public
+  Detail: N/A
 --修改为不存在的属主：报错
 drop user if exists test05_syn05;
 SQL SUCCESS

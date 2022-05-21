@@ -52,7 +52,7 @@ SQL SUCCESS
 create unique index index_050_01 on test_index_table_050_02(id) local;
 ?.*ERROR: access method "psort" does not support unique indexes
 create unique index index_050_02 on test_index_table_050_02 USING gin(to_tsvector('english', id)) local;
-?.*ERROR: unique index columns must contain the partition key and collation must be default collation
+?.*ERROR: unique local index columns must contain all the partition keys and collation must be default collation
 create unique index index_050_03 on test_index_table_050_02 USING btree(id) local;
 SQL SUCCESS
 --清理数据

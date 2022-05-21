@@ -1,4 +1,4 @@
--- @testpoint: hash分区表，不支持的功能 row movement，合理报错
+-- @testpoint: hash分区表，支持的功能 row movement
 --创建hash分区表,指定参数row movement
 drop table if exists partition_hash_tab;
 SQL SUCCESS
@@ -7,5 +7,4 @@ partition by hash(p_id)
 (partition p1,
  partition p2,
  partition p3) enable row movement;
-?.*ERROR: syntax error at or near "enable"
-?.*
+SQL SUCCESS

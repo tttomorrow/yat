@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -17,6 +17,7 @@ Case Type   : GUC
 Case Name   : 修改参数temp_file_limit为其他数据类型，观察预期结果；
 Description :
          1、查询temp_file_limit默认值；
+         2、修改temp_file_limit为false，"test",999999999、空值等，并校验其预期结果；
 Expect      :
         1、显示默认值；
         2、参数修改失败；
@@ -67,6 +68,8 @@ class Deletaduit(unittest.TestCase):
         sql_cmd = self.commonsh.execut_db_sql(f'''show temp_file_limit;''')
         self.log.info(sql_cmd)
         self.assertIn(self.res, sql_cmd)
+        # 使用设置gs_guc set设置temp_file_limit为9999999999
+        msg = self.commonsh.execute_gsguc('set', self.Constant.GSGUC_SUCCESS_MSG, 'temp_file_limit=9999999999')
         self.log.info(msg)
         self.assertFalse(msg)
         msg = self.commonsh.restart_db_cluster()

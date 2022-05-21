@@ -11,6 +11,7 @@ select median(id) from (values(1), (156.2), (3), (4)) as test(id);
 +--------+
 | 3.5    |
 +--------+
+select median(id) from (values(1156562655), (1564896295), (3262645265), (44848626595)) as test(id);
 +--------------+
 | median       |
 +--------------+

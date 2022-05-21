@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -18,18 +18,20 @@ Case Name   : 执行failover后不执行gs_om -t refreshconf，重启后查看�
 Description :
     1.关闭主数据库(主机执行)
     2.在备机上执行failover（备机执行）
-    3.重启集群
-    4.检查主备是否切换成功
+    3.检查主备是否切换成功
+    4.重启数据库集群
+    5.检查数据库主备节点状态
 Expect      :
     1.关闭主数据库成功
     2.在备机上执行failover成功
-    3.重启集群成功
-    4.检查主备状态，主备切换成功
+    3.集群主备节点切换成功
+    4.重启数据库成功
+    5.数据库主备节点切换为原有主备状态
 History     :
 """
 
 import unittest
-
+import re
 from testcase.utils.CommonSH import CommonSH
 from testcase.utils.Constant import Constant
 from testcase.utils.Logger import Logger
@@ -37,80 +39,68 @@ from yat.test import Node
 from yat.test import macro
 
 LOG = Logger()
+primary_sh = CommonSH('PrimaryDbUser')
 
 
+@unittest.skipIf('Standby' not in primary_sh.get_db_cluster_status('detail'),
+                 'Single node, and subsequent codes are not executed.')
 class SystemInternalTools(unittest.TestCase):
     def setUp(self):
         LOG.info('----this is setup------')
         LOG.info('---Opengauss_Function_Tools_gs_ctl_Case0065开始执行-----')
         self.constant = Constant()
         self.PrimaryNode = Node('PrimaryDbUser')
-        self.sh_primary = CommonSH('PrimaryDbUser')
+        self.StandbyNode = Node('Standby1DbUser')
+        self.node_num = primary_sh.get_node_num()
 
     def test_system_internal_tools(self):
-        LOG.info('-------------若为单机环境，后续不执行，直接通过----------')
-        query_cmd = f'''source {macro.DB_ENV_PATH};
-            gs_om -t status --detail;
-            '''
-        LOG.info(query_cmd)
-        query_msg = self.PrimaryNode.sh(query_cmd).result()
-        LOG.info(query_msg)
-        if 'Standby' not in query_msg:
-            return '单机环境，后续不执行，直接通过'
-        else:
-            self.StandbyNode = Node('Standby1DbUser')
-
-        LOG.info('-----------------关闭主数据库---------------------')
+        text = '---step1:主节点关闭数据库   expect:停库成功---'
+        LOG.info(text)
         stop_cmd = f'''source {macro.DB_ENV_PATH};
-            gs_ctl stop -D {macro.DB_INSTANCE_PATH} ;
-            '''
+            gs_ctl stop -D {macro.DB_INSTANCE_PATH};'''
         LOG.info(stop_cmd)
         stop_msg = self.PrimaryNode.sh(stop_cmd).result()
         LOG.info(stop_msg)
-        self.assertIn(self.constant.GS_CTL_STOP_SUCCESS_MSG, stop_msg)
+        self.assertIn(self.constant.GS_CTL_STOP_SUCCESS_MSG, stop_msg,
+                      '执行失败' + text)
 
-        LOG.info('-----------------进行备升主---------------------')
+        text = '---step2:在备1节点上进行failover   expect:成功---'
+        LOG.info(text)
         excute_cmd = f'''source {macro.DB_ENV_PATH};
-            gs_ctl failover -D {macro.DB_INSTANCE_PATH} -m fast;
-            '''
+            gs_ctl failover -D {macro.DB_INSTANCE_PATH} -m fast;'''
         LOG.info(excute_cmd)
         excute_msg = self.StandbyNode.sh(excute_cmd).result()
         LOG.info(excute_msg)
-        self.assertIn(self.constant.FAILOVER_SUCCESS_MSG, excute_msg)
+        self.assertIn(self.constant.FAILOVER_SUCCESS_MSG, excute_msg,
+                      '执行失败' + text)
 
-        LOG.info('---------------------重启数据库--------------------')
-        self.sh_primary.restart_db_cluster()
-        status = self.sh_primary.get_db_cluster_status()
-        self.assertTrue("Normal" in status or 'Degraded' in status)
+        text = '---step3:检查主备切换后状态   expect:主机切换为备机---'
+        LOG.info(text)
+        status1 = primary_sh.get_db_cluster_status(param='detail')
+        LOG.info(status1)
+        self.assertIn('S Primary', status1, '执行失败' + text)
 
-        LOG.info('-----------------查看主备状态---------------------')
-        query_cmd = f'''source {macro.DB_ENV_PATH};
-            gs_om -t status --detail;
-            '''
-        LOG.info(query_cmd)
-        query_msg = self.StandbyNode.sh(query_cmd).result()
-        LOG.info(query_msg)
-        self.node_msg = query_msg.splitlines()[10].strip()
-        self.assertIn('Primary', self.node_msg)
+        text = '---step4:重启数据库集群   expect:成功---'
+        LOG.info(text)
+        primary_sh.restart_db_cluster()
+        status2 = primary_sh.get_db_cluster_status()
+        self.assertTrue("Normal" in status2 or 'Degraded' in status2)
+
+        text = '---step5:再次查看数据库主备状态   expect:原主机状态恢复---'
+        LOG.info(text)
+        status3 = primary_sh.get_db_cluster_status(param='detail')
+        LOG.info(status3)
+        self.assertIn('P Primary', status3, '执行失败' + text)
 
     def tearDown(self):
         LOG.info('--------------this is tearDown-------------------')
-        LOG.info('-------若为单机环境，后续不执行，直接通过-------')
-        query_cmd = f'''source {macro.DB_ENV_PATH};
-            gs_om -t status --detail;
-            '''
-        LOG.info(query_cmd)
-        query_msg = self.PrimaryNode.sh(query_cmd).result()
-        LOG.info(query_msg)
-        if 'Standby' not in query_msg:
-            return '单机环境，后续不执行，直接通过'
-        else:
-            self.StandbyNode = Node('Standby1DbUser')
-        LOG.info('--------------恢复集群-备机重建--------------')
-        rebuild_cmd = f'''source {macro.DB_ENV_PATH};
-            gs_ctl build -D {macro.DB_INSTANCE_PATH};
-            '''
-        LOG.info(rebuild_cmd)
-        rebuild_msg = self.StandbyNode.sh(rebuild_cmd).result()
-        LOG.info(rebuild_msg)
+        LOG.info('----重建备机----')
+        build_msg_list = primary_sh.get_standby_and_build()
+        LOG.info(build_msg_list)
+        LOG.info('---检查数据库状态---')
+        status = primary_sh.get_db_cluster_status(param='all')
+        LOG.info(status)
+        regex_res = re.findall('instance_state.*:.*Normal', status)
+        LOG.info(regex_res)
+        self.assertEqual(len(regex_res), self.node_num)
         LOG.info('---Opengauss_Function_Tools_gs_ctl_Case0065执行完成----')

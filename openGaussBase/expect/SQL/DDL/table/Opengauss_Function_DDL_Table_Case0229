@@ -37,5 +37,6 @@ CREATE TABLE warehouse_t1
     W_GMT_OFFSET             decimal(5,2)
 );
 ?.*ERROR: relation "warehouse_t1" already exists.*
+?.*
 drop table if exists warehouse_t1;
 SQL SUCCESS

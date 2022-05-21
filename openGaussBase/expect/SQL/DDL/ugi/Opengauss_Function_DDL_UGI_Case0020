@@ -76,8 +76,7 @@ explain analyse select * from test_ugi_020 where c_id = 2;
 +-------------------------------------------------------------------------------------------------------------------------+
 --清空分区p2，破坏全局索引
 alter table test_ugi_020 truncate partition p2;
-?.*ERROR: Truncate Partition
-  Detail: Truncate Partition is not supported in List/Hash Partition currently
+SQL SUCCESS
 --清理表
 drop table test_ugi_020;
 SQL SUCCESS

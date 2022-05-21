@@ -5,6 +5,7 @@ create table int10 (name int);
 SQL SUCCESS
 insert into int10 values (1223340);
 SQL SUCCESS
+insert into int10 values (999999999);
 SQL SUCCESS
 insert into int10 values (1);
 SQL SUCCESS
@@ -17,6 +18,7 @@ select * from int10;
 | name      |
 +-----------+
 | 1223340   |
+| 999999999 |
 | 1         |
 | 2         |
 | 3         |

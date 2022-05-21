@@ -1,0 +1,194 @@
+-- @testpoint: range_hash二级分区表：同义词/主键外键/pg_constraint,部分测试点合理报错
+--step1: 创建表空间; expect:成功
+drop table if exists t_subpartition_0346;
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0346;
+SQL SUCCESS
+create tablespace ts_subpartition_0346 relative location 'subpartition_tablespace/subpartition_tablespace_0346';
+SQL SUCCESS
+--test1: 同义词
+--step2: 创建二级分区表; expect:成功
+create table t_subpartition_0346
+(
+    col_1 int,
+    col_2 int ,
+    col_3 varchar2 ( 30 ) ,
+    col_4 int
+)
+tablespace ts_subpartition_0346
+partition by range (col_1) subpartition by hash (col_2)
+(
+  partition p_range_1 values less than( -10 )
+  (
+    subpartition p_hash_1_1 ,
+    subpartition p_hash_1_2 ,
+     subpartition p_hash_1_3
+  ),
+  partition p_range_2 values less than( 20 ),
+  partition p_range_3 values less than( 30)
+  (
+    subpartition p_hash_3_1 ,
+    subpartition p_hash_3_2 ,
+    subpartition p_hash_3_3
+  ),
+    partition p_range_4 values less than( 50)
+  (
+    subpartition p_hash_4_1 ,
+    subpartition p_hash_4_2 ,
+    subpartition t_subpartition_0346
+  ),
+  partition p_range_5 values less than( maxvalue )
+) enable row movement;
+SQL SUCCESS
+--step3: 创建表同义词; expect:成功
+drop synonym if exists partition_t;
+SQL SUCCESS
+create or replace synonym partition_t for t_subpartition_0346;
+SQL SUCCESS
+--step4: 查询表同义词数据; expect:成功
+select * from partition_t;
++-------+-------+-------+-------+
+| col_1 | col_2 | col_3 | col_4 |
++-------+-------+-------+-------+
++-------+-------+-------+-------+
+--test2: 使用同义词对数据操作
+--step5: 插入数据; expect:成功
+insert into partition_t values(0,0,0,0);
+SQL SUCCESS
+insert into partition_t values(1,1,1,1),(4,1,4,4),(5,5,5,5),(8,8,8,8),(9,9,9,9);
+SQL SUCCESS
+insert into partition_t values(1,11,1,1),(4,41,4,4),(5,54,5,5),(8,87,8,8),(9,19,9,9);
+SQL SUCCESS
+insert into partition_t values(11,1,1,1),(14,1,4,4),(15,5,5,5),(18,8,8,8),(19,1,9,9);
+SQL SUCCESS
+insert into  partition_t values (generate_series(-19, 19),generate_series(-10, 100),generate_series(0, 99));
+SQL SUCCESS
+update partition_t set col_2=8 where col_2=4;
+SQL SUCCESS
+delete partition_t where col_2=8;
+SQL SUCCESS
+select count(*) from partition_t;
++--------+
+| count  |
++--------+
+| 141714 |
++--------+
+--step6: 创建视图; expect:成功
+drop view if exists t_subpartition_0346_view;
+SQL SUCCESS
+create view t_subpartition_0346_view as select * from t_subpartition_0346;
+SQL SUCCESS
+--step7: 对视图创建同义词; expect:成功
+drop synonym if exists partition_tv;
+SQL SUCCESS
+create synonym partition_tv for t_subpartition_0346_view;
+SQL SUCCESS
+--step8: 查看视图同义词数据; expect:成功
+select count(*) from partition_tv;
++--------+
+| count  |
++--------+
+| 141714 |
++--------+
+--step9: 删除视图同义词指定数据; expect:合理报错
+delete partition_tv where col_2=8;
+?.*ERROR: cannot delete from view "t_subpartition_0346_view.*
+  Hint: You need an unconditional ON DELETE DO INSTEAD rule or an INSTEAD OF DELETE trigger.
+--step10: 删除同义词; expect:成功
+drop synonym partition_tv;
+SQL SUCCESS
+drop synonym partition_t;
+SQL SUCCESS
+--test3: 主键外键
+--step11: 创建普通表,指定主键; expect:成功
+drop table if exists t_subpartition_0346_01 cascade;
+SQL SUCCESS
+create table t_subpartition_0346_01
+(
+    col_1 int primary key,
+    col_2 int ,
+    col_3 varchar2 ( 30 ) ,
+    col_4 int
+);
+SQL SUCCESS
+--step12: 创建二级分区表,指定外键; expect:成功
+drop table if exists t_subpartition_0346 cascade;
+SQL SUCCESS
+create table t_subpartition_0346
+(
+    col_1 int ,
+    col_2 int ,
+    col_3 varchar2 ( 30 ) ,
+    col_4 int ,
+    foreign key(col_1) references t_subpartition_0346_01(col_1)
+)
+tablespace ts_subpartition_0346
+partition by range (col_1) subpartition by hash (col_2)
+(
+  partition p_range_1 values less than( -10 )
+  (
+    subpartition p_hash_1_1 ,
+    subpartition p_hash_1_2 ,
+     subpartition p_hash_1_3
+  ),
+  partition p_range_2 values less than( 20 ),
+  partition p_range_3 values less than( 30)
+  (
+    subpartition p_hash_3_1 ,
+    subpartition p_hash_3_2 ,
+    subpartition p_hash_3_3
+  ),
+    partition p_range_4 values less than( 50)
+  (
+    subpartition p_hash_4_1 ,
+    subpartition p_hash_4_2 ,
+    subpartition t_subpartition_0346
+  ),
+  partition p_range_5 values less than( maxvalue )
+) enable row movement;
+SQL SUCCESS
+--step13: 向二级分区表插入普通表没有的数据; expect:合理报错
+insert into t_subpartition_0346 values(0,0,0,0);
+?.*ERROR: insert or update on table "t_subpartition_0346" violates foreign key constraint "t_subpartition_0346_col_1_fkey.*
+  Detail: Key (col_1)=(0) is not present in table "t_subpartition_0346_01".
+--step14: 插入数据; expect:成功
+insert into t_subpartition_0346_01 values(0,0,0,0);
+SQL SUCCESS
+insert into t_subpartition_0346 values(0,0,0,0);
+SQL SUCCESS
+--step15: 更新数据; expect:成功
+update t_subpartition_0346 set col_2=8 where col_2=0;
+SQL SUCCESS
+--step16: 更新二级分区表数据为普通表没有的数据; expect:合理报错
+update t_subpartition_0346 set col_1=8 where col_2=8;
+?.*ERROR: insert or update on table "t_subpartition_0346" violates foreign key constraint "t_subpartition_0346_col_1_fkey.*
+  Detail: Key (col_1)=(8) is not present in table "t_subpartition_0346_01".
+--step17: 删除数据; expect:成功
+delete t_subpartition_0346 where col_2=8;
+SQL SUCCESS
+--step18: 更新普通表数据; expect:成功
+update t_subpartition_0346_01 set col_1=8 where col_2=0;
+SQL SUCCESS
+--test4: pg_constraint
+--step19: 清空普通表数据; expect:合理报错
+truncate t_subpartition_0346_01;
+?.*ERROR: cannot truncate a table referenced in a foreign key constrain.*
+  Detail: Table "t_subpartition_0346" references "t_subpartition_0346_01".
+  Hint: Truncate table "t_subpartition_0346" at the same time, or use TRUNCATE ... CASCADE.
+--step20: 指定cascade清空普通表数据; expect:成功
+truncate t_subpartition_0346_01 cascade;
+SQL SUCCESS
+--step21: 查询pg_constraint数据; expect:成功
+select conname,contype,condeferrable,condeferred,convalidated from pg_constraint where conname='t_subpartition_0346_col_1_fkey';
++--------------------------------+---------+---------------+-------------+--------------+
+| conname                        | contype | condeferrable | condeferred | convalidated |
++--------------------------------+---------+---------------+-------------+--------------+
+| t_subpartition_0346_col_1_fkey | f       | false         | false       | true         |
++--------------------------------+---------+---------------+-------------+--------------+
+--step22: 清理环境; expect:成功
+drop table if exists t_subpartition_0346_01  cascade;
+SQL SUCCESS
+drop table if exists t_subpartition_0346  cascade;
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0346;
+SQL SUCCESS

@@ -30,6 +30,7 @@ select * from unlisten_test;
 | 6  | 46656       |
 | 7  | 823543      |
 | 8  | 16777216    |
+| 9  | 387420489   |
 +----+-------------+
 --清理环境
 drop table if exists unlisten_test cascade;

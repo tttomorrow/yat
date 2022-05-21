@@ -1,5 +1,4 @@
 -- @testpoint: drop temporary语句，删除全局临时表，合理报错
--- @modify at: 2020-11-24
 --建表
 drop  table if exists temp_table_025;
 create global temporary table temp_table_025(

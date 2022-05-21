@@ -7,6 +7,7 @@ insert into binary_double02 values (-12121);
 SQL SUCCESS
 insert into binary_double02 values (-000123);
 SQL SUCCESS
+insert into binary_double02 values (-999888777);
 SQL SUCCESS
 select * from binary_double02;
 +---------------+

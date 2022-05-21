@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -43,10 +43,9 @@ class Privategrant(unittest.TestCase):
         logger.info(
             '----Opengauss_Function_Security_Permission_Case0012 start----')
         self.userNode = Node('PrimaryDbUser')
-        self.DB_ENV_PATH = macro.DB_ENV_PATH
         self.DB_INSTANCE_PATH = macro.DB_INSTANCE_PATH
         self.sh_primy = CommonSH('PrimaryDbUser')
-        self.Constant = Constant()
+        self.constant = Constant()
 
     def test_default_permission(self):
         logger.info('-------create user || table-------')
@@ -55,8 +54,9 @@ class Privategrant(unittest.TestCase):
                    f'grant alter on security_table to wf;'
         msg1 = self.sh_primy.execut_db_sql(sql_cmd1)
         logger.info(msg1)
-        self.assertTrue(
-            "CREATE ROLE" in msg1 and "CREATE TABLE" in msg1 and "GRANT" in msg1)
+        self.assertIn(self.constant.CREATE_ROLE_SUCCESS_MSG, msg1)
+        self.assertIn(self.constant.CREATE_TABLE_SUCCESS, msg1)
+        self.assertIn(self.constant.GRANT_SUCCESS_MSG, msg1)
 
     def tearDown(self):
         sql_cmd1 = 'drop table security_table;' \

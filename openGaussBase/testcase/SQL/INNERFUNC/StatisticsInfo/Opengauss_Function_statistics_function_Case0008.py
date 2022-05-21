@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -27,29 +27,29 @@ Expect      :
     4.执行sql操作后，再执行函数，备节点执行
 History     :
 """
-
+import os
 import unittest
-from yat.test import Node
+
 from testcase.utils.CommonSH import CommonSH
 from testcase.utils.Logger import Logger
+from yat.test import Node
 
 Primary_SH = CommonSH('PrimaryDbUser')
 
 
-@unittest.skipIf(
-    '6002' not in Primary_SH.get_db_cluster_status('detail'),
-    '单机环境不执行')
-class Tools(unittest.TestCase):
+@unittest.skipIf(1 == Primary_SH.get_node_num(), '单机环境不执行')
+class StatisticsInfo08(unittest.TestCase):
     def setUp(self):
         self.log = Logger()
-        self.log.info('Opengauss_Function_statistics_function_Case0008开始')
+        self.log.info(f'-----{os.path.basename(__file__)} start-----')
         self.dbuser = Node('dbuser')
         self.commonsh = CommonSH()
         self.commonsh1 = CommonSH('Standby1DbUser')
 
     def test_server_tools1(self):
-        self.log.info('-----步骤1.查看openGauss中不同负载SELECT，'
-                      'UPDATE，INSERT，DELETE，DDL， DML，DCL计数信息，主节点执行-----')
+        text1 = f'-----step1: 查看opengauss中不同负载select，update，insert，delete，' \
+            f'ddl， dml，dcl计数信息，主节点执行;expect: 查看成功-----'
+        self.log.info(text1)
         sql_cmd = self.commonsh.execut_db_sql(
             f'select DBE_PERF.get_summary_workload_sql_count();')
         self.log.info(sql_cmd)
@@ -69,7 +69,9 @@ class Tools(unittest.TestCase):
         list3 = int(sql_cmd.split('\n')[-2].split(',')[-2])
         self.log.info(list3)
 
-        self.log.info('-----步骤2.执行sql操作后，再执行函数，主节点执行-----')
+        text2 = f'-----step2: 执行sql操作后，再执行函数，主节点执行' \
+            f';expect: 执行成功-----'
+        self.log.info(text2)
         sql_cmd = self.commonsh.execut_db_sql(
             f'create table test_abc(id int);'
             f'insert into test_abc values(1);'
@@ -88,10 +90,11 @@ class Tools(unittest.TestCase):
             raise Exception('函数执行异常，请检查')
         list4 = int(sql_cmd.split('\n')[-2].split(',')[-2])
         self.log.info(list4)
-        self.assertTrue(list4 == list3 + 6)
+        self.assertGreater(list4, list3, '执行失败:' + text2)
 
-        self.log.info('-----步骤3.查看openGauss中不同负载SELECT，'
-                      'UPDATE，INSERT，DELETE，DDL， DML，DCL计数信息，备节点执行-----')
+        text3 = f'-----step3: 查看opengauss中不同负载select，update，insert，delete，' \
+            f'ddl， dml，dcl计数信息，备节点执行;expect: 查看成功-----'
+        self.log.info(text3)
         sql_cmd = self.commonsh.execut_db_sql(
             f'select DBE_PERF.get_summary_workload_sql_count();')
         self.log.info(sql_cmd)
@@ -106,7 +109,9 @@ class Tools(unittest.TestCase):
         list3 = int(sql_cmd.split('\n')[-2].split(',')[-2])
         self.log.info(list3)
 
-        self.log.info('-----步骤4.执行sql操作后，再执行函数，备节点执行-----')
+        text4 = f'-----step2: 执行sql操作后，再执行函数，主节点执行' \
+            f';expect: 执行成功-----'
+        self.log.info(text4)
         sql_cmd = self.commonsh.execut_db_sql(
             f'create table test_abc(id int);'
             f'insert into test_abc values(1);'
@@ -125,7 +130,8 @@ class Tools(unittest.TestCase):
             raise Exception('函数执行异常，请检查')
         list4 = int(sql_cmd.split('\n')[-2].split(',')[-2])
         self.log.info(list4)
-        self.assertTrue(list4 == list3 + 6)
+        self.assertGreater(list4, list3, '执行失败:' + text4)
 
     def tearDown(self):
-        self.log.info('Opengauss_Function_statistics_function_Case0008结束')
+        self.log.info(f'-----无需清理环境-----')
+        self.log.info(f'-----{os.path.basename(__file__)} end-----')

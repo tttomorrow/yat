@@ -4,5 +4,6 @@ drop table if exists decimal_18;
 create table decimal_18 (name decimal(6,2));
 insert into decimal_18 values (0.123);
 insert into decimal_18 values (123.12656);
+insert into decimal_18 values (999.999999999);
 select * from decimal_18;
 drop table decimal_18;

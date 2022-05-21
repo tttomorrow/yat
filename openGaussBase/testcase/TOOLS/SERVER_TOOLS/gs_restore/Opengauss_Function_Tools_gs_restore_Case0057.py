@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -67,7 +67,8 @@ class Tools(unittest.TestCase):
         self.assertIn(self.constant.TABLE_CREATE_SUCCESS, sql_cmd)
 
         self.log.info("----------------导出tar格式文件-----------------")
-        mkdir_cmd = f"mkdir /home/{self.primary_dbuser.dbuser}/test_restore/ ;"
+        mkdir_cmd = f"mkdir /home/test_restore/ ;" \
+            f"chmod -R 777 /home/test_restore/"
         self.log.info(mkdir_cmd)
         mkdir_msg = self.root_user.sh(mkdir_cmd).result()
         self.log.info(mkdir_msg)

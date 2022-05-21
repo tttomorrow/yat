@@ -28,6 +28,7 @@ SQL SUCCESS
 --修改为存在的属主：新属主无create权限：报错
 alter synonym tmp_syn_01 owner to syn007;
 ?.*ERROR: permission denied for schema public
+  Detail: N/A
 --修改为不存在的属主：报错
 drop user if exists test_syn05 cascade;
 SQL SUCCESS

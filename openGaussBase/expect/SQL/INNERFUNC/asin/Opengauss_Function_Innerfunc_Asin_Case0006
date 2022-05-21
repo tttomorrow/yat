@@ -3,6 +3,7 @@ drop table if exists asin_test_03;
 SQL SUCCESS
 create table asin_test_03( col_1 bigint,col_2 float,col_3 int);
 SQL SUCCESS
+insert into asin_test_03 values(258,0.11022304998774664,10);
 SQL SUCCESS
 SELECT col_1,col_2,col_3 FROM asin_test_03 WHERE col_1 in (asin(0.2323231),asin(0.11),asin(0.102)) order by col_1,col_2,col_3;
 +-------+-------+-------+
@@ -13,6 +14,7 @@ SELECT col_1,col_2,col_3 FROM asin_test_03 WHERE COL_1 not in (asin(0.100000),as
 +-------+---------------------+-------+
 | col_1 | col_2               | col_3 |
 +-------+---------------------+-------+
+| 258   | 0.11022304998774664 | 10    |
 +-------+---------------------+-------+
 drop table if exists asin_test_03;
 SQL SUCCESS

@@ -7,6 +7,7 @@ show gin_fuzzy_search_limit;
 | 0                      |
 +------------------------+
 --设置，报错
+ALTER SYSTEM SET gin_fuzzy_search_limit to 2147483647;
 ?.*ERROR: unsupport parameter: gin_fuzzy_search_limit
 ALTER SYSTEM SET only support POSTMASTER-level, SIGHUP-level and BACKEND-level guc variable,
 and it must be allowed to set in postgresql.conf.

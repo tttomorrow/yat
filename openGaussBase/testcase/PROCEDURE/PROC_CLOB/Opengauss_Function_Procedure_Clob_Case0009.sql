@@ -12,6 +12,7 @@ end;
 --调用存储过程
 call proc_clob_009(to_char(88877));
 
+call proc_clob_009(to_char(1234567890,'099999999999999'));
 
 --删除存储过程
 drop procedure proc_clob_009;

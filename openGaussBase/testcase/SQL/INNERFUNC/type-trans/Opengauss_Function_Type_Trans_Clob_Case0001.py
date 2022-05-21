@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -17,6 +17,7 @@ Case Type   : 功能测试
 Case Name   : to_clob函数转换二进制类型raw最大值
 Description :
     步骤 1. 在sql_ascii数据库中执行语句
+    select length(to_clob(lpad('a',1073733621,'b')::raw));
 Expect      :
     步骤 1. 函数返回结果正确
 History     :
@@ -51,17 +52,21 @@ class Toclob(unittest.TestCase):
         msg2 = self.sh_primy.execut_db_sql(cmd2)
         LOG.info(msg2)
 
+        cmd3 = "select length(to_clob(lpad('a',1073733621,'b')::raw));"
         cmd4 = f'''source {macro.DB_ENV_PATH};
             gsql -d logdb1 -p {self.user.db_port} -c "{cmd3}" '''
         LOG.info(cmd4)
         msg4 = self.user.sh(cmd4).result()
         LOG.info(msg4)
+        self.assertTrue(msg4.find('1073733622') > -1)
 
+        cmd3 = "select char_length(to_clob(lpad('a',1073733621,'b')::text));"
         cmd4 = f'''source {macro.DB_ENV_PATH};
             gsql -d logdb1 -p {self.user.db_port} -c "{cmd3}" '''
         LOG.info(cmd4)
         msg4 = self.user.sh(cmd4).result()
         LOG.info(msg4)
+        self.assertTrue(msg4.find('1073733621') > -1)
 
         cmd5 = 'drop database if exists logdb1;'
         msg5 = self.sh_primy.execut_db_sql(cmd5)

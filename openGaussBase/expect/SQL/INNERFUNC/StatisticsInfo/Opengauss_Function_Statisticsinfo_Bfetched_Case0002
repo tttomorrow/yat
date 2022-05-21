@@ -19,6 +19,7 @@ select pg_stat_get_blocks_fetched('&^%^&*') from PG_CLASS a where a.relname = 's
 ?.*ERROR: invalid input syntax for type oid: \"\&\^\%\^\&\*\"
 ?.*
   Where: referenced column: pg_stat_get_blocks_fetched
+select pg_stat_get_blocks_fetched(99999999999998789) from PG_CLASS a where a.relname = 'sales';
 ?.*ERROR: OID out of range
   Where: referenced column: pg_stat_get_blocks_fetched
 select pg_stat_get_blocks_fetched(a.oid) from PG_CLASS a where a.relname = 'sales';

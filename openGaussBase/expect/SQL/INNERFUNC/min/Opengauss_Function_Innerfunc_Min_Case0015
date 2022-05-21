@@ -1,0 +1,99 @@
+-- @testpoint: 函数中调用min
+--step1:创建表; expect:成功
+drop table if exists t_min_case0015_inet;
+SQL SUCCESS
+drop table if exists t_min_case0015_cidr;
+SQL SUCCESS
+create table t_min_case0015_inet(i inet);
+SQL SUCCESS
+create table t_min_case0015_cidr(c cidr);
+SQL SUCCESS
+insert into t_min_case0015_inet values('122.5.5.3/26'),('122.5.5.9/26');
+SQL SUCCESS
+insert into t_min_case0015_cidr values('122.5.5.3/32'),('122.5.5.9/32');
+SQL SUCCESS
+--step2:创建函数 expect:成功
+create or replace function f_min_case0015_inet(out min_inet inet)
+returns inet
+as $$
+begin
+    select min(i) into min_inet from t_min_case0015_inet;
+    return min_inet;
+end;
+$$language plpgsql;/
+SQL SUCCESS
+--step3:调用函数 expect:122.5.5.3/26
+select f_min_case0015_inet();
++---------------------+
+| f_min_case0015_inet |
++---------------------+
+| 122.5.5.3/26        |
++---------------------+
+--step4:调用函数 expect:122.5.5.3/32
+delete from t_min_case0015_inet;
+SQL SUCCESS
+insert into t_min_case0015_inet values('122.5.5.3/32'),('::');
+SQL SUCCESS
+select f_min_case0015_inet();
++---------------------+
+| f_min_case0015_inet |
++---------------------+
+| 122.5.5.3           |
++---------------------+
+--step5:调用函数 expect:0.0.0.0
+delete from t_min_case0015_inet;
+SQL SUCCESS
+insert into t_min_case0015_inet values('0.0.0.0'),('::');
+SQL SUCCESS
+select f_min_case0015_inet();
++---------------------+
+| f_min_case0015_inet |
++---------------------+
+| 0.0.0.0             |
++---------------------+
+--step6:创建函数 expect:成功
+create or replace function f_min_case0015_cidr(out min_cidr cidr)
+returns cidr
+as $$
+begin
+    select min(c) into min_cidr from t_min_case0015_cidr;
+    return min_cidr;
+end;
+$$language plpgsql;/
+SQL SUCCESS
+--step7:调用函数 expect:122.5.5.3/32
+select f_min_case0015_cidr();
++---------------------+
+| f_min_case0015_cidr |
++---------------------+
+| 122.5.5.3/32        |
++---------------------+
+--step8:调用函数 expect:122.5.6.0/24
+delete  from t_min_case0015_cidr;
+SQL SUCCESS
+insert into t_min_case0015_cidr values('122.5.6.0/24');
+SQL SUCCESS
+select f_min_case0015_cidr();
++---------------------+
+| f_min_case0015_cidr |
++---------------------+
+| 122.5.6.0/24        |
++---------------------+
+--step9:调用函数 expect:0.0.0.0
+insert into t_min_case0015_cidr values('::'),('0.0.0.0');
+SQL SUCCESS
+select f_min_case0015_cidr();
++---------------------+
+| f_min_case0015_cidr |
++---------------------+
+| 0.0.0.0/32          |
++---------------------+
+--tearDown
+drop function f_min_case0015_inet;
+SQL SUCCESS
+drop function f_min_case0015_cidr;
+SQL SUCCESS
+drop table if exists t_min_case0015_inet;
+SQL SUCCESS
+drop table if exists t_min_case0015_cidr;
+SQL SUCCESS
