@@ -17,7 +17,13 @@ select func_add_sql(3,7);
 +--------------+
 | 10           |
 +--------------+
-SELECT pg_sleep(5);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -41,7 +47,13 @@ select func_add_sql(8,9);
 +--------------+
 | 17           |
 +--------------+
-SELECT pg_sleep(5);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -96,7 +108,13 @@ CALL proc_while_loop(10);
 +-----------------+
 |                 |
 +-----------------+
-SELECT pg_sleep(5);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -120,7 +138,13 @@ CALL proc_while_loop(10);
 +-----------------+
 |                 |
 +-----------------+
-SELECT pg_sleep(5);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+

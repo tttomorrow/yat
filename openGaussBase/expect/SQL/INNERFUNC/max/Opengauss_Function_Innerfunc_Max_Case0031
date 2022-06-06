@@ -1,0 +1,109 @@
+-- @testpoint: cidr类型取最大值，结果类型转换
+--step1:创建表; expect:成功
+drop table if exists t_max_case0031;
+SQL SUCCESS
+create table t_max_case0031(c cidr);
+SQL SUCCESS
+create table t_max_case0031_text(t text);
+SQL SUCCESS
+create table t_max_case0031_clob(c clob);
+SQL SUCCESS
+create table t_max_case0031_varchar(c varchar);
+SQL SUCCESS
+create table t_max_case0031_bpchar(c bpchar);
+SQL SUCCESS
+create table t_max_case0031_nvarchar2(c nvarchar2);
+SQL SUCCESS
+create table t_max_case0031_inet(c inet);
+SQL SUCCESS
+--step2:输出转换为text; expect:192.168.1.0/24
+insert into t_max_case0031 values('192.168/24'),('192.168/25'),('192.168.1'),('192.168');
+SQL SUCCESS
+insert into t_max_case0031_text select max(c) from  t_max_case0031;
+SQL SUCCESS
+select * from  t_max_case0031_text;
++----------------+
+| t              |
++----------------+
+| 192.168.1.0/24 |
++----------------+
+--step3:输出转换为clob; expect:192.168.0.0/24
+delete from t_max_case0031;
+SQL SUCCESS
+insert into t_max_case0031 values('192.168'),('192.168/14');
+SQL SUCCESS
+insert into t_max_case0031_clob select max(c) from  t_max_case0031;
+SQL SUCCESS
+select * from  t_max_case0031_clob;
++----------------+
+| c              |
++----------------+
+| 192.168.0.0/24 |
++----------------+
+--step4:输出转换为varchar; expect:10.1.0.0/16
+delete from t_max_case0031;
+SQL SUCCESS
+insert into t_max_case0031 values('10'),('9.8'),('10.1');
+SQL SUCCESS
+insert into t_max_case0031_varchar select max(c) from  t_max_case0031;
+SQL SUCCESS
+select * from  t_max_case0031_varchar;
++-------------+
+| c           |
++-------------+
+| 10.1.0.0/16 |
++-------------+
+--step5:输出转换为bpchar; expect:192.168.100.128/32
+delete from t_max_case0031;
+SQL SUCCESS
+insert into t_max_case0031 values('192.168.100.128/25'),('192.168.100.128');
+SQL SUCCESS
+insert into t_max_case0031_bpchar select max(c) from  t_max_case0031;
+SQL SUCCESS
+select * from  t_max_case0031_bpchar;
++--------------------+
+| c                  |
++--------------------+
+| 192.168.100.128/32 |
++--------------------+
+--step6:输出转换为nvarchar2; expect:10.1.2.12
+delete from t_max_case0031;
+SQL SUCCESS
+insert into t_max_case0031 values('10.1.2.3/32'),('10.1.2.12'),('10.1.2.12/30');
+SQL SUCCESS
+insert into t_max_case0031_nvarchar2 select max(c) from  t_max_case0031;
+SQL SUCCESS
+select * from  t_max_case0031_nvarchar2;
++--------------+
+| c            |
++--------------+
+| 10.1.2.12/32 |
++--------------+
+--step7:输出转换为inet; expect:10.1.2.12/31
+delete from t_max_case0031;
+SQL SUCCESS
+insert into t_max_case0031 values('10.1.2.3/32'),('10.1.2.12/31'),('10.1.2.12/30');
+SQL SUCCESS
+insert into t_max_case0031_inet select max(c) from  t_max_case0031;
+SQL SUCCESS
+select * from  t_max_case0031_inet;
++--------------+
+| c            |
++--------------+
+| 10.1.2.12/31 |
++--------------+
+--tearDown
+drop table if exists t_max_case0031;
+SQL SUCCESS
+drop table if exists t_max_case0031_text;
+SQL SUCCESS
+drop table if exists t_max_case0031_clob;
+SQL SUCCESS
+drop table if exists t_max_case0031_varchar;
+SQL SUCCESS
+drop table if exists t_max_case0031_bpchar;
+SQL SUCCESS
+drop table if exists t_max_case0031_nvarchar2;
+SQL SUCCESS
+drop table if exists t_max_case0031_inet;
+SQL SUCCESS

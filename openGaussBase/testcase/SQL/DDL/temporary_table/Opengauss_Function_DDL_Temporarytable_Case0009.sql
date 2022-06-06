@@ -1,4 +1,5 @@
 -- @testpoint: 无法进行隐式转换的类型间互相修改类型，合理报错
+-- @modify at: 2020-11-23
 --创建全局临时表
 drop table if exists temp_table_alter_009;
 create global temporary table temp_table_alter_009(

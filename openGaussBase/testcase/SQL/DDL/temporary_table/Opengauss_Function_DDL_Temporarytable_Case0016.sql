@@ -1,4 +1,5 @@
 -- @testpoint: 建表添加参数on commit delete rows,修改表属性，无法隐式转换的类型，合理报错
+-- @modify at: 2020-11-23
 --开启事务
 start transaction;
 --建表

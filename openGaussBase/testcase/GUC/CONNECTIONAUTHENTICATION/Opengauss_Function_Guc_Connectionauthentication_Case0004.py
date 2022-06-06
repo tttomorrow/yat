@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -31,11 +31,13 @@ Expect      : 1、显示默认值为安装数据库时指定端口；
               5、使用旧端口连接数据库失败
               6、恢复默认值成功，恢复为数据库安装时指定端口；
 History     :
+             优化assert及步骤
 """
 
-import random
+import os
 import unittest
 
+from testcase.utils.Common import Common
 from testcase.utils.CommonSH import CommonSH
 from testcase.utils.Constant import Constant
 from testcase.utils.Logger import Logger
@@ -47,58 +49,51 @@ class Deletaduit(unittest.TestCase):
     def setUp(self):
         self.log = Logger()
         self.constant = Constant()
-        self.casename = "Opengauss_Function_Guc_" \
-                        "Connectionauthentication_Case0004"
-        self.log.info(f"{self.casename} start")
+        self.log.info(f'-----{os.path.basename(__file__)} start -----')
         self.dbUserNode1 = Node(node='PrimaryDbUser')
-        self.dbUserNode = Node(node='PrimaryRoot')
         self.primary_sh = CommonSH('PrimaryDbUser')
-        self.dbuser = Node("dbuser")
+        self.common = Common()
+        self.default_value = self.common.show_param('port')
 
     def test_startdb(self):
-        text = "--step1:查看port默认值;expect:数据库端口"
+        text = '----step1:查询系统未使用端口;expect:成功----'
         self.log.info(text)
-        result = self.primary_sh.execut_db_sql('show port;')
-        self.assertIn(str(self.dbUserNode1.db_port), result, "执行失败" + text)
-        self.log.info("获取临时端口号")
-        port = random.randint(1, 65535)
-        check_cmd = f'lsof -i:{str(port)}'
-        check_result = self.dbUserNode1.sh(check_cmd).result()
-        while str(port) in check_result:
-            port = random.randint(1, 65535)
-            check_cmd = f'lsof -i:{str(port)}'
-            check_result = self.dbUserNode1.sh(check_cmd).result()
+        port = self.common.get_not_used_port(self.dbUserNode1)
+        self.log.info(port)
+        self.assertNotEqual(0, port, '执行失败:' + text)
 
-        text = "--step2:使用alter system set设置port;expect:成功"
+        text = '--step2:使用alter system set设置port;expect:成功--'
         self.log.info(text)
-        sql_cmd = self.primary_sh.execut_db_sql(f'''alter system set port to \
-            {str(port)};''')
+        sql_cmd = self.primary_sh.execut_db_sql(f"alter system set port to "
+                                                f"{str(port)};")
         self.log.info(sql_cmd)
         self.assertIn("ALTER SYSTEM SET", sql_cmd, "执行失败" + text)
 
-        text = "--step3:重启数据库使其生效;expect:成功"
+        text = '--step3:重启数据库使其生效;expect:成功--'
         self.log.info(text)
         self.primary_sh.restart_db_cluster()
         is_started = self.primary_sh.get_db_cluster_status()
         self.assertTrue("Degraded" in is_started or "Normal" in is_started,
                         "执行失败" + text)
 
-        text = "--step4:验证预期结果(因调用新端口，故不能调用公共函数);expect:成功"
+        text = '--step4:验证预期结果(因调用新端口，故不能调用公共函数);' \
+               'expect:成功--'
         self.log.info(text)
         check_sql = f"source {macro.DB_ENV_PATH};" \
                     f"gsql " \
-                    f"-d {self.dbuser.db_name} " \
+                    f"-d {self.dbUserNode1.db_name} " \
                     f"-p {str(port)} " \
                     f"-c 'show port';"
         self.log.info(check_sql)
         check_result = self.dbUserNode1.sh(check_sql).result()
+        self.log.info(check_result)
         self.assertIn(str(port), check_result, "执行失败" + text)
 
-        text = "--step5:使用旧端口连接数据库;expect:报错"
+        text = '--step5:使用旧端口连接数据库;expect:报错--'
         self.log.info(text)
         log_in = f"source {macro.DB_ENV_PATH};" \
                  f"gsql " \
-                 f"-d {self.dbuser.db_name} " \
+                 f"-d {self.dbUserNode1.db_name} " \
                  f"-p {self.dbUserNode1.db_port} " \
                  f"-U {self.dbUserNode1.ssh_user} " \
                  f"-W {self.dbUserNode1.ssh_password} " \
@@ -109,15 +104,20 @@ class Deletaduit(unittest.TestCase):
         self.assertIn('failed to connect', check_result, "执行失败" + text)
 
     def tearDown(self):
-        text = "--step6:恢复默认值;expect:成功"
+        text = '--step6:恢复默认值;expect:成功--'
         self.log.info(text)
         res = self.primary_sh.execute_gsguc('set',
                                             self.constant.GSGUC_SUCCESS_MSG,
                                             f"port="
-                                            f"{self.dbUserNode1.db_port}")
+                                            f"{self.default_value}")
         self.primary_sh.restart_db_cluster()
         status = self.primary_sh.get_db_cluster_status()
         self.assertTrue(res)
+        self.log.info('--测试数据库已恢复连接--')
+        sql_cmd = self.primary_sh.execut_db_sql(f"select 1;")
+        self.log.info(sql_cmd)
         self.assertTrue("Degraded" in status or "Normal" in status,
                         "执行失败" + text)
-        self.log.info(f"{self.casename} finish")
+        self.assertEqual('1', sql_cmd.splitlines()[2].strip(),
+                         "执行失败" + text)
+        self.log.info(f'-----{os.path.basename(__file__)} end -----')

@@ -3,6 +3,7 @@ drop table if exists bigint09;
 SQL SUCCESS
 create table bigint09 (name bigint);
 SQL SUCCESS
+insert into bigint09 values (9223372036854775808);
 ?.*ERROR: bigint out of range
   Where: referenced column: name
 select * from bigint09;

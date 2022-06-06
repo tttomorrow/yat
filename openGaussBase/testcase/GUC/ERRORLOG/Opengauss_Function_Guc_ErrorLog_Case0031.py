@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -14,7 +14,9 @@ See the Mulan PSL v2 for more details.
 """
 """
 Case Type   : GUC_ErrorLog
+Case Name   : 参数log_rotation_age的值设置为35791394
 Description :
+    1.修改参数log_rotation_age的值为35791394：gs_guc reload -N all -I all -c
     "log_rotation_age=35791394"
     2.log_directory路径下为空，执行重启数据库，生成一个日志文件，设置时间超过设置时间，
     再次重启数据库，查看日志文件

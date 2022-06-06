@@ -1,0 +1,53 @@
+-- @testpoint: sample snapshot --创建训练集与测试集,部分测试点合理报错
+--step1:建表并插入数据;expect: 建表并插入数据成功
+drop table if exists t_snaphot_tab_0002;
+SQL SUCCESS
+create table t_snaphot_tab_0002(id int, name varchar);
+SQL SUCCESS
+insert into t_snaphot_tab_0002 values (1,'zhangsan'),(2,'lisi'),(3,'wangwu'),(4,'lisa'),(5,'jack');
+SQL SUCCESS
+--step2:创建快照;expect: 创建成功
+create snapshot s_snapshot_s1@1.0 comment is 'first version' as select * from t_snaphot_tab_0002;
+?.*
+?.*| schema | name.*
+?.*
+?.*| public | s_snapshot_s1@1.0.*
+?.*
+--step3:创建训练集与测试集;expect: 创建成功
+sample snapshot s_snapshot_s1@1.0 stratify by name as _test at ratio .2, as _train at ratio .8 comment is 'training';
+?.*
+?.*| schema | name.*
+?.*
+?.*| public | s_snapshot_s1_test@1.0.*
+?.*| public | s_snapshot_s1_train@1.0.*
+?.*
+--step4:删除数据表快照;expect: 删除失败，报错提示有依赖该快照的其他snapshot
+purge snapshot s_snapshot_s1@1.0;
+?.*ERROR: cannot purge root snapshot 'public."s_snapshot_s1\@1.0"' having dependent snapshot.*
+  Hint: purge all dependent snapshots first
+  Where: referenced column: purge_snapshot_internal
+SQL statement "SELECT db4ai.purge_snapshot_internal(i_schema, i_name)"
+PL/pgSQL function db4ai.purge_snapshot(name,name) line 71 at PERFORM
+--step5:删除依赖快照;expect: 删除成功
+purge snapshot s_snapshot_s1_train@1.0;
+?.*
+?.*| schema | name.*
+?.*
+?.*| public | s_snapshot_s1_train@1.0.*
+?.*
+purge snapshot s_snapshot_s1_test@1.0;
+?.*
+?.*| schema | name.*
+?.*
+?.*| public | s_snapshot_s1_test@1.0.*
+?.*
+--step6:删除数据表快照;expect: 删除成功
+purge snapshot s_snapshot_s1@1.0;
+?.*
+?.*| schema | name.*
+?.*
+?.*| public | s_snapshot_s1@1.0.*
+?.*
+--step7:清理环境;expect: 清理成功
+drop table t_snaphot_tab_0002;
+SQL SUCCESS

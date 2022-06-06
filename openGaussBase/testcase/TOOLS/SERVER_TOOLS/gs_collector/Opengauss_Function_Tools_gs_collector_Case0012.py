@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -38,11 +38,10 @@ class Tools(unittest.TestCase):
         self.primary_dbuser = Node('PrimaryDbUser')
         self.root_node = Node('PrimaryRoot')
         self.constant = Constant()
-        self.tmp_dir_path = os.path.join(
-            os.path.dirname(macro.DB_INSTANCE_PATH), 'tmp')
+        self.tmp_dir_path = os.path.join(os.path.dirname(macro.PG_LOG_PATH))
 
     def test_server_tools1(self):
-        self.log.info('-Opengauss_Function_Tools_gs_collector_Case0012开始-')
+        self.log.info(f'-----{os.path.basename(__file__)}start-----')
         self.log.info('-----查看主机名称-----')
         check_cmd = f'hostname'
         self.log.info(check_cmd)
@@ -94,4 +93,4 @@ class Tools(unittest.TestCase):
         self.log.info(rm_cmd)
         rm_msg = self.root_node.sh(rm_cmd).result()
         self.log.info(rm_msg)
-        self.log.info('-Opengauss_Function_Tools_gs_collector_Case0012结束-')
+        self.log.info(f'-----{os.path.basename(__file__)}finish-----')

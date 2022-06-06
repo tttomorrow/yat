@@ -7,6 +7,7 @@ insert into bigserial_01 values (120);
 SQL SUCCESS
 insert into bigserial_01 values (0004567);
 SQL SUCCESS
+insert into bigserial_01 values (999999999);
 SQL SUCCESS
 select * from bigserial_01;
 +-----------+
@@ -14,6 +15,7 @@ select * from bigserial_01;
 +-----------+
 | 120       |
 | 4567      |
+| 999999999 |
 +-----------+
 drop table bigserial_01;
 SQL SUCCESS

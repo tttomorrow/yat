@@ -3,6 +3,7 @@ drop table if exists bigint03;
 SQL SUCCESS
 create table bigint03 (name bigint);
 SQL SUCCESS
+insert into bigint03 values (2.00000000001);
 SQL SUCCESS
 insert into bigint03 values (122.3340);
 SQL SUCCESS

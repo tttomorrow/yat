@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -16,10 +16,10 @@ See the Mulan PSL v2 for more details.
 Case Type   : Separation_rights
 Case Name   : 普通用户修改角色
 Description :
-    1.初始用户执行：CREATE USER sysadmin01 WITH password 'Qazwsx@123';
-                CREATE ROLE manager IDENTIFIED BY 'Bigdata@123';
-    2.sysadmin01 用户执行：ALTER ROLE manager IDENTIFIED BY 'Qazwsx_123'
-    REPLACE 'Bigdata@123';
+    1.初始用户执行：CREATE USER sysadmin01 WITH password '$PASSWORD1';
+                CREATE ROLE manager IDENTIFIED BY '$PASSWORD2';
+    2.sysadmin01 用户执行：ALTER ROLE manager IDENTIFIED BY '$PASSWORD3'
+    REPLACE '$PASSWORD2';
 Expect      :
     1.CREATE ROLE
     2.CREATE ROLE

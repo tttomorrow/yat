@@ -21,6 +21,7 @@ select variance(col_1) from table_test;
 +----------------------+
 | variance             |
 +----------------------+
+| 195.3307778958333333 |
 +----------------------+
 --入参为整数
 select variance(col_2) from table_test;
@@ -40,6 +41,7 @@ select variance(col_4) from table_test;
 +----------------------+
 | variance             |
 +----------------------+
+| 693.5833333333333333 |
 +----------------------+
 drop table table_test;
 SQL SUCCESS

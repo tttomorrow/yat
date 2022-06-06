@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -18,6 +18,8 @@ Case Name   : 修改参数psort_work_mem为其他数据类型，观察预期结�
 Description :
         1、查询psort_work_mem默认值；
            show psort_work_mem;
+        2、修改psort_work_mem为false，"test",9999999999等，并校验其预期结果；
+           gs_guc set -D /openGauss/zyn1026_gauss/cluster/dn1 -c "psort_work_mem=9999999999MB"
 Expect      :
         1、显示默认值；
         2、参数修改成功，校验修改后系统参数值为532MB；
@@ -71,6 +73,8 @@ class Deletaduit(unittest.TestCase):
         sql_cmd = self.commonsh.execut_db_sql(f'''show psort_work_mem;''')
         self.log.info(sql_cmd)
         self.assertIn(self.res, sql_cmd)
+        # 使用设置gs_guc set设置psort_work_mem为9999999999
+        msg = self.commonsh.execute_gsguc('set', self.Constant.GSGUC_SUCCESS_MSG, 'psort_work_mem=9999999999')
         self.log.info(msg)
         self.assertFalse(msg)
         # 修改参数失败重启后查看默认值

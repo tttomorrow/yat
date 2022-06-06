@@ -13,6 +13,7 @@ select nextval('b_serial');
 select nextval('b_serial');
 --修改序列最大值为 NO MAXVALUE
 alter SEQUENCE b_serial NO MAXVALUE;
+--查询序列max_value（9223372036854775807）
 select sequence_name,max_value from b_serial where sequence_name = 'b_serial';
 --删除序列
 drop SEQUENCE b_serial;

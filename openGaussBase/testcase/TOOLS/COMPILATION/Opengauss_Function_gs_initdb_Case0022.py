@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -42,7 +42,7 @@ class Tools(unittest.TestCase):
     def test_systools(self):
         self.logger.info('---------创建文件，写入密码---------')
         excute_cmd0 = f'touch {self.file};' \
-                      f'echo "QAZ2wsx@123" >> {self.file};'
+                      f'echo "{macro.COMMON_PASSWD}" >> {self.file};'
         self.logger.info(excute_cmd0)
         msg0 = self.userNode.sh(excute_cmd0).result()
         self.logger.info(msg0)

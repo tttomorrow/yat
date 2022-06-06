@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -20,6 +20,7 @@ Description :
         1.查询wait_dummy_time默认值
         2.修改参数值为字符test
         3.修改参数值为空串
+        4.修改参数值为超临界值2147483648
         5.修改参数值为小数125.255
         6.恢复参数默认值
 Expect      :
@@ -53,6 +54,8 @@ class HAReplication(unittest.TestCase):
         sql_cmd = self.commonsh.execut_db_sql('show wait_dummy_time;')
         self.log.info(sql_cmd)
         self.assertEqual('300', sql_cmd.split('\n')[2].strip())
+        self.log.info('步骤2:修改参数值test,"''"', 2147483648, 125.255)
+        invalid_value = ['test', "''", 2147483648, 125.255]
         for i in invalid_value:
             result = self.commonsh.execute_gsguc("set",
                                                  constant.GSGUC_SUCCESS_MSG,

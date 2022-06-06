@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -19,6 +19,7 @@ Case Name   :ssl_renegotiation_limit参数使用gs_guc reload设置为无效值(
 Description :
               1、查看ssl_renegotiation_limit默认值；
               show ssl_renegotiation_limit;
+              2、修改ssl_renegotiation_limit分别为-1、2147483648、100.25、
               'test'和空串，校验其预期结果；
 Expect      :
               1、显示默认值为0;
@@ -48,6 +49,7 @@ class GucTest(unittest.TestCase):
         self.log.info(sql_cmd)
         self.assertEqual('0', sql_cmd.split('\n')[2].strip())
         self.log.info("修改ssl_renegotiation_limit为无效值")
+        invalid_value = ['-1', '2147483648', '100.25', 'test', "''"]
         for i in invalid_value:
             result = COMMONSH.execute_gsguc('reload',
                                             self.constant.GSGUC_SUCCESS_MSG,

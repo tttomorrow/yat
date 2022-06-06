@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -33,7 +33,6 @@ Expect      :
         6.合理报错
         7.删除成功
         8.清理环境完成
-History     :
 """
 import os
 import unittest
@@ -44,11 +43,10 @@ from testcase.utils.Logger import Logger
 from yat.test import Node
 from yat.test import macro
 
-Primary_SH = CommonSH('PrimaryDbUser')
+Pri_SH = CommonSH('PrimaryDbUser')
 
 
-@unittest.skipIf(1 == Primary_SH.get_node_num(),
-                 '单机环境不执行')
+@unittest.skipIf(1 == Pri_SH.get_node_num(), '单机环境不执行')
 class LogicalReplication(unittest.TestCase):
     def setUp(self):
         self.log = Logger()
@@ -60,86 +58,150 @@ class LogicalReplication(unittest.TestCase):
         self.standby_node = Node('Standby1DbUser')
         self.pg_hba = os.path.join(macro.DB_INSTANCE_PATH,
                                    macro.PG_HBA_FILE_NAME)
+        self.us_name = "us_logical_replication_case0018"
+        self.slot_name = "slot_logical_replication_case0018"
+        self.pg_hba = os.path.join(macro.DB_INSTANCE_PATH,
+                                   macro.PG_HBA_FILE_NAME)
 
     def test_standby(self):
-        self.log.info('--步骤1:修改wal_level为logical;enable_slot_log为on--')
-        mod_msg = Primary_SH.execute_gsguc('set',
-                                           self.constant.GSGUC_SUCCESS_MSG,
-                                           'wal_level =logical')
+        text = '--step1:修改wal_level为logical;enable_slot_log为on;' \
+               'expect:修改成功--'
+        self.log.info(text)
+        mod_msg = Pri_SH.execute_gsguc('set',
+                                       self.constant.GSGUC_SUCCESS_MSG,
+                                       'wal_level =logical')
         self.log.info(mod_msg)
         self.assertTrue(mod_msg)
-        mod_msg = Primary_SH.execute_gsguc('set',
-                                           self.constant.GSGUC_SUCCESS_MSG,
-                                           'enable_slot_log =on')
+        mod_msg = Pri_SH.execute_gsguc('set',
+                                       self.constant.GSGUC_SUCCESS_MSG,
+                                       'enable_slot_log =on')
         self.log.info(mod_msg)
         self.assertTrue(mod_msg)
-        self.log.info('--步骤2:重启数据库--')
-        restart_msg = Primary_SH.restart_db_cluster()
+
+        text = '--step2:重启数据库;expect:重启成功--'
+        self.log.info(text)
+        restart_msg = Pri_SH.restart_db_cluster()
         self.log.info(restart_msg)
-        status = Primary_SH.get_db_cluster_status()
-        self.assertTrue("Degraded" in status or "Normal" in status)
-        self.log.info('--步骤3:配置逻辑复制的用户--')
-        sql_cmd = Primary_SH.execut_db_sql(f'''drop role if exists rep;
-            create role rep with login password '{macro.COMMON_PASSWD}';
-            alter role rep with replication sysadmin;''')
+        status = Pri_SH.get_db_cluster_status()
+        self.assertTrue("Degraded" in status or "Normal" in status,
+                        '执行失败:' + text)
+
+        text = '--step3:配置逻辑复制的用户;expect:配置成功--'
+        self.log.info(text)
+        sql_cmd = Pri_SH.execut_db_sql(f'''drop role if exists \
+                   {self.us_name};
+                   create role {self.us_name} with login password \
+                    '{macro.COMMON_PASSWD}';
+                   alter role {self.us_name} with replication sysadmin;''')
         self.log.info(sql_cmd)
-        self.assertIn(self.constant.CREATE_ROLE_SUCCESS_MSG, sql_cmd)
-        self.assertIn(self.constant.ALTER_ROLE_SUCCESS_MSG, sql_cmd)
-        self.log.info('--步骤4:主机创建逻辑复制槽--')
-        check_res = Primary_SH.execut_db_sql('select slot_name from '
-                                             'pg_replication_slots;')
+        self.assertIn(self.constant.CREATE_ROLE_SUCCESS_MSG, sql_cmd,
+                      '执行失败:' + text)
+        self.assertIn(self.constant.ALTER_ROLE_SUCCESS_MSG, sql_cmd,
+                      '执行失败:' + text)
+        self.log.info('--step2.1:配置主机--')
+        mod_msg = f"sed -i '$a\local    replication     {self.us_name}      " \
+                  f"trust'   {self.pg_hba}"
+        self.log.info(mod_msg)
+        msg = self.primary_node.sh(mod_msg).result()
+        self.log.info(msg)
+        mod_msg = f"sed -i '$a\host    replication     " \
+                  f"{self.us_name}   127.0.0.1/32   trust'   {self.pg_hba}"
+        self.log.info(mod_msg)
+        msg = self.primary_node.sh(mod_msg).result()
+        self.log.info(msg)
+        mod_msg = f"sed -i '$a\host   replication     " \
+                  f"{self.us_name}   ::1/128    trust'  {self.pg_hba}"
+        self.log.info(mod_msg)
+        msg = self.primary_node.sh(mod_msg).result()
+        self.log.info(msg)
+        self.log.info('--step2.2:配置备机--')
+        mod_msg = f"sed -i '$a\local    replication     {self.us_name}     " \
+                  f"trust'  {self.pg_hba}"
+        self.log.info(mod_msg)
+        msg = self.standby_node.sh(mod_msg).result()
+        self.log.info(msg)
+        mod_msg = f"sed -i '$a\host    replication     {self.us_name}   " \
+                  f"127.0.0.1/32   trust'  {self.pg_hba}"
+        self.log.info(mod_msg)
+        msg = self.standby_node.sh(mod_msg).result()
+        self.log.info(msg)
+        mod_msg = f"sed -i '$a\host    replication     {self.us_name}   " \
+                  f"::1/128   trust'  {self.pg_hba}"
+        self.log.info(mod_msg)
+        msg = self.standby_node.sh(mod_msg).result()
+        self.log.info(msg)
+        restart_msg = Pri_SH.restart_db_cluster()
+        self.log.info(restart_msg)
+        status = Pri_SH.get_db_cluster_status()
+        self.assertTrue("Degraded" in status or "Normal" in status,
+                        '执行失败:' + text)
+
+        text = '--step4:主机创建逻辑复制槽;expect:创建成功--'
+        self.log.info(text)
+        check_res = Pri_SH.execut_db_sql("select slot_name from "
+                                         "pg_replication_slots;")
         self.log.info(check_res)
-        if 'slot_test018' in check_res.split('\n')[-2].strip():
-            del_cmd = Primary_SH.execut_db_sql("select * from "
-                                               "pg_drop_replication_slot"
-                                               "('slot_test018');")
+        if f'{self.slot_name}' in check_res.split('\n')[-2].strip():
+            del_cmd = Pri_SH.execut_db_sql(f"select * from "
+                                           f"pg_drop_replication_slot"
+                                           f"('{self.slot_name}');")
             self.log.info(del_cmd)
-        cre_cmd = Primary_SH.execut_db_sql("select * from "
-                                           "pg_create_logical_replication_slot"
-                                           "('slot_test018', 'mppdb_decoding')"
-                                           ";")
+        cre_cmd = Pri_SH.execut_db_sql(f"select * from "
+                                       f"pg_create_logical_replication_slot"
+                                       f"('{self.slot_name}', "
+                                       f"'mppdb_decoding');")
         self.log.info(cre_cmd)
-        self.log.info('--步骤5:查询复制槽--')
-        query_cmd = Primary_SH.execut_db_sql('select slot_name,plugin from'
-                                             ' pg_get_replication_slots();')
+
+        text = '--step5:查询复制槽;expect:复制槽存在--'
+        self.log.info(text)
+        query_cmd = Pri_SH.execut_db_sql("select slot_name,plugin from "
+                                         "pg_get_replication_slots();")
         self.log.info(query_cmd)
-        self.assertIn('slot_test018', query_cmd)
-        self.log.info('--步骤6:备机使用pg_replication_slot_advance函数--')
-        sql_cmd = self.Standby_SH.execut_db_sql("select * from "
-                                                "pg_replication_slot_advance"
-                                                "('slot_test018',NULL);")
+        self.assertIn(f'{self.slot_name}', query_cmd, '执行失败:' + text)
+
+        text = '--step6:备机使用pg_replication_slot_advance函数;' \
+               'expect:合理报错--'
+        self.log.info(text)
+        sql_cmd = self.Standby_SH.execut_db_sql(f"select * from "
+                                                f"pg_replication_slot_advance"
+                                                f"('{self.slot_name}',NULL);")
         self.log.info(sql_cmd)
-        self.assertIn('ERROR', sql_cmd)
-        self.log.info('--步骤7:主机删除复制槽--')
-        del_cmd = Primary_SH.execut_db_sql("select * from "
-                                           "pg_drop_replication_slot"
-                                           "('slot_test018');")
+        self.assertIn('ERROR', sql_cmd, '执行失败:' + text)
+
+        text = '--step7:主机删除复制槽;expect:删除成功--'
+        self.log.info(text)
+        del_cmd = Pri_SH.execut_db_sql(f"select * from "
+                                       f"pg_drop_replication_slot"
+                                       f"('{self.slot_name}');")
         self.log.info(del_cmd)
-        self.assertIn('', del_cmd)
+        self.assertIn('', del_cmd, '执行失败:' + text)
 
     def tearDown(self):
-        self.log.info('--步骤8:清理环境--')
-        sql_cmd = Primary_SH.execut_db_sql('''drop role if exists rep;''')
+        text = '--step8:清理环境;expect:清理环境完成--'
+        self.log.info(text)
+        sql_cmd = Pri_SH.execut_db_sql(f'''drop role if exists 
+            {self.us_name};''')
         self.log.info(sql_cmd)
-        del_msg = f"sed -i '/replication     rep/d' {self.pg_hba}"
-        self.log.info(del_msg)
-        msg = self.primary_node.sh(del_msg).result()
-        self.log.info(msg)
-        del_msg = f"sed -i '/replication     rep/d' {self.pg_hba}"
+        del_msg = f"sed -i '/{self.us_name}/d' {self.pg_hba}"
         self.log.info(del_msg)
         msg = self.standby_node.sh(del_msg).result()
         self.log.info(msg)
-        restore_cmd = Primary_SH.execute_gsguc('set',
-                                               self.constant.GSGUC_SUCCESS_MSG,
-                                               'wal_level=hot_standby')
+        del_msg = f"sed -i '/{self.us_name}/d' {self.pg_hba}"
+        self.log.info(del_msg)
+        msg = self.primary_node.sh(del_msg).result()
+        self.log.info(msg)
+        restore_cmd = Pri_SH.execute_gsguc('set',
+                                           self.constant.GSGUC_SUCCESS_MSG,
+                                           'wal_level=hot_standby')
         self.log.info(restore_cmd)
-        restore_cmd = Primary_SH.execute_gsguc('set',
-                                               self.constant.GSGUC_SUCCESS_MSG,
-                                               'enable_slot_log=off')
+        restore_cmd = Pri_SH.execute_gsguc('set',
+                                           self.constant.GSGUC_SUCCESS_MSG,
+                                           'enable_slot_log=off')
         self.log.info(restore_cmd)
-        restart_msg = Primary_SH.restart_db_cluster()
+        restart_msg = Pri_SH.restart_db_cluster()
         self.log.info(restart_msg)
-        status = Primary_SH.get_db_cluster_status()
-        self.assertTrue("Degraded" in status or "Normal" in status)
+        status = Pri_SH.get_db_cluster_status()
+        self.assertTrue("Degraded" in status or "Normal" in status,
+                        '执行失败:' + text)
         self.log.info(
             '--Opengauss_Function_Logical_Replication_Case0018finish----')

@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -14,74 +14,96 @@ See the Mulan PSL v2 for more details.
 """
 """
 Case Type   : 服务端工具
-Case Name   : 对所有标识符强制加引号
+Case Name   : 导出数据需用AES128进行加密，不指定密钥
 Description :
-    1.连接数据库：
-    2.创建数据
-    3.退出数据库
-    4.source环境变量
-    5.对所有标识符强制加引号
-    6.连接数据库，清理环境
+    1.创建数据
+    2.导出数据需用AES128进行加密，不指定密钥
+    3.清理环境
 Expect      :
-    1.数据库连接成功
-    2.创建数据成功
-    3.退出数据库
-    4.source环境变量
-    5.对所有标识符强制加引号成功
-    6.清理环境成功
+    1.创建数据成功
+    2.输入密码导出成功
+    3.清理环境成功
 History     :
+    modified：2022/1/21 by 5318639 优化用例断言
 """
+import os
 import unittest
-from yat.test import Node
-from yat.test import macro
+
 from testcase.utils.Constant import Constant
 from testcase.utils.Logger import Logger
-
-LOG = Logger()
+from yat.test import Node
+from yat.test import macro
 
 
 class Tools(unittest.TestCase):
     def setUp(self):
-        LOG.info('----Opengauss_Function_Tools_gs_dumpall_Case0032start----')
+        self.log = Logger()
+        self.log.info(
+            '----Opengauss_Function_Tools_gs_dumpall_Case0032_start----')
         self.dbuser_node = Node('dbuser')
+        self.root_node = Node('default')
         self.constant = Constant()
+        self.dumpall_file = os.path.join(
+            os.path.dirname(macro.DB_INSTANCE_PATH), 'dumpall.sql')
+        self.dumpall_path = os.path.join(
+            os.path.dirname(macro.DB_INSTANCE_PATH))
+        self.key = f'12345678@qaz'
+        self.t_name = 't_dump_0032'
 
     def test_server_tools(self):
-        LOG.info('------------创建数据-------------')
-        sql_cmd1 = '''
-        drop table if exists t1; 
-        create table t1 (id int ,name char(10));
-        insert into t1 values (1,'aa'),(2,'bb');
-                        '''
-        excute_cmd1 = f'''source {macro.DB_ENV_PATH} ;
-                gsql -d {self.dbuser_node.db_name} -p\
-        {self.dbuser_node.db_port} -c "{sql_cmd1}"
-                                                '''
-        LOG.info(excute_cmd1)
+        text = '----step1:创建测试数据;expect:创建成功----'
+        self.log.info(text)
+        sql_cmd1 = f'''
+            drop table if exists {self.t_name}; 
+            create table {self.t_name} (id int ,name char(10));
+            insert into {self.t_name} values (1,'aa'),(2,'bb');
+            '''
+        excute_cmd1 = f'source {macro.DB_ENV_PATH};' \
+            f'gsql -d {self.dbuser_node.db_name} ' \
+            f'-p {self.dbuser_node.db_port} ' \
+            f'-c "{sql_cmd1}"'
+        self.log.info(excute_cmd1)
         msg1 = self.dbuser_node.sh(excute_cmd1).result()
-        LOG.info(msg1)
-        self.assertIn(self.constant.INSERT_SUCCESS_MSG, msg1)
+        self.log.info(msg1)
+        self.assertIn(self.constant.INSERT_SUCCESS_MSG, msg1,
+                      '执行失败:' + text)
 
-        LOG.info('-----转储数据需用AES128进行加密，但不指定密钥-----')
-        excute_cmd2 = f'''source {macro.DB_ENV_PATH} ;
-        gs_dumpall  -p {self.dbuser_node.db_port} --with-encryption=AES128;
-                              '''
-        LOG.info(excute_cmd2)
-        msg2 = self.dbuser_node.sh(excute_cmd2).result()
-        LOG.info(msg2)
-        self.assertIn('No key for encryption,please input the key', msg2)
+        text = '----step2:导出数据需用AES128进行加密，不指定密钥;expect:输入密码导出成功----'
+        self.log.info(text)
+        dumpall_cmd = f'''source {macro.DB_ENV_PATH};
+                expect <<EOF
+                set timeout -1
+                spawn gs_dumpall -p {self.dbuser_node.db_port} \
+                --with-encryption=AES128 -f {self.dumpall_file}
+                expect "*Key:"
+                send "{macro.GAUSSDB_INIT_USER_PASSWD}\n"
+                expect eof\n''' + "EOF"
+        self.log.info(dumpall_cmd)
+        dumpall_result1 = self.dbuser_node.sh(dumpall_cmd).result()
+        self.log.info(dumpall_result1)
+        du_cmd = f'cd {self.dumpall_path};du -h {self.dumpall_file};'
+        self.log.info(du_cmd)
+        du_msg = self.dbuser_node.sh(du_cmd).result()
+        self.log.info(du_msg)
+        dumpall_result2 = float(du_msg.split()[0][:-1])
+        self.log.info(dumpall_result2)
+        self.assertGreater(dumpall_result2, 0, '执行失败:' + text)
 
     def tearDown(self):
-        LOG.info('---清理环境---')
-        sql_cmd3 = '''  
-            drop table if exists t1; 
-            '''
-        excute_cmd3 = f'''
-            source {macro.DB_ENV_PATH} ;
-            gsql -d {self.dbuser_node.db_name}\
-            -p {self.dbuser_node.db_port} -c "{sql_cmd3}";
-                          '''
-        LOG.info(excute_cmd3)
-        msg3 = self.dbuser_node.sh(excute_cmd3).result()
-        LOG.info(msg3)
-        LOG.info('----Opengauss_Function_Tools_gs_dumpall_Case0032finish----')
+        text = '----step3:清理环境;expect:清理成功----'
+        self.log.info(text)
+        sql_cmd2 = f'drop table if exists {self.t_name};'
+        clear_cmd = f'source {macro.DB_ENV_PATH};' \
+            f'gsql -d {self.dbuser_node.db_name} ' \
+            f'-p {self.dbuser_node.db_port} ' \
+            f'-c "{sql_cmd2}";'
+        self.log.info(clear_cmd)
+        clear_msg = self.dbuser_node.sh(clear_cmd).result()
+        self.log.info(clear_msg)
+        rm_cmd = f'rm -rf {self.dumpall_file};'
+        rm_msg = self.root_node.sh(rm_cmd).result()
+        self.assertEqual('', rm_msg, '执行失败:' + text)
+        self.assertIn(self.constant.TABLE_DROP_SUCCESS, clear_msg,
+                      '执行失败:' + text)
+        self.log.info(
+            '----Opengauss_Function_Tools_gs_dumpall_Case0032_finish----')

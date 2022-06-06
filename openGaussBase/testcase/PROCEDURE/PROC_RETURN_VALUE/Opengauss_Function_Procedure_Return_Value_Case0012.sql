@@ -16,12 +16,14 @@ end;
 /
 --调用存储过程
 declare
+    v1 bigint:=9223372036854775806;
 begin
     proc_return_value_012(v1);
 end;
 /
 --调用存储过程
 declare
+    v2 bigint:=-9223372036854775807;
 begin
     proc_return_value_012(v2);
 end;

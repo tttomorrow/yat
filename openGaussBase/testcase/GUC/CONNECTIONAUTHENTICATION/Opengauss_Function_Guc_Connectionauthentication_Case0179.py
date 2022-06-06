@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -20,12 +20,13 @@ Description : 1、查看ssl_ciphers默认值；
               gs_guc check -D {cluster/dn1} -c ssl_ciphers
               2、使用ALTER SYSTM SET修改数据库参数ssl_ciphers，重启使其生效;
               ALTER SYSTEM set ssl_ciphers to 'DHE-RSA-AES256-GCM-SHA384;
-              DHE-RSA-AES128-GCM-SHA256;DHE-RSA-AES256-CCM';
+              DHE-RSA-AES128-GCM-SHA256';
 Expect      : 1、显示默认值；
               2、参数修改成功，重启失败；
 History     :
 """
 
+import os
 import unittest
 
 from testcase.utils.CommonSH import CommonSH
@@ -41,7 +42,7 @@ class GucTest(unittest.TestCase):
     def setUp(self):
         self.log = Logger()
         self.constant = Constant()
-        self.log.info('==Guc_Connectionauthentication_Case0179开始==')
+        self.log.info(f'-----{os.path.basename(__file__)} 开始-----')
 
         self.db_user_node = Node(node='PrimaryDbUser')
         status = COMMONSH.get_db_cluster_status()
@@ -61,9 +62,8 @@ class GucTest(unittest.TestCase):
                     + f";gsql -d {self.db_user_node.db_name} -p " \
                     + self.db_user_node.db_port \
                     + " -c \"ALTER SYSTEM set ssl_ciphers " \
-                      "to 'DHE-RSA-AES256-GCM-SHA384;" \
-                      "DHE-RSA-AES128-GCM-SHA256" \
-                      ";DHE-RSA-AES256-CCM';\""
+                      "to 'ECDHE-RSA-AES128-GCM-SHA256;" \
+                      "ECDHE-RSA-AES256-GCM-SHA384';\""
         self.log.info(altersql1)
         res1 = self.db_user_node.sh(altersql1).result()
         self.log.info(showcmd)
@@ -82,4 +82,4 @@ class GucTest(unittest.TestCase):
         COMMONSH.restart_db_cluster()
         status = COMMONSH.get_db_cluster_status()
         self.assertTrue("Normal" in status or "Degraded" in status)
-        self.log.info('==Guc_Connectionauthentication_Case0179完成==')
+        self.log.info(f'-----{os.path.basename(__file__)} 完成-----')

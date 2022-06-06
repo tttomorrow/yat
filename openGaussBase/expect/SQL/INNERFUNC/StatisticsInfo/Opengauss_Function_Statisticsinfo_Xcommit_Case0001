@@ -22,7 +22,13 @@ select * from test;
 +----+----+------+-------+
 end;
 SQL SUCCESS
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -49,7 +55,13 @@ select pg_stat_reset();
 +---------------+
 insert into test values (1,'a','sing',90.9);
 SQL SUCCESS
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -76,7 +88,13 @@ select pg_stat_reset();
 +---------------+
 update test set grade = 99.99 where sk = 1;
 SQL SUCCESS
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -103,7 +121,13 @@ select pg_stat_reset();
 +---------------+
 delete from test where sk = 1;
 SQL SUCCESS
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+

@@ -6,6 +6,7 @@ select hll_hash_boolean(1, 8);
 select hll_hash_boolean('1', 8);
 select hll_hash_boolean('y', 7);
 select hll_hash_boolean('yes', 7);
+select hll_hash_boolean('yes', 2147483647);
 
 select hll_hash_boolean(false, 0);
 select hll_hash_boolean('f', 0);

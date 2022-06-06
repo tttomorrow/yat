@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -19,6 +19,8 @@ Description :
     1、查询track_stmt_session_slot默认值，show track_stmt_session_slot;
     2、使用gs_guc set方式修改为其他值-1
        gs_guc set -D {cluster/dn1} -c "track_stmt_session_slot=-1";
+    3、使用gs_guc set方式修改为其他值2147483648
+       gs_guc set -D {cluster/dn1} -c "track_stmt_session_slot=2147483648";
     4、使用gs_guc set方式修改为其他值99.99
        gs_guc set -D {cluster/dn1} -c "track_stmt_session_slot=99.99";
     5、清理环境，恢复默认值;
@@ -61,9 +63,11 @@ class GucTestCase(unittest.TestCase):
         logger.info(set_cmd1)
         self.assertFalse(set_cmd1)
 
+        logger.info("======步骤三：设置track_stmt_session_slot为2147483648======")
         set_cmd2 = self.comsh.execute_gsguc('set',
                                             self.constant.GSGUC_SUCCESS_MSG,
                                             'track_stmt_session_slot = '
+                                            '2147483648')
         logger.info(set_cmd2)
         self.assertFalse(set_cmd2)
 

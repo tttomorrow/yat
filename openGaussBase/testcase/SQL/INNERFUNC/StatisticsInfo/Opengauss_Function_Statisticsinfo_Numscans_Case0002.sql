@@ -4,4 +4,5 @@ select pg_stat_get_numscans('') from PG_CLASS a where a.relname = 'sales';
 select pg_stat_get_numscans(a.oid,a.oid,a.oid) from PG_CLASS a where a.relname = 'sales';
 select pg_stat_get_numscans() from PG_CLASS a where a.relname = 'sales';
 select pg_stat_get_numscans('&^%^&*') from PG_CLASS a where a.relname = 'sales';
+select pg_stat_get_numscans(99999999999998789) from PG_CLASS a where a.relname = 'sales';
 select pg_stat_get_numscans(a.oid) from PG_CLASS a where a.relname = 'sales';

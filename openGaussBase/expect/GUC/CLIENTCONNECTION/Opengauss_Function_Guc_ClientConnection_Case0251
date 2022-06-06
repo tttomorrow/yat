@@ -7,17 +7,24 @@ show lockwait_timeout;
 | 20min            |
 +------------------+
 --设置，成功
+set lockwait_timeout to 2147483647;
 SQL SUCCESS
 show lockwait_timeout;
 +------------------+
 | lockwait_timeout |
 +------------------+
+| 2147483647ms     |
 +------------------+
 --设置，报错
 set lockwait_timeout to 'test';
 ?.*ERROR: invalid value for parameter "lockwait_timeout": "test"
+set lockwait_timeout to '2147483647%$#';
+?.*ERROR: invalid value for parameter "lockwait_timeout": "2147483647\%\$\#"
   Hint: Valid units for this parameter are "ms", "s", "min", "h", and "d".
 set lockwait_timeout to '-1';
+?.*ERROR: -1 is outside the valid range for parameter "lockwait_timeout" \(0 .. 2147483647\)
+set lockwait_timeout to '2147483648';
+?.*ERROR: invalid value for parameter "lockwait_timeout": "2147483648"
   Hint: Value exceeds integer range.
 set lockwait_timeout to 1582.256;
 ?.*ERROR: invalid value for parameter "lockwait_timeout": "1582.256"

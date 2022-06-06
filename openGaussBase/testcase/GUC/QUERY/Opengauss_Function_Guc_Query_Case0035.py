@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -20,12 +20,9 @@ Description :
     show enable_auto_clean_unique_sql;
     show enable_resource_track;
     show instr_unique_sql_count;
-    show unique_sql_clean_ratio;
-    2、修改unique_sql_clean_ratio为0.1，重启使其生效，并校验其预期结果；
+    2、修改enable_auto_clean_unique_sql为on，重启使其生效，并校验其预期结果；
     gs_guc set -N all -I all -c "enable_auto_clean_unique_sql=on"
-    gs_guc set -N all -I all -c "unique_sql_clean_ratio=0.1"
     gs_om -t stop && gs_om -t start
-    show unique_sql_clean_ratio;
     3、清空记录，执行100 unique_sql，查看hash table记录条数
     select reset_unique_sql('GLOBAL','ALL',100);
     select count(va) from (select get_instr_unique_sql() as va);
@@ -35,7 +32,6 @@ Description :
     select 1;
     5、恢复默认值；
     gs_guc set -N all -I all -c "enable_auto_clean_unique_sql=off"
-    gs_guc set -N all -I all -c "unique_sql_clean_ratio=0"
     gs_om -t stop && gs_om -t start
 Expect      :
     1、显示默认值；
@@ -85,16 +81,13 @@ class Guctestcase(unittest.TestCase):
         LOGGER.info(status)
         self.set_gs_guc("enable_resource_track", "on", "reload")
         self.set_gs_guc("instr_unique_sql_count", "100", "reload")
-        self.set_gs_guc("unique_sql_clean_ratio", "0.2", "reload")
         sql_cmd = COMMONSH.execut_db_sql("show enable_resource_track;"
-                                         "show unique_sql_clean_ratio;"
                                          "show instr_unique_sql_count;"
                                          "show enable_auto_clean_unique_sql;")
         LOGGER.info(sql_cmd)
         self.assertNotIn("off", sql_cmd)
         self.assertIn("on", sql_cmd)
         self.assertIn("100", sql_cmd)
-        self.assertIn("0.2", sql_cmd)
 
         LOGGER.info("步骤3：清空记录后触发自动淘汰")
         result = COMMONSH.execut_db_sql("select "
@@ -127,14 +120,13 @@ class Guctestcase(unittest.TestCase):
             connect_thread[i].join(1)
             result = connect_thread[i].get_result()
             LOGGER.info(result)
-            self.assertIn('81\n', result)
+            self.assertIn('91\n', result)
 
     def tearDown(self):
         LOGGER.info("步骤5：恢复默认值")
         self.set_gs_guc("enable_auto_clean_unique_sql", "off")
         status = COMMONSH.restart_db_cluster()
         LOGGER.info(status)
-        self.set_gs_guc("unique_sql_clean_ratio", "0.1", "reload")
         status = COMMONSH.get_db_cluster_status("detail")
         LOGGER.info(status)
         self.assertTrue("Normal" in status or "Degraded" in status)

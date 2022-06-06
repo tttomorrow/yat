@@ -3,9 +3,11 @@ select hextoraw(rawtohex('125abc578')) from sys_dummy;
 +--------------------+
 | hextoraw           |
 +--------------------+
+| 313235616263353738 |
 +--------------------+
 select rawtohex(hextoraw(rawtohex('125abc578'))) from sys_dummy;
 +--------------------+
 | rawtohex           |
 +--------------------+
+| 313235616263353738 |
 +--------------------+

@@ -1,5 +1,4 @@
 -- @testpoint: 创建本地临时表，不使用if not exists，存在同名表，合理报错
--- @modify at: 2020-11-24
 --建表
 drop table if exists temp_table_057;
 create local temporary table if not  exists temp_table_057(

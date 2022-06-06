@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -17,8 +17,8 @@ Case Type   : policy
 Case Name   : 密码为a-z小写字母的最少要求个数password_min_lowercase=3
 Description :
     1.设置password_min_lowercase=3，重启数据库生效
-    2.初始用户执行：create user wf with password 'QAZwsx@123';
-    create user user001 with password 'QAZWsx@123';
+    2.初始用户执行：create user wf with password '$PASSWORD1';(密码包含3个小写字母)
+    create user user001 with password '$PASSWORD2';(密码包含2个小写字母)
 Expect      :
     1.设置成功，数据库重启成功
     2.创建wf提示密码至少包含3个小写字母

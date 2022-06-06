@@ -1,0 +1,475 @@
+-- @testpoint: NVARCHAR(n)操作符测试
+--step1:操作符>; expect:成功
+select '!'::nvarchar > '"'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '('::nvarchar > ')'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '0'::nvarchar > '5'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '0'::nvarchar > 'A'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '@'::nvarchar > 'a'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '\\'::nvarchar > 'a'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '\\'::nvarchar > 'A'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '}'::nvarchar > '~'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '}'::nvarchar > '测试'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '测试工作'::nvarchar > '测试'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '测试'::nvarchar > '测试工作'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select 'aaa'::nvarchar > '测试工作'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select 'aaa'::nvarchar > 'bbb'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+--step2:操作符>=; expect:成功
+select '!'::nvarchar >= '"'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '('::nvarchar >= ')'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '0'::nvarchar >= '5'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '0'::nvarchar >= 'A'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '@'::nvarchar >= 'a'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '\\'::nvarchar >= 'a'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '\\'::nvarchar >= 'A'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '}'::nvarchar >= '~'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '}'::nvarchar >= '测试'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '测试工作'::nvarchar >= '测试'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '测试'::nvarchar >= '测试工作'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select 'aaa'::nvarchar >= '测试工作'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select 'aaa'::nvarchar >= 'bbb'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+--step3:操作符<; expect:成功
+select '!'::nvarchar < '"'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '('::nvarchar < ')'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '0'::nvarchar < '5'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '0'::nvarchar < 'A'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '@'::nvarchar < 'a'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '\\'::nvarchar < 'a'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '\\'::nvarchar < 'A'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '}'::nvarchar < '~'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '}'::nvarchar < '测试'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '测试工作'::nvarchar < '测试'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '测试'::nvarchar < '测试工作'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select 'aaa'::nvarchar < '测试工作'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select 'aaa'::nvarchar < 'bbb'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+--step4:操作符<=; expect:成功
+select '!'::nvarchar <= '"'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '('::nvarchar <= ')'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '0'::nvarchar <= '5'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '0'::nvarchar <= 'A'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '@'::nvarchar <= 'a'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '\\'::nvarchar <= 'a'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '\\'::nvarchar <= 'A'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '}'::nvarchar <= '~'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '}'::nvarchar <= '测试'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '测试工作'::nvarchar <= '测试'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '测试'::nvarchar <= '测试工作'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select 'aaa'::nvarchar <= '测试工作'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select 'aaa'::nvarchar <= 'bbb'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+--step5:操作符=; expect:成功
+select '!'::nvarchar = '"'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '('::nvarchar = ')'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '0'::nvarchar = '5'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '0'::nvarchar = 'A'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '@'::nvarchar = 'a'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '\\'::nvarchar = 'a'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '\\'::nvarchar = 'A'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '}'::nvarchar = '~'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '}'::nvarchar = '测试'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '测试工作'::nvarchar = '测试'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select '测试'::nvarchar = '测试工作'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select 'aaa'::nvarchar = '测试工作'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+select 'aaa'::nvarchar = 'bbb'::nvarchar;
++----------+
+| ?column? |
++----------+
+| false    |
++----------+
+--step6:操作符<>; expect:成功
+select '!'::nvarchar <> '"'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '('::nvarchar <> ')'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '0'::nvarchar <> '5'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '0'::nvarchar <> 'A'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '@'::nvarchar <> 'a'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '\\'::nvarchar <> 'a'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '\\'::nvarchar <> 'A'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '}'::nvarchar <> '~'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '}'::nvarchar <> '测试'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '测试工作'::nvarchar <> '测试'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select '测试'::nvarchar <> '测试工作'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select 'aaa'::nvarchar <> '测试工作'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+
+select 'aaa'::nvarchar <> 'bbb'::nvarchar;
++----------+
+| ?column? |
++----------+
+| true     |
++----------+

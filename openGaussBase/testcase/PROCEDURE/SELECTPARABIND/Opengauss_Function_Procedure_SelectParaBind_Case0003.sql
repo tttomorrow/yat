@@ -19,6 +19,8 @@ as
 	v1 char(50);
 	v2 varchar(50);
 begin
+    v1 := '2147483647';
+	v2 := '9223372036854775807';
     sqlstat := 'insert into all_datatype_tbl(c_char) select :p1';
     execute immediate sqlstat using v1;
     sqlstat := 'insert into all_datatype_tbl(c_varchar) select :p1';

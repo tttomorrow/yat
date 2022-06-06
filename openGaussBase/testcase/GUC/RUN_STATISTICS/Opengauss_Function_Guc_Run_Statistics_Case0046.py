@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -57,12 +57,14 @@ class GucTestCase(unittest.TestCase):
         LOGGER.info("步骤1:查询track_functions默认值 期望：默认值none")
         sql_cmd = COMMONSH.execut_db_sql("show track_functions;")
         LOGGER.info(sql_cmd)
+        self.assertNotIn(self.constant.SQL_WRONG_MSG[1], sql_cmd)
         self.assertEqual("none", sql_cmd.splitlines()[-2].strip())
 
         LOGGER.info("查询pg_stat_user_functions视图为空")
         sql_cmd = COMMONSH.execut_db_sql("select count(*) "
             "from pg_stat_user_functions;")
         LOGGER.info(sql_cmd)
+        self.assertNotIn(self.constant.SQL_WRONG_MSG[1], sql_cmd)
         self.assertEqual(int(sql_cmd.splitlines()[-2].strip()), 0)
 
         LOGGER.info("步骤2:管理员用户方式三修改track_functions为all")
@@ -83,6 +85,20 @@ class GucTestCase(unittest.TestCase):
         LOGGER.info(result)
         self.assertIn("all\n", result)
 
+        LOGGER.info("查询pg_stat_user_functions视图不为空")
+        sql_cmd = ("select calls from pg_stat_user_functions "
+                   "where funcname='syn_fun_001';")
+        excute_cmd = f'''source {macro.DB_ENV_PATH};\
+                gsql -d {self.db_name} -U {self.user_node.db_user}\
+                -p {self.user_node.db_port} \
+                -W {macro.COMMON_PASSWD} -c "{sql_cmd}"'''
+        LOGGER.info(excute_cmd)
+        result = self.user_node.sh(excute_cmd).result()
+        LOGGER.info(result)
+        self.assertNotIn(self.constant.SQL_WRONG_MSG[1], result)
+        num_before = result.splitlines()[-2].strip()
+        LOGGER.info(num_before)
+
         LOGGER.info("步骤3:调用函数 期望：执行成功")
         sql_cmd = ('''drop function if exists \
             syn_fun_001(c int);
@@ -96,6 +112,7 @@ class GucTestCase(unittest.TestCase):
                 return b;
             end;
             select syn_fun_001(5);
+            select pg_sleep(3);
             ''')
         excute_cmd = f'''source {macro.DB_ENV_PATH};\
                 gsql -d {self.db_name} -U {self.user_node.db_user}\
@@ -107,7 +124,8 @@ class GucTestCase(unittest.TestCase):
         self.assertNotIn(self.constant.SQL_WRONG_MSG[1], result)
 
         LOGGER.info("查询pg_stat_user_functions视图不为空")
-        sql_cmd = ("select count(*) from pg_stat_user_functions;")
+        sql_cmd = ("select calls from pg_stat_user_functions "
+                   "where funcname='syn_fun_001';")
         excute_cmd = f'''source {macro.DB_ENV_PATH};\
                 gsql -d {self.db_name} -U {self.user_node.db_user}\
                 -p {self.user_node.db_port} \
@@ -116,7 +134,9 @@ class GucTestCase(unittest.TestCase):
         result = self.user_node.sh(excute_cmd).result()
         LOGGER.info(result)
         self.assertNotIn(self.constant.SQL_WRONG_MSG[1], result)
-        self.assertGreater(int(result.splitlines()[-2].strip()), 0)
+        num_alter = result.splitlines()[-2].strip()
+        LOGGER.info(num_alter)
+        self.assertGreater(num_alter, num_before)
 
         LOGGER.info("步骤4:恢复默认值")
         LOGGER.info("删除函数")
@@ -138,13 +158,15 @@ class GucTestCase(unittest.TestCase):
     def tearDown(self):
         LOGGER.info("恢复默认值")
         COMMONSH.execut_db_sql(f"drop database if exists {self.db_name};")
-        sql_cmd = COMMONSH.execut_db_sql("show track_functions;")
-        if "none" != sql_cmd.splitlines()[-2].strip():
-            COMMONSH.execute_gsguc("reload",
-                                  self.constant.GSGUC_SUCCESS_MSG,
-                                  "track_functions='none'")
-            COMMONSH.restart_db_cluster()
+        COMMONSH.execute_gsguc("reload",
+                              self.constant.GSGUC_SUCCESS_MSG,
+                              "track_functions='none'")
+        result = COMMONSH.restart_db_cluster()
+        LOGGER.info(result)
+        result = COMMONSH.execut_db_sql("show track_functions;")
+        LOGGER.info(result)
         status = COMMONSH.get_db_cluster_status()
+        self.assertIn("none\n", result)
         self.assertTrue("Degraded" in status or "Normal" in status)
         LOGGER.info("==Opengauss_Function_Guc_Run_Statistics_Case0046"
             "执行结束==")

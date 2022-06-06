@@ -2,6 +2,7 @@
 
 drop table if exists proc_blob_table_002;
 create table proc_blob_table_002(t1 int,t2 blob);
+insert into proc_blob_table_002 values(1,'01010fadea0000001005678940111111111');
 
 --创建存储过程
 create or replace procedure proc_blob_002(v1 out raw) is

@@ -9,4 +9,5 @@ CREATE TABLE sales
 INSERT INTO sales VALUES(1, '2019-01-10 00:00:00');
 select pg_stat_get_live_tuples() from PG_CLASS a where a.relname = 'sales';
 select pg_stat_get_live_tuples(a.oid,a.oid) from PG_CLASS a where a.relname = 'sales';
+select pg_stat_get_live_tuples(98765432198765);
 drop table sales cascade;

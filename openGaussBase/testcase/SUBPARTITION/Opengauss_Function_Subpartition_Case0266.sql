@@ -1,0 +1,76 @@
+-- @testpoint: range_range二级分区表：列存表/压缩,测试点合理报错
+
+--test1: 列存表with ( {storage_parameter = value} [, ... ] ) ]
+--step1: 创建二级分区列存表; expect:合理报错
+drop table if exists t_subpartition_00266;
+create   table if not exists t_subpartition_0266
+(
+    col_1 int ,
+    col_2 int  ,
+	col_3 int ,
+    col_4 int 
+)
+with(fillfactor=80,orientation = column)
+partition by range (col_1) subpartition by range (col_2)
+(
+  partition p_range_1 values less than( 10 )
+  (
+    subpartition p_range_1_1 values less than( 5 ),
+    subpartition p_range_1_2 values less than( maxvalue )
+  ),
+  partition p_range_2 values less than( 20 )
+  (
+    subpartition p_range_2_1 values less than( 5 ),
+    subpartition p_range_2_2 values less than( 10 )
+  )
+) enable row movement;
+--step2: 创建二级分区列存表，压缩; expect:合理报错
+drop table if exists t_subpartition_00266;
+create   table if not exists t_subpartition_0266
+(
+    col_1 int ,
+    col_2 int  ,
+	col_3 int ,
+    col_4 int 
+)
+with(orientation = column,compression=middle)
+partition by range (col_1) subpartition by range (col_2)
+(
+  partition p_range_1 values less than( 10 )
+  (
+    subpartition p_range_1_1 values less than( 5 ),
+    subpartition p_range_1_2 values less than( maxvalue )
+  ),
+  partition p_range_2 values less than( 20 )
+  (
+    subpartition p_range_2_1 values less than( 5 ),
+    subpartition p_range_2_2 values less than( 10 )
+  )
+) enable row movement;
+
+--test2: compress
+--step3: 创建二级分区表，压缩; expect:合理报错
+drop table if exists t_subpartition_00266;
+create   table if not exists t_subpartition_0266
+(
+    col_1 int ,
+    col_2 int  ,
+	col_3 int ,
+    col_4 int 
+)compress
+partition by range (col_1) subpartition by range (col_2)
+(
+  partition p_range_1 values less than( 10 )
+  (
+    subpartition p_range_1_1 values less than( 5 ),
+    subpartition p_range_1_2 values less than( maxvalue )
+  ),
+  partition p_range_2 values less than( 20 )
+  (
+    subpartition p_range_2_1 values less than( 5 ),
+    subpartition p_range_2_2 values less than( 10 )
+  )
+) enable row movement;
+
+--step4: 清理环境; expect:成功
+drop table if exists t_subpartition_0266;

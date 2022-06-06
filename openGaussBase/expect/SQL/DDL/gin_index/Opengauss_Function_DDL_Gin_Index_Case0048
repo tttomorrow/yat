@@ -25,8 +25,14 @@ show ENABLE_BITMAPSCAN;
 +-------------------+
 --set fail
 set maintenance_work_mem=1023;
+?.*ERROR: 1023 is outside the valid range for parameter "maintenance_work_mem" (1024 .. 2147483647)?.*
+set maintenance_work_mem=2147483648;
+?.*ERROR: invalid value for parameter "maintenance_work_mem": "2147483648".*
   Hint: Value exceeds integer range.
 set work_mem=63;
+?.*ERROR: 63 is outside the valid range for parameter "work_mem" (64 .. 2147483647)?.*
+set work_mem=2147483648;
+?.*ERROR: invalid value for parameter "work_mem": "2147483648".*
   Hint: Value exceeds integer range.
 --partition table
 DROP TABLE IF EXISTS test_gin_student_row;

@@ -1,0 +1,161 @@
+-- @testpoint: range_hash二级分区表：分区键多个/相同/表达式,测试点合理报错
+--step1: 创建表空间; expect:成功
+drop table if exists t_subpartition_0323;
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0323;
+SQL SUCCESS
+create tablespace ts_subpartition_0323 relative location 'subpartition_tablespace/subpartition_tablespace_0323';
+SQL SUCCESS
+--test1: 分区键 --一级分区指定多个
+--step2: 创建二级分区表,一级分区键指定多个; expect:合理报错
+drop table if exists t_subpartition_0323;
+SQL SUCCESS
+create   table if not exists t_subpartition_0323
+(
+    col_1 int ,
+    col_2 int  ,
+	col_3 int ,
+    col_4 int 
+)
+tablespace ts_subpartition_0323
+partition by range (col_1,col_4) subpartition by hash (col_2)
+(
+  partition p_range_1 values less than( -10 )
+  (
+    subpartition p_hash_1_1 ,
+    subpartition p_hash_1_2 ,
+	 subpartition p_hash_1_3
+  ),
+  partition p_range_2 values less than( 20 ),
+  partition p_range_3 values less than( 30)
+  (
+    subpartition p_hash_3_1 ,
+    subpartition p_hash_3_2 ,
+	subpartition p_hash_3_3
+  ),
+    partition p_range_4 values less than( 50)
+  (
+    subpartition p_hash_4_1 ,
+    subpartition p_hash_4_2 ,
+	subpartition t_subpartition_0323
+  ),
+  partition p_range_5 values less than( maxvalue )
+) enable row movement;
+?.*ERROR: Un-support featur.*
+  Detail: The partition key's length should be 1.
+--test2: 分区键 --二级分区指定多个
+--step3: 创建二级分区表,一级分区键指定多个; expect:合理报错
+drop table if exists t_subpartition_0323;
+SQL SUCCESS
+create   table if not exists t_subpartition_0323
+(
+    col_1 int ,
+    col_2 int  ,
+	col_3 int ,
+    col_4 int 
+)
+tablespace ts_subpartition_0323
+partition by range (col_1,col_4) subpartition by hash (col_2,col_3)
+(
+  partition p_range_1 values less than( -10 )
+  (
+    subpartition p_hash_1_1 ,
+    subpartition p_hash_1_2 ,
+	 subpartition p_hash_1_3
+  ),
+  partition p_range_2 values less than( 20 ),
+  partition p_range_3 values less than( 30)
+  (
+    subpartition p_hash_3_1 ,
+    subpartition p_hash_3_2 ,
+	subpartition p_hash_3_3
+  ),
+    partition p_range_4 values less than( 50)
+  (
+    subpartition p_hash_4_1 ,
+    subpartition p_hash_4_2 ,
+	subpartition t_subpartition_0323
+  ),
+  partition p_range_5 values less than( maxvalue )
+) enable row movement;
+?.*ERROR: Un-support featur.*
+  Detail: The partition key's length should be 1.
+--test3: 分区键 --一级分区键与二级分区键相同
+--step4: 创建二级分区表,一级分区键与二级分区键相同; expect:合理报错
+drop table if exists t_subpartition_0323;
+SQL SUCCESS
+create   table if not exists t_subpartition_0323
+(
+    col_1 int ,
+    col_2 int  ,
+	col_3 int ,
+    col_4 int 
+)
+tablespace ts_subpartition_0323
+partition by range (col_1) subpartition by hash (col_1)
+(
+  partition p_range_1 values less than( -10 )
+  (
+    subpartition p_hash_1_1 ,
+    subpartition p_hash_1_2 ,
+	 subpartition p_hash_1_3
+  ),
+  partition p_range_2 values less than( 20 ),
+  partition p_range_3 values less than( 30)
+  (
+    subpartition p_hash_3_1 ,
+    subpartition p_hash_3_2 ,
+	subpartition p_hash_3_3
+  ),
+    partition p_range_4 values less than( 50)
+  (
+    subpartition p_hash_4_1 ,
+    subpartition p_hash_4_2 ,
+	subpartition t_subpartition_0323
+  ),
+  partition p_range_5 values less than( maxvalue )
+) enable row movement;
+?.*ERROR: The two partition keys of a subpartition partition table are the same.*
+  Detail: N/A
+--test4: 分区键 --分区键为表达式--不支持
+--step5: 创建二级分区表,分区键为表达式; expect:合理报错
+drop table if exists t_subpartition_0323;
+SQL SUCCESS
+create   table if not exists t_subpartition_0323
+(
+    col_1 int ,
+    col_2 int  ,
+	col_3 int ,
+    col_4 int 
+)
+tablespace ts_subpartition_0323
+partition by range (upper(col_1)) subpartition by hash (col_2)
+(
+  partition p_range_1 values less than( -10 )
+  (
+    subpartition p_hash_1_1 ,
+    subpartition p_hash_1_2 ,
+	 subpartition p_hash_1_3
+  ),
+  partition p_range_2 values less than( 20 ),
+  partition p_range_3 values less than( 30)
+  (
+    subpartition p_hash_3_1 ,
+    subpartition p_hash_3_2 ,
+	subpartition p_hash_3_3
+  ),
+    partition p_range_4 values less than( 50)
+  (
+    subpartition p_hash_4_1 ,
+    subpartition p_hash_4_2 ,
+	subpartition t_subpartition_0323
+  ),
+  partition p_range_5 values less than( maxvalue )
+) enable row movement;
+?.*ERROR: syntax error at or near "\(.*
+?.*
+--step6: 清理环境; expect:成功
+drop table if exists t_subpartition_0323;
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0323;
+SQL SUCCESS

@@ -26,29 +26,34 @@ select pg_stat_get_tuples_returned(a.oid) from PG_CLASS a where a.relname = 'tes
 -- 验证查表返回
 --查表 返回两行2 0
 SELECT * FROM sales;
-SELECT pg_sleep(1);
+SELECT pg_sleep(6);
+SELECT pg_sleep(6);
 select pg_stat_get_tuples_returned(a.oid) from PG_CLASS a where a.relname = 'sales';
 select pg_stat_get_tuples_returned(a.oid) from PG_CLASS a where a.relname = 'test_index1';
 -- testpoint:验证进索引返回
 -- 进入索引 也返回两行2 2  2 4
 update sales set time_id = '2019-06-02 10:00:00' where prod_id = 1;
-SELECT pg_sleep(1);
+SELECT pg_sleep(6);
+SELECT pg_sleep(6);
 select pg_stat_get_tuples_returned(a.oid) from PG_CLASS a where a.relname = 'sales';
 select pg_stat_get_tuples_returned(a.oid) from PG_CLASS a where a.relname = 'test_index1';
 
 update sales set time_id = '2020-06-02 10:00:00' where prod_id = 1;
-SELECT pg_sleep(1);
+SELECT pg_sleep(6);
+SELECT pg_sleep(6);
 select pg_stat_get_tuples_returned(a.oid) from PG_CLASS a where a.relname = 'sales';
 select pg_stat_get_tuples_returned(a.oid) from PG_CLASS a where a.relname = 'test_index1';
 -- testpoint:创建索引引起全局扫描 8 4 0  10 4 0
 create index test_index2 on sales (cust_id);
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
+SELECT pg_sleep(6);
 select pg_stat_get_tuples_returned(a.oid) from PG_CLASS a where a.relname = 'sales';
 select pg_stat_get_tuples_returned(a.oid) from PG_CLASS a where a.relname = 'test_index1';
 select pg_stat_get_tuples_returned(a.oid) from PG_CLASS a where a.relname = 'test_index2';
 
 update sales set channel_id = 'H' where cust_id = 12;
-SELECT pg_sleep(3);
+SELECT pg_sleep(6);
+SELECT pg_sleep(6);
 select pg_stat_get_tuples_returned(a.oid) from PG_CLASS a where a.relname = 'sales';
 select pg_stat_get_tuples_returned(a.oid) from PG_CLASS a where a.relname = 'test_index1';
 select pg_stat_get_tuples_returned(a.oid) from PG_CLASS a where a.relname = 'test_index2';
@@ -56,14 +61,16 @@ select pg_stat_get_tuples_returned(a.oid) from PG_CLASS a where a.relname = 'tes
 -- 查询所有 cust_id=12  channel_id:abc
 SELECT * FROM sales;
 SELECT * FROM sales where prod_id = 1;
-SELECT pg_sleep(2);
+SELECT pg_sleep(6);
+SELECT pg_sleep(6);
 select pg_stat_get_tuples_returned(a.oid) from PG_CLASS a where a.relname = 'sales';
 select pg_stat_get_tuples_returned(a.oid) from PG_CLASS a where a.relname = 'test_index1';
 select pg_stat_get_tuples_returned(a.oid) from PG_CLASS a where a.relname = 'test_index2';
 -- testpoint:查询不存在的
 SELECT * FROM sales where cust_id = 1;
 SELECT * FROM sales where channel_id = 'g';
-SELECT pg_sleep(1);
+SELECT pg_sleep(6);
+SELECT pg_sleep(6);
 select pg_stat_get_tuples_returned(a.oid) from PG_CLASS a where a.relname = 'sales';
 select pg_stat_get_tuples_returned(a.oid) from PG_CLASS a where a.relname = 'test_index1';
 select pg_stat_get_tuples_returned(a.oid) from PG_CLASS a where a.relname = 'test_index2';

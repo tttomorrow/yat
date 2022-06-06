@@ -10,6 +10,9 @@ create table Comments_test(
 )
 PARTITION BY RANGE (c_integer)
 (
+	partition P_20180121 values less than (0),
+	partition P_20190122 values less than (50000),
+	partition P_20200123 values less than (100000),
 	partition P_max values less than (maxvalue)
 );
 --openGauss关键字comments(非保留),作为列名不带双引号，comments大小匹配，建表成功
@@ -24,6 +27,9 @@ create table Collation_Catalog_test(
 )
 PARTITION BY RANGE (c_integer)
 (
+	partition P_20180121 values less than (0),
+	partition P_20190122 values less than (50000),
+	partition P_20200123 values less than (100000),
 	partition P_max values less than (maxvalue)
 );
 drop table if exists Comments_test;

@@ -1,0 +1,77 @@
+-- @testpoint: 行存压缩索引:指定压缩类型参数为zstd，验证创建表时参数组合，部分step合理报错
+
+--test1: 创建行存压缩 btree 索引：使用参数compresstype=2，其他压缩参数正常
+drop table if exists t_rowcompress_0005 cascade;
+SQL SUCCESS
+create table t_rowcompress_0005(cid int, name varchar2) with(compresstype=2);
+SQL SUCCESS
+--step1: 创建行存压缩 btree 索引，parameter compresstype=2; expect:成功
+drop index if exists i_rowcompress_0005 cascade;
+SQL SUCCESS
+create index i_rowcompress_0005 on t_rowcompress_0005(name) with (compresstype=2);
+SQL SUCCESS
+--step2: 创建行存压缩 btree 索引，parameter compress_level=1; expect:成功
+drop index if exists i_rowcompress_0005 cascade;
+SQL SUCCESS
+create index i_rowcompress_0005 on t_rowcompress_0005(name) with (compresstype=2, compress_level=1);
+SQL SUCCESS
+--step3: 创建行存压缩 btree 索引，parameter compress_chunk_size=1/4BLCKSZ; expect:成功
+drop index if exists i_rowcompress_0005 cascade;
+SQL SUCCESS
+create index i_rowcompress_0005 on t_rowcompress_0005(name) with (compresstype=2, compress_chunk_size=2048);
+SQL SUCCESS
+--step4: 创建行存压缩 btree 索引，parameter compress_prealloc_chunks=1; expect:成功
+drop index if exists i_rowcompress_0005 cascade;
+SQL SUCCESS
+create index i_rowcompress_0005 on t_rowcompress_0005(name) with(compresstype=2, compress_prealloc_chunks=1);
+SQL SUCCESS
+--step5: 创建行存压缩 btree 索引，parameter compress_byte_convert=true; expect:成功
+drop index if exists i_rowcompress_0005 cascade;
+SQL SUCCESS
+create index i_rowcompress_0005 on t_rowcompress_0005(name) with(compresstype=2, compress_byte_convert=true);
+SQL SUCCESS
+--step6: 创建行存压缩 btree 索引，parameter compress_byte_convert=true, compress_diff_convert=true; expect:成功
+drop index if exists i_rowcompress_0005 cascade;
+SQL SUCCESS
+create index i_rowcompress_0005 on t_rowcompress_0005(name) with(compresstype=2, compress_diff_convert=true, compress_byte_convert=true);
+SQL SUCCESS
+--step7: 创建行存压缩 btree 索引，parameter compress_chunk_size=1/16BLCKSZ, compress_prealloc_chunks=7, compress_byte_convert=true, compress_diff_convert=true; expect:成功
+drop index if exists i_rowcompress_0005 cascade;
+SQL SUCCESS
+create index i_rowcompress_0005 on t_rowcompress_0005(name) with(compresstype=2, compress_chunk_size=512, compress_prealloc_chunks=7, compress_diff_convert=true, compress_byte_convert=true);
+SQL SUCCESS
+
+--test2: 创建行存压缩 btree 索引：使用参数compresstype=2，其他压缩参数异常
+drop index if exists i_rowcompress_0005 cascade;
+SQL SUCCESS
+--step8: 创建行存压缩 btree 索引，parameter compress_chunk_size=1/3BLCKSZ; expect:合理报错
+create index i_rowcompress_0005 on t_rowcompress_0005(name) with(compresstype=2, compress_chunk_size=1000);
+?.*ERROR: invalid compress_chunk_size 1000 , must be one of 512, 1024, 2048 or 4096 for i_rowcompress_0005
+--step9: 创建行存压缩 btree 索引，parameter compress_chunk_size=abc; expect:合理报错
+create index i_rowcompress_0005 on t_rowcompress_0005(name) with(compresstype=2, compress_chunk_size=abc);
+?.*ERROR: invalid value for integer option "compress_chunk_size": abc
+--step10: 创建行存压缩 btree 索引，parameter compress_prealloc_chunks=2; expect:合理报错
+create index i_rowcompress_0005 on t_rowcompress_0005(name) with(compresstype=2, compress_prealloc_chunks=2);
+?.*ERROR: invalid compress_prealloc_chunks 2 , must be less than 2 for i_rowcompress_0005
+--step11: 创建行存压缩 btree 索引，parameter compress_chunk_size=1/8BLCKSZ, compress_prealloc_chunks=8; expect:合理报错
+create index i_rowcompress_0005 on t_rowcompress_0005(name) with(compresstype=2, compress_chunk_size=1024, compress_prealloc_chunks=8);
+?.*ERROR: value 8 out of bounds for option "compress_prealloc_chunks"
+  Detail: Valid values are between "0" and "7".
+--step12: 创建行存压缩 btree 索引，parameter compress_prealloc_chunks=abc; expect:合理报错
+create index i_rowcompress_0005 on t_rowcompress_0005(name) with(compresstype=2, compress_prealloc_chunks=abc);
+?.*ERROR: invalid value for integer option "compress_prealloc_chunks": abc
+--step13: 创建行存压缩 btree 索引，parameter compress_diff_convert=true; expect:合理报错
+create index i_rowcompress_0005 on t_rowcompress_0005(name) with(compresstype=2, compress_diff_convert=true);
+?.*ERROR: compress_diff_convert should be used with compress_byte_convert.
+--step14: 创建行存压缩 btree 索引，parameter compress_byte_convert=100; expect:合理报错
+create index i_rowcompress_0005 on t_rowcompress_0005(name) with(compresstype=2, compress_byte_convert=100);
+?.*ERROR: invalid value for boolean option "compress_byte_convert": 100
+--step15: 创建行存压缩 btree 索引，parameter compress_byte_convert=abc; expect:合理报错
+create index i_rowcompress_0005 on t_rowcompress_0005(name) with(compresstype=2, compress_byte_convert=abc);
+?.*ERROR: invalid value for boolean option "compress_byte_convert": abc
+
+--step16: 删除行存压缩表
+drop index if exists i_rowcompress_0005 cascade;
+SQL SUCCESS
+drop table if exists t_rowcompress_0005 cascade;
+SQL SUCCESS

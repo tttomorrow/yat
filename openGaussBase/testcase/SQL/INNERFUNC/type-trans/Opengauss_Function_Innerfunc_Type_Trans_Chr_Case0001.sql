@@ -32,9 +32,6 @@ select to_char(1234567891234.129::double precision, '9999999999999999d9999999999
 select to_char(2.12345678::double precision, '999d9999999999999999');
 select to_char(0.12345678::double precision, '999d9999999999999999');
 
-select to_char(3.12345678::double precision, '000000999d9999999999999999');
-select to_char(3.12345678::double precision, '000000999d9990000000000');
-select to_char(3.12345678::double precision, '00000000000000000000');
 
 -- clob转换为varchar
 select char_length(to_char(lpad('abccc',1024*1024*11,'x')::clob));

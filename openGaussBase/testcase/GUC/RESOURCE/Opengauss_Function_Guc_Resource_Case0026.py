@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -17,6 +17,8 @@ Case Type   : GUC
 Case Name   : 修改参数bulk_write_ring_size为其他数据类型，观察预期结果；
 Description :
          1、查询bulk_write_ring_size默认值；
+         2、修改bulk_write_ring_size为false，"test",99999999999999等，并校验其预期结果；
+            gs_guc set -D /cluster/dn1 -c "bulk_write_ring_size=99999999999999"
 Expect      :
         1、显示默认值；
         2、参数修改失败；
@@ -69,6 +71,8 @@ class Deletaduit(unittest.TestCase):
         sql_cmd = self.commonsh.execut_db_sql(f'''show bulk_write_ring_size;''')
         self.log.info(sql_cmd)
         self.assertIn(self.res, sql_cmd)
+        # 使用设置gs_guc set设置bulk_write_ring_size为99999999999999
+        msg = self.commonsh.execute_gsguc('set', self.Constant.GSGUC_SUCCESS_MSG, 'bulk_write_ring_size=99999999999999')
         self.log.info(msg)
         self.assertFalse(msg)
         # 修改失败后重启后查看默认值

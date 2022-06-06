@@ -1,0 +1,97 @@
+"""
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
+
+openGauss is licensed under Mulan PSL v2.
+You can use this software according to the terms and conditions of the Mulan PSL v2.
+You may obtain a copy of Mulan PSL v2 at:
+
+          http://license.coscl.org.cn/MulanPSL2
+
+THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+See the Mulan PSL v2 for more details.
+"""
+"""
+Case Type   : explain
+Case Name   : explain结合insert语句使用后rollback回滚
+Description :
+    1.建表
+    2.向表中插入数据
+    3.开启事务,explain结合insert语句使用,打印执行信息,
+      查询表中score=40对应的数据,rollback回滚,查询表中score=40对应的数据
+    4.清理环境
+Expect      :
+    1.建表成功
+    2.向表中插入数据成功
+    3.开启事务成功,成功打印执行信息,返回表中score=40对应的数据,
+      回滚成功,返回的数据为空
+    4.清理环境成功
+History     :
+"""
+
+import os
+import unittest
+from testcase.utils.CommonSH import CommonSH
+from testcase.utils.Constant import Constant
+from testcase.utils.Logger import Logger
+
+
+class SQL(unittest.TestCase):
+    def setUp(self):
+        self.logger = Logger()
+        self.primary_sh = CommonSH('PrimaryDbUser')
+        self.table = 'explain_insert_rollback_0023'
+        self.Constant = Constant()
+
+    def test_explain(self):
+        self.logger.info(f'-----{os.path.basename(__file__)} start-----')
+        step = 'step1:建表 expect:建表成功'
+        self.logger.info(step)
+        create_table = self.primary_sh.execut_db_sql(f'''
+            drop table if exists {self.table} ;
+            create table {self.table}(name varchar(10),stu_id varchar(5) 
+            not null,score int );''')
+        self.logger.info(create_table)
+        self.assertIn(self.Constant.CREATE_TABLE_SUCCESS, create_table,
+                      "建表失败" + step)
+
+        step = 'step2:向表中插入数据 expect:向表中插入数据成功'
+        self.logger.info(step)
+        insert_data = self.primary_sh.execut_db_sql(f'''
+            insert into {self.table} values('数学','01',50),
+            ('语文','02',55);''')
+        self.logger.info(insert_data)
+        self.assertIn(self.Constant.INSERT_SUCCESS_MSG, insert_data,
+                      "向表中插入数据失败" + step)
+
+        step = 'step3:开启事务,explain结合insert语句使用,打印执行信息,' \
+               '查询表中score=40对应的数据,rollback回滚,' \
+               '查询表中score=40对应的数据' \
+               'expect:开启事务成功,成功打印执行信息,' \
+               '返回表中score=40对应的数据,回滚成功，返回的数据为空'
+        self.logger.info(step)
+        explain = self.primary_sh.execut_db_sql(f'''start transaction;
+            explain performance insert into {self.table} 
+            values('物理','03',40);
+            select * from {self.table} where score = 40;
+            rollback;
+            select * from {self.table} where score = 40;''')
+        self.logger.info(explain)
+        data_spl = str(explain).split('ROLLBACK')
+        name_spl = data_spl[0]
+        self.logger.info(data_spl)
+        self.logger.info(name_spl)
+        self.assertTrue(' 物理 | 03     |    40' in name_spl
+                        and '物理' not in data_spl[1],
+                        "explain结合update语句使用后rollback回滚失败" + step)
+
+    def tearDown(self):
+        step = 'step4:清理环境 expect:清理环境成功'
+        self.logger.info(step)
+        de_table = self.primary_sh.execut_db_sql(f'''
+            drop table {self.table};''')
+        self.logger.info(de_table)
+        self.assertIn(self.Constant.DROP_TABLE_SUCCESS, de_table,
+                      "执行失败" + step)
+        self.logger.info(f'-----{os.path.basename(__file__)} end-----')

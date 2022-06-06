@@ -1,0 +1,28 @@
+-- @testpoint: pg_stat_set_last_data_changed_time(oid),手动设置该表上最后一次操作的时间,函数的异常校验，合理报错
+----step1：创建表; expect:成功
+create table tb_statistics_function_case0160(id int);
+SQL SUCCESS
+----step1：入参为空; expect:合理报错
+select pg_stat_set_last_data_changed_time() from PG_CLASS a where a.relname = 'tb_statistics_function_case0160';
+?.*ERROR: function pg_stat_set_last_data_changed_time\(\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_stat_set_last_data_changed_time
+----step2：多参; expect:合理报错
+select pg_stat_set_last_data_changed_time(a.oid,a.oid,a.oid) from PG_CLASS a where a.relname = 'tb_statistics_function_case0160';
+?.*ERROR: function pg_stat_set_last_data_changed_time\(oid, oid, oid\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_stat_set_last_data_changed_time
+----step3：入参超范围; expect:合理报错
+select pg_stat_set_last_data_changed_time(9999999999999) from PG_CLASS a where a.relname = 'tb_statistics_function_case0160';
+?.*ERROR: OID out of rang.*
+  Where: referenced column: pg_stat_set_last_data_changed_time
+----step4：入参为特殊字符; expect:合理报错
+select pg_stat_set_last_data_changed_time('**&&^') from PG_CLASS a where a.relname = 'tb_statistics_function_case0160';
+?.*ERROR: invalid input syntax for type oid: "\*\*\&\&\^.*
+?.*
+  Where: referenced column: pg_stat_set_last_data_changed_time
+----step5：清理环境; expect:成功
+drop table tb_statistics_function_case0160;
+SQL SUCCESS

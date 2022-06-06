@@ -80,7 +80,7 @@ where i.indrelid = 'test_ugi_052'::regclass order by c.relname;
 --查看执行计划，c_date走index scan
 explain analyse select * from test_ugi_052 where c_date = '2021-06-06 00:00:00';
 
---表test_ugi_052应当包含"wait_clean_gpi=y"
+--表test_ugi_052包含"wait_clean_gpi=y"
 select a.relname,a.parttype,a.reloptions from pg_partition a, pg_class b 
 where a.parentid = b.oid and b.relname = 'test_ugi_052' and a.reloptions[3] like '%wait_clean_gpi=y%' order by 1,2,3;
 --执行清理

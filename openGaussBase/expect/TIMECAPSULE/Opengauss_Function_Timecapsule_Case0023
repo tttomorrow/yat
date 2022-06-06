@@ -1,0 +1,88 @@
+-- @testpoint: 子对象删除,子对象索引依赖外部函数
+--step1: 查询enable_recyclebin默认值; expect:显示默认值off
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+
+--step2: 修改enable_recyclebin为on; expect:修改成功
+alter system set enable_recyclebin to on;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| on                |
++-------------------+
+--step3: 如果表存在清除表且清除回收站; expect:表清除成功且回收站清除成功
+drop table if exists t_timecapsule_0023;
+SQL SUCCESS
+purge recyclebin;
+SQL SUCCESS
+--step4: 创建函数; expect:函数创建成功
+create function f_timecapsule_0023(int) returns int
+as $$ select $1::int $$ language sql;
+/
+SQL SUCCESS
+--step5: 创建表; expect:表创建成功
+create table t_timecapsule_0023 (a int, b int);
+SQL SUCCESS
+--step6: 创建索引; expect:索引创建成功
+create index i_timecapsule_0023_01 on t_timecapsule_0023 (f_timecapsule_0023(b));
+SQL SUCCESS
+create index i_timecapsule_0023_02 on t_timecapsule_0023 (a);
+SQL SUCCESS
+--step7: 在回收站中截取原始对象名称; expect:截取显示结果为空
+select substr(rcyoriginname, 1, 9) rcyoriginname, rcyoperation, rcytype, rcycanrestore, rcycanpurge from gs_recyclebin order by rcyrelid;
++---------------+--------------+---------+---------------+-------------+
+| rcyoriginname | rcyoperation | rcytype | rcycanrestore | rcycanpurge |
++---------------+--------------+---------+---------------+-------------+
++---------------+--------------+---------+---------------+-------------+
+--step8: 删除表; expect:删除成功
+drop table t_timecapsule_0023;
+SQL SUCCESS
+--step9: 在回收站中截取原始对象名称; expect:截取结果显示两条数据
+select substr(rcyoriginname, 1, 9) rcyoriginname, rcyoperation, rcytype, rcycanrestore, rcycanpurge from gs_recyclebin order by rcyrelid;
++---------------+--------------+---------+---------------+-------------+
+| rcyoriginname | rcyoperation | rcytype | rcycanrestore | rcycanpurge |
++---------------+--------------+---------+---------------+-------------+
+| t_timecap     | d            | 0       | true          | true        |
+| i_timecap     | d            | 1       | false         | true        |
++---------------+--------------+---------+---------------+-------------+
+--step10: 清空回收站; expect:回收站清空成功
+purge recyclebin;
+SQL SUCCESS
+--step11: 删除函数; expect:函数删除成功
+drop function f_timecapsule_0023(int);
+SQL SUCCESS
+--step12: 在回收站中截取原始对象名称; expect:截取结果为空
+select substr(rcyoriginname, 1, 9) rcyoriginname, rcyoperation, rcytype, rcycanrestore, rcycanpurge from gs_recyclebin order by rcyrelid;
++---------------+--------------+---------+---------------+-------------+
+| rcyoriginname | rcyoperation | rcytype | rcycanrestore | rcycanpurge |
++---------------+--------------+---------+---------------+-------------+
++---------------+--------------+---------+---------------+-------------+
+--step13: 清理环境; expect:清理成功
+drop table if exists t_timecapsule_0023 purge;
+SQL SUCCESS
+--step14: 恢复默认值; expect:默认值恢复成功
+alter system set enable_recyclebin to off;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+

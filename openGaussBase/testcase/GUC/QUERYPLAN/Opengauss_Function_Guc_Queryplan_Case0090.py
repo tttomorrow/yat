@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -20,55 +20,58 @@ Description :
         2.依次修改参数值为test,12345,空串
         3.恢复参数默认值
 Expect      :
-        1.显示默认值为off
+        1.显示默认值为on
         2.合理报错
         3.默认值恢复成功
-History     :
 """
 import unittest
 
+from testcase.utils.Common import Common
 from testcase.utils.CommonSH import CommonSH
 from testcase.utils.Constant import Constant
 from testcase.utils.Logger import Logger
-
-LOG = Logger()
-commonsh = CommonSH('dbuser')
 
 
 class QueryPlan(unittest.TestCase):
 
     def setUp(self):
+        self.LOG = Logger()
+        self.pri = CommonSH('dbuser')
         self.constant = Constant()
-        LOG.info(
-            '-------Opengauss_Function_Guc_Queryplan_Case0090start------')
+        self.common = Common()
+        self.LOG.info('-Opengauss_Function_Guc_Queryplan_Case0090 start-')
 
     def test_enable_codegen(self):
-        LOG.info('--步骤1:查看默认值--')
-        sql_cmd = commonsh.execut_db_sql(f'''show enable_codegen;''')
-        LOG.info(sql_cmd)
-        self.assertIn(self.constant.BOOLEAN_VALUES[1], sql_cmd)
-        LOG.info('--步骤2:依次修改参数值为test,12345,"''"--')
+        text = '--step1:查看默认值;expect:默认值是on--'
+        self.LOG.info(text)
+        sql_cmd = self.pri.execut_db_sql("show enable_codegen;")
+        self.LOG.info(sql_cmd)
+        self.common.equal_sql_mdg(sql_cmd, "enable_codegen", "on",
+                                  "(1 row)", flag="1")
+        text = '--step2:依次修改参数值为test,12345,"''";expect:修改失败--'
+        self.LOG.info(text)
         invalid_value = ['test', 12345, "''"]
         for i in invalid_value:
-            result = commonsh.execute_gsguc("set",
+            result = self.pri.execute_gsguc("set",
                                             self.constant.GSGUC_SUCCESS_MSG,
                                             f"enable_codegen={i}")
-            self.assertFalse(result)
+            self.assertFalse(result, '执行失败:' + text)
 
     def tearDown(self):
-        LOG.info('--步骤3:恢复默认值--')
-        sql_cmd = commonsh.execut_db_sql('''show enable_codegen;''')
-        LOG.info(sql_cmd)
-        if "off" != sql_cmd.split('\n')[-2].strip():
-            msg = commonsh.execute_gsguc('set',
-                                         self.constant.GSGUC_SUCCESS_MSG,
-                                         "enable_codegen=off")
-            LOG.info(msg)
-            msg = commonsh.restart_db_cluster()
-            LOG.info(msg)
-        status = commonsh.get_db_cluster_status()
-        self.assertTrue("Degraded" in status or "Normal" in status)
-        sql_cmd = commonsh.execut_db_sql('''show enable_codegen;''')
-        LOG.info(sql_cmd)
-        LOG.info(
-            '-----Opengauss_Function_Guc_Queryplan_Case0090执行完成-------')
+        text = 'step3:恢复默认值;expect:恢复默认值成功--'
+        self.LOG.info(text)
+        msg = self.pri.execute_gsguc("set",
+                                     self.constant.GSGUC_SUCCESS_MSG,
+                                     "enable_codegen=on")
+        self.LOG.info(msg)
+        msg = self.pri.restart_db_cluster()
+        self.LOG.info(msg)
+        status = self.pri.get_db_cluster_status()
+        self.LOG.info(status)
+        sql_cmd = self.pri.execut_db_sql("show enable_codegen;")
+        self.LOG.info(sql_cmd)
+        self.assertTrue("Degraded" in status or "Normal" in status,
+                        '执行失败:' + text)
+        self.common.equal_sql_mdg(sql_cmd, "enable_codegen", "on",
+                                  "(1 row)", flag="1")
+        self.LOG.info('-Opengauss_Function_Guc_Queryplan_Case0090 finish-')

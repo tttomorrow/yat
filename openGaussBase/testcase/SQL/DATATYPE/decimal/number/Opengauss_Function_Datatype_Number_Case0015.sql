@@ -7,5 +7,6 @@ insert into number_15 values (123.12);
 insert into number_15 values (1234.12);
 insert into number_15 values (1234.1234);
 insert into number_15 values (9999.99);
+insert into number_15 values (1.11223344566);
 select * from number_15;
 drop table number_15;

@@ -1,5 +1,5 @@
 -- @testpoint: 创建视图的同义词，修改同义词属主（属主为存在+不存在+存在无create权限）,不存在+存在无create权限,合理报错
--- @modify at: 2020-11-26
+
 --建表
 drop table if EXISTS test_synonym cascade;
 create table test_synonym(a int,b varchar);
@@ -12,7 +12,7 @@ drop synonym if EXISTS synview cascade;
 create synonym synview for test_synview;
 --创建用户
 drop user if exists syn006;
-create user syn006 password "mima@123";
+create user syn006 password "Mima@123";
 --修改为存在的属主：新属主无create权限：报错
 alter synonym synview owner to syn006;
 --修改为不存在的属主：报错

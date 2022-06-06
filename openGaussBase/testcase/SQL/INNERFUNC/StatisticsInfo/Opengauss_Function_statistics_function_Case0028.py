@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -51,7 +51,7 @@ class Tools(unittest.TestCase):
             self.log.info(f'str_info = {str_info}')
             num = len(str_info.split(','))
             self.log.info(f'num = {num}')
-            if num == 20:
+            if num == 22:
                 self.log.info('汇聚openGauss内各节点上正在运行的线程相关的信息成功')
             else:
                 raise Exception('函数执行异常，请检查')

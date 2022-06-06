@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -26,15 +26,13 @@ Expect      :
 History     : 
 """
 
-import unittest
-import sys
 import os
+import unittest
+
+from testcase.utils.CommonSH import CommonSH
+from testcase.utils.Logger import Logger
 from yat.test import Node
 from yat.test import macro
-
-sys.path.append(sys.path[0] + "/../")
-from testcase.utils.Logger import Logger
-from testcase.utils.CommonSH import CommonSH
 
 logger = Logger()
 
@@ -42,29 +40,38 @@ logger = Logger()
 class Function(unittest.TestCase):
 
     def setUp(self):
-        logger.info("--------Opengauss_Function_DDL_Create_Directory_Case0005.py开始执行--------")
-        self.commonsh = CommonSH('dbuser')
-        self.userNode = Node('dbuser')
-        self.DB_ENV_PATH = macro.DB_INSTANCE_PATH
+        logger.info(f"-----{os.path.basename(__file__)}开始执行-----")
+        self.commonsh = CommonSH("dbuser")
+        self.userNode = Node("dbuser")
+        self.link_path = os.path.join("/home", f"{self.userNode.ssh_user}",
+                                      "my_link0005")
 
     def test_directory(self):
-        logger.info('--------路径含特殊字符。路径是相对路径。路径是符号连接。--------')
-        self.soft_link = [f"""rm -rf my_link""", f"""ln -s /tmp my_link"""]
+        text = "-----前置准备 创建符号链接-----"
+        logger.info(text)
+        self.soft_link = [f"rm -rf {self.link_path}",
+                          f"ln -s /tmp {self.link_path}"]
         for i in range(2):
             msg = self.userNode.sh(self.soft_link[i]).result()
             logger.info(msg)
-            self.assertTrue(len(msg.strip()) == 0)
-        error_path = ['/&~?!tmp/', '../tmp/', '/my_link/']
+            self.assertTrue(len(msg.strip()) == 0, "执行失败" + text)
+
+        text = "-----step1+2+3:路径含特殊字符/路径是相对路径/路径是符号连接;expect:-----"
+        logger.info(text)
+        error_path = ["/&~?!tmp/", "../tmp/", f"{self.link_path}"]
         error_msg = ['illegal string: "&"',
-                     'illegal string: "."',
-                     'directory does not exist']
+                     "ERROR:  directory path cannot be relative",
+                     "is not a directory, please check"]
         for j in range(3):
-            sql_cmd = "CREATE OR REPLACE DIRECTORY dir as '{}';".format(error_path[j])
+            sql_cmd = f"create or replace directory dir as '{error_path[j]}';"
             msg1 = self.commonsh.execut_db_sql(sql_cmd)
             logger.info(msg1)
-            self.assertTrue(error_msg[j] in msg1)
+            self.assertTrue(error_msg[j] in msg1, "执行失败" + text)
 
     def tearDown(self):
-        msg2 = self.userNode.sh(self.soft_link[0]).result()
-        logger.info(msg2)
-        logger.info('--------Opengauss_Function_DDL_Create_Directory_Case0005.py执行结束--------')
+        text = "清理环境"
+        logger.info(text)
+        result = self.userNode.sh(self.soft_link[0]).result()
+        logger.info(result)
+        self.assertTrue(len(result.strip()) == 0, "执行失败" + text)
+        logger.info(f"-----{os.path.basename(__file__)}执行结束-----")

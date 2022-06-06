@@ -1,0 +1,196 @@
+-- @testpoint: 行存本地临时-nvarchar(n)的约束\索引\表操作测试 部分测试点合理报错
+--step1:建表; expect:成功
+drop table if exists t_nvarchar_0008_01 cascade;
+SQL SUCCESS
+drop table if exists t_nvarchar_0008_02 cascade;
+SQL SUCCESS
+create temporary table t_nvarchar_0008_01(c_nvarchar nvarchar primary key);
+SQL SUCCESS
+create temporary table t_nvarchar_0008_02(c_nvarchar nvarchar);
+SQL SUCCESS
+--step2:约束测试; expect:成功
+--增加/删除唯一约束
+alter table t_nvarchar_0008_02 add constraint t_nvarchar_0008_02_c_nvarchar_key unique(c_nvarchar);
+SQL SUCCESS
+insert into t_nvarchar_0008_02(c_nvarchar) values('test'),('test');
+?.*ERROR: duplicate key value violates unique constraint "t_nvarchar_0008_02_c_nvarchar_key"?.*
+  Detail: Key (c_nvarchar)=(test) already exists.
+alter table t_nvarchar_0008_02 drop constraint t_nvarchar_0008_02_c_nvarchar_key;
+SQL SUCCESS
+insert into t_nvarchar_0008_02(c_nvarchar) values('test'),('test');
+SQL SUCCESS
+truncate t_nvarchar_0008_02;
+SQL SUCCESS
+--增加/删除not null约束
+alter table t_nvarchar_0008_02 modify c_nvarchar not null;
+SQL SUCCESS
+insert into t_nvarchar_0008_02(c_nvarchar) values(null);
+?.*ERROR: null value in column "c_nvarchar" violates not-null constraint?.*
+  Detail: Failing row contains (null).
+alter table t_nvarchar_0008_02 modify c_nvarchar null;
+SQL SUCCESS
+insert into t_nvarchar_0008_02(c_nvarchar) values(null);
+SQL SUCCESS
+truncate t_nvarchar_0008_02;
+SQL SUCCESS
+--增加/删除默认约束
+alter table t_nvarchar_0008_02 alter c_nvarchar set default 'test0008';
+SQL SUCCESS
+insert into t_nvarchar_0008_02(c_nvarchar) values(default);
+SQL SUCCESS
+select c_nvarchar from t_nvarchar_0008_02;
++------------+
+| c_nvarchar |
++------------+
+| test0008   |
++------------+
+truncate t_nvarchar_0008_02;
+SQL SUCCESS
+alter table t_nvarchar_0008_02 alter c_nvarchar drop default;
+SQL SUCCESS
+insert into t_nvarchar_0008_02(c_nvarchar) values(default);
+SQL SUCCESS
+select c_nvarchar from t_nvarchar_0008_02;
++------------+
+| c_nvarchar |
++------------+
+|            |
++------------+
+truncate t_nvarchar_0008_02;
+SQL SUCCESS
+--增加/删除检查约束
+alter table t_nvarchar_0008_02 add constraint t_nvarchar_0008_02_c_nvarchar_key check (c_nvarchar='test');
+SQL SUCCESS
+insert into t_nvarchar_0008_02(c_nvarchar) values('test0008');
+?.*ERROR: new row for relation "t_nvarchar_0008_02" violates check constraint "t_nvarchar_0008_02_c_nvarchar_key"?.*
+  Detail: N/A
+alter table t_nvarchar_0008_02 drop constraint t_nvarchar_0008_02_c_nvarchar_key;
+SQL SUCCESS
+insert into t_nvarchar_0008_02(c_nvarchar) values('test0008');
+SQL SUCCESS
+truncate t_nvarchar_0008_02;
+SQL SUCCESS
+--增加/删除主外键约束
+alter table t_nvarchar_0008_02 add constraint t_nvarchar_0008_02_c_nvarchar_key  primary key (c_nvarchar);
+SQL SUCCESS
+alter table t_nvarchar_0008_02 add column c_nvarchar1 nvarchar;
+SQL SUCCESS
+alter table t_nvarchar_0008_02 add constraint t_nvarchar_0008_02_c_nvarchar_fkey  foreign key (c_nvarchar1) references t_nvarchar_0008_01(c_nvarchar);
+SQL SUCCESS
+select conname from pg_constraint where conrelid in (select oid from pg_class where relname like 't_nvarchar_0008_02') order by conname;
++------------------------------------+
+| conname                            |
++------------------------------------+
+| t_nvarchar_0008_02_c_nvarchar_fkey |
+| t_nvarchar_0008_02_c_nvarchar_key  |
++------------------------------------+
+alter table t_nvarchar_0008_02 drop constraint t_nvarchar_0008_02_c_nvarchar_key cascade;
+SQL SUCCESS
+alter table t_nvarchar_0008_02 drop constraint t_nvarchar_0008_02_c_nvarchar_fkey cascade;
+SQL SUCCESS
+alter table t_nvarchar_0008_01 drop constraint "t_nvarchar_0008_01_pkey" cascade;
+SQL SUCCESS
+select conname from pg_constraint where conrelid in (select oid from pg_class where relname like 't_nvarchar_0008_02') order by conname;
++---------+
+| conname |
++---------+
++---------+
+--step3:索引; expect:成功
+create index index_0008_01 on t_nvarchar_0008_02(c_nvarchar,c_nvarchar1);
+SQL SUCCESS
+create index index_0008_02 on t_nvarchar_0008_02 using gin(to_tsvector('english', c_nvarchar));
+SQL SUCCESS
+--step4:表操作; expect:成功
+--增删字段
+alter table t_nvarchar_0008_02 drop column c_nvarchar1;
+SQL SUCCESS
+alter table t_nvarchar_0008_02 add column c_nvarchar1 nvarchar;
+SQL SUCCESS
+--修改字段长度
+alter table t_nvarchar_0008_02 modify c_nvarchar1 nvarchar(200);
+SQL SUCCESS
+alter table t_nvarchar_0008_02 modify c_nvarchar1 nvarchar(1048576);
+SQL SUCCESS
+alter table t_nvarchar_0008_02 modify c_nvarchar1 nvarchar(1048575);
+SQL SUCCESS
+alter table t_nvarchar_0008_02 modify c_nvarchar1 nvarchar(1048577);
+SQL SUCCESS
+--修改字段类型
+alter table t_nvarchar_0008_02 modify c_nvarchar1 nvarchar2(100);
+SQL SUCCESS
+alter table t_nvarchar_0008_02 modify c_nvarchar1 nvarchar(150);
+SQL SUCCESS
+alter table t_nvarchar_0008_02 add constraint t_nvarchar_0008_02_c_nvarchar_key unique(c_nvarchar);
+SQL SUCCESS
+alter table t_nvarchar_0008_02 modify c_nvarchar1 nvarchar2(100);
+SQL SUCCESS
+alter table t_nvarchar_0008_02 modify c_nvarchar1 text;
+SQL SUCCESS
+alter table t_nvarchar_0008_02 modify c_nvarchar1 clob;
+SQL SUCCESS
+alter table t_nvarchar_0008_02 modify c_nvarchar1 char;
+SQL SUCCESS
+alter table t_nvarchar_0008_02 modify c_nvarchar1 nvarchar(150);
+SQL SUCCESS
+--step5:sql操作; expect:成功
+insert into t_nvarchar_0008_02 values (1::nvarchar),(2::nvarchar),(3::nvarchar),(4::nvarchar),(5::nvarchar);
+SQL SUCCESS
+select * from t_nvarchar_0008_02;
++------------+-------------+
+| c_nvarchar | c_nvarchar1 |
++------------+-------------+
+| 1          |             |
+| 2          |             |
+| 3          |             |
+| 4          |             |
+| 5          |             |
++------------+-------------+
+update t_nvarchar_0008_02 set c_nvarchar = 'test' where c_nvarchar='1';
+SQL SUCCESS
+select * from t_nvarchar_0008_02;
++------------+-------------+
+| c_nvarchar | c_nvarchar1 |
++------------+-------------+
+| 2          |             |
+| 3          |             |
+| 4          |             |
+| 5          |             |
+| test       |             |
++------------+-------------+
+delete from t_nvarchar_0008_02 where c_nvarchar = '2';
+SQL SUCCESS
+select * from t_nvarchar_0008_02;
++------------+-------------+
+| c_nvarchar | c_nvarchar1 |
++------------+-------------+
+| 3          |             |
+| 4          |             |
+| 5          |             |
+| test       |             |
++------------+-------------+
+--upsert
+truncate t_nvarchar_0008_01;
+SQL SUCCESS
+truncate t_nvarchar_0008_02;
+SQL SUCCESS
+insert into t_nvarchar_0008_02 values ('a','test0008');
+SQL SUCCESS
+select * from t_nvarchar_0008_02 where c_nvarchar = 'a';
++------------+-------------+
+| c_nvarchar | c_nvarchar1 |
++------------+-------------+
+| a          | test0008    |
++------------+-------------+
+insert into t_nvarchar_0008_02 values ('a','test0008_01') on duplicate key update c_nvarchar1='test0008_01';
+SQL SUCCESS
+select * from t_nvarchar_0008_02 where c_nvarchar = 'a';
++------------+-------------+
+| c_nvarchar | c_nvarchar1 |
++------------+-------------+
+| a          | test0008_01 |
++------------+-------------+
+--step6:清理环境; expect:成功
+drop table if exists t_nvarchar_0008_01 cascade;
+SQL SUCCESS
+drop table if exists t_nvarchar_0008_02 cascade;
+SQL SUCCESS

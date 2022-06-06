@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -62,7 +62,7 @@ class DdlDatabaseCase0013(unittest.TestCase):
         self.dbspace = 'db_space'
         self.tbspace = 'tb_space'
         self.username = 'user_case008'
-        self.password = 'test@1234567'
+        self.password = macro.COMMON_PASSWD
 
     def test_database_case0006(self):
         self.log.info('----------1.创建用户------------------')

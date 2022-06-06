@@ -14,7 +14,6 @@ select to_number('5f','xxx');
 
 -- 模式串0长度比数字个数长，正常显示
 select to_number('89.988','00000d00000');
-select to_number('8909','00000000');
 
 -- 模式串0长度比数字个数短，截取显示
 select to_number('89.988888','999d00');

@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -80,7 +80,7 @@ class CopyFile(unittest.TestCase):
         logger.info('----------------------------复制文件并给权限，形成新的数据文件-----------------------------')
         excute_cmd = f'''
                     cp {self.DB_INSTANCE_PATH}/pg_copydir/testzl.dat {self.DB_INSTANCE_PATH}/pg_copydir/testzl1.dat;
-                    chmod 700 {self.DB_INSTANCE_PATH}/pg_copydir/testzl1.dat;
+                    chmod 777 {self.DB_INSTANCE_PATH}/pg_copydir/testzl1.dat;
                     '''
         logger.info(excute_cmd)
         msg = self.userNode.sh(excute_cmd).result()

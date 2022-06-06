@@ -1,0 +1,29 @@
+-- @testpoint: List分区表结合列约束unique,部分测试点合理报错
+--step1:创建list分区表,结合列约束;expect:成功
+drop table if exists t_partition_list_0070;
+SQL SUCCESS
+create table t_partition_list_0070
+(id                int,
+age                int unique,
+number             int,
+text               VARCHAR2(2000))
+partition by list(id)
+(partition p1 values(10),
+ partition p2 values(20));
+SQL SUCCESS
+--step2:插入数据;expect:合理报错
+insert into  t_partition_list_0070 values(10,10,10,'hahahahah');
+SQL SUCCESS
+insert into  t_partition_list_0070 values(20,10,-10,'hahahahah');
+?.*ERROR: duplicate key value violates unique constraint "t_partition_list_0070_age_tableoid_key.*
+  Detail: Key (age)=(10) already exists.
+--step3:查看数据;expect:成功
+select * from t_partition_list_0070;
++----+-----+--------+-----------+
+| id | age | number | text      |
++----+-----+--------+-----------+
+| 10 | 10  | 10     | hahahahah |
++----+-----+--------+-----------+
+--step4:清理环境
+drop table if exists t_partition_list_0070;
+SQL SUCCESS

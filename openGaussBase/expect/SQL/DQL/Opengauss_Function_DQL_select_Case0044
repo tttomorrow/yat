@@ -42,11 +42,13 @@ select distinct substr(VARIANCE(distinct b.c3),1,10), ceil(VAR_SAMP( a.sal*a.dep
 +------------+---------------------+
 | substr     | ?column?            |
 +------------+---------------------+
+| 3335667100 |                     |
 +------------+---------------------+
 select distinct substr(VARIANCE(distinct b.c3),1,10)||ceil(VAR_SAMP( a.sal*a.deptno+100))*100/50 from t_agg_join_003 a right join t_agg_join_004 b on a.id=b.id group by b.c1 order by 1;
 +-------------------------------+
 | ?column?                      |
 +-------------------------------+
+| 3335667100                    |
 +-------------------------------+
 drop table t_agg_join_003;
 SQL SUCCESS

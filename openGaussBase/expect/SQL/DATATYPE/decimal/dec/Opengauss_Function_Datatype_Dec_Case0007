@@ -13,19 +13,17 @@ insert into dec_07 values (date'2020-02-02');
 ?.*
   Where: referenced column: id
 insert into dec_07 values (TRUE);
-?.*ERROR: column "id" is of type numeric but expression is of type boolean
-  Hint: You will need to rewrite or cast the expression.
-?.*
-  Where: referenced column: id
+SQL SUCCESS
 insert into dec_07 values (HEXTORAW('DEADBEEF'));
 ?.*ERROR: column "id" is of type numeric but expression is of type raw
   Hint: You will need to rewrite or cast the expression.
 ?.*
   Where: referenced column: id
 select * from dec_07;
-+----+
-| id |
-+----+
-+----+
++------+
+| id   |
++------+
+| 1.00 |
++------+
 drop table dec_07;
 SQL SUCCESS

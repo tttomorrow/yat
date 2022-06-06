@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -14,14 +14,13 @@ See the Mulan PSL v2 for more details.
 """
 """
 Case Type   : GUC
-Case Name   : 创建函数，参数个数为667,合理报错
+Case Name   : 创建函数，参数个数为8193,合理报错
 Description :
         1.查询max_function_args默认值
-        2.创建函数，参数个数为667
+        2.创建函数，参数个数为8193
 Expect      :
-        1.显示默认值为666
+        1.显示默认值为8192
         2.合理报错
-History     :
 """
 import unittest
 
@@ -29,39 +28,39 @@ from testcase.utils.CommonSH import CommonSH
 from testcase.utils.Constant import Constant
 from testcase.utils.Logger import Logger
 
-LOG = Logger()
-commonsh = CommonSH('dbuser')
-
 
 class DeveloperOptions(unittest.TestCase):
     def setUp(self):
-        LOG.info(
+        self.log = Logger()
+        self.log.info(
             '------Opengauss_Function_DeveloperOptions_Case0109start------')
         self.constant = Constant()
-        self.args = ','.join(['para' + str(i) + ' int' for i in range(1, 668)])
+        self.com = CommonSH('dbuser')
+        self.fun_name = "fun_DeveloperOptions_Case0109"
+        self.args = ','.join(
+            ['para' + str(i) + ' int' for i in range(1, 8194)])
 
     def test_max_function_args(self):
-        LOG.info('--步骤1:查看默认值--')
-        sql_cmd = commonsh.execut_db_sql(f'''show max_function_args;''')
-        LOG.info(sql_cmd)
-        self.res = sql_cmd.splitlines()[-2].strip()
-        # 创建函数，报错
-        LOG.info('--步骤1:查看默认值--')
-        sql_cmd = commonsh.execut_db_sql(f'''
-        create or replace function func_052 ({self.args})
-       returns SETOF RECORD
-as \$\$
-begin
-    result_1 = i + 1;
-    result_2 = i * 10;
-return next;
-end;
-\$\$language plpgsql;''')
-        LOG.info(sql_cmd)
-        self.assertIn(
-        'ERROR:  functions cannot have more than 666 arguments', sql_cmd)
+        text = '--步骤1:查看默认值;expect:默认值为8192--'
+        self.log.info(text)
+        sql_cmd = self.com.execut_db_sql(f'''show max_function_args;''')
+        self.log.info(sql_cmd)
+        self.assertEqual('8192', sql_cmd.split('\n')[2].strip(),
+                         '执行失败:' + text)
+        text = '--步骤2:创建函数，参数个数为8193;expect:合理报错--'
+        self.log.info(text)
+        sql_cmd = self.com.execut_db_sql(f'''CREATE OR REPLACE FUNCTION \
+        {self.fun_name}({self.args}) RETURNS integer AS \$\$
+                BEGIN
+                        RETURN i + 1;
+                END;
+        \$\$ LANGUAGE plpgsql;
+        ''')
+        self.log.info(sql_cmd)
+        self.assertIn('RROR:  functions cannot have more than 8192 arguments',
+                      sql_cmd, '执行失败:' + text)
 
     def tearDown(self):
-        LOG.info('----------------this is teardown-----------------------')
-        LOG.info(
+        self.log.info('无须清理环境')
+        self.log.info(
             '----Opengauss_Function_DeveloperOptions_Case0109finish---')

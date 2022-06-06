@@ -6,6 +6,7 @@ create table fvt_proc_binary_blob_003(
   t2 blob
   );
 SQL SUCCESS
+insert into fvt_proc_binary_blob_003 values(1,'0101101111');
 SQL SUCCESS
 create or replace function fvt_proc_blob_003() return int
 is
@@ -28,6 +29,7 @@ select fvt_proc_blob_003();
 +-------------------+
 | fvt_proc_blob_003 |
 +-------------------+
+| 101101111         |
 +-------------------+
 --恢复环境
 drop function if exists fvt_proc_blob_003;

@@ -1,4 +1,4 @@
--- @testpoint: width_bucket函数b1、b2非数值类型，合理报错
+-- @testpoint: width_bucket函数b1、b2非数值类型，部分测试点合理报错
 drop table if exists data_01;
 SQL SUCCESS
 create table data_01 (clo1 char,clo2 boolean);
@@ -9,10 +9,11 @@ select width_bucket(clo1,2,5,5) from data_01;
 ?.*ERROR: invalid input syntax for type double precision: "a"
   Where: referenced column: width_bucket
 select width_bucket(clo2,-3,3,5) from data_01;
-?.*ERROR: function width_bucket\(boolean, integer, integer, integer\) does not exist
-  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
-?.*
-  Where: referenced column: width_bucket
++--------------+
+| width_bucket |
++--------------+
+| 4            |
++--------------+
 select width_bucket(null,-3,3,5) from data_01;
 +--------------+
 | width_bucket |

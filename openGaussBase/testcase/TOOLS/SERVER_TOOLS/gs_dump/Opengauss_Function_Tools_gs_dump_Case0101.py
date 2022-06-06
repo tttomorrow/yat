@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -31,7 +31,7 @@ Expect      :
     3.导出成功
     4.导出的过程互不影响，都会导出成功，且导出的数据不一致,gs_dumpall比gs_dump导出的信息多
     5.清理成功
-History     : 
+History     :
 """
 import os
 import unittest
@@ -52,7 +52,6 @@ class Tools(unittest.TestCase):
         self.log.info(
             '---Opengauss_Function_Tools_gs_dump_Case0101start---')
         self.constant = Constant()
-        self.DB_ENV_PATH = macro.DB_ENV_PATH
         self.Primary_Node1 = Node('PrimaryDbUser')
         self.Primary_Node2 = Node('PrimaryDbUser')
         self.Root_Node = Node('PrimaryRoot')
@@ -61,36 +60,55 @@ class Tools(unittest.TestCase):
             os.path.dirname(macro.DB_INSTANCE_PATH), 'dump1.sql')
         self.dump_path2 = os.path.join(
             os.path.dirname(macro.DB_INSTANCE_PATH), 'dump2.sql')
-        self.db_name = "db_dump0101"
-        self.tb_name = "t_dump0101"
+        self.db_name1 = "db_dump0101_01"
+        self.db_name2 = "db_dump0101_02"
+        self.tb_name1 = "t_dump0101_01"
+        self.tb_name2 = "t_dump0101_02"
 
     def test_tools_dump(self):
         text = '---step1:创建测试数据;expect:创建成功---'
         self.log.info(text)
-        self.log.info('------创建成功数据库-------')
+        text = '---step1.1:创建数据库;expect:创建成功---'
         self.log.info(text)
         sql_cmd = self.pri_sh.execut_db_sql(f'''
-            drop database if exists {self.db_name};
-            create database {self.db_name};''')
+            drop database if exists {self.db_name1};
+            drop database if exists {self.db_name2};
+            create database {self.db_name1};
+            create database {self.db_name2};''')
         self.log.info(sql_cmd)
         self.assertIn(self.constant.CREATE_DATABASE_SUCCESS, sql_cmd,
                       '执行失败:' + text)
-        self.log.info('---在创建的数据库中创建表和数据---')
-        sql_cmd = f'''drop table if  exists {self.tb_name};
-            create table {self.tb_name} (id int);
-            insert into {self.tb_name} values (generate_series(1,1000000));'''
+        text = '---step1.2:在创建的数据库中创建表和数据;expect:创建成功---'
+        self.log.info(text)
+        sql_cmd = f"drop table if  exists {self.tb_name1};" \
+            f"create table {self.tb_name1} (id int);" \
+            f"insert into {self.tb_name1} " \
+            f"values (generate_series(1,1000));"
         self.log.info(sql_cmd)
         sql_result = self.pri_sh.execut_db_sql(sql=sql_cmd,
-                                               dbname=f'{self.db_name}')
+                                               dbname=f'{self.db_name1}')
         self.log.info(sql_result)
         self.assertIn(self.constant.TABLE_CREATE_SUCCESS, sql_result,
                       '执行失败:' + text)
         self.assertIn(self.constant.INSERT_SUCCESS_MSG, sql_result,
                       '执行失败:' + text)
+        sql_cmd = f'drop table if  exists {self.tb_name2};' \
+            f'create table {self.tb_name2} (id int);' \
+            f'insert into {self.tb_name2} ' \
+            f'values (generate_series(1,1000));'
+        self.log.info(sql_cmd)
+        sql_result = self.pri_sh.execut_db_sql(sql=sql_cmd,
+                                               dbname=f'{self.db_name2}')
+        self.log.info(sql_result)
+        self.assertIn(self.constant.TABLE_CREATE_SUCCESS, sql_result,
+                      '执行失败:' + text)
+        self.assertIn(self.constant.INSERT_SUCCESS_MSG, sql_result,
+                      '执行失败:' + text)
+
         text = '---step2:在会话1执行导出操作;expect:导出成功---'
         self.log.info(text)
         dump_cmd = f'''source {macro.DB_ENV_PATH};\
-            gs_dump {self.db_name} \
+            gs_dump {self.db_name1} \
             -p {self.Primary_Node1.db_port} \
             -f {self.dump_path1};
             '''
@@ -112,11 +130,12 @@ class Tools(unittest.TestCase):
             self.com.get_sh_result, args=(self.Primary_Node2, dump_cmd))
         connect_thread2.setDaemon(True)
         connect_thread2.start()
+
         self.log.info('-----------获取session1结果-----------')
         connect_thread1.join(180)
         thread1_result = connect_thread1.get_result()
         self.log.info(thread1_result)
-        self.assertIn(f'dump database {self.db_name} successfully',
+        self.assertIn(f'dump database {self.db_name1} successfully',
                       thread1_result,
                       '执行失败:' + text)
         self.log.info('-----------获取session2结果-----------')
@@ -126,20 +145,28 @@ class Tools(unittest.TestCase):
         self.assertIn(f'dumpall operation successful',
                       thread2_result,
                       '执行失败:' + text)
+
         text = '---step4:对比导出的数据dump1.sql和dump2.sql;' \
                'expect:导出的数据不一致，gs_dumpall比gs_dump导出的信息多---'
         self.log.info(text)
-        du_cmd1 = f'du -h {self.dump_path1}; '
-        du_msg1 = self.Primary_Node1.sh(du_cmd1).result()
-        self.log.info(du_msg1)
-        dump = du_msg1.split()[0]
-        self.log.info(dump)
-        du_cmd2 = f'du -h {self.dump_path2}; '
-        du_msg2 = self.Primary_Node1.sh(du_cmd2).result()
-        self.log.info(du_msg2)
-        dumpall = du_msg2.split()[0]
-        self.log.info(dumpall)
-        self.assertLess(dump, dumpall, '执行失败:' + text)
+        cat_cmd1 = f'cat {self.dump_path1};'
+        cat_msg1 = self.Primary_Node1.sh(cat_cmd1).result()
+        self.log.info(cat_msg1)
+        self.assertIn(f'CREATE TABLE t_dump0101_01', cat_msg1,
+                      '执行失败:' + text)
+        self.assertIn(f'COPY t_dump0101_01', cat_msg1,
+                      '执行失败:' + text)
+        cat_cmd2 = f'cat {self.dump_path2}; '
+        cat_msg2 = self.Primary_Node1.sh(cat_cmd2).result()
+        self.log.info(cat_msg2)
+        self.assertIn(f'CREATE TABLE t_dump0101_01', cat_msg2,
+                      '执行失败:' + text)
+        self.assertIn(f'COPY t_dump0101_01', cat_msg2,
+                      '执行失败:' + text)
+        self.assertIn(f'CREATE TABLE t_dump0101_02', cat_msg2,
+                      '执行失败:' + text)
+        self.assertIn(f'COPY t_dump0101_02', cat_msg2,
+                      '执行失败:' + text)
 
     def tearDown(self):
         text = '--------------step5:清理环境;expect:清理环境完成-------------'
@@ -149,7 +176,8 @@ class Tools(unittest.TestCase):
         result = self.Root_Node.sh(rm_cmd).result()
         self.log.info(result)
         sql_cmd = self.pri_sh.execut_db_sql(
-            f'drop database if exists  {self.db_name};')
+            f'drop database if exists  {self.db_name1};'
+            f'drop database if exists  {self.db_name2};')
         self.log.info(sql_cmd)
         self.log.info(
             '------Opengauss_Function_Tools_gs_dump_Case0101finish------')

@@ -17,5 +17,6 @@ INSERT INTO sales VALUES(1, 12, '2019-02-05 00:00:00', 'e', 1, 1, 1);
 INSERT INTO sales VALUES(1, 12, '2019-02-03 00:00:00', 'f', 1, 1, 1);
 select pg_stat_get_xact_tuples_returned() from PG_CLASS a where a.relname = 'sales';
 select pg_stat_get_xact_tuples_returned(a.oid,a.oid,a.oid) from PG_CLASS a where a.relname = 'test_index1';
+select pg_stat_get_xact_tuples_returned(9877665432245678);
 select pg_stat_get_xact_tuples_returned('*&^%$') from PG_CLASS a where a.relname = 'test_index1';
 drop table sales cascade;

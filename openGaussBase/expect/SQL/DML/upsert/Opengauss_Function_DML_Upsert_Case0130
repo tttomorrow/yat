@@ -48,7 +48,7 @@ execute cdselect(1);
 | c-1 | d-1 |
 +-----+-----+
 insert into t_dml_upsert0130 values (3,3) on duplicate key update (c,d) = (execute cdselect(1));
-?.* ERROR: syntax error at or near "cdselect"
+?.*ERROR: syntax error at or near "cdselect"
 ?.*
 deallocate prepare cdselect ;
 SQL SUCCESS
@@ -61,7 +61,7 @@ execute cdselect(1);
 | c-1 |
 +-----+
 insert into t_dml_upsert0130 values (3,3) on duplicate key update c = (execute cdselect(1));
-?.* ERROR: syntax error at or near "cdselect"
+?.*ERROR: syntax error at or near "cdselect"
 ?.*
 deallocate prepare cdselect ;
 SQL SUCCESS
@@ -150,22 +150,20 @@ explain (costs off, verbose) select count(*) from t_dml_upsert_sub0130_01;
 |                     Output: b, c                             |
 +--------------------------------------------------------------+
 explain (costs off, verbose) insert into t_dml_upsert0130 values (4,4,'test') on duplicate key update c = (select count(*) from t_dml_upsert_sub0130_01);
-+------------------------------------------------------------------------------------+
-| QUERY PLAN                                                                         |
-+------------------------------------------------------------------------------------+
-| Insert on public.t_dml_upsert0130                                                  |
-|   Conflict Resolution: UPDATE                                                      |
-|   Conflict Arbiter Indexes: t_dml_upsert0130_pkey                                  |
-|   InitPlan 1 (returns $0)                                                          |
-|     ->  Aggregate                                                                  |
-|           Output: pg_catalog.count(*)                                              |
-|           ->  Aggregate                                                            |
-|                 Output: count(*)                                                   |
-|                 ->  Seq Scan on public.t_dml_upsert_sub0130_01                     |
-|                       Output: t_dml_upsert_sub0130_01.b, t_dml_upsert_sub0130_01.c |
-|   ->  Result                                                                       |
-|         Output: 4, '4'::text, 'test'::text, NULL::text                             |
-+------------------------------------------------------------------------------------+
++------------------------------------------------------------------------------+
+| QUERY PLAN                                                                   |
++------------------------------------------------------------------------------+
+| Insert on public.t_dml_upsert0130                                            |
+|   Conflict Resolution: UPDATE                                                |
+|   Conflict Arbiter Indexes: t_dml_upsert0130_pkey                            |
+|   InitPlan 1 (returns $0)                                                    |
+|     ->  Aggregate                                                            |
+|           Output: count(*)                                                   |
+|           ->  Seq Scan on public.t_dml_upsert_sub0130_01                     |
+|                 Output: t_dml_upsert_sub0130_01.b, t_dml_upsert_sub0130_01.c |
+|   ->  Result                                                                 |
+|         Output: 4, '4'::text, 'test'::text, NULL::text                       |
++------------------------------------------------------------------------------+
 insert into t_dml_upsert0130 values (4,4,'test') on duplicate key update c = (select count(*) from t_dml_upsert_sub0130_01);
 SQL SUCCESS
 select * from t_dml_upsert0130;

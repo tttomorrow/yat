@@ -3,8 +3,11 @@ select to_timestamp('0x5f');
 ?.*ERROR: invalid value "5f" for "Mon".*
   Detail: The given value did not match any of the allowed values for this field.
   Where: referenced column: to_timestamp
+select to_timestamp('999888762478.6427868173489');
 ?.*ERROR: value for "DD" in source string is out of range.*
+  Detail: Value must be in the range -2147483648 to 2147483647.
   Where: referenced column: to_timestamp
+select to_timestamp(-999888762478);
 ?.*ERROR: timestamp out of range.*
   Where: SQL function "to_timestamp" statement 1
 referenced column: to_timestamp

@@ -3,6 +3,7 @@ select acos(cos(1)) from sys_dummy;
 +--------------------+
 | acos               |
 +--------------------+
+| 0.9999999999999999 |
 +--------------------+
 select cos(acos(1)) from sys_dummy;
 +-----+

@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -28,7 +28,6 @@ Expect      :
         3.修改成功
         4.导出报错
         5.清理环境完成
-History     :
 """
 import os
 import unittest
@@ -121,6 +120,10 @@ class ToolsBackup(unittest.TestCase):
         self.log.info(cmd)
         result = self.Primary_Node.sh(cmd).result()
         self.log.info(result)
+        restart_msg = self.pri_sh.restart_db_cluster()
+        self.log.info(restart_msg)
+        status = self.pri_sh.get_db_cluster_status()
+        self.assertTrue("Degraded" in status or "Normal" in status)
 
         self.log.info('---创建导出文件并修改权限---')
         mkdir_cmd = f"touch {self.package}/dump_023;" \

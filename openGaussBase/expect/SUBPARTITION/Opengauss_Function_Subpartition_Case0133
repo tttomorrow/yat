@@ -1,0 +1,178 @@
+-- @testpoint: list_hash二级分区表：create like from 普通表/列存表,部分测试点合理报错
+--test1: create like from 普通表
+--step1: 创建普通表; expect:成功
+drop table if exists t_subpartition_0133_01;
+SQL SUCCESS
+create table t_subpartition_0133_01
+(
+  col_1 int primary key,
+  col_2 int not null ,
+  col_3 varchar2 ( 30 ) not null ,
+  col_4 int generated always as(2*col_2) stored ,
+    check (col_4 >= col_2)
+);
+SQL SUCCESS
+--step2: 创建表指定like including partition，使用partition by子句; expect:合理报错
+drop table if exists  t_subpartition_0133;
+SQL SUCCESS
+create table t_subpartition_0133 (like t_subpartition_0133_01 including partition )
+with(fillfactor=80)
+partition by list (col_1) subpartition by hash (col_2)
+(
+ partition p_list_1 values (-1,-2,-3,-4,-5,-6,-7,-8,-9,-10 )
+ (
+  subpartition p_hash_1_1 ,
+  subpartition p_hash_1_2 ,
+  subpartition p_hash_1_3
+ ),
+ partition p_list_2 values (1,2,3,4,5,6,7,8,9,10 )
+ (
+  subpartition p_hash_2_1 ,
+  subpartition p_hash_2_2 ,
+  subpartition p_hash_2_3 ,
+  subpartition p_hash_2_4 ,
+  subpartition p_hash_2_5
+ ),
+ partition p_list_3 values (11,12,13,14,15,16,17,18,19,20),
+ partition p_list_4 values (21,22,23,24,25,26,27,28,29,30 )
+ (
+  subpartition p_hash_4_1
+ ),
+ partition p_list_5 values (default)
+ (
+  subpartition p_hash_5_1
+ ),
+ partition p_list_6 values (31,32,33,34,35,36,37,38,39,40)
+ (
+  subpartition p_hash_6_1 ,
+  subpartition p_hash_6_2 ,
+  subpartition p_hash_6_3
+ )
+) enable row movement ;
+?.*ERROR: unsupport "like clause including partition" for partitioned tabl.*
+  Detail: use either "like clause including partition" or "partition by" clause
+--step3: 创建表指定like including partition; expect:合理报错
+create table t_subpartition_0133 (like t_subpartition_0133_01 including partition );
+?.*ERROR: could not specify "INCLUDING PARTITION" for non-partitioned-table relation:"t_subpartition_0133_01.*
+--step4: 创建表指定like，使用partition by子句; expect:成功
+drop table if exists  t_subpartition_0133;
+SQL SUCCESS
+create table t_subpartition_0133 (like t_subpartition_0133_01 )
+with(fillfactor=80)
+partition by list (col_1) subpartition by hash (col_2)
+(
+ partition p_list_1 values (-1,-2,-3,-4,-5,-6,-7,-8,-9,-10 )
+ (
+  subpartition p_hash_1_1 ,
+  subpartition p_hash_1_2 ,
+  subpartition p_hash_1_3
+ ),
+ partition p_list_2 values (1,2,3,4,5,6,7,8,9,10 )
+ (
+  subpartition p_hash_2_1 ,
+  subpartition p_hash_2_2 ,
+  subpartition p_hash_2_3 ,
+  subpartition p_hash_2_4 ,
+  subpartition p_hash_2_5
+ ),
+ partition p_list_3 values (11,12,13,14,15,16,17,18,19,20),
+ partition p_list_4 values (21,22,23,24,25,26,27,28,29,30 )
+ (
+  subpartition p_hash_4_1
+ ),
+ partition p_list_5 values (default)
+ (
+  subpartition p_hash_5_1
+ ),
+ partition p_list_6 values (31,32,33,34,35,36,37,38,39,40)
+ (
+  subpartition p_hash_6_1 ,
+  subpartition p_hash_6_2 ,
+  subpartition p_hash_6_3
+ )
+) enable row movement ;
+SQL SUCCESS
+--step5: 系统表查询信息; expect:成功
+select relname,parttype,partstrategy,indisusable,interval from pg_partition where parentid = (select oid from pg_class where relname = 't_subpartition_0133') order by relname;
++---------------------+----------+--------------+-------------+----------+
+| relname             | parttype | partstrategy | indisusable | interval |
++---------------------+----------+--------------+-------------+----------+
+| p_list_1            | p        | l            | true        |          |
+| p_list_2            | p        | l            | true        |          |
+| p_list_3            | p        | l            | true        |          |
+| p_list_4            | p        | l            | true        |          |
+| p_list_5            | p        | l            | true        |          |
+| p_list_6            | p        | l            | true        |          |
+| t_subpartition_0133 | r        | l            | true        |          |
++---------------------+----------+--------------+-------------+----------+
+select a.relname,a.parttype,a.partstrategy,a.indisusable from pg_partition a,(select oid from pg_partition
+where parentid = (select oid from pg_class where relname = 't_subpartition_0133')) b where a.parentid = b.oid order by a.relname;
++--------------------------+----------+--------------+-------------+
+| relname                  | parttype | partstrategy | indisusable |
++--------------------------+----------+--------------+-------------+
+| p_hash_1_1               | s        | h            | true        |
+| p_hash_1_2               | s        | h            | true        |
+| p_hash_1_3               | s        | h            | true        |
+| p_hash_2_1               | s        | h            | true        |
+| p_hash_2_2               | s        | h            | true        |
+| p_hash_2_3               | s        | h            | true        |
+| p_hash_2_4               | s        | h            | true        |
+| p_hash_2_5               | s        | h            | true        |
+| p_hash_4_1               | s        | h            | true        |
+| p_hash_5_1               | s        | h            | true        |
+| p_hash_6_1               | s        | h            | true        |
+| p_hash_6_2               | s        | h            | true        |
+| p_hash_6_3               | s        | h            | true        |
+| p_list_3_subpartdefault1 | s        | h            | true        |
++--------------------------+----------+--------------+-------------+
+--test2: create like from 列存表
+--step6: 创建列存表; expect:成功
+drop table if exists  t_subpartition_0133_01;
+SQL SUCCESS
+create table t_subpartition_0133_01 (col_1 int, col_2 int,col_3 int )
+with(orientation = column,compression=middle,max_batchrow=50000,
+partial_cluster_rows=100000,deltarow_threshold=1000);
+SQL SUCCESS
+--step7: 创建表指定like including reloptions; expect:合理报错
+drop table if exists  t_subpartition_0133;
+SQL SUCCESS
+create table t_subpartition_0133_08 (like t_subpartition_0133_01 including reloptions)
+partition by list (col_1) subpartition by hash (col_2)
+(
+ partition p_list_1 values (-1,-2,-3,-4,-5,-6,-7,-8,-9,-10 )
+ (
+  subpartition p_hash_1_1 ,
+  subpartition p_hash_1_2 ,
+  subpartition p_hash_1_3
+ ),
+ partition p_list_2 values (1,2,3,4,5,6,7,8,9,10 )
+ (
+  subpartition p_hash_2_1 ,
+  subpartition p_hash_2_2 ,
+  subpartition p_hash_2_3 ,
+  subpartition p_hash_2_4 ,
+  subpartition p_hash_2_5
+ ),
+ partition p_list_3 values (11,12,13,14,15,16,17,18,19,20),
+ partition p_list_4 values (21,22,23,24,25,26,27,28,29,30 )
+ (
+  subpartition p_hash_4_1
+ ),
+ partition p_list_5 values (default)
+ (
+  subpartition p_hash_5_1
+ ),
+ partition p_list_6 values (31,32,33,34,35,36,37,38,39,40)
+ (
+  subpartition p_hash_6_1 ,
+  subpartition p_hash_6_2 ,
+  subpartition p_hash_6_3
+ )
+) enable row movement ;
+?.*ERROR: Unsupport featur.*
+  Detail: cstore/timeseries don't support subpartition table.
+--step8: 清理环境; expect:成功
+drop table if exists t_subpartition_0133;
+SQL SUCCESS
+drop table if exists t_subpartition_0133_01;
+SQL SUCCESS

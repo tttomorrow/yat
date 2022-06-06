@@ -3,6 +3,7 @@
 drop table if exists tab130;
 create table tab130(c_id int,c_num int,c_name varchar(10),c_add jsonb);
 insert into tab130 values
+(1,18,'Allen','["Beijing",{"wx":789654123},"AAAAABAAAAA"]'),
 (2,368,'Bob','["Shanghai",158,"AAAAACAAAAA"]'),
 (3,59,'Cathy','["false","AAAAADAAAAA"]'),
 (4,96,'David','["Suzhou","true","AAAAAEAAAAA"]'),

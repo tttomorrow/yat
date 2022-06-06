@@ -1,3 +1,17 @@
+"""
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
+
+openGauss is licensed under Mulan PSL v2.
+You can use this software according to the terms and conditions of the Mulan PSL v2.
+You may obtain a copy of Mulan PSL v2 at:
+
+          http://license.coscl.org.cn/MulanPSL2
+
+THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+See the Mulan PSL v2 for more details.
+"""
 '''
 
 Case Type： 功能测试
@@ -46,24 +60,17 @@ class Bit_string_function(unittest.TestCase):
         Normal_SqlMdg2 = self.commonsh.execut_db_sql("SELECT octet_length(44::bit(83886081));")
         self.assertTrue('ERROR:  length for type bit cannot exceed 83886080' in Normal_SqlMdg2)
 
-        Normal_SqlMdg3 = self.commonsh.execut_db_sql("SELECT octet_length(B'11110011111001111100'::bit varying(83886081));")
         self.assertTrue('ERROR:  length for type varbit cannot exceed 83886080' in Normal_SqlMdg3)
 
-        Normal_SqlMdg6 = self.commonsh.execut_db_sql("SELECT octet_length(B'11110011111001111100'::bit varying(-1));")
         logger.info(Normal_SqlMdg6)
         self.assertTrue(Normal_SqlMdg6.find('length for type varbit must be at least 1') > -1)
-        Normal_SqlMdg7 = self.commonsh.execut_db_sql("SELECT octet_length(B'11110011111001111100'::bit(0));")
         logger.info(Normal_SqlMdg7)
         self.assertTrue(Normal_SqlMdg7.find('ERROR:  length for type bit must be at least 1') > -1)
 
         logger.info("-----------非01的数报错-----------")
-        Normal_SqlMdg8 = self.commonsh.execut_db_sql("SELECT octet_length(B'00000000000000000000h0000');")
         self.assertTrue('is not a valid binary digit' in Normal_SqlMdg8)
-        Normal_SqlMdg9 = self.commonsh.execut_db_sql("SELECT octet_length(B'0000000000030000000000000');")
         self.assertTrue('is not a valid binary digit' in Normal_SqlMdg9)
-        Normal_SqlMdg4 = self.commonsh.execut_db_sql("SELECT octet_length(B'111100111110011111F00'::bit varying);")
         self.assertTrue('is not a valid binary digit' in Normal_SqlMdg4)
-        Normal_SqlMdg5 = self.commonsh.execut_db_sql("SELECT octet_length(B'1111111111111111111114111111110000000000000000000'::bit(1));")
         self.assertTrue('is not a valid binary digit' in Normal_SqlMdg5)
 
     def tearDown(self):

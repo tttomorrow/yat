@@ -11,6 +11,9 @@ create table test_tbl(
 )
 partition by range (c_integer)
 (
+	partition p_20180121 values less than (0),
+	partition p_20190122 values less than (50000),
+	partition p_20200123 values less than (100000),
 	partition p_max values less than (maxvalue)
 );
 SQL SUCCESS

@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -44,25 +44,29 @@ class Privategrant(unittest.TestCase):
         logger.info(
             '----Opengauss_Function_Security_Permission_Case0015 start----')
         self.userNode = Node('PrimaryDbUser')
-        self.DB_ENV_PATH = macro.DB_ENV_PATH
         self.DB_INSTANCE_PATH = macro.DB_INSTANCE_PATH
         self.sh_primy = CommonSH('PrimaryDbUser')
-        self.Constant = Constant()
-
+        self.constant = Constant()
+        self.user = 'u_security_permission_0013'
+        self.table = 'table_security_permission_0013'
+    
     def test_default_permission(self):
         logger.info('------create user || table---------')
-        sql_cmd1 = f'create user wf with password \'{macro.COMMON_PASSWD}\';' \
-                   f'create table security_table(id1 int,id2 int,id3 int);' \
-                   f'revoke drop on security_table from wf;'
+        sql_cmd1 = f'drop user if exists {self.user};' \
+            f'create user {self.user} password \'{macro.COMMON_PASSWD}\';' \
+            f'drop table if exists {self.table};' \
+            f'create table {self.table}(id1 int,id2 int,id3 int);' \
+            f'revoke drop on {self.table} from {self.user};'
         msg1 = self.sh_primy.execut_db_sql(sql_cmd1)
         logger.info(msg1)
-        self.assertTrue(
-            "CREATE ROLE" in msg1 and "CREATE TABLE" in msg1 and "REVOKE" in msg1)
-
-
-def tearDown(self):
-    sql_cmd1 = 'drop table security_table;drop user if exists wf cascade;'
-    msg1 = self.sh_primy.execut_db_sql(sql_cmd1)
-    logger.info(msg1)
-    logger.info(
-        '----Opengauss_Function_Security_Permission_Case0015 finish----')
+        self.assertIn(self.constant.CREATE_ROLE_SUCCESS_MSG, msg1)
+        self.assertIn(self.constant.CREATE_TABLE_SUCCESS, msg1)
+        self.assertIn(self.constant.REVOKE_SUCCESS_MSG, msg1)
+    
+    def tearDown(self):
+        sql_cmd1 = f'drop table {self.table};' \
+                   f'drop user {self.user} cascade;'
+        msg1 = self.sh_primy.execut_db_sql(sql_cmd1)
+        logger.info(msg1)
+        logger.info(
+            '----Opengauss_Function_Security_Permission_Case0015 finish----')

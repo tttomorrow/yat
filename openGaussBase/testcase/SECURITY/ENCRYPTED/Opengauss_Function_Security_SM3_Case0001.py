@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -17,8 +17,8 @@ Case Type   : security_sm3
 Case Name   : 加密方式sm3，创建用户后修改认证方式为非sm3，可以连接数据库
 Description :
     1.修改password_encryption_type=3
-    2.pg_hba.conf文件中增加认证方式为sm3
-    3.创建用户user001
+    2.创建用户user001
+    3.pg_hba.conf文件中增加认证方式为sm3
     4.使用user001登录数据库
     5.将步骤中的认证方式修改为sha256，再次用user001连接数据库
 Expect      :
@@ -36,104 +36,106 @@ from testcase.utils.Common import Common
 from testcase.utils.CommonSH import CommonSH
 from testcase.utils.Logger import Logger
 
-logger = Logger()
-
 
 class Security(unittest.TestCase):
     def setUp(self):
-        logger.info('---Opengauss_Function_Security_sm3_Case0001 start---')
+        self.logger = Logger()
+        self.logger.info('--Opengauss_Function_Security_sm3_Case0001 start--')
         self.userNode = Node('PrimaryDbUser')
         self.DB_ENV_PATH = macro.DB_ENV_PATH
         self.DB_INSTANCE_PATH = macro.DB_INSTANCE_PATH
         self.sh_primy = CommonSH('PrimaryDbUser')
         self.common = Common()
+        self.user = 'u_security_sm3_0001'
         self.config = os.path.join(self.DB_INSTANCE_PATH, 'pg_hba.conf')
         self.confignew = os.path.join(self.DB_INSTANCE_PATH, 'pg_hba_bak.conf')
         self.default_msg_list = ''
-        logger.info('--------检查参数默认值---------')
+        self.logger.info('--------检查参数默认值---------')
         check_default = 'show password_encryption_type;'
         default_msg = self.sh_primy.execut_db_sql(check_default)
-        logger.info(default_msg)
+        self.logger.info(default_msg)
         self.default_msg_list = default_msg.splitlines()[2].strip()
-        logger.info(self.default_msg_list)
-        logger.info('--------备份白名单文件---------')
+        self.logger.info(self.default_msg_list)
+        self.logger.info('--------备份白名单文件---------')
         cp_cmd = f"cp {self.config} {self.confignew}"
         self.userNode.sh(cp_cmd).result()
     
-    def test_masking(self):
-        logger.info('--------1.修改password_encryption_type=3--------')
+    def test_encrypted(self):
+        text = '---step1:修改password_encryption_type=3;expect:成功---'
+        self.logger.info(text)
         exe_cmd1 = f'source {self.DB_ENV_PATH};' \
             f'gs_guc reload -D {self.DB_INSTANCE_PATH} -c ' \
             '"password_encryption_type=3"'
         msg1 = self.userNode.sh(exe_cmd1).result()
-        logger.info(msg1)
+        self.logger.info(msg1)
         check_cmd = 'show password_encryption_type;'
         check_msg = self.sh_primy.execut_db_sql(check_cmd)
-        logger.info(check_msg)
+        self.logger.info(check_msg)
         self.common.equal_sql_mdg(check_msg, 'password_encryption_type', '3',
                                   '(1 row)', flag='1')
-        logger.info('--------2.pg_hba.conf文件中增加认证方式为sm3--------')
-        exe_cmd2 = f'grep  "local.*all.*trust" {self.config}'
-        msg2 = self.userNode.sh(exe_cmd2).result()
-        logger.info(msg2)
-        insert_messages = f"local {self.userNode.db_name} user002 sm3"
-        exe_cmd3 = f'sed -i "/{msg2}/i\{insert_messages}" {self.config}'
-        logger.info(exe_cmd3)
-        msg3 = self.userNode.sh(exe_cmd3).result()
-        logger.info(msg3)
-        logger.info('--------3.创建用户user001--------')
-        sql_cmd4 = f'create user user001 with password \'' \
+        text = '---step2:创建用户1；expect:成功---'
+        self.logger.info(text)
+        sql_cmd2 = f'create user {self.user} with password \'' \
             f'{macro.COMMON_PASSWD}\';'
-        msg4 = self.sh_primy.execut_db_sql(sql_cmd4)
-        logger.info(msg4)
-        self.assertTrue('CREATE ROLE' in msg4)
-        logger.info('--------4.使用user001登录数据库--------')
+        msg2 = self.sh_primy.execut_db_sql(sql_cmd2)
+        self.logger.info(msg2)
+        self.assertIn('CREATE ROLE', msg2, '执行失败:' + text)
+        text = '---step3:pg_hba.conf文件中增加认证方式为sm3；expect:成功---'
+        self.logger.info(text)
+        guc_cmd = f'source {macro.DB_ENV_PATH};' \
+            f'gs_guc reload -D {macro.DB_INSTANCE_PATH} -h ' \
+            f'"local all all sm3"'
+        guc_msg = self.userNode.sh(guc_cmd).result()
+        self.logger.info(guc_msg)
+        text = '---step4:使用用户1登录数据库；expect:成功---'
+        self.logger.info(text)
+        exe_cmd3 = f'source {self.DB_ENV_PATH};' \
+            f'gsql -d {self.userNode.db_name} -p ' \
+            f'{self.userNode.db_port} -U {self.user} -W \'' \
+            f'{macro.COMMON_PASSWD}\' -c "\\q"'
+        self.logger.info(exe_cmd3)
+        msg3 = self.userNode.sh(exe_cmd3).result()
+        self.logger.info(msg3)
+        self.assertEqual('', msg3, '执行失败:' + text)
+        text = '--step5:将认证方式修改为sha256，再次用用户1连接数据库；expect:失败--'
+        self.logger.info(text)
+        guc_cmd4 = f'source {macro.DB_ENV_PATH};' \
+            f'gs_guc reload -D {macro.DB_INSTANCE_PATH} -h ' \
+            f'"local all all sha256"'
+        guc_msg4 = self.userNode.sh(guc_cmd4).result()
+        self.logger.info(guc_msg4)
         exe_cmd5 = f'source {self.DB_ENV_PATH};' \
             f'gsql -d {self.userNode.db_name} -p ' \
-            f'{self.userNode.db_port} -U user001 -W \'' \
+            f'{self.userNode.db_port} -U {self.user} -W \'' \
             f'{macro.COMMON_PASSWD}\' -c "\\q"'
-        logger.info(exe_cmd5)
+        self.logger.info(exe_cmd5)
         msg5 = self.userNode.sh(exe_cmd5).result()
-        logger.info(msg5)
-        self.assertTrue(msg5 == '')
-        logger.info('--5.将步骤中的认证方式修改为sha256，再次用user001连接数据库--')
-        cp_cmd = f"rm -rf {self.config};" \
-            f"cp {self.confignew} {self.config}"
-        self.userNode.sh(cp_cmd).result()
-        new_messages = f"local {self.userNode.db_name} user001 sha256"
-        exe_cmd6 = f'sed -i "/{msg2}/i\{new_messages}" {self.config}'
-        logger.info(exe_cmd6)
-        msg6 = self.userNode.sh(exe_cmd6).result()
-        logger.info(msg6)
-        exe_cmd7 = f'source {self.DB_ENV_PATH};' \
-            f'gsql -d {self.userNode.db_name} -p ' \
-            f'{self.userNode.db_port} -U user001 -W \'' \
-            f'{macro.COMMON_PASSWD}\' -c "\\q"'
-        logger.info(exe_cmd7)
-        msg7 = self.userNode.sh(exe_cmd7).result()
-        logger.info(msg7)
-        self.assertTrue("Invalid username/password,login denied" in msg7)
+        self.logger.info(msg5)
+        self.assertIn("Invalid username/password,login denied", msg5,
+                      '执行失败:' + text)
     
     def tearDown(self):
-        logger.info('-------1.恢复配置文件中的信息------')
-        ls_cmd = f'ls {self.DB_INSTANCE_PATH}'
-        ls_msg = self.userNode.sh(ls_cmd).result()
-        logger.info(ls_msg)
-        if 'pg_hba_bak.conf' in ls_msg:
-            cp_cmd = f"rm -rf {self.config};mv {self.confignew} {self.config}"
-            cp_msg = self.userNode.sh(cp_cmd).result()
-            logger.info(cp_msg)
-        logger.info('-------2.恢复加密方式配置------')
+        self.logger.info('-------1.恢复配置文件中的信息------')
+        check_cmd = f'if [ -f {self.config} ];then mv {self.confignew} ' \
+            f'{self.config};fi'
+        self.logger.info(check_cmd)
+        self.userNode.sh(check_cmd).result()
+        restart_cmd = f'source {macro.DB_ENV_PATH};' \
+            f'gs_ctl restart -D {macro.DB_INSTANCE_PATH} -M primary'
+        restart_msg = self.userNode.sh(restart_cmd).result()
+        self.logger.info(restart_msg)
+        self.logger.info('-------2.恢复加密方式配置------')
         exe_cmd1 = f'source {self.DB_ENV_PATH};' \
             f'gs_guc reload -D {self.DB_INSTANCE_PATH} -c ' \
             f'"password_encryption_type={self.default_msg_list}"'
         msg1 = self.userNode.sh(exe_cmd1).result()
-        logger.info(msg1)
+        self.logger.info(msg1)
         sql_cmd2 = 'show password_encryption_type;'
         msg2 = self.sh_primy.execut_db_sql(sql_cmd2)
-        logger.info(msg2)
-        logger.info('-------3.删除用户------')
-        sql_cmd3 = 'drop user user001'
+        self.logger.info(msg2)
+        self.logger.info('-------3.删除用户------')
+        sql_cmd3 = f'drop user {self.user}'
         msg3 = self.sh_primy.execut_db_sql(sql_cmd3)
-        logger.info(msg3)
-        logger.info('----Opengauss_Function_Security_sm3_Case0001 finish----')
+        self.logger.info(msg3)
+        self.logger.info(
+            '----Opengauss_Function_Security_sm3_Case0001 finish----')

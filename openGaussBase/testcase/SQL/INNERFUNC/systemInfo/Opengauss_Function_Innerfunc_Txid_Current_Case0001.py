@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -44,6 +44,7 @@ class Function(unittest.TestCase):
         msg0 = self.commonsh.execut_db_sql(func[0])
         self.log.info(msg0)
         id0 = int(msg0.splitlines()[-2].strip())
+        self.assertTrue(0 < id0 < 9223372036854775807)
         self.log.info('-------------事务内查询-------------')
         cmd1 = '''begin;
                   select txid_current();
@@ -52,10 +53,12 @@ class Function(unittest.TestCase):
         msg1 = self.commonsh.execut_db_sql(cmd1)
         self.log.info(msg1)
         id1 = int(msg1.splitlines()[3].strip())
+        self.assertTrue(0 < id1 < 9223372036854775807)
         self.log.info('-------------事务外查询-------------')
         msg2 = self.commonsh.execut_db_sql(func[0])
         self.log.info(msg2)
         id2 = int(msg2.splitlines()[-2].strip())
+        self.assertTrue(0 < id2 < 9223372036854775807)
         self.assertTrue(id0 < id1 < id2)
 
         self.log.info('-------------错误调用-------------')

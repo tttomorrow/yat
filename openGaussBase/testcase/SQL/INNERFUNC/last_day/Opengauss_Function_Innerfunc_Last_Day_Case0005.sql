@@ -13,6 +13,7 @@ begin
       insert into last_day_t001 values(
 	    fun_seq.nextval,
 	    3.1415926+fun_seq.nextval,
+	    i+1.456789445455,
 	    3.1415926+fun_seq.nextval,
 	    i/4
 	    );

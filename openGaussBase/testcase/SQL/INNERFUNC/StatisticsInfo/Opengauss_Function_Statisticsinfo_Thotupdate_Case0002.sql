@@ -19,7 +19,9 @@ create index test_index on sales(prod_id);
 select pg_stat_get_tuples_hot_updated(a.oid,a.oid,a.oid) from PG_CLASS a where a.relname = 'sales';
 -- 更新一条
 update sales set time_id = '2017-12-10 00:00:00' where channel_id = 'a';
+select pg_stat_get_tuples_hot_updated(’87654345888765#￥%……&*‘) from PG_CLASS a where a.relname = 'sales';
 -- 一条更新多次
 update sales set time_id = '2019-06-02 10:00:00' where channel_id = 'b';
 update sales set time_id = '2019-06-03 10:00:00' where channel_id = 'b';
+select pg_stat_get_tuples_hot_updated(987653456789987654);
 drop table sales cascade;

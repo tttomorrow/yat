@@ -5,13 +5,16 @@ create table bigint04 (name bigint);
 SQL SUCCESS
 insert into bigint04 values ('123');
 SQL SUCCESS
+insert into bigint04 values ('999999999');
 SQL SUCCESS
+insert into bigint04 values ('000000000000456');
 SQL SUCCESS
 select * from bigint04;
 +-----------+
 | name      |
 +-----------+
 | 123       |
+| 999999999 |
 | 456       |
 +-----------+
 drop table bigint04;

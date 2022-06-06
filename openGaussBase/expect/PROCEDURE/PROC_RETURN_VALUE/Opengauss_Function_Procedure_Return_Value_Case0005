@@ -21,6 +21,7 @@ create unique index  indx_t21 on table_002(t1);
 SQL SUCCESS
 create index indx_t22 on table_002(t2,t12);
 SQL SUCCESS
+insert into table_002 values(0,1,0.5,-1,-0.5,-12.34,-2147483647,-2147483648,12.3456789,1000.99987,10240365,2147483647,2147483646);
 SQL SUCCESS
 --创建存储过程
 create or replace procedure proc_return_value_005  as

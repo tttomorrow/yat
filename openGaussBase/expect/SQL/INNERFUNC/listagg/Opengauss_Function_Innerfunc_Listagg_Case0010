@@ -33,6 +33,7 @@ SELECT  deptno, listagg(job,1-1>1) WITHIN GROUP(ORDER BY job) AS Work_Type FROM 
   Hint: No function matches the given name and argument types. You might need to add explicit type casts.
 ?.*
   Where: referenced column: work_type
+select listagg(19223372036854775807::bigint) within group(order by 1) from sys_dummy;
 ?.*ERROR: bigint out of range
   Where: referenced column: listagg
 drop table emp cascade;

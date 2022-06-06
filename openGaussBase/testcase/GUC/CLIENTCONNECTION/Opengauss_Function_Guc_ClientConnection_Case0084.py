@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -17,6 +17,7 @@ Case Type   : GUC
 Case Name   : 使用gs_guc set方法设置参数statement_timeout为无效值，合理报错
 Description :
         1.查询statement_timeout默认值
+        2.修改参数值为2147483648
         3.修改参数值为-1
         4.修改参数值为test
         5.修改参数值为空串
@@ -51,6 +52,8 @@ class ClientConnection(unittest.TestCase):
         sql_cmd = commonsh.execut_db_sql(f'''show statement_timeout;''')
         LOG.info(sql_cmd)
         self.res = sql_cmd.splitlines()[-2].strip()
+        LOG.info('--步骤2:依次修改参数值为2147483648,-1,test,"''"--')
+        invalid_value = [2147483648, -1, 'test', "''"]
         for i in invalid_value:
             result = commonsh.execute_gsguc("set",
                                             self.constant.GSGUC_SUCCESS_MSG,

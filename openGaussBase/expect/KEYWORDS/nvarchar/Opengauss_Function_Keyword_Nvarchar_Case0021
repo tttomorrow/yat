@@ -1,0 +1,52 @@
+-- @testpoint: opengauss关键字nvarchar(非保留)，作为函数名 部分测试点合理报错
+--step1:关键字不带引号;expect:合理报错
+create or replace function nvarchar(i integer)
+returns integer
+as $$
+begin
+    return i+1;
+end;
+$$ language plpgsql;
+/
+?.*ERROR: syntax error at or near "\(.*
+?.*
+--step2:关键字带双引号;expect:成功
+create or replace function "nvarchar"(i integer)
+returns integer
+as $$
+begin
+    return i+1;
+end;
+$$ language plpgsql;
+/
+SQL SUCCESS
+drop function if exists "nvarchar"(i integer);
+SQL SUCCESS
+--step3:关键字带单引号;expect:合理报错
+drop function if exists 'nvarchar'(i integer);
+?.*ERROR: syntax error at or near "'nvarchar'.*
+?.*
+create function 'nvarchar'(i integer)
+returns integer
+as $$
+begin
+    return i+1;
+end;
+$$ language plpgsql;
+/
+?.*ERROR: syntax error at or near "'nvarchar'.*
+?.*
+--step4:关键字带反引号;expect:合理报错
+drop function if exists `nvarchar`(i integer);
+?.*ERROR: syntax error at or near "`.*
+?.*
+create function `nvarchar`(i integer)
+returns integer
+as $$
+begin
+    return i+1;
+end;
+$$ language plpgsql;
+/
+?.*ERROR: syntax error at or near "`.*
+?.*

@@ -1,9 +1,11 @@
 --  @testpoint:执行序列的最大值测试
+--创建递增序列，没有声明maxvalue，查询序列的最大值(9223372036854775807)
 drop SEQUENCE if exists test_seq1;
 create SEQUENCE test_seq1 INCREMENT 2;
 select sequence_name,max_value from test_seq1 where sequence_name = 'test_seq1';
 --删除序列
 drop SEQUENCE test_seq1;
+--创建递增序列,声明了NO MAXVALUE,查询序列的最大值(9223372036854775807)
 drop SEQUENCE if exists test_seq2;
 create SEQUENCE test_seq2 INCREMENT 2 NO MAXVALUE;
 select sequence_name,max_value from test_seq2 where sequence_name = 'test_seq2';

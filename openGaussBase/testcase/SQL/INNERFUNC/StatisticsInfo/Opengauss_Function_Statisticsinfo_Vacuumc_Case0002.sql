@@ -8,5 +8,6 @@ SELECT pg_sleep(1);
 select pg_stat_get_vacuum_count('') from pg_class  a where a.relname = 't1';
 select pg_stat_get_vacuum_count(a.oid,a.oid) = 1 from pg_class  a where a.relname = 't1';
 select pg_stat_get_vacuum_count() from pg_class  a where a.relname = 't1';
+select pg_stat_get_vacuum_count(99999999999999999999);
 select pg_stat_get_vacuum_count('&^%%^');
 drop table t1 cascade;

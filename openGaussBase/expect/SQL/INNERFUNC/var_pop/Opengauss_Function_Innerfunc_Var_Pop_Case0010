@@ -13,6 +13,7 @@ select var_pop(case when COL_2>10 then COL_2 else COL_1 end) from t_nvl_rca_tab;
 +--------------------+
 | var_pop            |
 +--------------------+
+| 196146.88888888888 |
 +--------------------+
 drop table if exists t_nvl_rca_tab;
 SQL SUCCESS

@@ -17,6 +17,7 @@ SQL SUCCESS
 create table all_datatype_tb2(c1 int,c2 int,c3 int,c4 int,c5 int,c6 int,c7 int,c8 int,c9 int,c10 int);
 SQL SUCCESS
 --插入数据
+insert into all_datatype_tb2 values(1,22,333,4444,55555,666666,7777777,88888888,999999999,1000000000);
 SQL SUCCESS
 select * from all_datatype_tb2;
 +----+----+-----+------+-------+--------+---------+----------+-----------+------------+

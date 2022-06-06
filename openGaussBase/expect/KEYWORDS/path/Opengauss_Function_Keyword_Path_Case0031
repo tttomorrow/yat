@@ -1,18 +1,23 @@
---  @testpoint:opengauss关键字path(非保留)，作为字段数据类型(合理报错)
---前置条件
+-- @testpoint: opengauss关键字path(非保留)，作为字段数据类型(部分测试点合理报错)
+--step1：关键字不带引号; expect: 执行成功
 drop table if exists path_test cascade;
 SQL SUCCESS
---关键字不带引号-合理报错
 create table path_test(id int,name path);
 SQL SUCCESS
---关键字带双引号-合理报错
+--step2：清理环境; expect: 执行成功
+drop table if exists path_test cascade;
+SQL SUCCESS
+--step3：关键字带双引号; expect: 执行成功
 create table path_test(id int,name "path");
-?.*ERROR: relation "path_test" already exists.*
---关键字带单引号-合理报错
+SQL SUCCESS
+--step4：清理环境; expect: 执行成功
+drop table if exists path_test cascade;
+SQL SUCCESS
+--step5：关键字带单引号; expect: 合理报错
 create table path_test(id int,name 'path');
-?.*ERROR: syntax error at or near "'path'".*
-?.*Position: .*
---关键字带反引号-合理报错
+?.*ERROR: syntax error at or near "'path'.*
+?.*
+--step6：关键字带反引号; expect: 合理报错
 create table path_test(id int,name `path`);
-?.*ERROR: syntax error at or near "`".*
-?.*Position: .*
+?.*ERROR: syntax error at or near "`.*
+?.*

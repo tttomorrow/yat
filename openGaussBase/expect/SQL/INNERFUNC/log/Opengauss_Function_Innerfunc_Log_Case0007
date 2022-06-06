@@ -12,7 +12,6 @@ select log(COL_LOG) as RESULT from LOG_003 order by COL_LOG;
 | result             |
 +--------------------+
 | 2.0                |
-| 2.0000000000000018 |
 +--------------------+
 drop table if exists LOG_003;
 SQL SUCCESS

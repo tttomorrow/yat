@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -23,7 +23,6 @@ Expect      :
     1.创建测试数据库正常
     2.设置快照开关参数正常
     3.清理环境成功
-History     : 
 """
 
 import unittest

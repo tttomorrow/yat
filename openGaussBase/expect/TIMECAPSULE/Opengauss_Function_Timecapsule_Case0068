@@ -1,0 +1,158 @@
+-- @testpoint: 对系统表,视图及临时表执行CSN,timestamp闪回及闪回查询,合理报错
+--step1: 查询参数默认值; expect:显示默认值依次为off/0/0
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+
+show vacuum_defer_cleanup_age;
++--------------------------+
+| vacuum_defer_cleanup_age |
++--------------------------+
+| 0                        |
++--------------------------+
+show version_retention_age;
++-----------------------+
+| version_retention_age |
++-----------------------+
+| 0                     |
++-----------------------+
+--step2: 修改参数值; expect:显示结果依次为on/1000/1000
+alter system set enable_recyclebin to on;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| on                |
++-------------------+
+alter system set vacuum_defer_cleanup_age to 1000;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show vacuum_defer_cleanup_age;
++--------------------------+
+| vacuum_defer_cleanup_age |
++--------------------------+
+| 1000                     |
++--------------------------+
+alter system set version_retention_age to 1000;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show version_retention_age;
++-----------------------+
+| version_retention_age |
++-----------------------+
+| 1000                  |
++-----------------------+
+--step3: 清空回收站; expect:回收站清空成功
+purge recyclebin;
+SQL SUCCESS
+--step4: 创建表; expect:表创建成功
+drop table if exists t_timecapsule_0068_01;
+SQL SUCCESS
+create table t_timecapsule_0068_01(a int);
+SQL SUCCESS
+select pg_sleep(4);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+--step5: 对系统表执行csn闪回查询; expect:闪回失败
+select * from pg_class timecapsule csn 92233720368547758;
+?.*ERROR: timecapsule feature does not support system tabl.*
+timecapsule table pg_class to csn 92233720368547758;
+?.*ERROR: timecapsule feature does not support system tabl.*
+select * from gs_txn_snapshot timecapsule csn 92233720368547758;
+?.*ERROR: timecapsule feature does not support system tabl.*
+timecapsule table gs_txn_snapshot to csn 92233720368547758;
+?.*ERROR: timecapsule feature does not support system tabl.*
+--step6: 创建视图; expect:视图创建成功
+drop view if exists v_timecapsule_0068;
+SQL SUCCESS
+create view v_timecapsule_0068 as select * from t_timecapsule_0068_01;
+SQL SUCCESS
+--step7: 对视图执行csn闪回查询; expect:闪回失败
+select * from v_timecapsule_0068 timecapsule csn 92233720368547758;
+?.*ERROR: timecapsule feature does not support non-ordinary tabl.*
+timecapsule table v_timecapsule_0068 to csn 92233720368547758;
+?.*ERROR: timecapsule feature does not support non-ordinary tabl.*
+--step8: 创建临时表; expect:临时表创建成功
+drop  table if exists t_timecapsule_0068_02;
+SQL SUCCESS
+create temp table t_timecapsule_0068_02 as (select * from t_timecapsule_0068_01 limit 0);
+SQL SUCCESS
+--step9: 对临时表执行timestamp闪回查询; expect:闪回失败
+select * from t_timecapsule_0068_02 timecapsule timestamp now();
+?.*ERROR: timecapsule feature does not support non-permanent tabl.*
+timecapsule table t_timecapsule_0068_02 to timestamp now();
+?.*ERROR: timecapsule feature does not support non-permanent tabl.*
+--step10: 清理环境 expect:环境清理成功
+drop view  v_timecapsule_0068;
+SQL SUCCESS
+drop table if exists t_timecapsule_0068_01 purge;
+SQL SUCCESS
+drop table if exists t_timecapsule_0068_02 purge;
+SQL SUCCESS
+purge recyclebin;
+SQL SUCCESS
+--step11: 恢复默认值; expect:恢复成功，依次显示结果为off/0/0
+alter system set enable_recyclebin to off;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+
+alter system set vacuum_defer_cleanup_age to 0;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show vacuum_defer_cleanup_age;
++--------------------------+
+| vacuum_defer_cleanup_age |
++--------------------------+
+| 0                        |
++--------------------------+
+alter system set version_retention_age to 0;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show version_retention_age;
++-----------------------+
+| version_retention_age |
++-----------------------+
+| 0                     |
++-----------------------+

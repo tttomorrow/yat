@@ -5,5 +5,6 @@ insert into data_01 values (-255, -67);
 select * from data_01;
 select clo1^clo2 from data_01;
 SELECT -255.001 ^ -67 AS RESULT;
+SELECT 12.235648798 ^ -1.21 AS RESULT;
 SELECT -2 ^ 3 AS RESULT;
 drop table if exists data_01;

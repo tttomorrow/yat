@@ -1,4 +1,18 @@
 """
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
+
+openGauss is licensed under Mulan PSL v2.
+You can use this software according to the terms and conditions of the Mulan PSL v2.
+You may obtain a copy of Mulan PSL v2 at:
+
+          http://license.coscl.org.cn/MulanPSL2
+
+THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+See the Mulan PSL v2 for more details.
+"""
+"""
 Case Type   : 基础功能
 Case Name   : 创建模式时创建对象
 Description :
@@ -43,7 +57,7 @@ Expect      :
     19.创建失败
 History     :
 """
-
+import os
 import unittest
 import time
 from yat.test import Node
@@ -69,6 +83,9 @@ class DdlDatabase(unittest.TestCase):
         self.username = 'user_case003'
         self.password = macro.COMMON_PASSWD
         self.comm = Common()
+        self.pg_xlog = os.path.join(macro.DB_INSTANCE_PATH, "pg_xlog")
+        self.pg_xlogback = os.path.join(macro.DB_INSTANCE_PATH,
+                                        "pg_xlogbkschema0003")
 
     def test_basebackup(self):
         self.log.info('------1.创建模式时创建分区表，分区索引及视图-------')
@@ -248,6 +265,19 @@ class DdlDatabase(unittest.TestCase):
 
     def tearDown(self):
         self.log.info('------------环境清理-----------')
+        text = "-----切换pg_xlog-----"
+        self.log.info(text)
+        switch_res = self.commonshpri.execut_db_sql("select pg_switch_xlog()")
+        self.log.info(switch_res)
+
+        text = "-----保留pg_xlog-----"
+        self.log.info(text)
+        result = self.comm.get_sh_result(self.db_primary_db_user,
+                                         f"rm -rf {self.pg_xlogback};"
+                                         f"cp -r {self.pg_xlog} "
+                                         f"{self.pg_xlogback}")
+        self.log.info(result)
+
         self.log.info("----------删除表-----------")
         result = self.commonshpri.execut_db_sql(
             "drop table if exists test_trigger_des_tbl cascade;"

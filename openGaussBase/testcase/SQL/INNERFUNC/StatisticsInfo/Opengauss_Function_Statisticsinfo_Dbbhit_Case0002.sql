@@ -17,6 +17,7 @@ INSERT INTO sales VALUES(1, 12, '2018-01-10 00:00:00', 'a', 1, 1, 1);
 select pg_stat_get_db_blocks_hit('') from PG_DATABASE a where a.datname = CURRENT_CATALOG;
 select pg_stat_get_db_blocks_hit(a.oid,a.oid) = 1 from PG_DATABASE a where a.datname = CURRENT_CATALOG;
 select pg_stat_get_db_blocks_hit() from PG_DATABASE a where a.datname = CURRENT_CATALOG;
+select pg_stat_get_db_blocks_hit(99999999999999999999);
 select pg_stat_get_db_blocks_hit('&^%%^');
 -- 恢复环境
 drop table sales cascade;

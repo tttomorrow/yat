@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -52,43 +52,54 @@ class GsBaseBackUpCase10(unittest.TestCase):
         self.backup_bak_path = os.path.join(macro.DB_BACKUP_PATH,
                                             'gs_basebackup')
         self.gs_basebackup_bak_name = 'gs_basebackup_Case0010.bak'
-        self.Gs_Basebackup_Expect_Msg = 'gs_basebackup: base backup completed'
         self.LOG.info(
             '----Opengauss_Function_Tools_gs_basebackup_Case0010 start----')
 
+        text = '----获取主机hostname值----'
+        self.LOG.info(text)
+        self.host_name = self.Primary_User_Node.sh(
+            'hostname').result().strip()
+
     def test_server_tools(self):
-        self.LOG.info('----创建备份目录----')
+        text = '----step1: 创建备份目录 expect: 成功----'
+        self.LOG.info(text)
         is_dir_exists_cmd = f'''if [ ! -d "{self.backup_bak_path}" ]
                                 then
                                     mkdir -p {self.backup_bak_path}
                                 fi'''
         result = self.Primary_User_Node.sh(is_dir_exists_cmd).result()
         self.LOG.info(result)
-        self.assertEqual(result, '')
+        self.assertEqual(result, '', '执行失败:' + text)
 
-        self.LOG.info('----修改备份目录权限700，以免权限有误----')
+        text = '----step1.1: 修改备份目录权限700，以免权限有误 expect: 成功----'
+        self.LOG.info(text)
         chmod_cmd = f"chmod 700 -R {self.backup_bak_path}"
         self.LOG.info(chmod_cmd)
         chmod_msg = self.Primary_Root_Node.sh(chmod_cmd).result()
         self.LOG.info(chmod_msg)
-        self.assertEqual(chmod_msg, '')
+        self.assertEqual(chmod_msg, '', '执行失败:' + text)
 
-        self.LOG.info('----查看备份目录----')
+        text = '----step1.2: 查看备份目录 expect: 成功----'
+        self.LOG.info(text)
         ls_cmd = f"ls -l {os.path.dirname(self.backup_bak_path)}"
         self.LOG.info(ls_cmd)
         ls_msg = self.Primary_User_Node.sh(ls_cmd).result()
         self.LOG.info(ls_msg)
 
-        self.LOG.info('----创建测试表---')
+        text = '----step1.3: 创建测试表 expect: 成功----'
+        self.LOG.info(text)
         sql_cmd = f"drop table if exists {self.T_NAME}; " \
             f"create table {self.T_NAME}(a int); " \
             f"insert into  {self.T_NAME} select generate_series(1,1000);"
         self.LOG.info(sql_cmd)
         sql_result = Primary_SH.execut_db_sql(sql_cmd)
         self.LOG.info(sql_result)
-        self.assertIn(self.Constant.CREATE_TABLE_SUCCESS, sql_result)
+        self.assertIn(self.Constant.CREATE_TABLE_SUCCESS,
+                      sql_result,
+                      '执行失败:' + text)
 
-        self.LOG.info('----执行备份----')
+        text = '----step1.4: 执行备份 expect: 成功----'
+        self.LOG.info(text)
         gs_basebackup_cmd = f"gs_basebackup " \
             f"-D {self.backup_bak_path} " \
             f"-Fp " \
@@ -104,63 +115,82 @@ class GsBaseBackUpCase10(unittest.TestCase):
             expect <<EOF
             set timeout 1200
             spawn {gs_basebackup_cmd}
-            expect "*assword:"
-            send "{self.Primary_User_Node.ssh_password}\\n"
-            expect "*assword:"
-            send "{self.Primary_User_Node.ssh_password}\\n"
-            expect "{self.Gs_Basebackup_Expect_Msg}" 
-            send_user "执行成功";exit
+            expect {{{{
+                "*assword:" {{{{ send "{self.Primary_User_Node.ssh_password}\
+                \\n";exp_continue }}}}
+                "{self.Constant.gs_basebackup_success_msg}" \
+                {{{{ send_user "执行成功\\n" }}}}
+            }}}}
             expect eof\n''' + "EOF"
         self.LOG.info(backup_cmd)
         backup_msg = self.Primary_User_Node.sh(backup_cmd).result()
         self.LOG.info(backup_msg)
-        self.assertIn(self.Constant.gs_basebackup_success_msg, backup_msg)
-        self.assertIn('100%', backup_msg)
-        self.assertIn("执行成功", backup_msg)
+        self.assertIn("执行成功", backup_msg, '执行失败:' + text)
 
-        self.LOG.info('----停止数据库----')
+        text = '----step1.5: 停止数据库 expect: 成功----'
+        self.LOG.info(text)
         is_stopped = Primary_SH.execute_gsctl(
             'stop', self.Constant.GS_CTL_STOP_SUCCESS_MSG)
-        self.assertTrue(is_stopped)
+        self.assertTrue(is_stopped, '执行失败:' + text)
 
         time.sleep(5)
 
-        self.LOG.info('----使用备份目录启动数据库----')
+        text = '----step2: 修改参数data_directory expect: 成功----'
+        self.LOG.info(text)
+        msg = Primary_SH.execute_gsguc(
+            command='set',
+            assert_flag=self.Constant.GSGUC_SUCCESS_MSG,
+            param=f"data_directory='{self.backup_bak_path}'",
+            node_name=self.host_name,
+            dn_path=self.backup_bak_path)
+        self.assertTrue(msg, '执行失败:' + text)
+
+        text = '----step2.1: 使用备份目录启动数据库 expect: 成功----'
+        self.LOG.info(text)
         start_cmd = f"source {macro.DB_ENV_PATH}; " \
             f"gs_ctl start -D {self.backup_bak_path} -M primary"
         self.LOG.info(start_cmd)
         start_msg = self.Primary_User_Node.sh(start_cmd).result()
         self.LOG.info(start_msg)
-        self.assertIn(self.Constant.RESTART_SUCCESS_MSG, start_msg)
+        self.assertIn(self.Constant.RESTART_SUCCESS_MSG,
+                      start_msg,
+                      '执行失败:' + text)
 
-        self.LOG.info('----重建备机需主备连接正常----')
+        text = '----step2.2: 重建备机需主备连接正常 expect: 成功----'
+        self.LOG.info(text)
         result = Primary_SH.wait_cluster_connected(self.backup_bak_path)
-        self.assertTrue(result)
+        self.assertTrue(result, '执行失败:' + text)
 
-        self.LOG.info('----重建备机----')
+        text = '----step2.3: 重建备机 expect: 成功----'
+        self.LOG.info(text)
         build_msg_list = Primary_SH.get_standby_and_build()
         for msg in build_msg_list:
-            self.assertIn(self.Constant.BUILD_SUCCESS_MSG, msg)
+            self.assertIn(self.Constant.BUILD_SUCCESS_MSG,
+                          msg,
+                          '执行失败:' + text)
 
-        self.LOG.info('----查询数据库状态确认是否启动成功----')
+        text = '----step2.3: 查询数据库状态确认是否启动成功 expect: 成功----'
+        self.LOG.info(text)
         query_cmd = f"source {macro.DB_ENV_PATH}; " \
             f"gs_ctl query -D {self.backup_bak_path}"
         self.LOG.info(query_cmd)
         query_msg = self.Primary_User_Node.sh(query_cmd).result()
         self.LOG.info(query_msg)
-        self.assertIn('db_state', query_msg)
+        self.assertIn('db_state', query_msg, '执行失败:' + text)
         for arg in query_msg.splitlines():
             if 'db_state' in arg:
-                self.assertIn('Normal', arg)
+                self.assertIn('Normal', arg, '执行失败:' + text)
 
-        self.LOG.info('----查询测试表是否存在----')
+        text = '----step2.4: 查询测试表是否存在 expect: 成功----'
+        self.LOG.info(text)
         sql_cmd = f"select * from {self.T_NAME};"
         self.LOG.info(sql_cmd)
         sql_msg = Primary_SH.execut_db_sql(sql_cmd)
         self.LOG.info(sql_msg)
-        self.assertIn('1000 rows', sql_msg)
+        self.assertIn('1000 rows', sql_msg, '执行失败:' + text)
 
     def tearDown(self):
+        self.LOG.info('----step3: run_teardown expect: 成功----')
         self.LOG.info('----停止数据库----')
         stop_cmd = f"source {macro.DB_ENV_PATH}; " \
             f"gs_ctl stop -D {self.backup_bak_path}"
@@ -168,17 +198,19 @@ class GsBaseBackUpCase10(unittest.TestCase):
         stop_msg = self.Primary_User_Node.sh(stop_cmd).result()
         self.LOG.info(stop_msg)
 
-        self.LOG.info('----删除备份文件----')
-        is_dir_exists_cmd = f'''rm -rf {self.backup_bak_path}'''
-        result = self.Primary_User_Node.sh(is_dir_exists_cmd).result()
-        self.LOG.info(result)
+        self.LOG.info('----修改参数data_directory----')
+        msg = Primary_SH.execute_gsguc(
+            command='set',
+            assert_flag=self.Constant.GSGUC_SUCCESS_MSG,
+            param=f"data_directory='{macro.DB_INSTANCE_PATH}'")
+        self.LOG.info(msg)
 
         self.LOG.info('----使用原目录启动数据库----')
-        start_cmd = f"source {macro.DB_ENV_PATH}; " \
-            f"gs_om -t restart"
-        self.LOG.info(start_cmd)
-        start_msg = self.Primary_User_Node.sh(start_cmd).result()
-        self.LOG.info(start_msg)
+        start_flag = Primary_SH.execute_gsctl(
+            'start',
+            self.Constant.RESTART_SUCCESS_MSG,
+            '-M primary')
+        self.LOG.info(start_flag)
 
         self.LOG.info('----重建备机需主备连接正常----')
         result = Primary_SH.wait_cluster_connected()
@@ -193,6 +225,11 @@ class GsBaseBackUpCase10(unittest.TestCase):
         self.LOG.info(sql_cmd)
         sql_msg = Primary_SH.execut_db_sql(sql_cmd)
         self.LOG.info(sql_msg)
+
+        self.LOG.info('----删除备份文件----')
+        is_dir_exists_cmd = f'''rm -rf {self.backup_bak_path}'''
+        result = self.Primary_User_Node.sh(is_dir_exists_cmd).result()
+        self.LOG.info(result)
 
         self.LOG.info(
             '----Opengauss_Function_Tools_gs_basebackup_Case0010 end----')

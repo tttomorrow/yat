@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -16,11 +16,13 @@ See the Mulan PSL v2 for more details.
 Case Type   : GUC
 Case Name   : 使用gs_guc set方法设置参数data_replicate_buffer_size为无效值,
               合理报错
+            （资料描述取值范围错误，已提issue，实际取值范围是4096..1072693248）
 Description :
         1.查询data_replicate_buffer_size默认值
         2.修改参数值为字符test
         3.修改参数值为超临界值4095
         4.修改参数值为空串
+        5.修改参数值为超临界值1072693249
         6.修改参数值为小数125.255
         7.恢复参数默认值
 Expect      :
@@ -55,6 +57,8 @@ class HAReplication(unittest.TestCase):
                                               'data_replicate_buffer_size;')
         self.log.info(sql_cmd)
         self.res = sql_cmd.splitlines()[-2].strip()
+        self.log.info('步骤2:修改参数值test,4095, "''",1072693249,125.255')
+        invalid_value = ['test', 4095, "''", 1072693249, 125.255]
         for i in invalid_value:
             result = self.commonsh.execute_gsguc("set",
                                                  constant.GSGUC_SUCCESS_MSG,

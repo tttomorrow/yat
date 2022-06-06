@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -65,6 +65,9 @@ class Policy(unittest.TestCase):
         sql_cmd1 = commonsh.execut_db_sql('''drop table if exists test_policy1;
                                    create table test_policy1(c_id int, c_usr varchar(20))PARTITION BY RANGE (c_id)
                                    (
+	                                partition P_20180121 values less than (0),
+	                                partition P_20190122 values less than (50),
+	                                partition P_20200123 values less than (100),
 	                                partition P_max values less than (maxvalue)
                                     );''')
         logger.info(sql_cmd1)

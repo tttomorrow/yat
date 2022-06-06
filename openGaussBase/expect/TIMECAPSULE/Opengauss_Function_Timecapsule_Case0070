@@ -1,0 +1,195 @@
+-- @testpoint: csn,timestamp闪回及查询语法测试,合理报错
+--step1: 查询参数默认值; expect:显示默认值依次为off/0/0
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+
+show vacuum_defer_cleanup_age;
++--------------------------+
+| vacuum_defer_cleanup_age |
++--------------------------+
+| 0                        |
++--------------------------+
+show version_retention_age;
++-----------------------+
+| version_retention_age |
++-----------------------+
+| 0                     |
++-----------------------+
+--step2: 修改参数值; expect:显示结果依次为on/1000/1000
+alter system set enable_recyclebin to on;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| on                |
++-------------------+
+alter system set vacuum_defer_cleanup_age to 1000;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show vacuum_defer_cleanup_age;
++--------------------------+
+| vacuum_defer_cleanup_age |
++--------------------------+
+| 1000                     |
++--------------------------+
+alter system set version_retention_age to 1000;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show version_retention_age;
++-----------------------+
+| version_retention_age |
++-----------------------+
+| 1000                  |
++-----------------------+
+--step3: 清空回收站; expect:回收站清空成功
+purge recyclebin;
+SQL SUCCESS
+--step4: 创建表; expect:表创建成功
+drop table if exists t_timecapsule_0070_01;
+SQL SUCCESS
+drop table if exists t_timecapsule_0070_02;
+SQL SUCCESS
+create table t_timecapsule_0070_01(a int);
+SQL SUCCESS
+create table t_timecapsule_0070_02(a int);
+SQL SUCCESS
+select pg_sleep(4);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+--step5: 闪回多个对象; expect:闪回失败,合理报错
+timecapsule table t_timecapsule_0070_01, t_timecapsule_0070_02 to timestamp now();
+?.*ERROR: syntax error at or near ",.*
+?.*
+--step6: 序列号csn未使用单引号; expect:闪回失败,合理报错
+timecapsule table t_timecapsule_0070_01 to csn 92233720368547758;
+?.*ERROR: invalid csn specifie.*
+--step7: 序列号为无效值; expect:闪回失败,合理报错
+timecapsule table t_timecapsule_0070_01 to csn '92233720368547758';
+?.*ERROR: invalid csn specifie.*
+--step8: 序列号为表达式; expect:闪回失败,合理报错
+timecapsule table t_timecapsule_0070_01 to csn '92233720368547758'+'434';
+?.*ERROR: invalid csn specifie.*
+--step9: csn闪回语句语法错误; expect:闪回失败,合理报错
+timecapsule table t_timecapsule_0070_01 to 92233720368547758;
+?.*ERROR: syntax error at or near "92233720368547758.*
+?.*
+timecapsule table t_timecapsule_0070_01 csn 92233720368547758;
+?.*ERROR: syntax error at or near "csn.*
+?.*
+--step10: 正确的timestamp闪回语法; expect:闪回成功
+timecapsule table t_timecapsule_0070_01 to timestamp now();
+SQL SUCCESS
+--step11: 查询闪回后的表; expect:显示结果为空与预期结果一致
+select * from t_timecapsule_0070_01;
++---+
+| a |
++---+
++---+
+--step12: timestamp闪回语句语法错误; expect:闪回失败,合理报错
+timecapsule table t_timecapsule_0070_01 to now();
+?.*ERROR: syntax error at or near "now.*
+?.*
+timecapsule table t_timecapsule_0070_01 timestamp now();
+?.*ERROR: syntax error at or near "timestamp.*
+?.*
+--step13: csn闪回查询csn序列值无效; expect:闪回失败,合理报错
+select * from t_timecapsule_0070_01 timecapsule csn (92233720368547758+1111);
+?.*ERROR: invalid csn specifie.*
+select * from t_timecapsule_0070_01 timecapsule csn :p1;
+?.*ERROR: bind message supplies 0 parameters, but prepared statement "" requires .*
+select * from t_timecapsule_0070_01 timecapsule csn (select 1 );
+?.*ERROR: timecapsule clause not support sublink.*
+select * from t_timecapsule_0070_01 t timecapsule csn t.a;
+?.*ERROR: invalid reference to FROM-clause entry for table "t.*
+  Hint: There is an entry for table "t", but it cannot be referenced from this part of the query.
+?.*
+select * from t_timecapsule_0070_01 t timecapsule csn constVal();
+?.*ERROR: function constval\(\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+--step14: csn闪回语句语法错误; expect:闪回失败,合理报错
+timecapsule table t_timecapsule_0070_01 to csn (92233720368547758+1111);
+?.*ERROR: invalid csn specifie.*
+timecapsule table t_timecapsule_0070_01 to :p1;
+?.*ERROR: syntax error at or near ":p1.*
+?.*
+--step15: csn闪回csn序列值无效; expect:闪回失败,合理报错
+timecapsule table t_timecapsule_0070_01 csn (select 1 );
+?.*ERROR: syntax error at or near "csn.*
+?.*
+timecapsule table t_timecapsule_0070_01 csn (select count(*) from pg_class);
+?.*ERROR: syntax error at or near "csn.*
+?.*
+--step16: 清理环境 expect:环境清理成功
+drop table if exists t_timecapsule_0070_01;
+SQL SUCCESS
+drop table if exists t_timecapsule_0070_02;
+SQL SUCCESS
+purge recyclebin;
+SQL SUCCESS
+--step17: 恢复默认值; expect:恢复成功，依次显示结果为off/0/0
+alter system set enable_recyclebin to off;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+
+alter system set vacuum_defer_cleanup_age to 0;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show vacuum_defer_cleanup_age;
++--------------------------+
+| vacuum_defer_cleanup_age |
++--------------------------+
+| 0                        |
++--------------------------+
+alter system set version_retention_age to 0;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show version_retention_age;
++-----------------------+
+| version_retention_age |
++-----------------------+
+| 0                     |
++-----------------------+

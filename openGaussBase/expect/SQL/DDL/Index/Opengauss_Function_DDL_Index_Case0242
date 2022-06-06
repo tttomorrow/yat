@@ -83,13 +83,13 @@ SQL SUCCESS
 create index team_idx_temp on table_gist_tmp using gist(p) where c1 <^ point(1,2) and c2 >^ point(3,10);
 SQL SUCCESS
 create index part_idx_temp_gloabl on table_gist_tmp_global using gist(p) where p <^ point(1,2);
-SQL SUCCESS
+?.*ERROR: access method "gist" is not support for global temporary table index
 create index team_idx_temp_gloabl on table_gist_tmp_global using gist(p) where c1 <^ point(1,2) and c2 >^ point(3,10);
-SQL SUCCESS
+?.*ERROR: access method "gist" is not support for global temporary table index
 create index exp_idx_tmp on table_gist_exp_tmp using gist(point(c));
 SQL SUCCESS
 create index exp_idx_tmp_global on table_gist_exp_tmp_global using gist(point(c));
-SQL SUCCESS
+?.*ERROR: access method "gist" is not support for global temporary table index
 --8.插入数据
 insert into table_gist_tmp values(point(0,0),point(0,0),point(0,0),generate_series(1,20000));
 SQL SUCCESS
@@ -127,18 +127,15 @@ explain select * from table_gist_tmp_global where p<^ point(1,2);
 ?.*
 ?.*QUERY PLAN.*
 ?.*
-?.*Bitmap Heap Scan on table_gist_tmp_global.*
-?.*Recheck Cond: (p <^ '(1,2)'::point)?.*
-?.*Bitmap Index Scan on part_idx_temp_gloabl.*
-?.*Index Cond: (p <^ '(1,2)'::point)?.*
+?.*Seq Scan on table_gist_tmp_global.*
+?.*Filter.*
 ?.*
 explain select * from table_gist_tmp_global where c1 <^ point(1,2) and c2 >^ point(3,10);
 ?.*
 ?.*QUERY PLAN.*
 ?.*
-?.*Bitmap Heap Scan on table_gist_tmp_global.*
-?.*Recheck Cond: ((c1 <^ '(1,2)'::point) AND (c2 >^ '(3,10)'::point))?.*
-?.*Bitmap Index Scan on team_idx_temp_gloabl.*
+?.*Seq Scan on table_gist_tmp_global.*
+?.*Filter.*
 ?.*
 explain select * from  table_gist_exp_tmp where point(c)>^ point(1,1);
 ?.*
@@ -146,17 +143,15 @@ explain select * from  table_gist_exp_tmp where point(c)>^ point(1,1);
 ?.*
 ?.*Bitmap Heap Scan on table_gist_exp_tmp.*
 ?.*Recheck Cond: (point(c) >^ '(1,1)'::point)?.*
-?.*Bitmap Index Scan on exp_idx_tmp.*
+?.*Bitmap Index Scan on exp_idx_tmp?.*
 ?.*Index Cond: (point(c) >^ '(1,1)'::point)?.*
 ?.*
 explain select * from  table_gist_exp_tmp_global where point(c)>^ point(1,1);
 ?.*
 ?.*QUERY PLAN.*
 ?.*
-?.*Bitmap Heap Scan on table_gist_exp_tmp_global.*
-?.*Recheck Cond: (point(c) >^ '(1,1)'::point)?.*
-?.*Bitmap Index Scan on exp_idx_tmp_global.*
-?.*Index Cond: (point(c) >^ '(1,1)'::point)?.*
+?.*Seq Scan on table_gist_exp_tmp_global.*
+?.*Filter.*
 ?.*
 --10.查看查询结果
 select count(*) from table_gist_tmp where p<^ point(1,2);

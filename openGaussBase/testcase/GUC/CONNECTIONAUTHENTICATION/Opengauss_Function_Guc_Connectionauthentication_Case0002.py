@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -69,13 +69,13 @@ class Deletaduit(unittest.TestCase):
 
         text = "--step2:设置随机端口号，并使用设置gs_guc reload设置;expect:成功"
         self.log.info(text)
-        port = random.randint(1, 65535)
-        check_cmd = f'lsof -i:{str(port)}'
-        check_result = self.dbUserNode1.sh(check_cmd).result()
-        while str(port) in check_result:
-            port = random.randint(1, 65535)
+        port = 0
+        for i in range(1000):
+            port = random.randint(10000, 65535)
             check_cmd = f'lsof -i:{str(port)}'
             check_result = self.dbUserNode1.sh(check_cmd).result()
+            if str(port) not in check_result:
+                break
         guc_cmd = f"source {macro.DB_ENV_PATH};gs_guc reload " \
                   f"-D {macro.DB_INSTANCE_PATH} -c 'port=\'{str(port)}\''"
         self.log.info(guc_cmd)

@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -35,9 +35,8 @@ Expect      :
         6.session1导出成功且session2给表插入数据成功
         7.获取2个session结果成功
         8.导入成功
-        9.导入表数据增加，session2插入的数据也会导出
+        9.导入表数据未增加，session2插入的数据未导出
         10.清理环境完成
-History     :
 """
 import os
 import unittest
@@ -65,7 +64,7 @@ class ToolsBackup(unittest.TestCase):
         self.package = os.path.join(
             os.path.dirname(macro.DB_INSTANCE_PATH), 'package_tool')
         self.db_name = "db_jdbcgsbackup0054"
-        self.user = "s_jdbcgsbackup0054"
+        self.user = "u_jdbcgsbackup0054"
         self.tb_name = "t_jdbcgsbackup0054"
         text = '---备份pg_hba.conf文件---'
         self.log.info(text)
@@ -115,7 +114,7 @@ class ToolsBackup(unittest.TestCase):
             password '{macro.COMMON_PASSWD}';
             drop table if  exists {self.tb_name};
             create table {self.tb_name} (id int);
-            insert into {self.tb_name} values (generate_series(1,1000000));'''
+            insert into {self.tb_name} values (generate_series(1,20000000));'''
         self.log.info(sql_cmd)
         sql_result = self.pri_sh.execut_db_sql(sql=sql_cmd,
                                                dbname=f'{self.db_name}')
@@ -140,6 +139,10 @@ class ToolsBackup(unittest.TestCase):
         self.log.info(cmd)
         result = self.Primary_Node.sh(cmd).result()
         self.log.info(result)
+        restart_msg = self.pri_sh.restart_db_cluster()
+        self.log.info(restart_msg)
+        status = self.pri_sh.get_db_cluster_status()
+        self.assertTrue("Degraded" in status or "Normal" in status)
         self.assertIn(f'{self.Primary_Node.db_host}/32   sha256', result,
                       '执行失败:' + text)
 
@@ -153,7 +156,7 @@ class ToolsBackup(unittest.TestCase):
             -p {self.Primary_Node.db_port} \
             -U {self.user} \
             -P {macro.COMMON_PASSWD} \
-            -s public'''
+            -s public; '''
         self.log.info(sql_cmd)
         connect_thread1 = ComThread(
             self.com.get_sh_result, args=(Node('PrimaryDbUser'), sql_cmd))
@@ -162,8 +165,8 @@ class ToolsBackup(unittest.TestCase):
 
         text = 'step6.1---session2给表插入数据;expect:插入成功---'
         self.log.info(text)
-        sql_cmd = f'''insert into {self.tb_name} values \
-            (generate_series(1,100));'''
+        sql_cmd = f'''select pg_sleep(1);
+            insert into {self.tb_name} values (10);'''
         self.log.info(sql_cmd)
         connect_thread2 = ComThread(self.pri_sh.execut_db_sql,
                                     args=(sql_cmd, '', f'{self.db_name}',))
@@ -173,7 +176,7 @@ class ToolsBackup(unittest.TestCase):
         text = 'step7:---获取2个session结果;expect:获取结果成功---'
         self.log.info(text)
         self.log.info('获取session1结果')
-        connect_thread1.join(60 * 10)
+        connect_thread1.join(600 * 10)
         thread1_result = connect_thread1.get_result()
         self.log.info(thread1_result)
         self.assertIn(self.constant.jdbcgsbackup_success, thread1_result,
@@ -216,14 +219,13 @@ class ToolsBackup(unittest.TestCase):
                          self.constant.jdbcgsbackup_failed[2], msg,
                          '执行失败:' + text)
 
-        text = 'step9:---查看表数据---;expect:插入数据导入成功---'
+        text = 'step9:---查看表数据---;expect:插入数据导入---'
         self.log.info(text)
         sql_cmd = f'''select count(*) from {self.tb_name};'''
         sql_result = self.pri_sh.execut_db_sql(sql=sql_cmd,
                                                dbname=f'{self.db_name}')
         self.log.info(sql_result)
-        self.assertEqual('1000100', sql_result.splitlines()[2].strip(),
-                         '执行失败:' + text)
+        self.assertIn('20000000' or '20000001', sql_result, '执行失败:' + text)
 
     def tearDown(self):
         text = 'step10:---清理环境;expect:清理环境完成---'

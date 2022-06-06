@@ -22,7 +22,7 @@ interval ('1 year')
 SQL SUCCESS
 -- 创建唯一索引
 create unique index idx_001 on common_table_001(col_4);
-?.*ERROR: Global and local partition index should not be on same column
+SQL SUCCESS
 -- 创建列注释
 comment on column common_table_001.col_6 is 'this is a comment to be verified.';
 SQL SUCCESS
@@ -61,6 +61,7 @@ order by relname;
 -- 验证check，被继承
 insert into partition_table_001 values (-2,'aaa',1,'2016-02-23',true,'aaa',1.1);
 ?.*ERROR: new row for relation "partition_table_001" violates check constraint "common_table_001_col_1_check"
+  Detail: N/A
 -- 验证default,被继承
 insert into partition_table_001 values (2,default,2,'2017-03-23',false,'bbb',2.2);
 SQL SUCCESS

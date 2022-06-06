@@ -14,6 +14,7 @@ select pg_stat_get_xact_tuples_deleted('') from PG_CLASS a where a.relname = 'sa
 | pg_stat_get_xact_tuples_deleted |
 +---------------------------------+
 +---------------------------------+
+select pg_stat_get_xact_tuples_deleted(9999999999999) from PG_CLASS a where a.relname = 'sales';
 ?.*ERROR: OID out of range
   Where: referenced column: pg_stat_get_xact_tuples_deleted
 select pg_stat_get_xact_tuples_deleted('**&&^') from PG_CLASS a where a.relname = 'sales';

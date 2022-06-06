@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -16,10 +16,12 @@ See the Mulan PSL v2 for more details.
 Case Type   : 工具-GS_BASEBACKUP
 Case Name   : 非白名单远程机器备份
 Description :
-    1、开始备份：gs_basebackup -D /usr2/chenchen/basebackup/bak_hblack -Fp
+    1.创建备份目录
+    2.开始备份：gs_basebackup -D /usr2/chenchen/basebackup/bak_hblack -Fp
         -Xstream -p 18333 -h ip -l gauss_26.bak -U sysadmin -W
 Expect      :
-    1、备份报错：gs_basebackup: could not connect to server: FATAL:
+    1.创建备份目录成功
+    2.备份报错：gs_basebackup: could not connect to server: FATAL:
         no pg_hba.conf entry for host "10.10.10.10".
 History     :
 """
@@ -46,7 +48,8 @@ class GsBaseBackUpCase25(unittest.TestCase):
             '----Opengauss_Function_Tools_gs_basebackup_Case0025 start----')
 
     def test_server_tools(self):
-        self.LOG.info('----创建目录----')
+        text = '----step1: 创建目录 expect: 成功----'
+        self.LOG.info(text)
         is_dir_exists_cmd = f'''if [ ! -d "{self.gs_basebackup_bak_path}" ]
                                 then
                                     mkdir {self.gs_basebackup_bak_path}
@@ -54,7 +57,8 @@ class GsBaseBackUpCase25(unittest.TestCase):
         result = self.Primary_User_Node.sh(is_dir_exists_cmd).result()
         self.LOG.info(result)
 
-        self.LOG.info('----执行备份----')
+        text = '----step2: 执行备份 expect: 失败----'
+        self.LOG.info(text)
         gs_basebackup_cmd = f"gs_basebackup " \
             f"-D {self.gs_basebackup_bak_path} " \
             f"-Fp " \
@@ -68,15 +72,21 @@ class GsBaseBackUpCase25(unittest.TestCase):
             expect <<EOF
             set timeout 300
             spawn {gs_basebackup_cmd}
-            expect "*assword:"
-            send "{self.Primary_User_Node.ssh_password}\\n"
+            expect {{{{
+                "*assword:" {{{{ send \
+                    "{self.Primary_User_Node.ssh_password}\\n";\
+                    exp_continue }}}}
+                "{self.ASSERT_INFO}" \
+                {{{{ send_user "执行成功\\n" }}}}
+            }}}}
             expect eof\n''' + '''EOF'''
         self.LOG.info(backup_cmd)
         backup_result = self.Primary_User_Node.sh(backup_cmd).result()
         self.LOG.info(backup_result)
-        self.assertIn(self.ASSERT_INFO, backup_result)
+        self.assertIn("执行成功", backup_result, '执行失败:' + text)
 
     def tearDown(self):
+        self.LOG.info('----step3: run_teardown expect: 成功----')
         self.LOG.info('----清理备份目录----')
         clean_cmd = f"rm -rf {self.gs_basebackup_bak_path}"
         result = self.Primary_User_Node.sh(clean_cmd).result()

@@ -5,6 +5,7 @@ create table fvt_proc_binary_blob_003(
   t1 int,
   t2 blob
   );
+insert into fvt_proc_binary_blob_003 values(1,'0101101111');
 
 create or replace function fvt_proc_blob_003() return int
 is

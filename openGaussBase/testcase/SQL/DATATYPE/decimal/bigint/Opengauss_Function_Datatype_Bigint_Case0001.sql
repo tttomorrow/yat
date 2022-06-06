@@ -4,5 +4,6 @@ drop table if exists bigint01;
 create table bigint01 (name bigint);
 insert into bigint01 values (120);
 insert into bigint01 values (99999999);
+insert into bigint01 values (112233445566);
 select * from bigint01;
 drop table bigint01;

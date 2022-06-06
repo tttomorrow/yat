@@ -1,0 +1,53 @@
+-- @testpoint: 创建package后使用replace参数,声明重名package,替换原本包规格内容,重新定义package body
+
+--step1:声明包规格 expect:声明成功
+create or replace package p_test_0003 is
+var1 int:=1;
+var2 int:=2;
+procedure p_package_0003();
+end p_test_0003;
+/
+
+--step2:定义包体 expect:定义包体成功
+create or replace package body p_test_0003 is
+procedure p_package_0003()
+is
+begin
+drop table if exists t_package_0003;
+create table t_package_0003(c_int int);
+insert into t_package_0003 values(var1),(var2);
+end;
+end p_test_0003;
+/
+
+--step3:使用replace参数,重新声明已存在package expect:声明成功
+create or replace package p_test_0003 is
+var3 int:=1;
+procedure p_package_0003(var4 int);
+end p_test_0003;
+/
+
+--step4:重新定义package body expect:定义成功
+create  or replace package body p_test_0003 is
+procedure p_package_0003(var4 int)
+is
+begin
+drop table if exists t_package_0003;
+create table t_package_0003(c_int int);
+insert into t_package_0003 values(var3);
+end;
+end p_test_0003;
+/
+
+--step5:查询系统表gs_package中p_test_0003对应的包规格内容 expect:返回重新声明的包规格内容
+select pkgspecsrc from gs_package where pkgname = 'p_test_0003';
+
+--step6:调用新package expect:调用成功
+call p_test_0003.p_package_0003(3);
+
+--step7:查询表数据 expect:返回package执行后的表数据
+select * from t_package_0003;
+
+--step8:清理环境 expect:清理环境成功
+drop table t_package_0003;
+drop package p_test_0003;

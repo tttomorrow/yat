@@ -3,6 +3,7 @@ drop table if exists proc_clob_table_011;
 SQL SUCCESS
 create table proc_clob_table_011(t1 int,t2 clob,t3 clob);
 SQL SUCCESS
+insert into proc_clob_table_011 values(1,'01010101111100000100000010000000100111111111字符串字符串字符串#￥%……&*（——）（*&……gv个国家级科技控股及港口价格可加工客','ukagcccccccfttttayyygdbbbbuyu7885445112');
 SQL SUCCESS
 --创建存储过程
 create or replace procedure proc_clob_011() is

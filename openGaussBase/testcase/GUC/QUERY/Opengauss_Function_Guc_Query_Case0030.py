@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -20,20 +20,15 @@ Description :
     show enable_auto_clean_unique_sql;
     show enable_resource_track;
     show instr_unique_sql_count;
-    show unique_sql_clean_ratio;
-    2、主机修改unique_sql_clean_ratio为0.05，最大条目100，
-    备机修改unique_sql_clean_ratio为0.1，最大条目20，
-    级联备修改unique_sql_clean_ratio为0.2，最大条目30，
+    2、主机修改enable_auto_clean_unique_sql为on，最大条目100，
+    备机修改enable_auto_clean_unique_sql为on，最大条目20，
+    级联备修改enable_auto_clean_unique_sql为on，最大条目30，
     重启使其生效，并校验其预期结果
     gs_guc set -D {dn1} -c "enable_auto_clean_unique_sql=on"
     gs_guc set -D {dn1} -c "instr_unique_sql_count=100"
-    gs_guc set -D {dn1} -c "unique_sql_clean_ratio=0.05"
     gs_guc set -D {dn1} -c "instr_unique_sql_count=20"
-    gs_guc set -D {dn1} -c "unique_sql_clean_ratio=0.1"
     gs_guc set -D {dn1} -c "instr_unique_sql_count=30"
-    gs_guc set -D {dn1} -c "unique_sql_clean_ratio=0.2"
     gs_om -t stop && gs_om -t start
-    show unique_sql_clean_ratio;
     3、清空记录，主机执行100+1 unique_sql，
     备机执行20+1 unique_sql触发自动淘汰，
     级联备执行30+1 unique_sql触发自动淘汰，
@@ -44,7 +39,6 @@ Description :
     select count(va) from (select get_instr_unique_sql() as va);
     4、恢复默认值；
     gs_guc set -N all -I all -c "enable_auto_clean_unique_sql=off"
-    gs_guc set -N all -I all -c "unique_sql_clean_ratio=0.1"
     gs_guc set -N all -I all -c "instr_unique_sql_count=100"
     gs_om -t stop && gs_om -t start
 Expect      :
@@ -130,11 +124,7 @@ class Guctestcase(unittest.TestCase):
                                            self.constant.GSGUC_SUCCESS_MSG,
                                            f"instr_unique_sql_count=100")
         self.logger.info(result)
-        result = self.com_s1.execute_gsguc("reload",
-                                           self.constant.GSGUC_SUCCESS_MSG,
-                                           f"unique_sql_clean_ratio=0.05")
-        self.logger.info(result)
-        sql = "show enable_resource_track;show unique_sql_clean_ratio;" \
+        sql = "show enable_resource_track;" \
               "show use_workload_manager;show instr_unique_sql_count;" \
               "show enable_auto_clean_unique_sql;"
         sql_cmd = self.primary_sh.execut_db_sql(sql)
@@ -142,7 +132,6 @@ class Guctestcase(unittest.TestCase):
         self.assertNotIn("off", sql_cmd, "执行失败" + text)
         self.assertIn("on", sql_cmd, "执行失败" + text)
         self.assertIn("100", sql_cmd, "执行失败" + text)
-        self.assertIn("0.05", sql_cmd, "执行失败" + text)
 
         text = "级联备-备2设置"
         self.logger.info(text)
@@ -151,16 +140,9 @@ class Guctestcase(unittest.TestCase):
                                            f"instr_unique_sql_count=30",
                                            single=True)
         self.logger.info(result)
-        result = self.com_s2.execute_gsguc("reload",
-                                           self.constant.GSGUC_SUCCESS_MSG,
-                                           f"unique_sql_clean_ratio=0.2",
-                                           single=True)
-        self.logger.info(result)
-        sql_cmd = self.com_s2.execut_db_sql("show instr_unique_sql_count;"
-                                            "show unique_sql_clean_ratio")
+        sql_cmd = self.com_s2.execut_db_sql("show instr_unique_sql_count")
         self.logger.info(sql_cmd)
         self.assertIn("30", sql_cmd, "执行失败" + text)
-        self.assertIn("0.2", sql_cmd, "执行失败" + text)
 
         text = "备1设置"
         self.logger.info(text)
@@ -169,34 +151,21 @@ class Guctestcase(unittest.TestCase):
                                            f"instr_unique_sql_count=20",
                                            single=True)
         self.logger.info(result)
-        result = self.com_s1.execute_gsguc("reload",
-                                           self.constant.GSGUC_SUCCESS_MSG,
-                                           f"unique_sql_clean_ratio=0.1",
-                                           single=True)
-        self.logger.info(result)
-        sql_cmd = self.com_s1.execut_db_sql("show instr_unique_sql_count;"
-                                            "show unique_sql_clean_ratio")
+        sql_cmd = self.com_s1.execut_db_sql("show instr_unique_sql_count;")
         self.logger.info(sql_cmd)
         self.assertIn("20", sql_cmd, "执行失败" + text)
-        self.assertIn("0.1", sql_cmd, "执行失败" + text)
 
         text = "3节点再次查询 核对参数"
         self.logger.info(text)
-        sql_cmd = self.primary_sh.execut_db_sql("show instr_unique_sql_count;"
-                                                "show unique_sql_clean_ratio")
+        sql_cmd = self.primary_sh.execut_db_sql("show instr_unique_sql_count")
         self.logger.info(sql_cmd)
         self.assertIn("100", sql_cmd, "执行失败" + text)
-        self.assertIn("0.05", sql_cmd, "执行失败" + text)
-        sql_cmd = self.com_s1.execut_db_sql("show instr_unique_sql_count;"
-                                            "show unique_sql_clean_ratio")
+        sql_cmd = self.com_s1.execut_db_sql("show instr_unique_sql_count")
         self.logger.info(sql_cmd)
         self.assertIn("20", sql_cmd, "执行失败" + text)
-        self.assertIn("0.1", sql_cmd, "执行失败" + text)
-        sql_cmd = self.com_s2.execut_db_sql("show instr_unique_sql_count;"
-                                            "show unique_sql_clean_ratio")
+        sql_cmd = self.com_s2.execut_db_sql("show instr_unique_sql_count")
         self.logger.info(sql_cmd)
         self.assertIn("30", sql_cmd, "执行失败" + text)
-        self.assertIn("0.2", sql_cmd, "执行失败" + text)
 
         text = "--step3:清空记录，主机执行100+1 unique_sql，备机执行20+1 unique_sql " \
                "级联备执行30+1 触发自动淘汰，查看hash table记录条数;" \
@@ -219,16 +188,21 @@ class Guctestcase(unittest.TestCase):
             self.logger.info(result)
             self.assertNotIn("ERROR", result, "执行失败" + text)
 
+        result = self.primary_sh.execut_db_sql("select count(*) "
+                                               "from dbe_perf.statement;")
+        self.logger.info(result)
         self.logger.info("unique_sql不足100时补足100")
         result = self.primary_sh.execut_db_sql("select count(*) "
                                                "from dbe_perf.statement;")
         self.logger.info(result)
         num = int(result.splitlines()[-2].strip())
-        table_list = ["PG_EXTENSION", "PG_INDEX", "PG_INHERITS", "PG_JOB",
-                      "PG_JOB_PROC", "PG_LANGUAGE", "PG_LARGEOBJECT"]
+        table_list = ["pg_extension", "pg_index", "pg_inherits", "pg_job",
+                      "pg_job_proc", "pg_language", "pg_largeobject",
+                      "pg_class", "pg_proc", "pg_cast"]
         for i in range(100 - num):
-            result = self.primary_sh.execut_db_sql(f"select count(*) "
-                                                   f"from {table_list[i]};")
+            sql = f"select count(*) from {table_list[i]};"
+            self.logger.info(sql)
+            result = self.primary_sh.execut_db_sql(sql)
             self.logger.info(result)
         self.logger.info("unique_sql记录条数达到100")
         result = self.primary_sh.execut_db_sql("select count(*) "
@@ -238,7 +212,7 @@ class Guctestcase(unittest.TestCase):
         result = self.primary_sh.execut_db_sql("select count(va) "
             "from (select get_instr_unique_sql() as va);")
         self.logger.info(result)
-        self.assertIn("96\n", result, "执行失败" + text)
+        self.assertIn("91\n", result, "执行失败" + text)
 
         text = "备1执行并核对"
         self.logger.info(text)
@@ -295,7 +269,7 @@ class Guctestcase(unittest.TestCase):
         result = self.com_s2.execut_db_sql("select count(va) "
             "from (select get_instr_unique_sql() as va);")
         self.logger.info(result)
-        self.assertIn("25\n", result, "执行失败" + text)
+        self.assertIn("28\n", result, "执行失败" + text)
 
     def tearDown(self):
         text = "--step4:恢复默认值;expect:成功"
@@ -323,7 +297,6 @@ class Guctestcase(unittest.TestCase):
         self.set_gs_guc("enable_auto_clean_unique_sql", "no")
         status = self.primary_sh.restart_db_cluster()
         self.logger.info(status)
-        self.set_gs_guc("unique_sql_clean_ratio", "0.1", "reload")
         self.set_gs_guc("instr_unique_sql_count", "100", "reload")
         status = self.primary_sh.get_db_cluster_status("detail")
         self.logger.info(status)

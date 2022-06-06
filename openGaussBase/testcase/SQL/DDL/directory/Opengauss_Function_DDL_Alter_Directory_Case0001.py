@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -31,7 +31,7 @@ Expect      :
     5.查询目录信息成功
     6.删除目录成功
     7.删除用户成功
-History     :添加marco文件
+History     :
 """
 import unittest
 from yat.test import macro
@@ -54,7 +54,7 @@ class Privategrant(unittest.TestCase):
         sql_cmd1 = commonsh.execut_db_sql(sql)
         logger.info(sql_cmd1)
         self.assertIn(constant.CREATE_ROLE_SUCCESS_MSG, sql_cmd1)
-        sql_cmd2 = commonsh.execut_db_sql('''drop DIRECTORY if exiusts test_dir1;
+        sql_cmd2 = commonsh.execut_db_sql('''drop DIRECTORY if exists test_dir1;
                                        create DIRECTORY test_dir1 as '/tmp/';''')
         logger.info(sql_cmd2)
         self.assertIn(constant.CREATE_DIRECTORY_SUCCESS_MSG, sql_cmd2)

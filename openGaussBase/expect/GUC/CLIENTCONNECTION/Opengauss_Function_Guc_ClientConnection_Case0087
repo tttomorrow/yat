@@ -11,6 +11,8 @@ set statement_timeout to 35791.156415;
 ?.*ERROR: invalid value for parameter "statement_timeout": "35791.156415"
   Hint: Valid units for this parameter are "ms", "s", "min", "h", and "d".
 --修改参数带单位s，报错
+set statement_timeout to '2147483647s';
+?.*ERROR: invalid value for parameter "statement_timeout": "2147483647s"
   Hint: Value exceeds integer range.
 --修改参数带单位min,报错
 set statement_timeout to '35792min';

@@ -16,9 +16,11 @@ where castsource= (select oid from pg_type where typname='bool'));
 | typname   | proname   | castcontext | castmethod |
 +-----------+-----------+-------------+------------+
 | int1      | bool_int1 | i           | f          |
+| int16     | int16     | i           | f          |
 | int4      | int4      | i           | f          |
 | int2      | bool_int2 | i           | f          |
 | int8      | bool_int8 | i           | f          |
+| numeric   | numeric   | i           | f          |
 | text      | text      | a           | f          |
 | clob      | text      | a           | f          |
 | varchar   | text      | a           | f          |

@@ -2,4 +2,5 @@
 select pg_stat_get_xact_function_total_time() is null from PG_PROC a where a.proname = 'pg_column_size';
 select pg_stat_get_xact_function_total_time('') is null from PG_PROC a where a.proname = 'pg_column_size';
 select pg_stat_get_xact_function_total_time(a.oid,a.oid) is null from PG_PROC a where a.proname = 'pg_column_size';
+select pg_stat_get_xact_function_total_time(988765787870787) is null from PG_PROC a where a.proname = 'pg_column_size';
 select pg_stat_get_xact_function_total_time('*&^^&*') is null from PG_PROC a where a.proname = 'pg_column_size';

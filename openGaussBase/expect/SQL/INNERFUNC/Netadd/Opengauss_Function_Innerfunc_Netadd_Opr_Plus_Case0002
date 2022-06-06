@@ -1,7 +1,8 @@
 -- @testpoint: 网络地址操作符+的异常校验，合理报错
 -- 整数直接向前进位255制
 SELECT inet '192.168.1.6' + 0x25 AS RESULT;
-?.*ERROR: syntax error at or near "AS"
+?.*ERROR: Invalid use of identifiers.
+  Detail: Syntax error found near token "x25"
 ?.*
 SELECT inet '192.168.1.257' + 250 AS RESULT;
 ?.*ERROR: invalid input syntax for type inet: "192.168.1.257"
@@ -17,7 +18,7 @@ SELECT inet '255.255.255.250' * 5 AS RESULT;
 ?.*
   Where: referenced column: result
 SELECT inet '255.255.255.250/24' &* 5 AS RESULT;
-?.*ERROR: operator does not exist: inet \&\* integer
+?.*ERROR: operator does not exist: inet &\* integer
   Hint: No operator matches the given name and argument type(s). You might need to add explicit type casts.
 ?.*
   Where: referenced column: result

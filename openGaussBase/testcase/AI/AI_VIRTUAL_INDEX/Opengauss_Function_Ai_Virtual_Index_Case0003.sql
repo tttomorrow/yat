@@ -1,0 +1,79 @@
+-- @testpoint: 创建双表,使用双查询语句创建虚拟索引,并进行索引查询,删除
+
+--step1:建表1 expect:建表1成功
+drop table if exists t_ai_virtual_index_0003_01;
+create table t_ai_virtual_index_0003_01(col_int int,col_numeric numeric,col_float float,col_char char(10),col_text text,col_time time);
+
+--step2:建表2 expect:建表2成功
+drop table if exists t_ai_virtual_index_0003_02;
+create table t_ai_virtual_index_0003_02(col_int int,col_dec dec,col_money money,col_boolean boolean,col_char char(10),col_clob clob);
+
+--step3:建存储过程 expect:建存储过程成功
+create or replace procedure p_virtual_index_0003(a int) is
+V_int int;
+V_numeric numeric;
+V_float float;
+V_char char(10);
+V_text text;
+V_time time;
+begin
+for i in 1..a
+loop
+V_int :=i;
+V_numeric :=i+1.11;
+V_float :=i*5.55;
+V_char :='x_'|| i;
+V_text :='V_text_'|| i;
+V_time :='19:41:20';
+execute immediate 'insert into t_ai_virtual_index_0003_01 values
+(:p1,:p2,:p3,:p4,:p5,:p6)
+'using V_int,V_numeric,V_float,V_char,V_text,V_time;
+end loop;
+end;
+/
+
+--step4:向表1中插入1000000条数据并统计数据的数量 expect:向表1中插入1000000条数据成功,返回表1数据的数量
+call p_virtual_index_0003(1000000);
+select count(*) from t_ai_virtual_index_0003_01;
+
+--step5:创建虚拟索引1;expect:创建虚拟索引1成功
+select * from hypopg_create_index('create index on t_ai_virtual_index_0003_01(col_int)');
+
+--step6:查看执行计划;expect:返回执行计划
+explain select t_ai_virtual_index_0003_01.col_int,t_ai_virtual_index_0003_01.col_numeric,t_ai_virtual_index_0003_02.col_money from t_ai_virtual_index_0003_01 inner join t_ai_virtual_index_0003_02 on  t_ai_virtual_index_0003_01.col_int = t_ai_virtual_index_0003_02.col_int 
+where t_ai_virtual_index_0003_01.col_int > 20000 order by t_ai_virtual_index_0003_01.col_int desc limit 20;
+
+--step7:删除索引1 expect:删除索引1成功
+select * from hypopg_reset_index();
+
+--step8:创建虚拟索引2,3;expect:创建虚拟索引2,3成功
+select * from hypopg_create_index('create index on t_ai_virtual_index_0003_01(col_char)');
+
+select * from hypopg_create_index('create index on t_ai_virtual_index_0003_01(col_int)');
+
+--step9:查看执行计划;expect:返回执行计划
+explain select t_ai_virtual_index_0003_01.col_int,t_ai_virtual_index_0003_01.col_numeric,t_ai_virtual_index_0003_02.col_money from t_ai_virtual_index_0003_01 right join t_ai_virtual_index_0003_02 on  t_ai_virtual_index_0003_01.col_int = t_ai_virtual_index_0003_02.col_int 
+where t_ai_virtual_index_0003_01.col_int > 20000 order by t_ai_virtual_index_0003_01.col_int desc limit 20;
+
+--step10:删除索引2,3 expect:删除索引2,3成功
+select * from hypopg_reset_index();
+
+--step11:创建虚拟索引4,5 expect:创建虚拟索引4,5成功
+select * from hypopg_create_index('create index on t_ai_virtual_index_0003_01(col_char)');
+
+select * from hypopg_create_index('create index on t_ai_virtual_index_0003_02(col_money)');
+
+--step12:查看执行计划 expect:返回执行计划
+explain select t_ai_virtual_index_0003_01.col_int,t_ai_virtual_index_0003_01.col_numeric,t_ai_virtual_index_0003_02.col_money from t_ai_virtual_index_0003_01 inner join t_ai_virtual_index_0003_02 on t_ai_virtual_index_0003_01.col_int = t_ai_virtual_index_0003_02.col_int 
+where t_ai_virtual_index_0003_02.col_int < 3000 and t_ai_virtual_index_0003_02.col_money in ('$5,998.00','$5,960.00','$5,982.00') order by t_ai_virtual_index_0003_01.col_int desc limit 20;
+
+--step13:删除索引4,5 expect:删除索引4,5成功
+select * from hypopg_reset_index();
+
+--step14:查询现有索引 expect:返回为空
+select * from hypopg_display_index();
+
+--step15:清理环境 expect:清理环境成功
+drop table t_ai_virtual_index_0003_01;
+drop table t_ai_virtual_index_0003_02;
+drop procedure p_virtual_index_0003;

@@ -56,6 +56,7 @@ select VAR_POP(a.sal3), max(abs(b.sal)) from t_agg_join_003 a full join t_agg_jo
 +-----------------------+-----+
 | var_pop               | max |
 +-----------------------+-----+
+| 8088.8888888888888889 | 300 |
 +-----------------------+-----+
 select VAR_POP(b.deptno), max(abs(a.sal3)) from t_agg_join_003 a right join t_agg_join_001 b on a.id2=b.id where a.sal3>=99 group by a.deptno order by 1,2;
 +---------+-----+

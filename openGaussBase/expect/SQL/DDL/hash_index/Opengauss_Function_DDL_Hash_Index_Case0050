@@ -1,0 +1,43 @@
+-- @testpoint: 测试create index concurrently关键字创建哈希索引及与insert 结合使用，部分step合理报错
+--创建表
+drop table if exists t_hash_index_0050;
+SQL SUCCESS
+create table t_hash_index_0050(id01 int,id02 int,id03 char(20)) with(orientation=row);
+SQL SUCCESS
+--创建哈希索引(单索引)
+create index concurrently i_hash_index_0050_01 on t_hash_index_0050 using hash(id01);
+SQL SUCCESS
+--创建哈希索引(多个索引)
+create index concurrently i_hash_index_0050_02,i_hash_index_0050_03 on t_hash_index_0050 using btree(id02,id03);
+?.*ERROR: syntax error at or near ","
+?.*
+create index concurrently i_hash_index_0050_02,i_hash_index_0050_03 on t_hash_index_0050 using hash(id02,id03);
+?.*ERROR: syntax error at or near ","
+?.*
+--删除哈希索引
+drop index if exists i_hash_index_0050_01;
+SQL SUCCESS
+drop index if exists i_hash_index_0050_02;
+SQL SUCCESS
+drop index if exists i_hash_index_0050_03;
+SQL SUCCESS
+--删除表、表空间
+drop table t_hash_index_0050 cascade;
+SQL SUCCESS
+--------------------------------------------
+/*与insert操作联合使用*/
+drop table if exists t_hash_index_0050;
+SQL SUCCESS
+create table t_hash_index_0050(id01 int,id02 int,id03 char(20)) with(orientation=row);
+SQL SUCCESS
+--创建哈希索引(单索引)
+create index concurrently i_hash_index_0050_01 on  t_hash_index_0050 using hash(id01);
+SQL SUCCESS
+insert into t_hash_index_0050 select random()*10, random()*3, 'XXX' from generate_series(1,5000);
+SQL SUCCESS
+--删除哈希索引
+drop index if exists i_hash_index_0050_01;
+SQL SUCCESS
+--删除表、表空间
+drop table t_hash_index_0050 cascade;
+SQL SUCCESS

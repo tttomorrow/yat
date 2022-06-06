@@ -185,11 +185,11 @@ explain analyse select * from test_ugi_047 where c_info = '1-4';
 |   Iterations: 5                                                                                                                               |
 ?.*->  Partitioned Seq Scan on test_ugi_047?.*
 |         Filter: ((c_info)::text = '1-4'::text)                                                                                                |
-|         Rows Removed by Filter: 8                                                                                                             |
+?.*Rows Removed by Filter.*
 |         Selected Partitions:  1..5                                                                                                            |
 ?.*Total runtime:?.*
 +-----------------------------------------------------------------------------------------------------------------------------------------------+
---表test_ugi_047应当包含"wait_clean_gpi=y"
+--表test_ugi_047包含"wait_clean_gpi=y"
 select a.relname,a.parttype,a.reloptions from pg_partition a, pg_class b 
 where a.parentid = b.oid and b.relname = 'test_ugi_047' and a.reloptions[3] like '%wait_clean_gpi=y%' order by 1,2,3;
 +--------------+----------+---------------------------------------------------+

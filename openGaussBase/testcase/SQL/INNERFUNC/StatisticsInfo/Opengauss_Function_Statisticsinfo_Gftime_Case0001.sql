@@ -6,7 +6,8 @@ set track_functions to 'all';
 set track_io_timing to 'on';
 -- 内建函数 不适用
 SELECT pg_column_size(1);
-SELECT pg_sleep(5);
+SELECT pg_sleep(6);
+SELECT pg_sleep(6);
 select pg_stat_get_function_total_time(a.oid) is null from PG_PROC a where a.proname = 'pg_column_size';
 -- 自定义函数
 drop FUNCTION if exists func_add_sql;
@@ -17,12 +18,14 @@ CREATE FUNCTION func_add_sql(integer, integer) RETURNS integer
     RETURNS NULL ON NULL INPUT;
 /
 select func_add_sql(3,7);
-SELECT pg_sleep(5);
+SELECT pg_sleep(6);
+SELECT pg_sleep(6);
 select pg_stat_get_function_total_time(a.oid)>0 from PG_PROC a where a.proname = 'func_add_sql';
 select pg_stat_get_function_total_time(a.oid)=0 from PG_PROC a where a.proname = 'func_add_sql';
 select pg_stat_reset();
 select func_add_sql(3,7);
-SELECT pg_sleep(5);
+SELECT pg_sleep(6);
+SELECT pg_sleep(6);
 select pg_stat_get_function_total_time(a.oid)>0 from PG_PROC a where a.proname = 'func_add_sql';
 select pg_stat_get_function_total_time(a.oid)=0 from PG_PROC a where a.proname = 'func_add_sql';
 drop FUNCTION func_add_sql;
@@ -42,7 +45,8 @@ AS
     END;
 /
 CALL proc_while_loop(10);
-SELECT pg_sleep(5);
+SELECT pg_sleep(6);
+SELECT pg_sleep(6);
 select pg_stat_get_function_total_time(a.oid)>0 from PG_PROC a where a.proname = 'proc_while_loop';
 select pg_stat_get_function_total_time(a.oid)=0 from PG_PROC a where a.proname = 'proc_while_loop';
 DROP PROCEDURE proc_while_loop;

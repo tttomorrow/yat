@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -26,8 +26,10 @@ Expect      :
         3.期望:1主2备减容为1主1备，wal函数查询为1主1备，local_role显示为Normal，重启后检查再次检查结果一致
         4.恢复环境
 History     :
+        修改单机环境不执行为非1+2环境不执行
 """
 import time
+import os
 import unittest
 
 from testcase.utils.ComThread import ComThread
@@ -42,11 +44,10 @@ LOGGER = Logger()
 COMMONSH = CommonSH("PrimaryDbUser")
 
 
-@unittest.skipIf(1 == COMMONSH.get_node_num(),
-                 'Single node, and subsequent codes are not executed.')
+@unittest.skipIf(1 >= COMMONSH.get_node_num(), '单机环境不执行')
 class Gstoolstestcase(unittest.TestCase):
     def setUp(self):
-        LOGGER.info("==Opengauss_Function_Tools_gs_dropnode_Case0001 start==")
+        LOGGER.info(f'-----{os.path.basename(__file__)} start-----')
         self.constant = Constant()
         status = COMMONSH.get_db_cluster_status("detail")
         LOGGER.info(status)
@@ -56,6 +57,7 @@ class Gstoolstestcase(unittest.TestCase):
         status = COMMONSH.get_db_cluster_status("detail")
         LOGGER.info(status)
         self.assertTrue("Normal" in status or "Degraded" in status)
+        self.pri_root_node = Node("PrimaryRoot")
         self.user_node = Node("PrimaryDbUser")
         self.s_node1 = Node("Standby1DbUser")
         self.s_node2 = Node("Standby2DbUser")
@@ -63,6 +65,11 @@ class Gstoolstestcase(unittest.TestCase):
         self.s_com1 = CommonSH("Standby1DbUser")
         self.s_com2 = CommonSH("Standby2DbUser")
         self.com = Common()
+        self.standby_ip_list = [self.s_node1.ssh_host, self.s_node2.ssh_host]
+        self.ssh_file = '~/.ssh'
+
+        num = COMMONSH.get_node_num()
+        self.assertGreaterEqual(num, 3, "执行失败:节点数量异常，减容不执行")
 
         LOGGER.info("查询synchronous_standby_names默认值")
         result = COMMONSH.execut_db_sql("show synchronous_standby_names")
@@ -74,6 +81,28 @@ class Gstoolstestcase(unittest.TestCase):
         result = self.s_com2.execut_db_sql("show synchronous_standby_names")
         LOGGER.info(f"s2 synchronous_standby_names is {result}")
         self.synchronous_standby_names_s2 = result.strip().splitlines()[-2]
+
+        LOGGER.info("-----创建root互信-----")
+        result = self.com.get_sh_result(self.pri_root_node,
+                                        f"ls {macro.DB_SCRIPT_PATH}")
+        if "gs_sshexkey" not in result:
+            cmd = f"cd {macro.DB_SCRIPT_PATH}/../; " \
+                f"tar -zxvf openGauss-Package-bak*.tar.gz > /dev/null"
+            result = self.pri_root_node.sh(cmd).result()
+            LOGGER.info(result)
+            result = self.com.get_sh_result(self.pri_root_node,
+                                            f"ls {macro.DB_SCRIPT_PATH}")
+            LOGGER.info(result)
+            if "gs_sshexkey" not in result:
+                raise Exception("cat not find gs_sshexkey, Please check!")
+
+        self.host_tuple = (self.pri_root_node.ssh_host,
+                           self.s_node1.ssh_host,
+                           self.s_node2.ssh_host)
+        self.params = {'-f': 'test_hosts'}
+        self.com_root.exec_gs_sshexkey(macro.DB_SCRIPT_PATH,
+                                       *self.host_tuple,
+                                       **self.params)
 
     def test_tool(self):
         LOGGER.info("步骤1：1主2备，启线程1执行减容 根据减容和重启提示输入yes")
@@ -156,4 +185,19 @@ class Gstoolstestcase(unittest.TestCase):
                                   single=True)
 
         self.assertTrue("Normal" in status or "Degraded" in status)
-        LOGGER.info("==Opengauss_Function_Tools_gs_dropnode_Case0001 finish=")
+
+        LOGGER.info("-----清理集群节点root互信-----")
+        for i in self.standby_ip_list:
+            LOGGER.info(f"-----清理备{i}节点互信文件-----")
+            rm_cmd1 = f'''ssh {i} <<EOF rm -rf {self.ssh_file}/*\n''' + "EOF"
+            LOGGER.info(rm_cmd1)
+            rm_res1 = self.pri_root_node.sh(rm_cmd1).result()
+            LOGGER.info(rm_res1)
+
+        LOGGER.info(f"-----清理主节点互信文件-----")
+        rm_cmd2 = f'''rm -rf {self.ssh_file}/*;ls {self.ssh_file}'''
+        LOGGER.info(rm_cmd2)
+        rm_res2 = self.pri_root_node.sh(rm_cmd2).result()
+        LOGGER.info(rm_res2)
+        self.assertEqual('', rm_res2, '清理互信文件失败')
+        LOGGER.info(f'-----{os.path.basename(__file__)} end-----')

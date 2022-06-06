@@ -1,0 +1,65 @@
+-- @testpoint: 目标表和源表都为临时表，进行merge into操作
+--step1: 创建目标表和源表以及各自的临时表并插入数据 ;expect: 成功
+drop table if exists t_mergeinto_14_01;
+SQL SUCCESS
+drop table if exists t_mergeinto_14_02;
+SQL SUCCESS
+create table t_mergeinto_14_01(product_id integer,product_name varchar2(60),
+category varchar2(60));
+SQL SUCCESS
+insert into t_mergeinto_14_01 values (1501, 'vivitar 35mm', 'electrncs');
+SQL SUCCESS
+insert into t_mergeinto_14_01 values (1502, 'olympus is50', 'electrncs');
+SQL SUCCESS
+insert into t_mergeinto_14_01 values (1600, 'play gym', 'toys');
+SQL SUCCESS
+insert into t_mergeinto_14_01 values (1601, 'lamaze', 'toys');
+SQL SUCCESS
+insert into t_mergeinto_14_01 values (1666, 'harry potter', 'dvd');
+SQL SUCCESS
+create table t_mergeinto_14_02(product_id integer,product_name varchar2(60),
+category varchar2(60));
+SQL SUCCESS
+insert into t_mergeinto_14_02 values (1502, 'olympus camera', 'electrncs');
+SQL SUCCESS
+insert into t_mergeinto_14_02 values (1601, 'lamaze', 'toys');
+SQL SUCCESS
+insert into t_mergeinto_14_02 values (1666, 'harry potter', 'toys');
+SQL SUCCESS
+insert into t_mergeinto_14_02 values (1700, 'wait interface', 'books');
+SQL SUCCESS
+create temp table t_mergeinto_14_03 as select * from t_mergeinto_14_01;
+SQL SUCCESS
+create temp table t_mergeinto_14_04 as select * from t_mergeinto_14_02;
+SQL SUCCESS
+--step2: 进行merge into 操作; expect: 成功
+merge into t_mergeinto_14_03 t3   using t_mergeinto_14_04 t4
+ on (t3.product_id = t4.product_id)
+when matched then
+  update set t3.product_name = t4.product_name, t3.category = t4.category
+  where t3.product_name != 'play gym'
+when not matched then
+  insert values (t4.product_id, t4.product_name, t4.category)
+  where t4.category = 'books';
+SQL SUCCESS
+--step3: 查询更新后的结果 ;expect: 成功
+select * from t_mergeinto_14_03 order by product_id;
++------------+----------------+-----------+
+| product_id | product_name   | category  |
++------------+----------------+-----------+
+| 1501       | vivitar 35mm   | electrncs |
+| 1502       | olympus camera | electrncs |
+| 1600       | play gym       | toys      |
+| 1601       | lamaze         | toys      |
+| 1666       | harry potter   | toys      |
+| 1700       | wait interface | books     |
++------------+----------------+-----------+
+--step4: 清理环境删除表 ; expect: 成功
+drop table t_mergeinto_14_01;
+SQL SUCCESS
+drop table t_mergeinto_14_02;
+SQL SUCCESS
+drop table t_mergeinto_14_03;
+SQL SUCCESS
+drop table t_mergeinto_14_04;
+SQL SUCCESS

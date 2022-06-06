@@ -1,0 +1,175 @@
+-- @testpoint: list_hash二级分区表：truncate,部分测试点合理报错
+--step1: 创建表空间; expect:成功
+drop table if exists t_subpartition_0164;
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0164;
+SQL SUCCESS
+create tablespace ts_subpartition_0164 relative location 'subpartition_tablespace/subpartition_tablespace_0164';
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0164_01;
+SQL SUCCESS
+create tablespace ts_subpartition_0164_01 relative location 'subpartition_tablespace/subpartition_tablespace_0164_01';
+SQL SUCCESS
+--test1: truncate  table
+--step2: 创建二级分区表; expect:成功
+create table if not exists t_subpartition_0164
+(
+    col_1 int ,
+    col_2 int ,
+    col_3 varchar2 ( 30 ) not null ,
+    col_4 int
+)tablespace ts_subpartition_0164
+partition by list (col_1) subpartition by hash (col_2)
+(
+  partition p_list_1 values (-1,-2,-3,-4,-5,-6,-7,-8,-9,-10 )
+  (
+    subpartition p_hash_1_1 ,
+    subpartition p_hash_1_2 ,
+    subpartition p_hash_1_3
+  ),
+  partition p_list_2 values (1,2,3,4,5,6,7,8,9,10 )
+  (
+    subpartition p_hash_2_1 ,
+    subpartition p_hash_2_2 ,
+    subpartition p_hash_2_3 ,
+    subpartition p_hash_2_4 tablespace ts_subpartition_0164_01 ,
+    subpartition p_hash_2_5
+  ),
+  partition p_list_3 values (11,12,13,14,15,16,17,18,19,20),
+  partition p_list_4 values (21,22,23,24,25,26,27,28,29,30 )
+  (
+    subpartition p_hash_4_1 tablespace ts_subpartition_0164_01
+  ),
+  partition p_list_5 values (default)
+  (
+    subpartition p_hash_5_1
+  ),
+  partition p_list_6 values (31,32,33,34,35,36,37,38,39,40)
+  (
+    subpartition p_hash_6_1 ,
+    subpartition p_hash_6_2 ,
+    subpartition p_hash_6_3
+  )
+) enable row movement ;
+SQL SUCCESS
+--step3: 插入数据; expect:成功
+insert into t_subpartition_0164 values(1,11,1,1),(4,41,4,4),(5,54,5,5),(8,87,8,8),(9,19,9,9);
+SQL SUCCESS
+--step4: 查询数据; expect:成功
+select * from t_subpartition_0164;
++-------+-------+-------+-------+
+| col_1 | col_2 | col_3 | col_4 |
++-------+-------+-------+-------+
+| 9     | 19    | 9     | 9     |
+| 5     | 54    | 5     | 5     |
+| 8     | 87    | 8     | 8     |
+| 1     | 11    | 1     | 1     |
+| 4     | 41    | 4     | 4     |
++-------+-------+-------+-------+
+--step5: 清空表数据; expect:成功
+truncate t_subpartition_0164;
+SQL SUCCESS
+--step6: 查询数据; expect:成功,0条数据
+select * from t_subpartition_0164;
++-------+-------+-------+-------+
+| col_1 | col_2 | col_3 | col_4 |
++-------+-------+-------+-------+
++-------+-------+-------+-------+
+--step7: 查询二级分区数据; expect:成功,0条数据
+select * from t_subpartition_0164 subpartition(p_hash_1_1);
++-------+-------+-------+-------+
+| col_1 | col_2 | col_3 | col_4 |
++-------+-------+-------+-------+
++-------+-------+-------+-------+
+--test2: truncate  partition
+--step8: 插入数据; expect:成功
+insert into t_subpartition_0164 values(1,1,1,1),(5,5,5,5),(8,8,8,8),(9,9,9,9);
+SQL SUCCESS
+insert into t_subpartition_0164 values(11,11,1,1),(15,15,5,5),(18,81,8,8),(29,9,9,9);
+SQL SUCCESS
+insert into t_subpartition_0164 values(21,11,1,1),(15,15,5,5),(18,81,8,8),(-29,31,9,9);
+SQL SUCCESS
+insert into t_subpartition_0164 values(-1,1,1,1),(-1,-15,5,5),(-8,7,8,8),(-9,29,9,9);
+SQL SUCCESS
+insert into t_subpartition_0164 values(-8,18,1);
+SQL SUCCESS
+--step9: 查询指定一级分区数据; expect:成功,5条数据
+select * from t_subpartition_0164 partition(p_list_1);
++-------+-------+-------+-------+
+| col_1 | col_2 | col_3 | col_4 |
++-------+-------+-------+-------+
+| -1    | -15   | 5     | 5     |
+| -8    | 7     | 8     | 8     |
+| -8    | 18    | 1     |       |
+| -1    | 1     | 1     | 1     |
+| -9    | 29    | 9     | 9     |
++-------+-------+-------+-------+
+--step10: 查询指定一级数据; expect:成功,4条数据
+select * from t_subpartition_0164 partition(p_list_2);
++-------+-------+-------+-------+
+| col_1 | col_2 | col_3 | col_4 |
++-------+-------+-------+-------+
+| 1     | 1     | 1     | 1     |
+| 8     | 8     | 8     | 8     |
+| 5     | 5     | 5     | 5     |
+| 9     | 9     | 9     | 9     |
++-------+-------+-------+-------+
+--step11: 清空指定一级分区数据; expect:成功
+alter table t_subpartition_0164 truncate partition p_list_1;
+SQL SUCCESS
+--step12: 清空指定一级分区数据; expect:成功
+alter table t_subpartition_0164 truncate partition p_list_2;
+SQL SUCCESS
+--step13: 查询指定一级分区数据; expect:成功,0条数据
+select * from t_subpartition_0164 partition(p_list_1);
++-------+-------+-------+-------+
+| col_1 | col_2 | col_3 | col_4 |
++-------+-------+-------+-------+
++-------+-------+-------+-------+
+--step14: 查询指定一级分区数据; expect:成功,0条数据
+select * from t_subpartition_0164 partition(p_list_2);
++-------+-------+-------+-------+
+| col_1 | col_2 | col_3 | col_4 |
++-------+-------+-------+-------+
++-------+-------+-------+-------+
+--step15: 查询表数据; expect:成功,8条数据
+select * from t_subpartition_0164;
++-------+-------+-------+-------+
+| col_1 | col_2 | col_3 | col_4 |
++-------+-------+-------+-------+
+| -29   | 31    | 9     | 9     |
+| 29    | 9     | 9     | 9     |
+| 21    | 11    | 1     | 1     |
+| 11    | 11    | 1     | 1     |
+| 15    | 15    | 5     | 5     |
+| 18    | 81    | 8     | 8     |
+| 15    | 15    | 5     | 5     |
+| 18    | 81    | 8     | 8     |
++-------+-------+-------+-------+
+--test3: truncate  subpartition
+--step16: 查询指定二级分区数据; expect:成功,有数据
+select * from t_subpartition_0164 subpartition(p_hash_4_1);
++-------+-------+-------+-------+
+| col_1 | col_2 | col_3 | col_4 |
++-------+-------+-------+-------+
+| 29    | 9     | 9     | 9     |
+| 21    | 11    | 1     | 1     |
++-------+-------+-------+-------+
+--step17: 清空指定二级分区数据; expect:成功
+alter table t_subpartition_0164 truncate subpartition p_hash_4_1;
+SQL SUCCESS
+--step18: 查询指定二级分区数据; expect:成功,无数据
+select * from t_subpartition_0164 subpartition(p_hash_4_1);
++-------+-------+-------+-------+
+| col_1 | col_2 | col_3 | col_4 |
++-------+-------+-------+-------+
++-------+-------+-------+-------+
+--step19: 清空指定两个二级分区数据; expect:合理报错
+alter table t_subpartition_0164 truncate subpartition p_hash_1_1,p_hash_2_1;
+?.*ERROR: syntax error at or near "p_hash_2_1.*
+?.*Position:.*
+--step20: 清理环境; expect:成功
+drop table if exists t_subpartition_0164;
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0164;
+SQL SUCCESS

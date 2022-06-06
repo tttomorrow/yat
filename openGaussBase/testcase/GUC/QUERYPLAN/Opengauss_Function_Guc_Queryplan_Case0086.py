@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -17,6 +17,7 @@ Case Type   : GUC
 Case Name   : 使用gs_guc set方法设置参数plan_mode_seed为无效值,合理报错
 Description :
         1.查询plan_mode_seed默认值
+        2.依次修改参数值为test,-2,空串,2147483648,198.526
         3.恢复参数默认值
 Expect      :
         1.显示默认值为0
@@ -47,6 +48,8 @@ class QueryPlan(unittest.TestCase):
         sql_cmd = commonsh.execut_db_sql('show plan_mode_seed;')
         LOG.info(sql_cmd)
         self.res = sql_cmd.splitlines()[-2].strip()
+        LOG.info('--步骤2:依次修改参数值为test,-2,"''",2147483648,198.526--')
+        invalid_value = ['test', -2, "''", 2147483648, 198.526]
         for i in invalid_value:
             result = commonsh.execute_gsguc("set",
                                             self.constant.GSGUC_SUCCESS_MSG,

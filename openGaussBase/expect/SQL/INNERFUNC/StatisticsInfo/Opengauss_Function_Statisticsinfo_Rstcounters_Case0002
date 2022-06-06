@@ -19,6 +19,7 @@ select pg_stat_reset_single_table_counters('&^%^&*') from PG_CLASS a where a.rel
 ?.*ERROR: invalid input syntax for type oid: \"\&\^\%\^\&\*\"
 ?.*
   Where: referenced column: pg_stat_reset_single_table_counters
+select pg_stat_reset_single_table_counters(99999999999998789) from PG_CLASS a where a.relname = 'sales';
 ?.*ERROR: OID out of range
   Where: referenced column: pg_stat_reset_single_table_counters
 select pg_stat_reset_single_table_counters(a.oid) from PG_CLASS a where a.relname = 'sales';

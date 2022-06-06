@@ -1,0 +1,235 @@
+-- @testpoint: rollback事务后执行csn闪回查询,合理报错
+--step1: 查询参数默认值; expect:显示默认值依次为off/0/0
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+
+show vacuum_defer_cleanup_age;
++--------------------------+
+| vacuum_defer_cleanup_age |
++--------------------------+
+| 0                        |
++--------------------------+
+show version_retention_age;
++-----------------------+
+| version_retention_age |
++-----------------------+
+| 0                     |
++-----------------------+
+--step2: 修改参数值; expect:显示结果依次为on/1000/1000
+alter system set enable_recyclebin to on;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| on                |
++-------------------+
+alter system set vacuum_defer_cleanup_age to 1000;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show vacuum_defer_cleanup_age;
++--------------------------+
+| vacuum_defer_cleanup_age |
++--------------------------+
+| 1000                     |
++--------------------------+
+alter system set version_retention_age to 1000;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show version_retention_age;
++-----------------------+
+| version_retention_age |
++-----------------------+
+| 1000                  |
++-----------------------+
+--step3: 清空回收站; expect:回收站清空成功
+purge recyclebin;
+SQL SUCCESS
+--step4: 创建表t_timecapsule_0083_01; expect:表创建成功
+drop table if exists t_timecapsule_0083_01;
+SQL SUCCESS
+create table t_timecapsule_0083_01(id int, snaptime timestamptz, snapcsn bigint);
+SQL SUCCESS
+--step5: 创建表t_timecapsule_0083_02后向t_timecapsule_0083_01中插入记录; expect:表创建成功且记录插入成功
+create table t_timecapsule_0083_02
+(
+  r_reason_sk    integer,
+  r_reason_id    character(16),
+  r_reason_desc  character(100)
+);
+SQL SUCCESS
+select pg_sleep(4);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+insert into t_timecapsule_0083_01 select 1, now(), int8in(xidout(next_csn)) from gs_get_next_xid_csn();
+SQL SUCCESS
+--step6: 开启事务; expect:事务开启成功
+start transaction;
+SQL SUCCESS
+--step7: 向表t_timecapsule_0083_02插入数据后向t_timecapsule_0083_01中插入记录; expect:插入成功
+insert into t_timecapsule_0083_02(r_reason_sk, r_reason_id, r_reason_desc) values (1, 'aaaaaaaaaaaaaaaa', 'reason1');
+SQL SUCCESS
+select pg_sleep(4);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+insert into t_timecapsule_0083_01 select 2, now(), int8in(xidout(next_csn)) from gs_get_next_xid_csn();
+SQL SUCCESS
+insert into t_timecapsule_0083_02(r_reason_sk, r_reason_id, r_reason_desc) values (2, 'abbbbbbbbbbbbbba', 'reason2');
+SQL SUCCESS
+select pg_sleep(4);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+insert into t_timecapsule_0083_01 select 3, now(), int8in(xidout(next_csn)) from gs_get_next_xid_csn();
+SQL SUCCESS
+--step8: 回滚事务; expect:事务回滚成功
+rollback;
+SQL SUCCESS
+--step9: 向表t_timecapsule_0083_02插入数据后向t_timecapsule_0083_01中插入记录; expect:插入成功
+insert into t_timecapsule_0083_02(r_reason_sk, r_reason_id, r_reason_desc) values (3, 'acccccccccccccca', 'reason3');
+SQL SUCCESS
+select pg_sleep(4);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+insert into t_timecapsule_0083_01 select 4, now(), int8in(xidout(next_csn)) from gs_get_next_xid_csn();
+SQL SUCCESS
+--step10: 创建函数f_timecapsule_0083_01(); expect:函数创建成功
+create or replace function f_timecapsule_0083_01(int8)
+  returns integer
+  language plpgsql
+as
+$body$
+declare
+  count integer;
+begin
+  count = (select snapcsn from t_timecapsule_0083_01 where id =  $1);
+  return count;
+end;
+$body$;
+/
+SQL SUCCESS
+--step11: 创建函数f_timecapsule_0083_02(); expect:函数创建成功
+create or replace function f_timecapsule_0083_02(int8)
+  returns timestamptz
+  language plpgsql
+as
+$body$
+declare
+  count timestamptz;
+begin
+  count = (select snaptime from t_timecapsule_0083_01 where id =  $1);
+  return count;
+end;
+$body$;
+/
+SQL SUCCESS
+--step12: 执行闪回及闪回查询开启事务之前; expect:闪回成功
+timecapsule table t_timecapsule_0083_02 to csn f_timecapsule_0083_01(1);
+SQL SUCCESS
+select * from t_timecapsule_0083_02 timecapsule csn f_timecapsule_0083_01(1) order by r_reason_sk;
++-------------+-------------+---------------+
+| r_reason_sk | r_reason_id | r_reason_desc |
++-------------+-------------+---------------+
++-------------+-------------+---------------+
+--step13: 在回滚前执行闪回及闪回查询; expect:合理报错
+timecapsule table t_timecapsule_0083_02 to csn f_timecapsule_0083_01(2);
+?.*ERROR: timecapsule clause is not constant expression or evaulted null value.*
+select * from t_timecapsule_0083_02 timecapsule csn f_timecapsule_0083_01(2) order by r_reason_sk;
+?.*ERROR: timecapsule clause is not constant expression or evaulted null value.*
+timecapsule table t_timecapsule_0083_02 to csn f_timecapsule_0083_01(3);
+?.*ERROR: timecapsule clause is not constant expression or evaulted null value.*
+select * from t_timecapsule_0083_02 timecapsule csn f_timecapsule_0083_01(3) order by r_reason_sk;
+?.*ERROR: timecapsule clause is not constant expression or evaulted null value.*
+--step14 回滚后执行闪回及闪回查询; expect:闪回成功
+timecapsule table t_timecapsule_0083_02 to csn f_timecapsule_0083_01(4);
+SQL SUCCESS
+select * from t_timecapsule_0083_02 timecapsule csn f_timecapsule_0083_01(4) order by r_reason_sk;
++-------------+------------------+------------------------------------------------------------------------------------------------------+
+| r_reason_sk | r_reason_id      | r_reason_desc                                                                                        |
++-------------+------------------+------------------------------------------------------------------------------------------------------+
+| 3           | acccccccccccccca | reason3                                                                                              |
++-------------+------------------+------------------------------------------------------------------------------------------------------+
+--step15: 清理环境 expect:环境清理成功
+drop table if exists t_timecapsule_0083_02;
+SQL SUCCESS
+drop table if exists t_timecapsule_0083_01;
+SQL SUCCESS
+drop function if exists f_timecapsule_0083_02();
+SQL SUCCESS
+drop function if exists f_timecapsule_0083_01();
+SQL SUCCESS
+purge recyclebin;
+SQL SUCCESS
+--step16: 恢复默认值; expect:恢复成功，依次显示结果为off/0/0
+alter system set enable_recyclebin to off;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+
+alter system set vacuum_defer_cleanup_age to 0;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show vacuum_defer_cleanup_age;
++--------------------------+
+| vacuum_defer_cleanup_age |
++--------------------------+
+| 0                        |
++--------------------------+
+alter system set version_retention_age to 0;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show version_retention_age;
++-----------------------+
+| version_retention_age |
++-----------------------+
+| 0                     |
++-----------------------+

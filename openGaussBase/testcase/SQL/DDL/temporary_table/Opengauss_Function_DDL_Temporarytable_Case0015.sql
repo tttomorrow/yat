@@ -1,4 +1,5 @@
 -- @testpoint: 删除表数据后使用alter table语句修改列名，数据类型，无法转换的类型间合理报错
+-- @modify at: 2020-11-23
 --建表
 drop table if exists temp_table_alter_015;
 create global temporary table temp_table_alter_015(

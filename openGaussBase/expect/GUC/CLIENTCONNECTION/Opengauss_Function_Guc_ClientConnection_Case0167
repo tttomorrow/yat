@@ -7,11 +7,17 @@ show gin_fuzzy_search_limit;
 | 0                      |
 +------------------------+
 --设置，成功
+set gin_fuzzy_search_limit to 2147483647;
 SQL SUCCESS
 --设置，报错
 set gin_fuzzy_search_limit to 'test';
 ?.*ERROR: invalid value for parameter "gin_fuzzy_search_limit": "test"
+set gin_fuzzy_search_limit to '2147483647%$#';
+?.*ERROR: invalid value for parameter "gin_fuzzy_search_limit": "2147483647\%\$\#"
 set gin_fuzzy_search_limit to '-1';
+?.*ERROR: -1 is outside the valid range for parameter "gin_fuzzy_search_limit" \(0 .. 2147483647\)
+set gin_fuzzy_search_limit to '2147483648';
+?.*ERROR: invalid value for parameter "gin_fuzzy_search_limit": "2147483648"
   Hint: Value exceeds integer range.
 set gin_fuzzy_search_limit to '';
 ?.*ERROR: invalid value for parameter "gin_fuzzy_search_limit": ""

@@ -18,6 +18,8 @@ SELECT * FROM  V_TEST_LN order by tt;
 | tt                 |
 +--------------------+
 | 0.0                |
+| 0.6931471805599453 |
+| 1.3862943611198906 |
 +--------------------+
 drop view if exists V_TEST_LN;
 SQL SUCCESS

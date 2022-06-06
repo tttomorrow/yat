@@ -10,6 +10,9 @@ create table prefix_test(
 )
 PARTITION BY RANGE (c_integer)
 (
+	partition P_20180121 values less than (0),
+	partition P_20190122 values less than (50000),
+	partition P_20200123 values less than (100000),
 	partition P_max values less than (maxvalue)
 );
 select * from prefix_test;
@@ -27,6 +30,9 @@ create table Collation_Catalog_test(
 )
 PARTITION BY RANGE (c_integer)
 (
+	partition P_20180121 values less than (0),
+	partition P_20190122 values less than (50000),
+	partition P_20200123 values less than (100000),
 	partition P_max values less than (maxvalue)
 );
 select * from Collation_Catalog_test;

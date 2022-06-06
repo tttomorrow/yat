@@ -5,9 +5,11 @@ create table float4_03 (name float4);
 SQL SUCCESS
 insert into float4_03 values (12122);
 SQL SUCCESS
+insert into float4_03 values (99999999999);
 SQL SUCCESS
 insert into float4_03 values (-12122);
 SQL SUCCESS
+insert into float4_03 values (-99999999999);
 SQL SUCCESS
 select * from float4_03;
 +---------------+

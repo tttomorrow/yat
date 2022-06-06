@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -93,6 +93,8 @@ class Jdbcisreadonly(unittest.TestCase):
         self.log.info(cmd)
         result = self.db_primary_root_node.sh(cmd).result()
         self.log.info(result)
+        self.assertIn('第1行结果：+999999999-12-31T23:59:59.999999999', result)
+        self.assertIn('第2行结果：-999999999-01-01T00:00', result)
         self.assertIn('第3行结果：null', result)
         today = date.today().strftime("%Y-%m-%d")
         self.assertIn(f'第4行结果：{today}', result)

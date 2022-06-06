@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -14,18 +14,18 @@ See the Mulan PSL v2 for more details.
 """
 """
 Case Type   : 系统内部使用工具
-Case Name   : 使用不存在的pid启动trace
+Case Name   : 使用不存在的port启动trace
 Description :
-    1.查看gaussdb进程号
-    2.指定不存在的pid启动trace
+    1.查看gaussdb端口号
+    2.指定不存在的port启动trace
 Expect      :
-    1.查看gaussdb进程号成功
+    1.查看gaussdb端口号成功
     2.启动trace失败，报错Attach to trace config failed
 History     :
 """
 
 import unittest
-
+import random
 from testcase.utils.CommonSH import CommonSH
 from testcase.utils.Constant import Constant
 from testcase.utils.Logger import Logger
@@ -44,18 +44,18 @@ class SystemInternalTools(unittest.TestCase):
         self.sh_primary = CommonSH('PrimaryDbUser')
 
     def test_system_internal_tools(self):
-        LOG.info('-----------------查看数据库进程号---------------')
-        pid_cmd = f"ps -ef | grep {self.PrimaryNode.ssh_user} | " \
-            f"grep gaussdb | grep {macro.DB_INSTANCE_PATH} | tr -s ' '" \
-            f"| grep -v grep | cut -d ' ' -f 2"
-        LOG.info(pid_cmd)
-        self.pid_msg = self.PrimaryNode.sh(pid_cmd).result()
-        LOG.info('数据库进程为：' + self.pid_msg)
+        LOG.info('-----------------查看数据库端口号---------------')
+        show_port = f'''show port;'''
+        res = self.sh_primary.execut_db_sql(show_port)
+        self.node_port = res.splitlines()[-2].strip()
+        LOG.info('数据库端口为:' + self.node_port)
 
         LOG.info('--------------启动trace------------------')
-        self.new_pid = str(int(self.pid_msg) + 10)
+        rand_num = random.randint(100, 10000)
+        self.new_port = str(int(self.node_port) + rand_num)
         start_cmd = f'''source {macro.DB_ENV_PATH};
-            gstrace start -p {self.new_pid};
+            source /etc/profile
+            gstrace start -p {self.new_port};
             '''
         LOG.info(start_cmd)
         start_msg = self.PrimaryNode.sh(start_cmd).result()
@@ -64,7 +64,7 @@ class SystemInternalTools(unittest.TestCase):
     def tearDown(self):
         LOG.info('--------------this is tearDown--------------')
         stop_cmd = f'''source {macro.DB_ENV_PATH};
-            gstrace stop -p {self.pid_msg};
+            gstrace stop -p {self.node_port};
             '''
         LOG.info(stop_cmd)
         stop_msg = self.PrimaryNode.sh(stop_cmd).result()

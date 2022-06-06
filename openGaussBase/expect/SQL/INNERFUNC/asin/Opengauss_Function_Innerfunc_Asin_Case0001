@@ -9,6 +9,8 @@ select asin(c_decimal) t1 from asin_test_01 where c_decimal in (1,-1) order by t
 +---------------------+
 | t1                  |
 +---------------------+
+| -1.5707963267948966 |
+| 1.5707963267948966  |
 +---------------------+
 drop table if exists asin_test_01;
 SQL SUCCESS

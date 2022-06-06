@@ -1,4 +1,5 @@
 -- @testpoint: 使用join...on语句，on条件为整数和bool类型比较，查询成功
+-- @modify at: 2020-11-13
 --建表
 drop table if exists zsharding_tbl;
 create table zsharding_tbl(

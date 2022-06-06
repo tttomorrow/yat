@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -1157,3 +1157,250 @@ class Constant:
     @property
     def masking_policy_create_success_msg(self):
         return 'CREATE MASKING POLICY'
+
+    # 初始化数据库成功提示信息
+    @property
+    def initdb_success_msg(self):
+        return 'Success. You can now start the database server'
+
+    # 初始用户密码为空，连接数据库并执行语句提示信息
+    @property
+    def gsql_error_msg(self):
+        return 'set the password of the user'
+
+    # gs_encrypt单独使用密钥或密文加密失败提示信息
+    @property
+    def secure_false(self):
+        return 'key and vector should be both specified.'
+
+    @property
+    def drop_masking_policy_success(self):
+        return 'DROP MASKING POLICY'
+
+    @property
+    def alter_masking_policy_success(self):
+        return 'ALTER MASKING POLICY'
+
+    @property
+    def drop_resource_label_success(self):
+        return 'DROP RESOURCE LABEL'
+
+    @property
+    def create_snapshot_success(self):
+        return 'WDR snapshot request has been submitted'
+
+    # preinstall预安装成功提示信息
+    @property
+    def preinstall_success_msg(self):
+        return 'Preinstallation succeeded'
+
+    # 普通用户执行preinstall预安装失败提示信息
+    @property
+    def preinstall_error_msg(self):
+        return 'Only a user with the root permission can run this script'
+
+    # postuninstall清理数据库提示信息
+    @property
+    def postuninstall_success_msg(self):
+        return 'Successfully cleaned environment'
+
+    # preinstall预安装设置os成功提示信息
+    @property
+    def preinstall_setos_success_msg(self):
+        return 'Successfully set OS parameters.'
+
+    # wget网络连接成功提示信息
+    @property
+    def wget_connect_success_msg(self):
+        return r'Connecting to *** (.*) connected'
+
+    # passwd修改密码成功提示信息
+    @property
+    def passwd_success_msg(self):
+        return 'passwd: all authentication tokens updated successfully'
+
+    # ODBC连接数据库失败返回信息
+    @property
+    def odbc_connect_fail_msg(self):
+        return '[ISQL]ERROR: Could not SQLConnect'
+
+    # install安装成功提示信息
+    @property
+    def install_success_msg(self):
+        return 'Successfully installed application'
+
+    # uninstall卸载成功提示信息
+    @property
+    def uninstall_success_msg(self):
+        return 'Uninstallation succeeded'
+
+    # env路径为数据库相关路径，预安装失败提示信息
+    @property
+    def error_env_msg(self):
+        return "The parameter '--sep-env-file' value is incorrect"
+
+    # preinstall预安装密码包含非法字符失败提示信息
+    @property
+    def password_error_msg(self):
+        return 'The password contains illegal characters'
+
+    # 超时时间设置失败提示信息
+    @property
+    def error_timeout_msg(self):
+        incorrect_msg = (
+            'value is incorrect', 'type should be a nonnegative integer')
+        return incorrect_msg
+
+    # 进入最大可用模式提示
+    @property
+    def keep_sync_window_msg(self):
+        return "WARNING:  canceling wait for synchronous replication due " \
+               "to syncmaster standalone."
+
+    #创建发布端成功
+    @property
+    def create_pub_succ_msg(self):
+        return "CREATE PUBLICATION"
+
+    #删除发布端成功
+    @property
+    def drop_pub_succ_msg(self):
+        return "DROP PUBLICATION"
+
+    #创建订阅端成功
+    @property
+    def create_sub_succ_msg(self):
+        return 'CREATE SUBSCRIPTION'
+
+    #删除订阅端成功
+    @property
+    def drop_sub_succ_msg(self):
+        return 'DROP SUBSCRIPTION'
+
+    #修改发布端成功
+    @property
+    def alter_pub_succ_msg(self):
+        return 'ALTER PUBLICATION'
+
+    #更新分区表失败
+    @property
+    def update_partition_fail_msg(self):
+        return 'fail to update partitioned table'
+
+    #删除发布端成功
+    @property
+    def drop_pub_succ_msg(self):
+        return 'DROP PUBLICATION'
+
+    #删除订阅端成功
+    @property
+    def drop_sub_succ_msg(self):
+        return 'DROP SUBSCRIPTION'
+
+    #gs_encrypt加密失败
+    @property
+    def encrypted_fail_msg(self):
+        return 'Invalid password,it must contain at least three kinds of ' \
+               'characters'
+
+    #修改订阅端成功
+    @property
+    def alter_sub_succ_msg(self):
+        return 'ALTER SUBSCRIPTION'
+
+    #创建扩展
+    @property
+    def create_extension_success(self):
+        return 'CREATE EXTENSION'
+
+    #删除扩展
+    @property
+    def drop_extension_success(self):
+        return 'DROP EXTENSION'
+
+    #创建服务
+    @property
+    def create_server_success(self):
+        return 'CREATE SERVER'
+
+    #删除服务
+    @property
+    def drop_server_success(self):
+        return 'DROP SERVER'
+
+    #创建用户映射
+    @property
+    def create_usermapping_success(self):
+        return 'CREATE USER MAPPING'
+
+    #删除用户映射
+    @property
+    def drop_usermapping_success(self):
+        return 'DROP USER MAPPING'
+
+    @property
+    def timecapsule_table_succ_msg(self):
+        return 'TimeCapsule Table'
+
+    @property
+    def create_cmk_success(self):
+        return 'CREATE CLIENT MASTER KEY'
+
+    @property
+    def create_cek_success(self):
+        return 'CREATE COLUMN ENCRYPTION KEY'
+
+    @property
+    def drop_cmk_success(self):
+        return 'DROP CLIENT MASTER KEY'
+
+    @property
+    def drop_cek_success(self):
+        return 'DROP COLUMN ENCRYPTION KEY'
+
+    #不存在秘钥
+    @property
+    def key_cipher_notexist_msg(self):
+        return 'ERROR:  No key file subscription.key.cipher'
+
+    #提示创建秘钥
+    @property
+    def create_key_warning_msg(self):
+        return 'HINT:  Please create subscription.key.cipher ' \
+               'file with gs_guc and gs_ssh, such as :gs_ssh -c ' \
+               '"gs_guc generate -S XXX -D $GAUSSHOME/bin -o subscription"'
+
+    #修改外表成功
+    @property
+    def alter_foreign_table_success(self):
+        return 'ALTER FOREIGN TABLE'
+
+    #提示无法连接发布端
+    @property
+    def can_not_connect_pub_msg(self):
+        return "ERROR:  Failed to connect to publisher"
+
+    #生成加密密码文件成功
+    @property
+    def create_keycipher_success(self):
+        return "gs_guc generate -S ***"
+
+    # 提示无法连接新发布端
+    @property
+    def can_not_conn_newpub_msg(self):
+        return "The new conninfo cannot connect to new publisher"
+
+    # 创建package成功
+    @property
+    def create_package_success_msg(self):
+        return "CREATE PACKAGE"
+
+    # 创建package body成功
+    @property
+    def create_package_body_success_msg(self):
+        return "CREATE PACKAGE BODY"
+
+    # 删除package成功
+    @property
+    def drop_package_success_msg(self):
+        return "DROP PACKAGE"

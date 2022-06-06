@@ -10,7 +10,9 @@ show ENABLE_BITMAPSCAN;
 
 --set fail
 set maintenance_work_mem=1023;
+set maintenance_work_mem=2147483648;
 set work_mem=63;
+set work_mem=2147483648;
 
 --row table
 

@@ -7,6 +7,7 @@ insert into bigint02 values (-102);
 SQL SUCCESS
 insert into bigint02 values (-9999999);
 SQL SUCCESS
+insert into bigint02 values (-2233445566);
 SQL SUCCESS
 select * from bigint02;
 +-------------+
@@ -14,6 +15,7 @@ select * from bigint02;
 +-------------+
 | -102        |
 | -9999999    |
+| -2233445566 |
 +-------------+
 drop table bigint02;
 SQL SUCCESS

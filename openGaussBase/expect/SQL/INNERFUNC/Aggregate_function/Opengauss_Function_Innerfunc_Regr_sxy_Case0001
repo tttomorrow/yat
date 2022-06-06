@@ -24,7 +24,6 @@ select regr_sxy(height, id)from  table_test where id <5;
 +------------------+
 | regr_sxy         |
 +------------------+
-| 4.32000000000005 |
 +------------------+
 select regr_sxy(age, id)from  table_test where id <9;
 +----------+

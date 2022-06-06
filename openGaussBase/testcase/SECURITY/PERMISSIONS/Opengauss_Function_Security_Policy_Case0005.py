@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -17,7 +17,7 @@ Case Type   : policy
 Case Name   : 设置failed_login_attempts=0,自动锁定功能不生效
 Description :
     步骤 1.设置failed_login_attempts=0，重启数据库生效
-    步骤 2.初始用户执行：create user wf with password 'Qazwsx@123';
+    步骤 2.初始用户执行：create user wf with password '$PASSWORD';
     步骤 3.用wf用户登录，输入错误的密码，登录1000次
 Expect      :
     步骤 1.设置成功，数据库重启成功

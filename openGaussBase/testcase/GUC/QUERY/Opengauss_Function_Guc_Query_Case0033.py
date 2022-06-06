@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -20,13 +20,11 @@ Description :
     show enable_resource_track;
     show enable_auto_clean_unique_sql;
     show instr_unique_sql_count;
-    show unique_sql_clean_ratio;
-    2、设置enable_resource_track为off,修改unique_sql_clean_ratio为0.1，
+    2、设置enable_resource_track为off,
     重启使其生效，并校验其预期结果；
     gs_guc set -N all -I all -c "enable_resource_track=off"
     gs_guc set -N all -I all -c "enable_auto_clean_unique_sql=off"
     gs_om -t stop && gs_om -t start
-    show unique_sql_clean_ratio;
     show enable_resource_track;
     show instr_unique_sql_count;
     3、清空记录，执行1 unique_sql,查看hash table记录条数
@@ -35,7 +33,6 @@ Description :
     gsql -r -d -p -f test.sql
     select count(va) from (select get_instr_unique_sql() as va);
     4、恢复默认值；
-    gs_guc set -N all -I all -c "unique_sql_clean_ratio=0"
     gs_om -t stop && gs_om -t start
 Expect      :
     1、显示默认值；
@@ -83,16 +80,13 @@ class Guctestcase(unittest.TestCase):
         LOGGER.info(status)
         self.set_gs_guc("enable_resource_track", "off", "reload")
         self.set_gs_guc("instr_unique_sql_count", "100", "reload")
-        self.set_gs_guc("unique_sql_clean_ratio", "0.2", "reload")
         sql_cmd = COMMONSH.execut_db_sql("show enable_resource_track;"
-                                         "show unique_sql_clean_ratio;"
                                          "show instr_unique_sql_count;"
                                          "show enable_auto_clean_unique_sql;")
         LOGGER.info(sql_cmd)
         self.assertNotIn("on", sql_cmd)
         self.assertIn("off", sql_cmd)
         self.assertIn("100", sql_cmd)
-        self.assertIn("0.2", sql_cmd)
 
         LOGGER.info("步骤3：清空记录后查询执行大量unique sql，查询不被记录")
         result = COMMONSH.execut_db_sql("select count(*) "
@@ -118,7 +112,6 @@ class Guctestcase(unittest.TestCase):
         self.set_gs_guc("enable_resource_track", "on")
         status = COMMONSH.restart_db_cluster()
         LOGGER.info(status)
-        self.set_gs_guc("unique_sql_clean_ratio", "0.1", "reload")
         status = COMMONSH.get_db_cluster_status("detail")
         LOGGER.info(status)
         self.assertTrue("Normal" in status or "Degraded" in status)

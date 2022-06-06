@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -16,21 +16,17 @@ See the Mulan PSL v2 for more details.
 Case Type   : 服务端工具
 Case Name   : 指定创建转储使用的角色名（不设置角色密码）
 Description :
-    1.连接数据库：
-    2.创建数据
-    3.退出数据库
-    4.source环境变量
-    5.指定创建转储使用的角色名（不设置角色密码）
-    6.连接数据库，清理环境
+    1.创建测试数据
+    2.指定创建转储使用的角色名，不指定密码
+    3.清理环境
 Expect      :
-    1.数据库连接成功
-    2.创建数据成功
-    3.退出数据库
-    4.source环境变量
-    5.导出是失败
-    6.清理环境成功
+    1.创建测试数据成功
+    2.导出成功
+    3.清理环境成功
 History     :
+    modified: by 5318639 2022/1/21 优化用例，适配新版本
 """
+import os
 import unittest
 
 from testcase.utils.Constant import Constant
@@ -38,59 +34,93 @@ from testcase.utils.Logger import Logger
 from yat.test import Node
 from yat.test import macro
 
-LOG = Logger()
-
 
 class Tools(unittest.TestCase):
     def setUp(self):
-        LOG.info('----Opengauss_Function_Tools_gs_dumpall_Case0064start----')
+        self.log = Logger()
+        self.log.info(
+            '----Opengauss_Function_Tools_gs_dumpall_Case0064start----')
         self.dbuser_node = Node('dbuser')
         self.constant = Constant()
-        self.gs_dumpall_msg = 'options --role --rolepassword' \
-                              ' need use together'
+        self.db_name = "db_dumpall0064"
+        self.tb_name = "t_dumpall0064_1"
+        self.u_name1 = "u_dumpall0064_1"
+        self.u_name2 = "u_dumpall0064_2"
+        self.dumpall_path = os.path.join(
+            os.path.dirname(macro.DB_INSTANCE_PATH), 'dumpall.sql')
 
     def test_server_tools(self):
-        LOG.info('------------创建数据-------------')
-        sql_cmd1 = '''drop table if exists test1; 
-            create table test1 (id int ,name char(10));
-            insert into test1 values (1,'aa'),(2,'bb');
-            drop user if exists user1; 
-            drop user if exists user2; 
-            create user user1 identified by 'qwer@123';
-            create user user2 identified by 'qwer@123';
-            grant all privileges to user1;
-            grant user1 to user2;
+        text = '-------step1:创建测试数据;expect:创建成功--------'
+        self.log.info(text)
+        text = '-------step1.1:连接数据库并创建数据库;expect:创建成功--------'
+        self.log.info(text)
+        sql_cmd1 = f'drop database if exists {self.db_name};' \
+            f'create database {self.db_name};'
+        excute_cmd1 = f'source {macro.DB_ENV_PATH};' \
+            f'gsql -d {self.dbuser_node.db_name} ' \
+            f'-p {self.dbuser_node.db_port} ' \
+            f'-c "{sql_cmd1}"'
+        self.log.info(excute_cmd1)
+        msg1 = self.dbuser_node.sh(excute_cmd1).result()
+        self.log.info(msg1)
+        self.assertIn(self.constant.CREATE_DATABASE_SUCCESS, msg1,
+                      '执行成功' + text)
+        text = '-------step1.2:在创建好的数据库中创建表并插入数据;expect:创建成功--------'
+        self.log.info(text)
+        sql_cmd2 = f''' 
+            drop table if exists {self.tb_name}; 
+            create table {self.tb_name} (id int ,name char(10));
+            insert into {self.tb_name} values (1,'aa'),(2,'bb');
+            drop user if exists {self.u_name1}; 
+            drop user if exists {self.u_name2}; 
+            create user {self.u_name1} identified by \'{macro.COMMON_PASSWD}\';
+            create user {self.u_name2} identified by \'{macro.COMMON_PASSWD}\';
+            grant all privileges to {self.u_name1};
+            grant {self.u_name1} to {self.u_name2};
             '''
-        gsql_cmd1 = f'''source {macro.DB_ENV_PATH} ;
-            gsql -d {self.dbuser_node.db_name} -p\
-            {self.dbuser_node.db_port} -c "{sql_cmd1}"
-            '''
-        LOG.info(gsql_cmd1)
-        sql_msg1 = self.dbuser_node.sh(gsql_cmd1).result()
-        LOG.info(sql_msg1)
-        self.assertIn(self.constant.INSERT_SUCCESS_MSG, sql_msg1)
-
-        LOG.info('--指定创建转储使用的角色名（不设置角色密码）--')
-        dumpall_cmd = f'''source {macro.DB_ENV_PATH} ;
-            gs_dumpall -p {self.dbuser_node.db_port} -U user2 -W qwer@123\
-            -f {macro.DB_INSTANCE_PATH}/dumpall.sql --role user1;
-            '''
-        LOG.info(dumpall_cmd)
-        dumpall_msg = self.dbuser_node.sh(dumpall_cmd).result()
-        LOG.info(dumpall_msg)
-        self.assertIn(self.gs_dumpall_msg, dumpall_msg)
+        excute_cmd2 = f'source {macro.DB_ENV_PATH};' \
+            f'gsql -d {self.db_name} ' \
+            f'-p {self.dbuser_node.db_port} ' \
+            f'-c "{sql_cmd2}"'
+        self.log.info(excute_cmd2)
+        msg2 = self.dbuser_node.sh(excute_cmd2).result()
+        self.log.info(msg2)
+        self.assertIn(self.constant.ALTER_ROLE_SUCCESS_MSG, msg2,
+                      '执行成功' + text)
+        self.assertIn(self.constant.INSERT_SUCCESS_MSG, msg2, '执行成功' + text)
+        text = '------step3:指定创建转储使用的角色名，不指定角色密码;expect:交互输入密码后导出成功------'
+        self.log.info(text)
+        dumpall_cmd = f'''source {macro.DB_ENV_PATH};
+                expect <<EOF
+                set timeout -1
+                spawn gs_dumpall -p {self.dbuser_node.db_port}  \
+                -U {self.dbuser_node.ssh_user} \
+                -W {self.dbuser_node.ssh_password} \
+                -f {self.dumpall_path} --role {self.u_name1}
+                expect {{{{
+                    "*assword:" {{{{ send "{macro.COMMON_PASSWD}\n"; \
+                    exp_continue }}}}
+                    eof {{{{ send_user \n }}}}
+                }}}}\n''' + "EOF"
+        self.log.info(dumpall_cmd)
+        dumpall_result = self.dbuser_node.sh(dumpall_cmd).result()
+        self.log.info(dumpall_result)
+        self.assertIn(f'dumpall operation successful', dumpall_result,
+                      '执行失败:' + text)
 
     def tearDown(self):
-        LOG.info('---清理环境---')
-        sql_cmd2 = '''drop user  user1; 
-            drop user  user2; 
-            drop table test1;
-            '''
-        clear_cmd = f'''source {macro.DB_ENV_PATH} ;
-            gsql -d {self.dbuser_node.db_name}\
-            -p {self.dbuser_node.db_port} -c "{sql_cmd2}";
-            '''
-        LOG.info(clear_cmd)
-        clear_msg = self.dbuser_node.sh(clear_cmd).result()
-        LOG.info(clear_msg)
-        LOG.info('----Opengauss_Function_Tools_gs_dumpall_Case0064finish----')
+        text = '-----------------step3:清理环境;expect:清理完成----------------'
+        self.log.info(text)
+        sql_cmd4 = f'drop database if exists {self.db_name};' \
+            f'drop role {self.u_name1};' \
+            f'drop role {self.u_name2}'
+        excute_cmd4 = f'source {macro.DB_ENV_PATH};' \
+            f'gsql -d {self.dbuser_node.db_name} ' \
+            f'-p {self.dbuser_node.db_port} ' \
+            f'-c "{sql_cmd4}";' \
+            f'rm -rf {self.dumpall_path};'
+        self.log.info(excute_cmd4)
+        msg4 = self.dbuser_node.sh(excute_cmd4).result()
+        self.log.info(msg4)
+        self.log.info(
+            '----Opengauss_Function_Tools_gs_dumpall_Case0064finish----')

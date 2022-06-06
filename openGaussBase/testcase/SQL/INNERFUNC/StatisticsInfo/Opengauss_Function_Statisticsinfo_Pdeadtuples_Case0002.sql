@@ -23,6 +23,7 @@ INSERT INTO sales VALUES(1, 12, '2019-08-03 00:00:00', 'd', 1, 1, 1);
 update sales set time_id = '2019-06-02 10:00:00' where channel_id = 'b';
 update sales set time_id = '2020-06-02 10:00:00' where channel_id = 'd';
 select pg_stat_get_partition_dead_tuples() from pg_partition  a where a.relname = 'p1';
+select pg_stat_get_partition_dead_tuples(9999999999999999999999999) from pg_partition  a where a.relname = 'p2';
 -- 删除数据
 delete from sales where channel_id = 'b';
 delete from sales where channel_id = 'c';

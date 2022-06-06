@@ -61,12 +61,11 @@ SQL SUCCESS
 create index index12221 on tab1222(message);
 SQL SUCCESS
 create index index12222 on tab1222 using gin(message);
-SQL SUCCESS
+?.*ERROR: access method "gin" is not support for global temporary table index.*
 create unique index index12223 on tab1222 using btree(message asc);
 SQL SUCCESS
 create index index12224 on tab1222 using gist(message);
-?.*ERROR: data type jsonb has no default operator class for access method "gist.*
-  Hint: You must specify an operator class for the index or define a default operator class for the data type.
+?.*ERROR: access method "gist" is not support for global temporary table index.*
 --清理数据
 drop index if exists index12211;
 SQL SUCCESS

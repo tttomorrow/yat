@@ -23,7 +23,7 @@ insert into table_alter_016(ad) values ('confirmed');
 SQL SUCCESS
 insert into table_alter_016(ad) values (3);
 ?.*ERROR: new row for relation "table_alter_016" violates check constraint "table_alter_016_check".*
-  Detail: Failing row contains (null, 3, null).
+  Detail: N/A
 alter table table_alter_016 drop constraint table_alter_016_check;
 SQL SUCCESS
 insert into table_alter_016(ad) values(1);

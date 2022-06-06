@@ -1,4 +1,5 @@
 -- @testpoint: 使用inner join语句，查询成功
+-- @modify at: 2020-11-13
 --建表
 drop table if exists all_datatype_table;
 create table all_datatype_table(id int not null,c_intger integer,c_char char(10))

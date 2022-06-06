@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -17,6 +17,8 @@ Case Type   : GUC
 Case Name   : 修改参数temp_buffers为其他数据类型，观察预期结果；
 Description :
          1、查询temp_buffers默认值；
+         2、修改temp_buffers为false，"test",9999999999等，并校验其预期结果；
+            gs_guc set -D /openGauss/zyn1026_gauss/cluster/dn1 -c "temp_buffers=9999999999"
 Expect      :
         1、显示默认值；
         2、参数修改失败；
@@ -65,6 +67,8 @@ class Deletaduit(unittest.TestCase):
         sql_cmd = self.commonsh.execut_db_sql(f'''show temp_buffers;''')
         self.log.info(sql_cmd)
         self.assertIn(self.res, sql_cmd)
+        # 使用设置gs_guc set设置temp_buffers为9999999999
+        msg = self.commonsh.execute_gsguc('set', self.Constant.GSGUC_SUCCESS_MSG, 'temp_buffers=9999999999')
         self.log.info(msg)
         self.assertFalse(msg)
         # 修改失败后重启后查看默认值

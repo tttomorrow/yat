@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -20,6 +20,7 @@ Description :
         2.修改参数值为字符test
         3.修改参数值为小数100.987
         4.修改参数值为超临界值-1
+        5.修改参数值为超临界值2147483648
         6.修改参数值为空串
         7.恢复参数默认值
 Expect      :
@@ -53,6 +54,8 @@ class DeveloperOption(unittest.TestCase):
         sql_cmd = commonsh.execut_db_sql('''show FencedUDFMemoryLimit;''')
         LOG.info(sql_cmd)
         self.res = sql_cmd.splitlines()[-2].strip()
+        LOG.info('--步骤2:修改参数值为test，100.987, -1,2147483648,空串合理报错--')
+        invalid_value = ['test', 100.987, -1, 2147483648, "''"]
         for i in invalid_value:
             msg = commonsh.execute_gsguc('set',
                                          self.constant.GSGUC_SUCCESS_MSG,

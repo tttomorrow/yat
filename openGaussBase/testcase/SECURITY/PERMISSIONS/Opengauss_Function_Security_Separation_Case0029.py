@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -16,7 +16,7 @@ See the Mulan PSL v2 for more details.
 Case Type   : Separation_rights
 Case Name   : 普通用户可赋予管理员权限
 Description :
-    1.初始用户执行：CREATE USER sysadmin01 WITH password 'Qazwsx@123';
+    1.初始用户执行：CREATE USER sysadmin01 WITH password '$PASSWORD';
                 ALTER USER sysadmin01 SYSADMIN;
 Expect      :
     1.CREATE ROLE
@@ -45,16 +45,16 @@ class Policy(unittest.TestCase):
         self.DB_ENV_PATH = macro.DB_ENV_PATH
         self.DB_INSTANCE_PATH = macro.DB_INSTANCE_PATH
         self.Constant = Constant()
-
+    
     def test_policy(self):
         logger.info('----------create user --------------')
         sql_cmd1 = f'CREATE USER sysadmin01 WITH password ' \
-                   f'\'{macro.COMMON_PASSWD}\';' \
-                   f'ALTER USER sysadmin01 SYSADMIN;'
+            f'\'{macro.COMMON_PASSWD}\';' \
+            f'ALTER USER sysadmin01 SYSADMIN;'
         msg1 = self.sh_primy.execut_db_sql(sql_cmd1)
         logger.info(msg1)
         self.assertIn(self.Constant.ALTER_ROLE_SUCCESS_MSG, msg1)
-
+    
     def tearDown(self):
         logger.info('-----------清理环境-----------')
         sql_cmd1 = f'drop user if exists sysadmin01 CASCADE;'

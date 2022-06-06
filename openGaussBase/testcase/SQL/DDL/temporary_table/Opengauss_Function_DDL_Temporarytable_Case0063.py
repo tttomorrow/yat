@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -61,6 +61,8 @@ class Temporarytable(unittest.TestCase):
         logger.info(sql_cmd1)
         self.assertIn(constant.TABLE_CREATE_SUCCESS, sql_cmd1)
         sql_cmd2 = commonsh.execut_db_sql('''
+        insert into temp_table_alter_0063 values(1,1.0002,'dghg','jjjsdfghjhjui','010111100','010101101',date_trunc('hour', timestamp  '2001-02-16 20:38:40'));
+        insert into temp_table_alter_0063 values(2,1.0002,'dghg','jjjsdfghjhjui','010111100','010101101',date_trunc('hour', timestamp  '2001-02-16 20:38:40'));
         insert into temp_table_alter_0063 select * from temp_table_alter_0063;
         insert into temp_table_alter_0063 select * from temp_table_alter_0063;
         select count(*) from temp_table_alter_0063;''')

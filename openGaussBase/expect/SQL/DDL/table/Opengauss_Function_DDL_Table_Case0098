@@ -11,12 +11,14 @@ CREATE TABLE TAB_12
 (id                      NUMBER(7)not null,
  text                       VARCHAR2(2000)
  );
-?.*ERROR: relation "tab_12" already exists
+?.*ERROR: relation "tab_12" already exists.*
+?.*
 --ERROR:  relation "tab_12" already exists
 CREATE TABLE tab_12
 (id                      NUMBER(7)not null,
  text                       VARCHAR2(2000)
  );
-?.*ERROR: relation "tab_12" already exists
+?.*ERROR: relation "tab_12" already exists.*
+?.*
 drop table if exists tab_12;
 SQL SUCCESS

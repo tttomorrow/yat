@@ -48,12 +48,15 @@ SQL SUCCESS
 --fail(COLUMN)
 CREATE INDEX  test_gin_2_first_name_idx  ON test_gin_2 USING GIN(to_tsvector('english', first_name)) with (FASTUPDATE=off,GIN_PENDING_LIST_LIMIT=63);
 ?.*ERROR: value 63 out of bounds for option "gin_pending_list_limit"?.*
+  Detail: Valid values are between "64" and "2147483647".
 --fail (row)
 CREATE INDEX  test_gin_row1_idx ON test_gin_row1 USING GIN(info) with (FASTUPDATE=off, GIN_PENDING_LIST_LIMIT=63);
 ?.*ERROR: value 63 out of bounds for option "gin_pending_list_limit"?.*
+  Detail: Valid values are between "64" and "2147483647".
 --fail(row)
 CREATE INDEX  test_gin_row2_first_name_idx  ON test_gin_row2 USING GIN(to_tsvector('english', first_name)) with (FASTUPDATE=off,GIN_PENDING_LIST_LIMIT=63);
 ?.*ERROR: value 63 out of bounds for option "gin_pending_list_limit"
+  Detail: Valid values are between "64" and "2147483647".
 --successfully (COLUMN)
 CREATE INDEX  test_gin_2_first_name_idx  ON test_gin_2 USING GIN(to_tsvector('english', first_name)) with (FASTUPDATE=off,GIN_PENDING_LIST_LIMIT=64);
 SQL SUCCESS

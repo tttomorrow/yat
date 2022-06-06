@@ -20,7 +20,13 @@ CREATE TABLE sales
  amount_sold NUMBER(10,2)
 );
 SQL SUCCESS
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -35,7 +41,13 @@ select pg_stat_get_tuples_updated(a.oid) from PG_CLASS a where a.relname = 'sale
 -- 数据插入sales
 INSERT INTO sales VALUES(1, 12, '2019-01-10 00:00:00', 'a', 1, 1, 1);
 SQL SUCCESS
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -58,7 +70,13 @@ SQL SUCCESS
 -- 更新一条 1
 update sales set time_id = '2017-12-10 00:00:00' where channel_id = 'a';
 SQL SUCCESS
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -75,7 +93,13 @@ update sales set time_id = '2019-06-02 10:00:00' where channel_id = 'b';
 SQL SUCCESS
 update sales set time_id = '2019-06-02 10:00:00' where channel_id = 'b';
 SQL SUCCESS
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -94,7 +118,13 @@ update sales set time_id = '2019-06-02 10:00:00' where channel_id = 'd';
 SQL SUCCESS
 update sales set time_id = '2019-06-03 10:00:00' where channel_id = 'e';
 SQL SUCCESS
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+

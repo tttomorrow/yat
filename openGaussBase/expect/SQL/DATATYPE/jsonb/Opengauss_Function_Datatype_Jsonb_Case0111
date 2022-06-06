@@ -65,11 +65,9 @@ create index index11121 on tab1112(message);
 ?.*ERROR: data type json has no default operator class for access method "btree.*
   Hint: You must specify an operator class for the index or define a default operator class for the data type.
 create index index11122 on tab1112 using gist(message);
-?.*ERROR: data type json has no default operator class for access method "gist.*
-  Hint: You must specify an operator class for the index or define a default operator class for the data type.
+?.*ERROR: access method "gist" is not support for global temporary table index
 create index index11123 on tab1112 using gin(message);
-?.*ERROR: data type json has no default operator class for access method "gin.*
-  Hint: You must specify an operator class for the index or define a default operator class for the data type.
+?.*ERROR: access method "gin" is not support for global temporary table index
 create unique index index11124 on tab1112 using btree(message asc);
 ?.*ERROR: data type json has no default operator class for access method "btree.*
   Hint: You must specify an operator class for the index or define a default operator class for the data type.

@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -46,7 +46,8 @@ class Tools(unittest.TestCase):
         self.commonsh = CommonSH()
 
     def test_built_in_func(self):
-        self.log.info('-----步骤1.汇聚所有节点上线程的阻塞等待情况，以系统用户执行-----')
+        text = '--step1: 汇聚所有节点上线程的阻塞等待情况，以系统用户执行;expect: 执行成功--'
+        self.log.info(text)
         sql_cmd = self.commonsh.execut_db_sql(
             f'select DBE_PERF.get_global_thread_wait_status() limit 3;')
         self.log.info(sql_cmd)
@@ -57,14 +58,15 @@ class Tools(unittest.TestCase):
             self.log.info(f'str_info = {str_info}')
             num = len(str_info.split(','))
             self.log.info(f'num = {num}')
-            if num == 15:
+            if num == 16:
                 self.log.info('汇聚所有节点上线程的阻塞等待情况成功')
             else:
                 raise Exception('函数执行异常，请检查')
         else:
             raise Exception('执行结果异常，请检查')
 
-        self.log.info("-----步骤2.汇聚所有节点上线程的阻塞等待情况，以非系统用户执行-----")
+        text = '--step2: 汇聚所有节点上线程的阻塞等待情况，以非系统用户执行;expect: 合理报错--'
+        self.log.info(text)
         gsql_cmd = f'source {macro.DB_ENV_PATH};' \
             f'gsql -p {self.dbuser.db_port} -d {self.dbuser.db_name}' \
             f' -U  {self.dbuser.db_user} ' \
@@ -73,7 +75,8 @@ class Tools(unittest.TestCase):
         self.log.info(gsql_cmd)
         msg = self.dbuser.sh(gsql_cmd).result()
         self.log.info(msg)
-        self.assertIn('ERROR:  permission denied for schema dbe_perf', msg)
+        self.assertIn('ERROR:  permission denied for schema dbe_perf',
+                      msg, '执行失败:' + text)
 
     def tearDown(self):
         self.log.info('Opengauss_Function_statistics_function_Case0029结束')

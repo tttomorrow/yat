@@ -52,6 +52,7 @@ explain performance select - -32.32::float4;
 ?.*QUERY PLAN.*
 ?.*
 ?.*
+|   Output: 32.319999695::real                                                       |
 ?.*
 ?.*
 ?.*
@@ -125,6 +126,7 @@ explain performance select @ -32.32::float4;
 ?.*QUERY PLAN.*
 ?.*
 ?.*
+|   Output: 32.319999695::real                                                       |
 ?.*
 ?.*
 ?.*
@@ -208,6 +210,7 @@ explain performance select !! 32::int8;
 ?.*QUERY PLAN.*
 ?.*
 ?.*
+|   Output: 263130836933693530167218012160000000::numeric                            |
 ?.*
 ?.*
 ?.*
@@ -415,6 +418,7 @@ explain performance select 32::int8 !;
 ?.*QUERY PLAN.*
 ?.*
 ?.*
+|   Output: 263130836933693530167218012160000000::numeric                            |
 ?.*
 ?.*
 ?.*
@@ -430,6 +434,7 @@ explain performance select |/ 32.32::float8;
 ?.*QUERY PLAN.*
 ?.*
 ?.*
+|   Output: 5.6850681614207578818::double precision                                  |
 ?.*
 ?.*
 ?.*
@@ -445,6 +450,7 @@ explain performance select ||/ 32.32::float8;
 ?.*QUERY PLAN.*
 ?.*
 ?.*
+?.*Output: 3.185349696715?.*
 ?.*
 ?.*
 ?.*
@@ -470,6 +476,7 @@ explain performance select @-@ path '1,1,2,2,3,3,4,4';
 ?.*QUERY PLAN.*
 ?.*
 ?.*
+|   Output: 8.4852813742385713169::double precision                                  |
 ?.*
 ?.*
 ?.*

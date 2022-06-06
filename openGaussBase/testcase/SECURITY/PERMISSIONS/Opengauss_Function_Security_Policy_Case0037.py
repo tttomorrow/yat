@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -17,8 +17,7 @@ Case Type   : policy
 Case Name   : 密码为a-z小写字母的最少要求个数password_min_lowercase=999
 Description :
     1.在postgres.conf中设置password_min_lowercase=999，重启数据库生效
-    2.初始用户执行：create user wf with password 'Qazwsx@123';
-    create user user001 with password 'Qazwsx@123';
+    2.初始用户执行：create user wf with password '$PASSWORD';
 Expect      :
     1.设置成功，数据库重启成功
     2.提示密码至少包含999个小写字母
@@ -39,7 +38,6 @@ class Policy(unittest.TestCase):
         logger.info('---Opengauss_Function_Security_Policy_Case0037 start---')
         self.common = Common()
         self.sh_primy = CommonSH('PrimaryDbUser')
-        self.DB_ENV_PATH = macro.DB_ENV_PATH
         self.new_password1 = macro.COMMON_PASSWD.upper() + "qaz"
         self.Constant = Constant()
         self.configure = 'password_min_lowercase=999'

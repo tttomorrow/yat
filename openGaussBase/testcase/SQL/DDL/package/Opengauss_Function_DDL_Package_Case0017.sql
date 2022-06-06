@@ -1,0 +1,22 @@
+-- @testpoint: 创建package,名称与当前schema重名,合理报错
+
+--step1:创建schema expect:成功
+drop schema if exists s_package_0017;
+create schema s_package_0017;
+
+--step2:切换当前schema为新建schema expect:成功
+set current_schema = s_package_0017;
+
+--step3:查询当前schema expect:返回新建schema
+select current_schema;
+
+--step4:声明package,名称与当前schema重名 expect:合理报错
+create or replace package s_package_0017 is
+var1 int:=1;
+var2 int:=2;
+procedure p_package_0017();
+end s_package_0017;
+/
+
+--step5:清理环境 expect:成功
+drop schema s_package_0017;

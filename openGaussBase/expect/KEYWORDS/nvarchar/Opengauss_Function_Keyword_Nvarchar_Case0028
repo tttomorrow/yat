@@ -1,0 +1,66 @@
+-- @testpoint: opengauss关键字nvarchar(非保留)，作为同义词对象名,部分测试点合理报错
+--step1:建表;expect:成功
+drop table if exists t_nvarchar_0028;
+SQL SUCCESS
+create table t_nvarchar_0028(id int,name varchar(10));
+SQL SUCCESS
+--step2:关键字不带引号;expect:成功
+drop synonym if exists nvarchar;
+SQL SUCCESS
+create synonym nvarchar for t_nvarchar_0028;
+SQL SUCCESS
+insert into nvarchar values (1,'ada'),(2, 'bob');
+SQL SUCCESS
+update nvarchar set nvarchar.name='cici' where nvarchar.id=2;
+SQL SUCCESS
+select * from nvarchar;
++----+------+
+| id | name |
++----+------+
+| 1  | ada  |
+| 2  | cici |
++----+------+
+--step3:关键字带双引号;expect:成功
+drop synonym if exists "nvarchar";
+SQL SUCCESS
+create synonym "nvarchar" for t_nvarchar_0028;
+SQL SUCCESS
+--step4:关键字带单引号;expect:合理报错
+drop synonym if exists 'nvarchar';
+?.*ERROR: syntax error at or near "'nvarchar'"
+?.*
+create synonym 'nvarchar' for t_nvarchar_0028;
+?.*ERROR: syntax error at or near "'nvarchar'"
+?.*
+insert into 'nvarchar' values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "'nvarchar'"
+?.*
+update 'nvarchar' set 'nvarchar'.name='cici' where 'nvarchar'.id=2;
+?.*ERROR: syntax error at or near "'nvarchar'"
+?.*
+select * from 'nvarchar';
+?.*ERROR: syntax error at or near "'nvarchar'"
+?.*
+--step5:关键字带反引号;expect:合理报错
+drop synonym if exists `nvarchar`;
+?.*ERROR: syntax error at or near "`"
+?.*
+create synonym `nvarchar` for t_nvarchar_0028;
+?.*ERROR: syntax error at or near "`"
+?.*
+insert into `nvarchar` values (1,'ada'),(2, 'bob');
+?.*ERROR: syntax error at or near "`"
+?.*
+update `nvarchar` set `nvarchar`.name='cici' where `nvarchar`.id=2;
+?.*ERROR: syntax error at or near "`"
+?.*
+select * from `nvarchar`;
+?.*ERROR: syntax error at or near "`"
+?.*
+--step6:清理环境;expect:成功
+drop synonym if exists "nvarchar";
+SQL SUCCESS
+drop synonym if exists nvarchar;
+SQL SUCCESS
+drop table if exists t_nvarchar_0028;
+SQL SUCCESS

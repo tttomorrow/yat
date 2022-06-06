@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -23,19 +23,17 @@ History     :
 """
 
 import unittest
-
+import os
 from testcase.utils.Constant import Constant
 from testcase.utils.Logger import Logger
 from yat.test import Node
 from yat.test import macro
 
-LOG = Logger()
-
 
 class SystemInternalTools(unittest.TestCase):
     def setUp(self):
-        LOG.info('-------------------this is setup--------------------')
-        LOG.info('--Opengauss_Function_Tools_Gs_Probackup_Case0004开始执行-')
+        self.log = Logger()
+        self.log.info(f'-----{os.path.basename(__file__)} start-----')
         self.constant = Constant()
         self.PrimaryNode = Node('PrimaryDbUser')
         self.except_msg = ['gs_probackup - utility to manage backup/recovery'
@@ -50,6 +48,7 @@ class SystemInternalTools(unittest.TestCase):
                            '[--remote-host=destination]',
                            '[--remote-path=path] [--remote-user=username]',
                            '[--remote-port=port] [--ssh-options=ssh_options]',
+                           '[--remote-libpath=libpath]',
                            '[--help]', '',
                            'gs_probackup del-instance -B backup-path '
                            '--instance=instance_name',
@@ -75,6 +74,7 @@ class SystemInternalTools(unittest.TestCase):
                            '[--remote-host=destination]',
                            '[--remote-path=path] [--remote-user=username]',
                            '[--remote-port=port] [--ssh-options=ssh_options]',
+                           '[--remote-libpath=libpath]',
                            '[--help]', '',
                            'gs_probackup set-backup -B backup-path '
                            '--instance=instance_name -i backup-id',
@@ -121,6 +121,7 @@ class SystemInternalTools(unittest.TestCase):
                            '[--remote-path=path] [--remote-user=username]',
                            '[--remote-port=port] [--ssh-options=ssh_options]',
                            '[--ttl=interval] [--expire-time=time]',
+                           '[--backup-pg-replslot]',
                            '[--help]',
                            '',
                            'gs_probackup restore -B backup-path '
@@ -201,22 +202,20 @@ class SystemInternalTools(unittest.TestCase):
                            '[--help]']
 
     def test_system_internal_tools(self):
-        LOG.info('------------------显示帮助信息------------------')
+        self.log.info('------------------显示帮助信息------------------')
         cmd_list = ['-?', '--help']
         for cmd in cmd_list:
             check_cmd1 = f'''source {macro.DB_ENV_PATH};
             gs_probackup {cmd};
             '''
-            LOG.info(check_cmd1)
+            self.log.info(check_cmd1)
             help_msg = self.PrimaryNode.sh(check_cmd1).result()
-            LOG.info(help_msg)
+            self.log.info(help_msg)
             line_msg = help_msg.splitlines()
             for j in line_msg:
-                LOG.info(j)
+                self.log.info(j)
                 self.assertIn(j.strip(), self.except_msg)
 
     def tearDown(self):
-        LOG.info('--------------this is tearDown--------------')
         # 无须清理环境
-        LOG.info(
-            '---Opengauss_Function_Tools_Gs_Probackup_Case0004执行完成---')
+            self.log.info(f'-----{os.path.basename(__file__)} end-----')

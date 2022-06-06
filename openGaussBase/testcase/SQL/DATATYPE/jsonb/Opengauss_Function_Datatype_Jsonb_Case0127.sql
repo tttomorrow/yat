@@ -4,6 +4,7 @@
 --char-->jsonb
 drop table if exists tab127;
 create table tab127(id int,name varchar,address char(50),number text);
+insert into tab127 values(023,'Jack','{"age":20,"city":"xiamen"}',158237664);
 alter table tab127 modify address jsonb;
 
 --varchar-->jsonb

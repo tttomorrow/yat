@@ -18,6 +18,7 @@ as
     sqlstat varchar(500);
 	v1 clob;
 begin
+    v1 := 'abc123456789asdf';
     sqlstat := 'insert into all_datatype_tbl(c_clob) select :p1';
     execute immediate sqlstat using v1;
 end;

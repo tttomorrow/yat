@@ -1,4 +1,4 @@
---  @testpoint: --创建序列名称验证大小写
+-- @testpoint: --创建序列名称验证大小写 合理报错
 drop TABLE IF EXISTS customer_address CASCADE;
  CREATE TABLE customer_address
 (

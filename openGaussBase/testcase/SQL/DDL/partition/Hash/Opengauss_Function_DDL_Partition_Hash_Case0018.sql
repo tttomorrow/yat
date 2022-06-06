@@ -1,0 +1,18 @@
+-- @testpoint: 创建普通hash分区表，验证不支持的数据类型（位串类型） 合理报错
+
+--step1：不支持的数据类型，位串类型的bit(n)类型 expect：合理报错
+drop table if exists partition_hash_tab_t1;
+create table partition_hash_tab_t1(p_id int,p_bit bit(3))
+partition by hash(p_bit)
+(partition part_1,
+ partition part_2);
+
+--step1：不支持的数据类型，位串类型的bit varying(n)类型 expect：合理报错
+drop table if exists partition_hash_tab_t2;
+create table partition_hash_tab_t2(p_id int,p_bit bit varying(5))
+partition by hash(p_bit)
+(partition part_1,
+ partition part_2);
+
+--step2：清理环境 expect：成功
+--No need to clean

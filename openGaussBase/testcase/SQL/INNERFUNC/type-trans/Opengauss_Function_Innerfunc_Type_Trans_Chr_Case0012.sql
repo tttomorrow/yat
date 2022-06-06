@@ -18,7 +18,6 @@ select to_char(-1239.456::numeric(7,3),'999D999s');
 
 -- 模式串长、短
 select to_char(-1239.456::numeric(7,3),'0009999D9000s');
-select to_char(-1239.456::numeric(7,3),'00000000');
 
 --指定其它格式
 select to_char(-1239.456::numeric(7,3),'08f9999D9000s');

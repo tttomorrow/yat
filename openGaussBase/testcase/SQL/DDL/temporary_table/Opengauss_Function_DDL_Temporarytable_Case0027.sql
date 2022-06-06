@@ -1,4 +1,5 @@
 -- @testpoint: 删除带参数on commit delete rows的全局临时表
+-- @modify at: 2020-11-24
 --建表
 drop table if exists temp_table_027;
 create global temporary table temp_table_027(

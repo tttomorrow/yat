@@ -1,4 +1,5 @@
 -- @testpoint: 给表中插入数据，再创建视图
+-- @modified at: 2020-11-18
 --建表
 drop table if exists table_view_002 cascade ;
 SQL SUCCESS

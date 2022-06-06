@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -18,6 +18,7 @@ Case Name   : 修改参数auth_iteration_count为无效值
 Description :
               1、查看auth_iteration_count默认值；
               show auth_iteration_count;
+              2、修改auth_iteration_count分别为2047、102400.25、134217729、
               'test'，空值、校验其预期结果；
 Expect      :
               1、显示默认值为10000；
@@ -48,6 +49,7 @@ class GucTest(unittest.TestCase):
         self.log.info(sql_cmd)
         self.assertEqual('10000', sql_cmd.split('\n')[2].strip())
         self.log.info("修改auth_iteration_count为无效值")
+        invalid_value = ['2047', '102400.25', '134217729', 'test', "''"]
         for i in invalid_value:
             result = COMMONSH.execute_gsguc('set',
                                             self.constant.GSGUC_SUCCESS_MSG,

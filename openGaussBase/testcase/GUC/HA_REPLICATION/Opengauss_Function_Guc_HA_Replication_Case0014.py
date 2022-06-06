@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -21,6 +21,7 @@ Description :
         3.修改参数值为超临界值1
         4.修改参数值为小数500.985
         5.修改参数值为空串
+        6.修改参数值为超临界值2147483648
         7.恢复参数默认值
 Expect      :
         1.显示默认值为16
@@ -54,6 +55,8 @@ class HAReplication(unittest.TestCase):
         sql_cmd = self.commonsh.execut_db_sql('show wal_keep_segments;')
         self.log.info(sql_cmd)
         self.res = sql_cmd.splitlines()[-2].strip()
+        self.log.info('步骤2:修改参数值test,1, 500.985, "''",2147483648')
+        invalid_value = ['test', 1, 500.985, "''", 2147483648]
         for i in invalid_value:
             result = self.commonsh.execute_gsguc("set",
                                                  constant.GSGUC_SUCCESS_MSG,

@@ -14,6 +14,7 @@ select pg_stat_get_xact_numscans(a.oid,a.oid,a.oid) from PG_CLASS a where a.reln
   Hint: No function matches the given name and argument types. You might need to add explicit type casts.
 ?.*
   Where: referenced column: pg_stat_get_xact_numscans
+select pg_stat_get_xact_numscans(9999999999999) from PG_CLASS a where a.relname = 'sales';
 ?.*ERROR: OID out of range
   Where: referenced column: pg_stat_get_xact_numscans
 select pg_stat_get_xact_numscans('*&^%$') from PG_CLASS a where a.relname = 'sales';

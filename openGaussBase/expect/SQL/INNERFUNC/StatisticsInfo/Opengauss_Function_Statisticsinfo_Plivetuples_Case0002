@@ -35,6 +35,7 @@ select pg_stat_get_partition_live_tuples(a.oid,a.oid,a.oid) from pg_partition  a
   Hint: No function matches the given name and argument types. You might need to add explicit type casts.
 ?.*
   Where: referenced column: pg_stat_get_partition_live_tuples
+select pg_stat_get_partition_live_tuples(9887666989575467897) from pg_partition  a where a.relname = 'p2';
 ?.*ERROR: function pg_stat_get_partition_live_tuples\(numeric\) does not exist
   Hint: No function matches the given name and argument types. You might need to add explicit type casts.
 ?.*

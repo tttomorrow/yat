@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -24,11 +24,13 @@ Expect      :
         2.收集成功
         3.删除成功
 History     :
+        增加collector收集成功断言
 """
 
 
 import os
 import time
+import datetime
 import unittest
 from yat.test import Node
 from yat.test import macro
@@ -47,8 +49,7 @@ class Tools(unittest.TestCase):
 
     def setUp(self):
         self.log = Logger()
-        self.log.info(
-            '-----Opengauss_Function_Tools_gs_collector_Case0028start-----')
+        self.log.info(f'----{os.path.basename(__file__)} start----')
         self.dbusernode = Node('PrimaryDbUser')
         self.constant = Constant()
         self.path = os.path.join(macro.DB_INSTANCE_PATH, 'collector_config')
@@ -66,7 +67,8 @@ class Tools(unittest.TestCase):
         self.log.info('-----------获取收集日志的时间---------')
         current_date = time.strftime("%Y%m%d", time.localtime())
         self.log.info(current_date)
-        current_time = time.strftime("%Y%m%d %H:%M", time.localtime())
+        current_time = (datetime.datetime.now() + datetime.timedelta(days=1)).\
+            strftime("%Y%m%d %H:%M")
         self.log.info(current_time)
         self.log.info('-----步骤2：通过时间筛选收集xlog-----')
         collector_cmd = f'source {macro.DB_ENV_PATH};' \
@@ -76,6 +78,7 @@ class Tools(unittest.TestCase):
         self.log.info(collector_cmd)
         collector_msg = self.dbusernode.sh(collector_cmd).result()
         self.log.info(collector_msg)
+        self.assertIn('Successfully collected files', collector_msg, '收集失败')
         tar_cmd = f'source {macro.DB_ENV_PATH};' \
             f'cd {self.result_path};' \
             f'tar -zxvf collector*.tar.gz;'
@@ -93,5 +96,4 @@ class Tools(unittest.TestCase):
         self.log.info(rm_cmd)
         rm_msg = self.dbusernode.sh(rm_cmd).result()
         self.log.info(rm_msg)
-        self.log.info(
-            '-----Opengauss_Function_Tools_gs_collector_Case0028finish-----')
+        self.log.info(f'----{os.path.basename(__file__)} finish----')

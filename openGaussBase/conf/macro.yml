@@ -1,51 +1,91 @@
+# Example
+#   USER_DEFINE_VALUE: 'value1'
+#   USER_DEFAULT_VALUE2: 'value2'
+
+ZSQL_PATH: zsql
+GSQL_PATH: gsql
+
 # 数据库配置
 # 数据库实例安装路径
-DB_INSTANCE_PATH: '/data/function0830/cluster/dn1'
-# 数据库环境变量文件路径
-DB_ENV_PATH: '/home/function0830/gaussdb.bashrc'
-# dn名，dn_6001/dn_6002
-DN_NODE_NAME: 'dn_6001/dn_6002/dn_6003'
-# pg_log路径
-PG_LOG_PATH: '/data/function0830/cluster/gaussdb_log/function0830/pg_log'
-# 日志路径
-GAUSSDB_LOG_PATH: '/data/function0830/cluster/gaussdb_log'
-# 归档路径
-ARCH_PATH: '/data/function0830/cluster/arch'
-# pg_xlog路径
-PG_XLOG_PATH: '/data/function0830/cluster/dn1/pg_xlog'
-
-# 文件/日志
+DB_INSTANCE_PATH: '/data/jenkins/workspace/openGaussInstall/dbinstall/cluster/dn1'
 # postgresql.conf
 DB_PG_CONFIG_NAME: 'postgresql.conf'
-# pg_hba.conf
-PG_HBA_FILE_NAME: 'pg_hba.conf'
-# 自定义路径
-DB_MY_PATH: '/home/function0830'
-# 用户密码（用于新建用户被替换的密码）
-PASSWD_INITIAL: '********'
-# 用户密码（常用密码）
-PASSWD_REPLACE: '********'
-# 通用密码
-COMMON_PASSWD: '********'
-# 数据库初始用户的数据库密码
-GAUSSDB_INIT_USER_PASSWD: '********'
+# 数据库环境变量文件路径
+DB_ENV_PATH: '/home/jenkins/gauss_env'
+# dn名，dn_6001/dn_6002
+DN_NODE_NAME: 'dn_6001'
+# 安装包SCRIPT目录
+DB_SCRIPT_PATH: '/data/jenkins/workspace/openGaussInstall/pkg/script'
 
-# 其他
-# core文件路径
-DB_CORE_PATH: '/core/corefile'
-# 词典预定义文件路径
-DB_DictFile: '////data/function0830/cluster/app/share/postgresql/tsearch_data'
-# 用例中调用脚本路径（脚本来源git：testcase/script）
-SCRIPTS_PATH: '/autotest_software/yat-0.10.20/function_testcase_all/../function_testcase_all/testcase/script/'
-# 备份文件路径
-DB_BACKUP_PATH: '/home/function0830'
-# mot.conf
+# 文件/日志
+# state文件名
+STATE_FILE_NAME: 'gaussdb.state'
+# pg_hba文件名
+PG_HBA_FILE_NAME: 'pg_hba.conf'
+# mot配置文件
 MOT_CONF_NAME: 'mot.conf'
-# 数据库xml文件路径
-DB_XML_PATH: '/opt/function0830/0830/pkg/function0830.xml'
-# 数据库script目录
-DB_SCRIPT_PATH: '/opt/function0830/0830/pkg/script'
-# JDBC路径
-JDBC_PATH: '/autotest_software/yat-0.10.20/function_testcase_all/../lib/postgresql.jar'
-# openGauss-tools-backup.jar获取路径
+# pid文件名
+PID_FILE_NAME: 'postmaster.pid'
+# pg_log路径
+PG_LOG_PATH: '/data/jenkins/workspace/openGaussInstall/dbinstall/cluster/gaussdb_log/jenkins/pg_log'
+# 审计日志目录
+PG_AUDIT_PATH: '/data/jenkins/workspace/openGaussInstall/dbinstall/cluster/gaussdb_log/jenkins/pg_audit'
+# gaussdb_log目录名
+GAUSSDB_LOG_PATH: '/data/jenkins/workspace/openGaussInstall/dbinstall/cluster/gaussdb_log'
+# arch路径
+ARCH_PATH: '/data/jenkins/workspace/openGaussInstall/dbinstall/cluster/arch'
+# pg_xlog路径
+PG_XLOG_PATH: '/data/jenkins/workspace/openGaussInstall/dbinstall/cluster/dn1/pg_xlog'
+# 核文件路径
+#COREFILE_PATH : '/data/jenkins/workspace/openGaussTestCaseCI_Check_openGaussBaseTestCase/yatSuite/corefile'
+DB_CORE_PATH : '/corefile'
+# 控制文件路径:
+PG_CONTROL_PATH: '/data/jenkins/workspace/openGaussInstall/dbinstall/cluster/dn1/global/pg_control'
+# 自定义路径
+DB_MY_PATH: '/data/jenkins/workspace'
+# 用户密码（用于新建用户被替换的密码）
+PASSWD_INITIAL: '******'
+# 用户密码（常用密码）
+PASSWD_REPLACE: '******'
+COMMON_PASSWD: '******'
+GAUSSDB_INIT_USER_PASSWD: '******'
+
+# 工具
+# tpcc工具安装路径
+TPCC_PATH: ''
+# tpcc工具配置文件路径
+TPCCFILE_PATH : ''
+# cfe工具路径
+CFE_PATH: ''
+# cfe故障路径
+CFEDJSK_PATH: ''
+# cfe故障磁盘路径
+CFEDISKNAME_PATH: ''
+# newpress工具路径
+PRESS_PATH: ''
+PYCONN_PATH: ''
+
+# 脚本
+SCRIPTS_PATH: '/data/jenkins/workspace/openGaussTestCaseCI_Check_openGaussBaseTestCase/opengauss/openGaussBase/testcase/script/'
+
+# other
+# 备份（移动）路径
+DB_BACKUP_PATH: '/home/jenkins'
+# tpcc运行时间(需与tpcc配置文件运行时间配置一致，单位：minute)
+TPCC_RUN_MAX_TIME: '1'
+
+DB_DISK_NAME: '/dev/data'
+DB_POSTMASTER_PID_NAME: 'postmaster.pid'
+#词典预定义文件路径
+DB_DictFile: '/data/jenkins/workspace/openGaussInstall/dbinstall/cluster/app/share/postgresql/tsearch_data'
+JDBC_PATH: '/data/jenkins/common/yatSuite/lib/postgresql.jar'
+
+DB_XML_PATH: '/home/jenkins/openGaussXml.xml'
 PACKAGE_URL: ''
+ODBC_NAME: 'openGauss-X.X.X-ODBC.tar.gz'
+
+#postgis编译产物路径
+POSTGIS_URL_X86: '/postgis/plat_X86'
+POSTGIS_URL_ARM: '/postgis/plat_ARM'
+
+FTP_PATH: '***'

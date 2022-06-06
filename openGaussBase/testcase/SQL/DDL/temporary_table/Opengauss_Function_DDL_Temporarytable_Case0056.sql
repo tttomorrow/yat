@@ -1,4 +1,5 @@
 -- @testpoint: 创建全局临时表，使用基本数据类型
+-- @modify at: 2020-11-24
 --建表
 drop table if exists temp_table_056;
 create global TEMPORARY table temp_table_056(
@@ -69,12 +70,9 @@ COL_65 date
 --插入数据
 insert into temp_table_056 values(
 32768,to_timestamp('2019-01-03 14:58:54.000000','YYYY-MM-DD HH24:MI:SS.FFFFFF'),true,3.1415926,lpad('abc','30','a@123&^%djgk'),987,'asjk&%$454',10011.456789445455,lpad('abc','50','a@123&^%djgk'),'字符串',
-false,'1001011',315454.1415926,99/4,'101101000111111101010',0,1,to_timestamp('2019-01-04 16:33:47.123456','YYYY-MM-DD HH24:MI:SS.FFFFFF'),'1',(INTERVAL '4 5:12:10.222' DAY TO SECOND(3)),
 0,rpad('abc','10','e'),353848,rpad('abc','10','exc'),lpad('abc','30','a@123&^%djgk'),lpad('abc','20','a@123&^%djgk'),9745.548,-99,3141.5,to_timestamp('2019-01-04 16:33:47.123456','YYYY-MM-DD HH24:MI:SS.FFFFFF'),
-to_timestamp('2019-01-03 14:58:54.000000','YYYY-MM-DD HH24:MI:SS.FFFFFF'),'a@123&^%djgk',(INTERVAL '12' YEAR),' ','0','101101000111111101010','这是一个字符串',1/2.15,'0FAADB9','a@123&^%djgk',
 1.0E+100,3.14,4445.25,rpad('abc','10','&'),lpad('abc','10','&'),'abc&GDsh',125563.141592,rpad('abc','10','e'),'2019-01-03 14:14:12','a@123汉字&^%djgk',
 +2,-1.79E+100,98*0.99,'1010101001010','abca@123&^%djgk','abca@123&^%djgk','2019-01-03 14:14:12',25563.1415,'a字符串@123&^%djgk',lpad('10',20,'01010'),
-'1001010','2019-01-03 14:14:12','010101111111100000000000000','abc&GDsh','2019-01-03 15:19:00');
 --查询
 select count(*) from temp_table_056;
 --删表

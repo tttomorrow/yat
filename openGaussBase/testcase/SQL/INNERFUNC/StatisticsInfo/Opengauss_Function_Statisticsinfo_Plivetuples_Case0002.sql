@@ -19,4 +19,5 @@ select pg_stat_get_partition_live_tuples(a.oid) from pg_class  a where a.relname
 select pg_stat_get_partition_live_tuples() from pg_partition  a where a.relname = 'p2';
 INSERT INTO sales VALUES(1, 12, '2018-01-10 00:00:00', 'a', 1, 1, 1);
 select pg_stat_get_partition_live_tuples(a.oid,a.oid,a.oid) from pg_partition  a where a.relname = 'p1';
+select pg_stat_get_partition_live_tuples(9887666989575467897) from pg_partition  a where a.relname = 'p2';
 drop table sales cascade;

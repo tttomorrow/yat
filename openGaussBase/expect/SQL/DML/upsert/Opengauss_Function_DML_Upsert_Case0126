@@ -23,7 +23,7 @@ select * from t_dml_upsert0126;
 +---+---+---+---+
 --目标列为int类型，子查询结果为text类型，无法隐式转换为int类型，合理报错
 insert into t_dml_upsert0126 values(1,5,3) on duplicate key update c = (select c from t_dml_upsert_sub0126 where a = excluded.a);
-?.* ERROR: invalid input syntax for integer: "c-1"
+?.*ERROR: invalid input syntax for integer: "c-1"
   Where: referenced column: c
 --目标列为int类型，子查询结果为text类型，可以隐式转换为int类型，insert成功
 insert into t_dml_upsert0126 values(2,5,0) on duplicate key update c = (select b from t_dml_upsert_sub0126 where a = excluded.a*3);
@@ -51,11 +51,11 @@ select * from t_dml_upsert0126;
 +---+---+---+-----+
 --目标列为not null，子查询结果为空，合理报错
 insert into t_dml_upsert0126 values(1,5,1) on duplicate key update c = (select c from t_dml_upsert_sub0126 where a>10);
-?.* ERROR: null value in column "c" violates not-null constraint
+?.*ERROR: null value in column "c" violates not-null constraint
   Detail: Failing row contains (1, 1, null, null).
 --目标列为unique，子查询结果与存量数据重复，合理报错
 insert into t_dml_upsert0126 values(1,5,1) on duplicate key update b = (select b from t_dml_upsert_sub0126 where a=2);
-?.* ERROR: INSERT ON DUPLICATE KEY UPDATE don't allow update on primary key or unique key.
+?.*ERROR: INSERT ON DUPLICATE KEY UPDATE don't allow update on primary key or unique key.
 --处理测试数据
 drop table if exists t_dml_upsert0126;
 SQL SUCCESS

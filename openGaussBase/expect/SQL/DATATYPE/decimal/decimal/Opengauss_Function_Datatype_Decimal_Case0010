@@ -1,22 +1,18 @@
--- @testpoint: 插入bool类型，合理报错
+-- @testpoint: 插入bool类型
 drop table if exists decimal_10;
 SQL SUCCESS
 create table decimal_10 (name decimal);
 SQL SUCCESS
 insert into decimal_10 values (true);
-?.*column "name" is of type numeric but expression is of type boolean
-  Hint: You will need to rewrite or cast the expression.
-?.*
-  Where: referenced column: name
+SQL SUCCESS
 insert into decimal_10 values (false);
-?.*ERROR: column "name" is of type numeric but expression is of type boolean
-  Hint: You will need to rewrite or cast the expression.
-?.*
-  Where: referenced column: name
+SQL SUCCESS
 select * from decimal_10;
 +------+
 | name |
 +------+
+| 1    |
+| 0    |
 +------+
 drop table decimal_10;
 SQL SUCCESS

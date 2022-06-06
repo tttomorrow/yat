@@ -1,0 +1,22 @@
+-- @testpoint: pg_stat_get_db_deadlocks(oid)，查看数据库中死锁的数量，入参为无效值时，合理报错
+----step1：入参为空; expect:合理报错
+select pg_stat_get_db_deadlocks() from PG_DATABASE a where a.datname = datname;
+?.*ERROR: function pg_stat_get_db_deadlocks\(\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_stat_get_db_deadlocks
+----step2：多参; expect:合理报错
+select pg_stat_get_db_deadlocks(a.oid,a.oid,a.oid) from PG_DATABASE a where a.datname = datname;
+?.*ERROR: function pg_stat_get_db_deadlocks\(oid, oid, oid\) does not exis.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: pg_stat_get_db_deadlocks
+----step3：入参超范围; expect:合理报错
+select pg_stat_get_db_deadlocks(9999999999999) from PG_DATABASE a where a.datname = datname;
+?.*ERROR: OID out of rang.*
+  Where: referenced column: pg_stat_get_db_deadlocks
+----step4：入参为特殊字符; expect:合理报错
+select pg_stat_get_db_deadlocks('*&^%$') from PG_DATABASE a where a.datname = datname;
+?.*ERROR: invalid input syntax for type oid: "\*\&\^\%\$.*
+?.*
+  Where: referenced column: pg_stat_get_db_deadlocks

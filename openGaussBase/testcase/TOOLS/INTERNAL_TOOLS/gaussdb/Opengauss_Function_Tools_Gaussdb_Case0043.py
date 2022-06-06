@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -19,12 +19,14 @@ Description :
     1.关闭正在运行的数据库
     gs_ctl stop -D /opt/openGauss_zl/cluster/dn1
     2.使用gaussdb工具设置-S参数的值大于最大值，启动数据库
+    gaussdb -D /opt/openGauss_zl/cluster/dn1 -p 19701 -S 2147483648 -M primary
 Expect      :
     1.关闭正在运行的数据库成功
     2.使用gaussdb工具设置-S参数的值大于最大值，启动数据库失败
 History     :
 """
 import unittest
+import os
 from multiprocessing import Process
 
 from testcase.utils.ComThread import ComThread
@@ -38,7 +40,7 @@ from testcase.utils.Logger import Logger
 class Tools(unittest.TestCase):
     def setUp(self):
         self.logger = Logger()
-        self.logger.info('--Opengauss_Function_Tools_Gaussdb_Case0043 start--')
+        self.logger.info(f'---{os.path.basename(__file__)} start--')
         self.userNode = Node(node='PrimaryDbUser')
         self.userNode2 = Node(node='PrimaryDbUser')
         self.DB_ENV_PATH = macro.DB_ENV_PATH
@@ -63,6 +65,7 @@ class Tools(unittest.TestCase):
         self.logger.info("----使用gaussdb工具设置-p参数为不存在的端口号启动---")
         excute_cmd3 = f'''source {self.DB_ENV_PATH};
              gaussdb -D {self.DB_INSTANCE_PATH} -p {self.userNode.db_port} \
+-S 2147483648 -M primary'''
         self.logger.info(excute_cmd3)
         thread_2 = ComThread(self.userNode2.sh, args=(excute_cmd3,))
         thread_2.setDaemon(True)
@@ -73,7 +76,7 @@ class Tools(unittest.TestCase):
         excute_cmd3 = '''drop user if exists user006 cascade;'''
         msg3 = self.sh_primy.execut_db_sql(excute_cmd3)
         self.logger.info(msg3)
-        self.assertTrue(msg3.find("failed to connect Unknown") > -1)
+        self.assertTrue(msg3.find("failed to connect") > -1)
 
     def tearDown(self):
         self.logger.info('-----------恢复数据库状态-----------')
@@ -86,4 +89,4 @@ class Tools(unittest.TestCase):
         msg2 = self.sh_primy.execut_db_sql(excute_cmd2)
         self.logger.info(msg2)
         self.assertTrue(msg2.find("DROP ROLE") > -1)
-        self.logger.info('-Opengauss_Function_Tools_Gaussdb_Case0043 finish-')
+        self.logger.info(f'---{os.path.basename(__file__)} finish---')

@@ -1,0 +1,18 @@
+-- @testpoint: 测试能否正确删除哈希索引，部分step合理报错
+--创建表
+drop table if exists t_hash_index_0040;
+SQL SUCCESS
+create table t_hash_index_0040(id01 int,id02 int) with(orientation=row);
+SQL SUCCESS
+--创建哈希索引
+create index i_hash_index_0040_01 on t_hash_index_0040 using hash(id01);
+SQL SUCCESS
+--删除哈希索引(存在)
+drop index i_hash_index_0040_01;
+SQL SUCCESS
+--删除哈希索引(不存在)
+drop index i_hash_index_0040_02;
+?.*ERROR: index "i_hash_index_0040_02" does not exist
+--删除表、表空间
+drop table t_hash_index_0040 cascade;
+SQL SUCCESS

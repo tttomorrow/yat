@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -17,6 +17,8 @@ Case Type   : GUC
 Case Name   : 修改table_skewness_warning_rows，观察预期结果；
 Description :
     1、查询table_skewness_warning_rows默认值,show table_skewness_warning_rows;
+    2、修改table_skewness_warning_rows为2147483647，
+    gs_guc set -D {cluster/dn1} -c "table_skewness_warning_rows=2147483647"
     3、恢复默认值；
 Expect      :
     1、显示默认值；
@@ -38,6 +40,7 @@ class GucTestCase(unittest.TestCase):
         logger.info("===Opengauss_Function_Guc_Otheroptions_Case0040开始执行===")
         self.constant = Constant()
         self.comsh = CommonSH('PrimaryDbUser')
+        self.set_param = "table_skewness_warning_rows = 2147483647"
         status = self.comsh.get_db_cluster_status()
         self.assertTrue("Degraded" in status or "Normal" in status)
 
@@ -47,6 +50,7 @@ class GucTestCase(unittest.TestCase):
         logger.info(cmd1)
         self.assertEqual("100000", cmd1.split("\n")[-2].strip())
 
+        logger.info("===修改table_skewness_warning_rows为2147483647，期望：修改成功===")
         res = self.comsh.execute_gsguc('set', self.constant.GSGUC_SUCCESS_MSG,
                                        self.set_param)
         self.assertTrue(res)
@@ -55,6 +59,7 @@ class GucTestCase(unittest.TestCase):
         self.comsh.restart_db_cluster()
         cmd2 = self.comsh.execut_db_sql('''show table_skewness_warning_rows;''')
         logger.info(cmd2)
+        self.assertEqual("2147483647", cmd2.split("\n")[-2].strip())
 
     def tearDown(self):
         logger.info("======恢复配置======")

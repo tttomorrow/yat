@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -33,7 +33,7 @@ Expect      :
         6.导入成功
         7.查询成功，数据一致
         8.清理环境完成
-              用例复制postgresql.jar包步骤
+              用例复制postgresql.jar包步骤;
 """
 import os
 import unittest
@@ -133,6 +133,10 @@ class ToolsBackup(unittest.TestCase):
         self.log.info(cmd)
         result = self.Primary_Node.sh(cmd).result()
         self.log.info(result)
+        restart_msg = self.pri_sh.restart_db_cluster()
+        self.log.info(restart_msg)
+        status = self.pri_sh.get_db_cluster_status()
+        self.assertTrue("Degraded" in status or "Normal" in status)
 
         self.log.info('---导出指定数据库下的表---')
         sql_cmd = f'''cd {self.package}/openGauss-tools-backup;\

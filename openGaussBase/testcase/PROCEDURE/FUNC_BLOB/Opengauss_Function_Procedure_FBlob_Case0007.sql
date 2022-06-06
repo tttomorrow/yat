@@ -5,6 +5,7 @@ create table fvt_func_blob_table_007(
   t1 int,
   t2 blob
   );
+insert into fvt_func_blob_table_007 values(1,'01010fadea0000001005678940111111111');
 
 --创建自定义函数
 create or replace function fvt_func_blob_007() return raw

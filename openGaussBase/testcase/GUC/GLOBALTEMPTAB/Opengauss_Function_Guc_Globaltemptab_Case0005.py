@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -59,6 +59,7 @@ class GucTestCase(unittest.TestCase):
                                         "'test'")
         self.assertFalse(res1)
 
+        logger.info("=修改max_active_global_temporary_table为10000001，期望：设置失败=")
         res2 = self.comsh.execute_gsguc('set',
                                         self.constant.GSGUC_SUCCESS_MSG,
                                         "max_active_global_temporary_table="

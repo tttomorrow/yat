@@ -1,4 +1,5 @@
 -- @testpoint: 同义词进行DML操作
+-- @modify at: 2020-11-25
 --建表
 drop table if exists test_SYN_056;
 create table test_SYN_056 (c_id int not null,c_first varchar2(40),c_since date,c_end timestamp,c_text clob,c_data blob);

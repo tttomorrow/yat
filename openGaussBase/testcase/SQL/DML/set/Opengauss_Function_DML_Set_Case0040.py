@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -25,7 +25,7 @@ Expect      :
     2. 合理报错
     3. 修改成功
     4. 恢复成功
-History     : 
+History     :
 """
 
 import unittest
@@ -60,8 +60,8 @@ class Function(unittest.TestCase):
         check('0')  # 检查默认值是0
 
         self.flag = True  # 恢复标志
-        # 取值范围0~100
-        var = [-1, 101, 20.85, 'A', 100, 0]
+        # 取值范围0~1000000
+        var = [-1, 1000001, 20.85, 'A', 100, 0]
         for i in range(6):
             cmd = f'ALTER SYSTEM SET advance_xlog_file_num to {var[i]};'
             msg = self.commonsh.execut_db_sql(cmd)

@@ -9,6 +9,7 @@ select * from test2;
 +--------------+
 | f2           |
 +--------------+
+| 111122223333 |
 +--------------+
 drop table if exists test2;
 SQL SUCCESS

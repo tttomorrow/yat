@@ -20,6 +20,7 @@ where castsource= (select oid from pg_type where typname='int2'));
 | float4        | float4       | i           | f          |
 | float8        | float8       | i           | f          |
 | numeric       | numeric      | i           | f          |
+| int16         | int16        | i           | f          |
 | bool          | int2_bool    | i           | f          |
 | interval      | numtoday     | i           | f          |
 | oid           | int4         | i           | f          |

@@ -1,0 +1,26 @@
+-- @testpoint: List分区表结合列约束（default）默认值和数据类型匹配
+--step01:创建list分区表;expect:成功
+drop table if exists t_partition_list_0059;
+SQL SUCCESS
+create table  t_partition_list_0059
+(id               number(7)  ,
+age           int  default '123',
+ filename                   varchar2(255),
+ text                       varchar2(2000))
+partition by list(id)
+(partition p1 values(1),
+ partition p2 values(2));
+SQL SUCCESS
+--step02:插入数据;expect:成功
+insert into t_partition_list_0059(id,filename,text) values (1,'李四','list分区');
+SQL SUCCESS
+--step03: 查看数据;expect:成功
+select * from t_partition_list_0059 order by id asc;
++----+-----+----------+--------+
+| id | age | filename | text   |
++----+-----+----------+--------+
+| 1  | 123 | 李四       | list分区 |
++----+-----+----------+--------+
+--step04: 清理数据;expect:成功
+drop table if exists t_partition_list_0059 cascade;
+SQL SUCCESS

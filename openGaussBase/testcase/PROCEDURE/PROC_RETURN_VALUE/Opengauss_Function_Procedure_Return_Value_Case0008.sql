@@ -13,6 +13,7 @@ end;
 /
 --调用存储过程
 declare
+    v1 integer:=123456789;
 begin
     proc_return_value_008(v1);
 end;

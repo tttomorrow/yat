@@ -1,4 +1,5 @@
 -- @testpoint: 修改数据类型，修改不存在的列合理报错；修改的列类型与插入数据类型不符，合理报错
+-- @modify at: 2020-11-23
 --建表1
 DROP TABLE IF EXISTS temp_table_alter_012;
 SQL SUCCESS

@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -68,6 +68,8 @@ class Deletaduit(unittest.TestCase):
         sql_cmd = self.commonsh.execut_db_sql(f'''show vacuum_cost_delay;''')
         self.log.info(sql_cmd)
         self.assertIn(self.res, sql_cmd)
+        # 使用设置gs_guc set设置vacuum_cost_delay为9999999999
+        msg = self.commonsh.execute_gsguc('set', self.Constant.GSGUC_SUCCESS_MSG, 'vacuum_cost_delay=9999999999')
         self.log.info(msg)
         self.assertFalse(msg)
         # 修改失败后重启查看默认值

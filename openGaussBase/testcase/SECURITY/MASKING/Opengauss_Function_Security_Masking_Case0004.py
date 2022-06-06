@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -66,6 +66,8 @@ class Security(unittest.TestCase):
         logger.info('------poladmin用户创建表、资源标签------')
         sql_cmd4 = '''create table person(id int,name char(10),creditcard 
                 varchar(25),address varchar(60));
+                insert into person values(1,'张三','1234567890666','Shanxi,
+                Xian,yuhuazhai'),(2,'李四','543215020666','Fujian,Xiamen');
                 grant all privileges on table person to user001;
                 create resource label creditcard_lable add column
                 (person.creditcard);'''

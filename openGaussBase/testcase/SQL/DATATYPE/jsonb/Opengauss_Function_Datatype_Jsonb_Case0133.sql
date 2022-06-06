@@ -14,6 +14,7 @@ where c.relname = 'tab133' and a.attrelid = c.oid and a.attnum>0;
 --增加列
 alter table tab133 add(c_add jsonb);
 insert into tab133 values(1,0,3.14,1.0002,3.55555,5,7887.656,0,0.111111,3.1415926,'dghg','jjj','pokj99',
+'ywgdghghhgghe',hextoraw('101A1101'),'010101101',date_trunc('hour', timestamp  '2001-02-16 20:38:40'),
 to_timestamp('2019-01-03 14:58:54.000000','YYYY-MM-DD HH24:MI:SS.FFFFFF'),'"add"');
 SELECT col_description(a.attrelid,a.attnum) as comment,format_type(a.atttypid,a.atttypmod) as type,a.attname as name, a.attnotnull as notnull
 FROM pg_class as c,pg_attribute as a

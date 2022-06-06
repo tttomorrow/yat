@@ -1,0 +1,88 @@
+-- @testpoint: range_range二级分区表：分区键1个存在/不存在/指定多个,部分测试点合理报错
+--step1: 创建表空间; expect:成功
+drop table if exists t_subpartition_0272;
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0272;
+SQL SUCCESS
+create tablespace ts_subpartition_0272 relative location 'subpartition_tablespace/subpartition_tablespace_0272';
+SQL SUCCESS
+--test1: 分区键 --1个
+--step2: 创建二级分区表,二级分区键1个且列存在; expect:成功
+create   table if not exists t_subpartition_0272
+(
+    col_1 int ,
+    col_2 int  ,
+	col_3 int ,
+    col_4 int 
+)
+tablespace ts_subpartition_0272
+partition by range (col_1) subpartition by range (col_2)
+(
+  partition p_range_1 values less than( 10 )
+  (
+    subpartition p_range_1_1 values less than( 5 ),
+    subpartition p_range_1_2 values less than( maxvalue )
+  ),
+  partition p_range_2 values less than( 20 )
+  (
+    subpartition p_range_2_1 values less than( 5 ),
+    subpartition t_subpartition_0272 values less than( 10 )
+  )
+) enable row movement;
+SQL SUCCESS
+--step3: 创建二级分区表,二级分区键1个且列不存在; expect:合理报错
+drop table if exists t_subpartition_0272;
+SQL SUCCESS
+create   table if not exists t_subpartition_0272
+(
+    col_1 int ,
+    col_2 int  ,
+	col_3 int ,
+    col_4 int 
+)
+tablespace ts_subpartition_0272
+partition by range (col_1) subpartition by range (col_5)
+(
+  partition p_range_1 values less than( 10 )
+  (
+    subpartition p_range_1_1 values less than( 5 ),
+    subpartition p_range_1_2 values less than( maxvalue )
+  ),
+  partition p_range_2 values less than( 20 )
+  (
+    subpartition p_range_2_1 values less than( 5 ),
+    subpartition t_subpartition_0272 values less than( 10 )
+  )
+) enable row movement;
+?.*ERROR: undefined column"col_5" is used as a partitioning colum.*
+--step4: 创建二级分区表,一级分区键指定多个; expect:合理报错
+drop table if exists t_subpartition_0272;
+SQL SUCCESS
+create   table if not exists t_subpartition_0272
+(
+    col_1 int ,
+    col_2 int  ,
+	col_3 int ,
+    col_4 int 
+)
+tablespace ts_subpartition_0272
+partition by range (col_1,col_3) subpartition by range ( col_2)
+(
+  partition p_range_1 values less than( 10 )
+  (
+    subpartition p_range_1_1 values less than( 5 ),
+    subpartition p_range_1_2 values less than( maxvalue )
+  ),
+  partition p_range_2 values less than( 20 )
+  (
+    subpartition p_range_2_1 values less than( 5 ),
+    subpartition t_subpartition_0272 values less than( 10 )
+  )
+) enable row movement;
+?.*ERROR: Un-support featur.*
+  Detail: The partition key's length should be 1.
+--step5: 清理环境; expect:成功
+drop table if exists t_subpartition_0272;
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0272;
+SQL SUCCESS

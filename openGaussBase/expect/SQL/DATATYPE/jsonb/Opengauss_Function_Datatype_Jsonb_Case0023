@@ -53,13 +53,13 @@ select '{" ":"qwe"}'::json ->> ' ';
 select '{}'::json ->> 2;
 ?.*ERROR: cannot extract array element from a non-arra.*
 select '{"a": 1, "b": {"a": 2, "b": null}}'::json  ->> a;
-?.*ERROR: column "a" does not exist.*
+?.*ERROR: column "a" does not exis.*
 ?.*
 select '{"a": 1, "b": {"a": 2, "b": null}}'::json  ->> 2021-05-31 12:59:08;
 ?.*ERROR: syntax error at or near "12.*
 ?.*
 select '{"foo": [true, "bar"], "tags": {"a": 1, "b": null}}'::json ->> 192.168.100.128/25;
-?.*ERROR: syntax error at or near ".100.*
+?.*ERROR: syntax error at or near "192.168.100.128.*
 ?.*
 select '{"a":null, "bb": 1, "bb": "A",   "cde": [1,2,   "re"], "abc": 1}'::json ->> true;
 ?.*ERROR: cannot extract array element from a non-arra.*
@@ -82,20 +82,20 @@ select '[{"a":"foo"},{"b":"bar"},{"c":"baz"}]'::json ->> 'a';
 ?.*ERROR: cannot extract field from a non-objec.*
 --不合理输入3.左侧输入值为非object-json类型，右侧为非text类型
 select 'abcdefg'::json ->> ab;
-?.*ERROR: invalid input syntax for type json.*
+?.*ERROR: invalid input syntax for type jso.*
   Detail: Token "abcdefg" is invalid.
 ?.*
   Where: JSON data, line 1: abcdefg
 select '''abcdefg'''::json ->> 2021-05-31;
-?.*ERROR: invalid input syntax for type json.*
+?.*ERROR: invalid input syntax for type jso.*
   Detail: Token "'" is invalid.
 ?.*
   Where: JSON data, line 1: '...
 select '\"$$\"'::json ->>192.168.100.128/25;
-?.*ERROR: syntax error at or near ".100.*
+?.*ERROR: syntax error at or near "192.168.100.128.*
 ?.*
 select '"["www@13^", 1, {"name": "john"}, "2"]"'::json ->> 1/2;
-?.*ERROR: invalid input syntax for type json.*
+?.*ERROR: invalid input syntax for type jso.*
   Detail: Token "www" is invalid.
 ?.*
   Where: JSON data, line 1: "["www...

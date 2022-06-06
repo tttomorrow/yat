@@ -10,6 +10,7 @@ explain performance insert into test_cast_0027 values('abcdef');
 SELECT c_varchar,octet_length(c_varchar) FROM test_cast_0027;
 
 --testpoint：长度不需要转换:success
+explain performance insert into test_cast_0027 values('12345678901234567890');
 SELECT c_varchar,octet_length(c_varchar) FROM test_cast_0027;
 
 --清理环境

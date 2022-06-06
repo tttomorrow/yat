@@ -10,7 +10,7 @@ CREATE or replace FUNCTION test_cast_fun_0032(integer) RETURNS name
 --testpoint:二目操作符  = ：success
 select oprname,oprkind,test_cast_fun_0032(oprleft::int),test_cast_fun_0032(oprright::int),test_cast_fun_0032(oprresult::int),proname from pg_operator o
 left join pg_proc p on p.oid=o.oprcode
-where oprname ='=' and oprkind = 'b' order by test_cast_fun_0032(oprleft::int) asc;
+where oprname ='=' and oprkind = 'b' order by test_cast_fun_0032(oprleft::int),test_cast_fun_0032(oprright::int), test_cast_fun_0032(oprresult::int) asc;
 
 explain performance select '2020-09-30'::abstime = '2020-09-30'::abstime;
 explain performance select true = false;
@@ -73,7 +73,7 @@ explain performance select '[105.2e3,"test",{"a":1}]'::jsonb = '[107.2e3,"test",
 --testpoint:二目操作符  <= ：success
 select oprname,oprkind,test_cast_fun_0032(oprleft::int),test_cast_fun_0032(oprright::int),test_cast_fun_0032(oprresult::int),proname from pg_operator o
 left join pg_proc p on p.oid=o.oprcode
-where oprname ='<=' and oprkind = 'b' order by test_cast_fun_0032(oprleft::int) asc;
+where oprname ='<=' and oprkind = 'b' order by test_cast_fun_0032(oprleft::int),test_cast_fun_0032(oprright::int),test_cast_fun_0032(oprresult::int) asc;
 
 explain performance select '2020-09-29'::date <= '2020-09-30'::timestamp;
 explain performance select true <= false;
@@ -85,7 +85,7 @@ explain performance select '[109.2e3,"test",{"a":1}]'::jsonb <= '[105.2e3,"test"
 --testpoint:二目操作符  >= ：success
 select oprname,oprkind,test_cast_fun_0032(oprleft::int),test_cast_fun_0032(oprright::int),test_cast_fun_0032(oprresult::int),proname from pg_operator o
 left join pg_proc p on p.oid=o.oprcode
-where oprname ='>=' and oprkind = 'b' order by test_cast_fun_0032(oprleft::int) asc;
+where oprname ='>=' and oprkind = 'b' order by test_cast_fun_0032(oprleft::int) ,test_cast_fun_0032(oprright::int),test_cast_fun_0032(oprresult::int)asc;
 
 explain performance select '2020-09-29'::date >= '2020-09-30'::timestamp;
 explain performance select true >= false;
@@ -97,7 +97,7 @@ explain performance select '[101.2e3,"test",{"a":1}]'::jsonb >= '[105.2e3,"test"
 --testpoint:二目操作符  @@@ ：success
 select oprname,oprkind,test_cast_fun_0032(oprleft::int),test_cast_fun_0032(oprright::int),test_cast_fun_0032(oprresult::int),proname from pg_operator o
 left join pg_proc p on p.oid=o.oprcode
-where oprname ='@@@' and oprkind = 'b' order by test_cast_fun_0032(oprleft::int) asc;
+where oprname ='@@@' and oprkind = 'b' order by test_cast_fun_0032(oprleft::int) ,test_cast_fun_0032(oprright::int),test_cast_fun_0032(oprresult::int)asc;
 
 explain performance SELECT to_tsvector('fat cats ate rats') @@@ to_tsquery('cat & rat');
 

@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -56,6 +56,7 @@ class Bit_string_function(unittest.TestCase):
         logger.info("-----------二进制字符串-----------")
         msg4 = self.commonsh.execut_db_sql("""SELECT btrim(' opengauss ', E'\\\\\\000'::bytea) AS RESULT;""")
         logger.info(msg4)
+        self.assertTrue(msg4.splitlines()[2].strip(' ') == '\\x206f70656e676175737320')
         msg5 = self.commonsh.execut_db_sql("""SELECT btrim('00\\\\\\',E'\\\\\\000'::bytea ) AS RESULT;""")
         logger.info(msg5)
         self.assertTrue(msg5.splitlines()[2].strip(' ') == '\\x30305c')

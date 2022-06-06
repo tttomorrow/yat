@@ -1,0 +1,90 @@
+-- @testpoint: list_list二级分区表：分区键为表达式/分区数0,部分测试点合理报错
+
+--test1: 分区键为表达式
+--step1: 创建二级分区表,二级分区键为表达式; expect:合理报错
+drop table if exists t_subpartition_0036;
+drop tablespace if exists ts_subpartition_0036;
+create tablespace ts_subpartition_0036 relative location 'subpartition_tablespace/subpartition_tablespace_0036';
+create table if not exists t_subpartition_0036
+(
+    col_1 int ,
+    col_2 int ,
+    col_3 int ,
+    col_4 int
+)
+tablespace ts_subpartition_0036
+partition by list (col_1) subpartition by list (upper(col_2))
+(
+  partition p_list_1 values(-1,-2,-3,-4,-5,-6,-7,-8,-9,-10 )
+  (
+    subpartition p_list_1_1 values ( 0,-1,-2,-3,-4,-5,-6,-7,-8,-9 ),
+    subpartition p_list_1_2 values ( default )
+  ),
+  partition p_list_2 values(0,1,2,3,4,5,6,7,8,9)
+  (
+    subpartition p_list_2_1 values ( 0,1,2,3,4,5,6,7,8,9 ),
+    subpartition p_list_2_2 values ( default ),
+    subpartition p_list_2_3 values ( 10,11,12,13,14,15,16,17,18,19),
+    subpartition p_list_2_4 values ( 20,21,22,23,24,25,26,27,28,29 ),
+    subpartition p_list_2_5 values ( 30,31,32,33,34,35,36,37,38,39 )
+  ),
+  partition p_list_3 values(10,11,12,13,14,15,16,17,18,19)
+  (
+    subpartition p_list_3_2 values ( default )
+  ),
+  partition p_list_4 values(default ),
+  partition p_list_5 values(20,21,22,23,24,25,26,27,28,29)
+  (
+    subpartition p_list_5_1 values ( 0,1,2,3,4,5,6,7,8,9 ),
+    subpartition p_list_5_2 values ( default ),
+    subpartition p_list_5_3 values ( 10,11,12,13,14,15,16,17,18,19),
+    subpartition p_list_5_4 values ( 20,21,22,23,24,25,26,27,28,29 ),
+    subpartition p_list_5_5 values ( 30,31,32,33,34,35,36,37,38,39 )
+  ),
+  partition p_list_6 values(30,31,32,33,34,35,36,37,38,39),
+  partition p_list_7 values(40,41,42,43,44,45,46,47,48,49)
+  (
+    subpartition p_list_7_1 values ( default )
+  )
+) enable row movement;
+
+--test2: 分区数--0个
+--step2: 创建二级分区表,一级分区与二级分区数都为0; expect:合理报错
+drop table if exists t_subpartition_0036;
+create table if not exists t_subpartition_0036
+(
+    col_1 int ,
+    col_2 int ,
+    col_3 int ,
+    col_4 int
+)
+tablespace ts_subpartition_0036
+partition by list (col_1) subpartition by list (col_2)
+enable row movement;
+--step3: 创建二级分区表,二级分区数为0; expect:成功
+drop table if exists t_subpartition_0036;
+create table if not exists t_subpartition_0036
+(
+    col_1 int ,
+    col_2 int ,
+    col_3 int ,
+    col_4 int
+)
+tablespace ts_subpartition_0036
+partition by list (col_1) subpartition by list (col_2)
+(
+  partition p_list_1 values(-1,-2,-3,-4,-5,-6,-7,-8,-9,-10 ),
+  partition p_list_2 values(0,1,2,3,4,5,6,7,8,9),
+  partition p_list_3 values(10,11,12,13,14,15,16,17,18,19),
+  partition p_list_4 values(default ),
+  partition p_list_5 values(20,21,22,23,24,25,26,27,28,29),
+  partition p_list_6 values(30,31,32,33,34,35,36,37,38,39)
+) enable row movement;
+--step4: 查看分区信息; expect:成功
+select relname, parttype, partstrategy, indisusable from pg_partition where parentid = (select oid from pg_class where relname = 't_subpartition_0036') order by relname;
+select a.relname,a.parttype,a.partstrategy,a.indisusable from pg_partition a,(select oid from pg_partition
+where parentid = (select oid from pg_class where relname = 't_subpartition_0036')) b where a.parentid = b.oid order by a.relname;
+
+--step5: 清理环境; expect:成功
+drop table if exists t_subpartition_0036;
+drop tablespace if exists ts_subpartition_0036;

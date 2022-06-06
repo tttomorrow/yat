@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -18,6 +18,8 @@ Case Name   : 修改autovacuum为其他数据类型，观察其预期结果；
 Description :
             1、查询autovacuum默认值；
             show autovacuum；
+            2、修改autovacuum为2147483648，'test'，观察预期结果；
+            gs_guc set -D {cluster/dn1}  -c "autovacuum=2147483648"
             gs_guc set -D {cluster/dn1}  -c "autovacuum='test'"
 Expect      :
             1、显示默认值；
@@ -49,9 +51,11 @@ class GucTest(unittest.TestCase):
         LOGGER.info(sql_cmd)
         self.assertEqual("on", sql_cmd.split("\n")[-2].strip())
 
+        LOGGER.info("==修改autovacuum为2147483648，期望：合理报错==")
         LOGGER.info("==期望：修改失败，show参数为默认值==")
         result = COMMONSH.execute_gsguc(
             'set', self.constant.GSGUC_SUCCESS_MSG,
+            "autovacuum=2147483648")
         self.assertFalse(result)
         sql_cmd = COMMONSH.execut_db_sql('''show autovacuum;''')
         LOGGER.info(sql_cmd)

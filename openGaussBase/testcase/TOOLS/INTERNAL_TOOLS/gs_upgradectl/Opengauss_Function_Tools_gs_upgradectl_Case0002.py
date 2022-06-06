@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -64,13 +64,11 @@ class Gstoolstestcase(unittest.TestCase):
         result = self.user_node.sh(f"source {macro.DB_ENV_PATH};"
             f"gs_upgradectl -t auto-upgrade -X noexists.xml").result()
         LOGGER.info(result)
-        self.assertIn("GAUSS-50201", result)
         self.assertIn("does not exist", result)
         LOGGER.info("指定不存在的xml")
         result = self.user_node.sh(f"source {macro.DB_ENV_PATH};"
             f"gs_upgradectl -t auto-upgrade -X noexists.xml --grey").result()
         LOGGER.info(result)
-        self.assertIn("GAUSS-50201", result)
         self.assertIn("does not exist", result)
 
         LOGGER.info("root用户复制xml")

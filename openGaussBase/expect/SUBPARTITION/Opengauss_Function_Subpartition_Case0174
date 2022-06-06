@@ -1,0 +1,138 @@
+-- @testpoint: list_hash二级分区表：执行算子
+--step1: 创建表空间; expect:成功
+drop table if exists t_subpartition_0174;
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0174;
+SQL SUCCESS
+create tablespace ts_subpartition_0174 relative location 'subpartition_tablespace/subpartition_tablespace_0174';
+SQL SUCCESS
+--test1: 执行算子--seq scan
+--step2: 创建二级分区表; expect:成功
+create table if not exists t_subpartition_0174
+(
+    col_1 int ,
+    col_2 int, 
+    col_3 varchar2 ( 30 ) ,
+    col_4 int
+)tablespace ts_subpartition_0174
+partition by list (col_1) subpartition by hash (col_2)
+(
+  partition p_list_1 values (-1,-2,-3,-4,-5,-6,-7,-8,-9,-10 )
+  (
+    subpartition p_hash_1_1 ,
+    subpartition p_hash_1_2 ,
+    subpartition p_hash_1_3 
+  ),
+  partition p_list_2 values (1,2,3,4,5,6,7,8,9,10 )
+  (
+    subpartition p_hash_2_1 ,
+    subpartition p_hash_2_2 ,
+    subpartition p_hash_2_3 ,
+    subpartition p_hash_2_4 ,
+    subpartition p_hash_2_5 
+  ),
+  partition p_list_3 values (11,12,13,14,15,16,17,18,19,20),
+  partition p_list_4 values (21,22,23,24,25,26,27,28,29,30 )
+  (
+    subpartition p_hash_4_1 
+  ),
+  partition p_list_5 values (default)
+  (
+    subpartition p_hash_5_1 
+  ),
+  partition p_list_6 values (31,32,33,34,35,36,37,38,39,40)
+  (
+    subpartition p_hash_6_1 ,
+    subpartition p_hash_6_2 ,
+    subpartition p_hash_6_3 
+  )
+) enable row movement ;
+SQL SUCCESS
+--step3: 插入数据; expect:成功
+insert into t_subpartition_0174 values(0,0,0,0);
+SQL SUCCESS
+insert into t_subpartition_0174 values(-11,1,1,1),(-14,1,4,4),(-25,15,5,5),(-808,8,8,8),(-9,9,9,9);
+SQL SUCCESS
+insert into t_subpartition_0174 values(1,11,1,1),(4,41,4,4),(5,54,5,5),(8,87,8,8),(9,19,9,9);
+SQL SUCCESS
+insert into t_subpartition_0174 values(11,1,1,1),(14,1,4,4),(15,5,5,5),(18,8,8,8),(19,1,9,9);
+SQL SUCCESS
+--step4: 查看执行计划; expect:成功,有seq scan执行算子
+explain analyze select * from t_subpartition_0174;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.* Partition Iterator  .*
+?.*   Iterations: .*
+?.*   ->  Partitioned Seq Scan on t_subpartition_0174  .*
+?.*         Selected Partitions: .*
+?.*         Selected Subpartitions: .*
+?.* Total runtime: .*
+?.*
+--test2: 执行算子--index  scan
+--step5: 二级分区键创建索引; expect:成功
+drop index if exists i_subpartition_0174;
+SQL SUCCESS
+create index i_subpartition_0174 on t_subpartition_0174(col_2);
+SQL SUCCESS
+--step6: 插入数据; expect:成功
+insert into t_subpartition_0174 values (generate_series(0, 19),generate_series(0, 1000),generate_series(0, 99));
+SQL SUCCESS
+--step7: 查看执行计划; expect:成功,有index scan执行算子
+explain analyze select * from t_subpartition_0174 where col_2 in  (select col_1 from t_subpartition_0174 subpartition(p_hash_2_2) where col_1 >10);
+?.*
+?.*QUERY PLAN.*
+?.*
+?.* Nested Loop  .*
+?.*   ->  HashAggregate  .*
+?.*         Group By Key: .*
+?.*         ->  Partition Iterator  .*
+?.*               Iterations: .*
+?.*               ->  Partitioned Seq Scan on t_subpartition_0174  .*
+?.*                     Filter: .*
+?.*                     Rows Removed by Filter: .*
+?.*                     Selected Partitions: .*
+?.*                     Selected Subpartitions: .*
+?.*   ->  Index Scan using i_subpartition_0174 on t_subpartition_0174  .*
+?.*         Index Cond: .*
+?.* Total runtime: .*
+?.*
+--test3: 执行算子--bitmap index scan/bitmap heap scan
+--step8: 查看执行计划; expect:成功,有bitmap heap scan执行算子
+explain analyze select *  from t_subpartition_0174 where col_2 >500 and col_2 <8000 order by col_1;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.* Sort  .*
+?.*   Sort Key: .*
+?.*   Sort Method: .*
+?.*   ->  Bitmap Heap Scan on t_subpartition_0174  .*
+?.*         Recheck Cond: .*
+?.*         Heap Blocks: .*
+?.*         ->  Bitmap Index Scan on i_subpartition_0174  .*
+?.*               Index Cond: .*
+?.* Total runtime: .*
+?.*
+--test4: 执行算子--支持plan hint调优
+--step9: 查看执行计划; expect:成功,指定index scan
+explain analyze select /*+ indexscan(t_subpartition_0174 index_01)*/ *  from t_subpartition_0174 where col_2 >500 and col_2 <8000 order by col_1;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.* Sort  .*
+?.*   Sort Key: .*
+?.*   Sort Method: .*
+?.*   ->  Bitmap Heap Scan on t_subpartition_0174  .*
+?.*         Recheck Cond: .*
+?.*         Heap Blocks: .*
+?.*         ->  Bitmap Index Scan on i_subpartition_0174  .*
+?.*               Index Cond: .*
+?.* Total runtime: .*
+?.*
+--step10: 清理环境; expect:成功
+drop index if exists i_subpartition_0174;
+SQL SUCCESS
+drop table if exists t_subpartition_0174;
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0174;
+SQL SUCCESS

@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -18,12 +18,15 @@ Case Name   : 参数plog_merge_age的值设置设为2min，24h
 Description :
     1.修改参数plog_merge_age的值为1：gs_guc reload -N all -I all -c
     "plog_merge_age=1"，查看值：show plog_merge_age;
+    2.修改参数plog_merge_age的值为2147483647：gs_guc reload -N all -I all -c
+    "plog_merge_age=2147483647"，查看值：show plog_merge_age;
     3.修改参数plog_merge_age的值为1d：gs_guc reload -N all -I all -c
     "plog_merge_age=1d"，查看值：show plog_merge_age;
     4.修改参数plog_merge_age的值为1h：gs_guc reload -N all -I all -c
     "plog_merge_age=1h"，查看值：show plog_merge_age;
 Expect      :
     1.参数设置成功,返回1
+    2.参数设置成功,返回2147483647
     3.参数设置成功,返回1d
     4.参数设置成功,返回1h
 History     :
@@ -66,7 +69,9 @@ class Errorlog(unittest.TestCase):
         self.logger.info(msg2)
         self.common.equal_sql_mdg(msg2, 'plog_merge_age', '1ms', '(1 row)',
                                 flag='1')
+        self.logger.info('-----设置参数plog_merge_age值为2147483647----')
         excute_cmd1 = f'source {self.DB_ENV_PATH};gs_guc reload -N all -I ' \
+                      f'all -c "plog_merge_age=2147483647"'
         self.logger.info(excute_cmd1)
         msg1 = self.userNode.sh(excute_cmd1).result()
         self.logger.info(msg1)
@@ -74,6 +79,7 @@ class Errorlog(unittest.TestCase):
         sql_cmd2 = 'show plog_merge_age;'
         msg2 = self.sh_primy.execut_db_sql(sql_cmd2)
         self.logger.info(msg2)
+        self.common.equal_sql_mdg(msg2, 'plog_merge_age', '2147483647ms',
                                 '(1 row)', flag='1')
         self.logger.info('-----设置参数plog_merge_age值为1d----')
         excute_cmd1 = f'source {self.DB_ENV_PATH};gs_guc reload -N all -I ' \

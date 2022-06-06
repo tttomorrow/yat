@@ -13,6 +13,7 @@ select COL_SIN as result from TEST_SIN_02;
 +--------------------+
 | result             |
 +--------------------+
+| 0.8090234634050661 |
 | 0.0                |
 +--------------------+
 drop table TEST_SIN_02;

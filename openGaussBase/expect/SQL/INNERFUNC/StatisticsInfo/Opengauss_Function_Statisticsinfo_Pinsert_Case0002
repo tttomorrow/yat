@@ -25,6 +25,7 @@ select pg_stat_get_partition_tuples_inserted(a.oid,a.oid) from PG_PARTITION a wh
   Hint: No function matches the given name and argument types. You might need to add explicit type casts.
 ?.*
   Where: referenced column: pg_stat_get_partition_tuples_inserted
+select pg_stat_get_partition_tuples_inserted(98765432198765);
 ?.*ERROR: OID out of range
   Where: referenced column: pg_stat_get_partition_tuples_inserted
 drop table sales cascade;

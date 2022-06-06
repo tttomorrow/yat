@@ -16,7 +16,7 @@ SQL SUCCESS
 --插入数据，报错
 insert into temp_table_alter_015(ad) values (3);
 ?.*ERROR: new row for relation "temp_table_alter_015" violates check constraint "temp_table_alter_015_check"
-  Detail: Failing row contains (null, 3, null).
+  Detail: N/A
 --删除约束
 alter table temp_table_alter_015 drop constraint temp_table_alter_015_check;
 SQL SUCCESS

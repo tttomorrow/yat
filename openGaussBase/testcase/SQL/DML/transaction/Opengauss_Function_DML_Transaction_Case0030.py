@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -25,100 +25,86 @@ Expect      :
     2.在匿名块中写入位串类型的变量，对数据库表执行插入操作成功
     3.主机事务数据同步成功
     4.备机事务数据同步成功
+History     : 
 """
 
+import os
 import unittest
 from yat.test import Node
-from yat.test import macro
 from testcase.utils.Constant import Constant
+from testcase.utils.CommonSH import CommonSH
+from testcase.utils.Common import Common
 from testcase.utils.Logger import Logger
 
 logger = Logger()
 
 
+@unittest.skipIf(1 >= CommonSH('PrimaryDbUser').get_node_num(), '单机环境不执行')
 class TransactionFile(unittest.TestCase):
     def setUp(self):
-        logger.info('--------------------Opengauss_Function_DML_Transaction_Case0030开始执行-----------------------')
-        self.PrimaryNode = Node('PrimaryDbUser')
-        self.DB_ENV_PATH = macro.DB_ENV_PATH
+        logger.info(f'-----{os.path.basename(__file__)[:-3]}开始执行-----')
+        self.primary_node = Node('PrimaryDbUser')
+        self.primary_sh_node = CommonSH('PrimaryDbUser')
+        self.standby1_sh_node = CommonSH('Standby1DbUser')
+        self.com = Common()
         self.Constant = Constant()
+        self.tb_name = 'test_trans_0030'
 
     def test_transaction_file(self):
-        logger.info('---------------------若为单机环境，后续不执行，直接通过--------------------')
-        excute_cmd = f''' source {self.DB_ENV_PATH}
-                       gs_om -t status --detail
-                      '''
-        logger.info(excute_cmd)
-        msg = self.PrimaryNode.sh(excute_cmd).result()
+        logger.info('-----step1:创建测试表;expect:创建成功-----')
+        sql_cmd = f'drop table if exists {self.tb_name};' \
+                  f'create table {self.tb_name}' \
+                  f'(c_bit bit(3),c_bitvaring bit varying(5));'
+        msg = self.primary_sh_node.execut_db_sql(sql_cmd,
+                dbname=f'{self.primary_node.db_name}')
         logger.info(msg)
-        if 'Standby' not in msg:
-            return '单机环境，后续不执行，直接通过'
-        else:
-            self.StandbyNode = Node('Standby1DbUser')
-            logger.info('------------------------创建测试表--------------------')
-            sql_cmd = '''drop table if exists testzl;
-                         create table testzl(sk bit(3),sk1 bit varying(5)); '''
-            excute_cmd = f'''
-                        source {self.DB_ENV_PATH} ;
-                        gsql -d {self.PrimaryNode.db_name} -p {self.PrimaryNode.db_port} -c "{sql_cmd}"
-                        '''
-            logger.info(excute_cmd)
-            msg = self.PrimaryNode.sh(excute_cmd).result()
-            logger.info(msg)
-            self.assertIn(self.Constant.TABLE_CREATE_SUCCESS, msg)
+        self.assertIn(self.Constant.TABLE_CREATE_SUCCESS, msg)
 
-            logger.info('-------------在匿名块中写入位串类型的变量，对数据库表执行插入操作-------------')
-            sql_cmd = f'''  declare 
-                              a BIT(3);
-                              b BIT VARYING(5) ;
-                            begin
-                              a := B'101';
-                              b := B'00';
-                              insert into testzl values (a,b);
-                            end;
-                         '''
-            excute_cmd = f'''
-                            source {self.DB_ENV_PATH} ;
-                            gsql -d {self.PrimaryNode.db_name} -p {self.PrimaryNode.db_port} -c "{sql_cmd}"
-                            '''
-            logger.info(excute_cmd)
-            msg = self.PrimaryNode.sh(excute_cmd).result()
-            logger.info(msg)
-            self.assertIn(self.Constant.CREATE_ANONYMOUS_BLOCK_SUCCESS_MSG, msg)
+        logger.info('-----step2:在匿名块中写入位串类型的变量，对数据库表执行插入操作;expect:插入成功-----')
+        sql_cmd = f'''  declare 
+                          a bit(3);
+                          b bit varying(5) ;
+                        begin
+                          a := B'101';
+                          b := B'00';
+                          insert into {self.tb_name} values (a,b);
+                        end;
+                     '''
+        msg = self.primary_sh_node.execut_db_sql(sql_cmd,
+                dbname=f'{self.primary_node.db_name}')
+        logger.info(msg)
+        self.assertIn(self.Constant.CREATE_ANONYMOUS_BLOCK_SUCCESS_MSG, msg)
 
-            logger.info('-----------------查看主机数据-------------------')
-            sql_cmd = f'''select count(*) from testzl;'''
-            excute_cmd = f'''
-                            source {self.DB_ENV_PATH} ;
-                            gsql -d {self.StandbyNode.db_name} -p {self.StandbyNode.db_port} -c "{sql_cmd}"
-                            '''
-            logger.info(excute_cmd)
-            msg = self.StandbyNode.sh(excute_cmd).result()
-            logger.info(msg)
-            res = msg.splitlines()[-2].strip()
-            self.assertIn('1', res)
+        logger.info('-----step3:查看主机数据;expect:1-----')
+        sql_cmd = f'''select count(*) from {self.tb_name};'''
+        msg = self.primary_sh_node.execut_db_sql(sql_cmd,
+                dbname=f'{self.primary_node.db_name}')
+        logger.info(msg)
+        res = msg.splitlines()[-2].strip()
+        self.assertIn('1', res)
 
-            logger.info('-----------------查看备机数据-------------------')
-            sql_cmd = f'''select count(*) from testzl;'''
-            excute_cmd = f'''
-                            source {self.DB_ENV_PATH} ;
-                            gsql -d {self.StandbyNode.db_name} -p {self.StandbyNode.db_port} -c "{sql_cmd}"
-                            '''
-            logger.info(excute_cmd)
-            msg = self.StandbyNode.sh(excute_cmd).result()
-            logger.info(msg)
-            res = msg.splitlines()[-2].strip()
-            self.assertIn('1', res)
+        logger.info('----等待备机完成数据同步----')
+        node_num = self.com.get_node_num(self.primary_node)
+        logger.info(node_num)
+        consistency_flag = self.primary_sh_node.check_location_consistency(
+                                                                'primary',
+                                                                 node_num,
+                                                                 300)
+        self.assertTrue(consistency_flag)
+
+        logger.info('-----step4:查看备机数据;expect:1-----')
+        msg = self.standby1_sh_node.execut_db_sql(sql_cmd,
+                dbname=f'{self.primary_node.db_name}')
+        logger.info(msg)
+        res = msg.splitlines()[-2].strip()
+        self.assertIn('1', res)
 
     def tearDown(self):
-        logger.info('----------------清理环境-----------------------')
-        sql_cmd = 'drop table if exists testzl;'
-        excute_cmd = f'''    
-                        source {self.DB_ENV_PATH} ;
-                        gsql -d {self.PrimaryNode.db_name} -p {self.PrimaryNode.db_port} -c "{sql_cmd}"
-                        '''
-        logger.info(excute_cmd)
-        msg = self.PrimaryNode.sh(excute_cmd).result()
+        logger.info('-----清理环境-----')
+        sql_cmd = f'drop table if exists {self.tb_name};'
+        msg = self.primary_sh_node.execut_db_sql(sql_cmd,
+                dbname=f'{self.primary_node.db_name}')
+        logger.info(msg)
         logger.info(msg)
         self.assertIn(self.Constant.TABLE_DROP_SUCCESS, msg)
-        logger.info('----------------------Opengauss_Function_DML_Transaction_Case0030执行完成------------------------')
+        logger.info(f'-----{os.path.basename(__file__)[:-3]}执行完成-----')

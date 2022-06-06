@@ -12,6 +12,9 @@ create table pool_test(
 )
 PARTITION BY RANGE (c_integer)
 (
+	partition P_20180121 values less than (0),
+	partition P_20190122 values less than (50000),
+	partition P_20200123 values less than (100000),
 	partition P_max values less than (maxvalue)
 );
 insert into pool_test(c_id,'pool') values(2,'china');

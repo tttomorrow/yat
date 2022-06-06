@@ -9,6 +9,7 @@ select EXTRACT(EPOCH FROM clo1) from test_date01;
 +----------------+
 | date_part      |
 +----------------+
+| 2.533707936E11 |
 +----------------+
 SELECT EXTRACT(EPOCH FROM timestamp with time zone '0001-01-01 00:00:00-01');
 +----------------+

@@ -37,7 +37,7 @@ explain select * from index170.test_index_table_170 where c_int > 5000 group by 
 ?.*
 ?.*QUERY PLAN.*
 ?.*
-?.*
+?.*HashAggregate.*
 ?.*
 ?.*Partition Iterator.*
 ?.*
@@ -55,7 +55,7 @@ explain select * from index170.test_index_table_170 where c_int > 500 group by c
 ?.*
 ?.*QUERY PLAN.*
 ?.*
-?.*
+?.*HashAggregate.*
 ?.*
 ?.*Partition Iterator.*
 ?.*
@@ -104,10 +104,7 @@ explain select * from index170.test_index_table_170 where c_int > 500 group by c
 ?.*
 ?.*Partition Iterator.*
 ?.*
-?.*Partitioned Bitmap Heap Scan on test_index_table_170.*
-?.*
-?.*
-?.*Partitioned Bitmap Index Scan on index_170_01.*
+?.*Partitioned Seq Scan on test_index_table_170.*
 ?.*
 ?.*
 ?.*

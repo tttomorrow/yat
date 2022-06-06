@@ -1,4 +1,4 @@
---  @testpoint:使用SET CONSTRAINTS语句，设置多个约束名
+-- @testpoint: 使用SET CONSTRAINTS语句，设置多个约束名,部分step合理报错
 --建表同时定义检查约束和主键约束
 drop table if exists t4;
 SQL SUCCESS
@@ -32,7 +32,7 @@ SQL SUCCESS
 --修改数据，合理报错（违反检查约束)
 update t4 set id =id -2;
 ?.*ERROR: new row for relation "t4" violates check constraint "t4_id_check"
-  Detail: Failing row contains (4, a).
+?.*
 --关闭事务
 end;
 SQL SUCCESS

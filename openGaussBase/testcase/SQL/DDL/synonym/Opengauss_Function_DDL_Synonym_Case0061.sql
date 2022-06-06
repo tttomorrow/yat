@@ -1,5 +1,4 @@
 -- @testpoint: 创建序列同义词，创建成功，使用时合理报错
--- @modify at: 2020-11-26
 --创建序列
 drop SEQUENCE if exists s_SYN_061 cascade;
 CREATE SEQUENCE s_SYN_061;

@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -17,6 +17,7 @@ Case Type   : GUC
 Case Name   : 修改参数work_mem为其他数据类型，观察预期结果；
 Description :
          1、查询work_mem默认值；
+         2、修改work_mem为false，"test",999999999等，并校验其预期结果；
 Expect      :
         1、显示默认值；
         2、参数修改失败；
@@ -65,6 +66,7 @@ class Deletaduit(unittest.TestCase):
         sql_cmd = self.commonsh.execut_db_sql(f'''show work_mem;''')
         self.log.info(sql_cmd)
         self.assertIn(self.res, sql_cmd)
+        # 使用设置gs_guc set设置work_mem为9999999999
         msg = self.commonsh.execute_gsguc('set', self.Constant.GSGUC_SUCCESS_MSG, 'work_mem=test')
         self.log.info(msg)
         self.assertFalse(msg)

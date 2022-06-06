@@ -1,0 +1,119 @@
+-- @testpoint: range_range二级分区表：create if not exists 同名,部分测试点合理报错
+
+--test1: create if not exists （二级分区表）
+--step1: 创建二级分区表; expect:成功
+drop table if exists  t_subpartition_0258;
+create   table if not exists t_subpartition_0258
+(
+    col_1 int  ,
+    col_2 int  not null ,
+  col_3 varchar2 ( 30 ) not null ,
+    col_4 int  generated always as(2*col_2) stored  ,
+	check (col_4 >= col_2)
+)
+with(fillfactor=80)
+partition by range (col_1) subpartition by range (col_2)
+(
+  partition p_range_1 values less than( 10 )
+  (
+    subpartition p_range_1_1 values less than( 5 ),
+    subpartition p_range_1_2 values less than( maxvalue )
+  ),
+  partition p_range_2 values less than( 20 )
+  (
+    subpartition p_range_2_1 values less than( 5 ),
+    subpartition p_range_2_2 values less than( 10 )
+  )
+) enable row movement; 
+--step2: 创建同名不同字段数目的二级分区表; expect:成功
+create   table if not exists t_subpartition_0258
+(
+    col_1 int  ,
+    col_2 int  not null ,
+	col_3 varchar2 ( 30 ) not null ,
+    col_4 int  generated always as(2*col_2) stored  ,
+    col_5 int  ,
+	check (col_4 >= col_2)
+)
+with(fillfactor=80)
+partition by range (col_1) subpartition by range (col_2)
+(
+  partition p_range_1 values less than( 10 )
+  (
+    subpartition p_range_1_1 values less than( 5 ),
+    subpartition p_range_1_2 values less than( maxvalue )
+  ),
+  partition p_range_2 values less than( 20 )
+  (
+    subpartition p_range_2_1 values less than( 5 ),
+    subpartition p_range_2_2 values less than( 10 )
+  )
+) enable row movement;
+--step3: 查看数据; expect:成功，4列数据，上一个建表时，表已存在，未覆盖
+select * from t_subpartition_0258;
+--step4: 创建同名不同字段数据类型的二级分区表; expect:成功
+create   table if not exists t_subpartition_0258
+(
+    col_1 int  ,
+    col_2 int  not null ,
+	col_3 int not null ,
+    col_4 int  generated always as(2*col_2) stored  ,
+	check (col_4 >= col_2)
+)
+with(fillfactor=80)
+partition by range (col_1) subpartition by range (col_2)
+(
+  partition p_range_1 values less than( 10 )
+  (
+    subpartition p_range_1_1 values less than( 5 ),
+    subpartition p_range_1_2 values less than( maxvalue )
+  ),
+  partition p_range_2 values less than( 20 )
+  (
+    subpartition p_range_2_1 values less than( 5 ),
+    subpartition p_range_2_2 values less than( 10 )
+  )
+) enable row movement;
+--step5: col_3列插入字符串类型的数据; expect:成功，上一个建表时，表已存在，未覆盖
+insert into t_subpartition_0258 values(1,1,'aa');
+
+--test2: create if not exists （普通表）
+--step6: 创建普通表; expect:成功
+drop table if exists  t_subpartition_0258;
+create   table if not exists t_subpartition_0258
+(
+    col_1 int  ,
+    col_2 int  not null ,
+	col_3 varchar2 ( 30 ) not null ,
+    col_4 int  generated always as(2*col_2) stored  ,
+	check (col_4 >= col_2)
+);
+
+--step7: 创建二级分区表和普通表同名; expect:成功
+create   table if not exists t_subpartition_0258
+(
+    col_1 int  ,
+    col_2 int  not null ,
+	col_3 int not null ,
+    col_4 int  generated always as(2*col_2) stored  ,
+	check (col_4 >= col_2)
+)
+with(fillfactor=80)
+partition by range (col_1) subpartition by range (col_2)
+(
+  partition p_range_1 values less than( 10 )
+  (
+    subpartition p_range_1_1 values less than( 5 ),
+    subpartition p_range_1_2 values less than( maxvalue )
+  ),
+  partition p_range_2 values less than( 20 )
+  (
+    subpartition p_range_2_1 values less than( 5 ),
+    subpartition p_range_2_2 values less than( 10 )
+  )
+) enable row movement;
+--step8: 查看指定二级分区数据数据; expect:合理报错，上一个建表时，表已存在，未覆盖
+select * from t_subpartition_0258 subpartition(p_range_1_5);
+
+--step9: 清理环境; expect:成功
+drop table if exists t_subpartition_0258;

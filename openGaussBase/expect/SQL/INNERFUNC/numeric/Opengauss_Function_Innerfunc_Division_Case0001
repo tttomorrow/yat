@@ -15,6 +15,7 @@ SELECT 124/45 AS RESULT;
 +--------------------+
 | result             |
 +--------------------+
+| 2.7555555555555555 |
 +--------------------+
 drop table if exists data_01;
 SQL SUCCESS

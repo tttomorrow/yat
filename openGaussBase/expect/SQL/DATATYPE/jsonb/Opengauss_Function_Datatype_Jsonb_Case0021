@@ -70,13 +70,13 @@ select '[{"a":"foo"},{"b":"bar"},{"c":"baz"}]'::json ->> null;
 +----------+
 --不合理输入1.左侧输入值为array-json类型，右侧为非int类型
 select '["a","foo","b","bar","c","baz"]'::json ->> "b" ;
-?.*ERROR: column "b" does not exist.*
+?.*ERROR: column "b" does not exis.*
 ?.*
 select '[null,true,false,"null","true","false"]'::json ->> 2021-05-31 12:59:08;
 ?.*ERROR: syntax error at or near "12.*
 ?.*
 select '[138,0.58,-369,1.25e+6]'::json ->> 192.168.100.128/25;
-?.*ERROR: syntax error at or near ".100.*
+?.*ERROR: syntax error at or near "192.168.100.128.*
 ?.*
 --不合理输入2.左侧输入值为非array-json类型，右侧为int类型
 select '138'::json ->> 1;
@@ -84,7 +84,7 @@ select '138'::json ->> 1;
 select '"ALL"'::json ->> 0;
 ?.*ERROR: cannot extract element from a scala.*
 select '+100'::json ->> -2;
-?.*ERROR: invalid input syntax for type json.*
+?.*ERROR: invalid input syntax for type jso.*
   Detail: Token "+" is invalid.
 ?.*
   Where: JSON data, line 1: +...
@@ -94,20 +94,20 @@ select 'true'::json ->8;
 ?.*ERROR: cannot extract element from a scala.*
 --不合理输入3.左侧输入值为非array-json类型，右侧为非int类型
 select 'abcdefg'::json ->> 'ab';
-?.*ERROR: invalid input syntax for type json.*
+?.*ERROR: invalid input syntax for type jso.*
   Detail: Token "abcdefg" is invalid.
 ?.*
   Where: JSON data, line 1: abcdefg
 select '''abcdefg'''::json ->> 2021-05-31;
-?.*ERROR: invalid input syntax for type json.*
+?.*ERROR: invalid input syntax for type jso.*
   Detail: Token "'" is invalid.
 ?.*
   Where: JSON data, line 1: '...
 select '\"$$\"'::json ->>192.168.100.128/25;
-?.*ERROR: syntax error at or near ".100.*
+?.*ERROR: syntax error at or near "192.168.100.128.*
 ?.*
 select '"["www@13^", 1, {"name": "john"}, "2"]"'::json ->> 1/2;
-?.*ERROR: invalid input syntax for type json.*
+?.*ERROR: invalid input syntax for type jso.*
   Detail: Token "www" is invalid.
 ?.*
   Where: JSON data, line 1: "["www...

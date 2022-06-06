@@ -11,6 +11,7 @@ select char_length(ACOS(-0.9)) from sys_dummy;
 +-------------+
 | 19          |
 +-------------+
+select char_length(COS(120 * 3.14159265359/180)) from sys_dummy;
 +-------------+
 | char_length |
 +-------------+

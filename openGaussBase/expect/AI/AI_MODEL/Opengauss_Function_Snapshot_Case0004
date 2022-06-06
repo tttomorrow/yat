@@ -1,0 +1,38 @@
+-- @testpoint: 创建快照后删除不存在的快照,合理报错
+--step1:建表并插入数据;expect: 建表并插入数据成功
+drop table if exists t_snapshot_tab_0004;
+SQL SUCCESS
+create table t_snapshot_tab_0004(id int, name varchar);
+SQL SUCCESS
+insert into t_snapshot_tab_0004 values (1,'zhangsan'),(2,'lisi'),(3,'wangwu'),(4,'lisa'),(5,'jack');
+SQL SUCCESS
+--step2:创建快照;expect: 创建成功
+create snapshot s_snapshot_s1@1.0 comment is 'first version' as select * from t_snapshot_tab_0004;
+?.*
+?.*| schema | name.*
+?.*
+?.*| public | s_snapshot_s1@1.0.*
+?.*
+--step3:删除数据表快照;expect: 报错提示快照不存在
+purge snapshot s_snapshot_s1@3.0;
+?.*ERROR: snapshot public."s_snapshot_s1\@3.0" does not exis.*
+  Where: referenced column: purge_snapshot_internal
+SQL statement "SELECT db4ai.purge_snapshot_internal(i_schema, i_name)"
+PL/pgSQL function db4ai.purge_snapshot(name,name) line 71 at PERFORM
+--step4:发布数据表快照;expect: 报错提示快照不存在
+select * from public.s_snapshot_s1@3.0;
+?.*ERROR: relation "public.s_snapshot_s1\@3.0" does not exist.*
+?.*
+--step5:存档数据表快照;expect: 报错提示快照不存在
+archive snapshot s_snapshot_s1@3.0;
+?.*ERROR: snapshot public."s_snapshot_s1\@3.0" does not exis.*
+  Where: PL/pgSQL function db4ai.archive_snapshot(name,name) line 11 at assignment
+--step6:清理环境;expect: 清理成功
+purge snapshot s_snapshot_s1@1.0;
+?.*
+?.*| schema | name.*
+?.*
+?.*| public | s_snapshot_s1@1.0.*
+?.*
+drop table t_snapshot_tab_0004;
+SQL SUCCESS

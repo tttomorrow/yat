@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -17,17 +17,14 @@ Case Type   : 逻辑复制
 Case Name   : 备机使用pg_recvlogical语句创建逻辑复制槽，合理报错
 Description :
         1.修改参数wal_level为logical;enable_slot_log为on
-        2.重启数据库
-        3.备机pg_hba.conf文件配置逻辑复制的用户白名单
-        4.备机机创建逻辑复制槽
-        5.清理环境
+        2.备机pg_hba.conf文件配置逻辑复制的用户白名单
+        3.备机机创建逻辑复制槽
+        4.清理环境
 Expect      :
         1.修改参数wal_level为logical;enable_slot_log为on成功
-        2.重启数据库成功
-        3.pg_hba.conf 配置逻辑复制的用户白名单成功
-        4.合理报错
-        5.清理环境完成
-History     :
+        2.pg_hba.conf 配置逻辑复制的用户白名单成功
+        3.合理报错
+        4.清理环境完成
 """
 import os
 import unittest
@@ -54,9 +51,13 @@ class LogicalReplication(unittest.TestCase):
         self.standby_sh = CommonSH('Standby1DbUser')
         self.pg_hba = os.path.join(macro.DB_INSTANCE_PATH,
                                    macro.PG_HBA_FILE_NAME)
+        self.us_name = "us_logical_replication_case0002"
+        self.slot_name = "slot_logical_replication_case0002"
 
     def test_standby_logical(self):
-        self.log.info('--步骤1:修改wal_level为logical;enable_slot_log为on--')
+        text = '--step1:修改wal_level为logical;enable_slot_log为on;' \
+               'expect:修改成功--'
+        self.log.info(text)
         mod_msg = Primary_SH.execute_gsguc('set',
                                            self.constant.GSGUC_SUCCESS_MSG,
                                            'wal_level =logical')
@@ -67,40 +68,54 @@ class LogicalReplication(unittest.TestCase):
                                            'enable_slot_log =on')
         self.log.info(mod_msg)
         self.assertTrue(mod_msg)
-        self.log.info('--步骤2:重启数据库--')
         restart_msg = Primary_SH.restart_db_cluster()
         self.log.info(restart_msg)
         status = Primary_SH.get_db_cluster_status()
-        self.assertTrue("Degraded" in status or "Normal" in status)
-        self.log.info('--步骤3:备机配置逻辑复制的用户--')
-        sql_cmd = Primary_SH.execut_db_sql(f'''drop role if exists rep;
-            create role rep with login password '{macro.COMMON_PASSWD}';''')
+        self.assertTrue("Degraded" in status or "Normal" in status,
+                        '执行失败:' + text)
+
+        text = '--step2:配置备机逻辑复制的用户;expect:配置成功--'
+        self.log.info(text)
+        sql_cmd = Primary_SH.execut_db_sql(f'''drop role if exists \
+            {self.us_name};
+            create role {self.us_name} with login password \
+            '{macro.COMMON_PASSWD}';''')
         self.log.info(sql_cmd)
-        self.assertIn(self.constant.CREATE_ROLE_SUCCESS_MSG, sql_cmd)
-        sql_cmd = Primary_SH.execut_db_sql('''alter role rep with replication
-            sysadmin;''')
+        self.assertIn(self.constant.CREATE_ROLE_SUCCESS_MSG, sql_cmd,
+                      '执行失败:' + text)
+        sql_cmd = Primary_SH.execut_db_sql(f'''alter role {self.us_name} \
+        with replication sysadmin;''')
         self.log.info(sql_cmd)
-        self.assertIn(self.constant.ALTER_ROLE_SUCCESS_MSG, sql_cmd)
+        self.assertIn(self.constant.ALTER_ROLE_SUCCESS_MSG, sql_cmd,
+                      '执行失败:' + text)
         self.log.info(sql_cmd)
-        mod_msg = f"sed -i '$a\local    replication     rep      trust' " \
-                  f"{self.pg_hba}"
+        self.log.info('配置备机')
+        mod_msg = f"sed -i '$a\local    replication     {self.us_name}     " \
+                  f"trust'  {self.pg_hba}"
         self.log.info(mod_msg)
         msg = self.standby_node.sh(mod_msg).result()
         self.log.info(msg)
-        mod_msg = f"sed -i '$a\host    replication     rep   127.0.0.1/32   " \
-                  f"trust' {self.pg_hba}"
+        mod_msg = f"sed -i '$a\host    replication     {self.us_name}   " \
+                  f"127.0.0.1/32   trust'  {self.pg_hba}"
         self.log.info(mod_msg)
         msg = self.standby_node.sh(mod_msg).result()
         self.log.info(msg)
-        mod_msg = f"sed -i '$a\host    replication     rep   ::1/128  " \
-                  f"trust' {self.pg_hba}"
+        mod_msg = f"sed -i '$a\host    replication     {self.us_name}   " \
+                  f"::1/128   trust'  {self.pg_hba}"
         self.log.info(mod_msg)
         msg = self.standby_node.sh(mod_msg).result()
         self.log.info(msg)
-        self.log.info('--步骤4:备机创建逻辑复制槽--')
+        restart_msg = Primary_SH.restart_db_cluster()
+        self.log.info(restart_msg)
+        status = Primary_SH.get_db_cluster_status()
+        self.assertTrue("Degraded" in status or "Normal" in status,
+                        '执行失败:' + text)
+
+        text = '--step3:备机创建逻辑复制槽;expect:报错--'
+        self.log.info(text)
         create_cmd = f"pg_recvlogical -d postgres " \
-                     f"-U rep " \
-                     f"-S slot_test002 " \
+                     f"-U {self.us_name} " \
+                     f"-S {self.slot_name} " \
                      f"-p {self.standby_node.db_port} " \
                      f"-P mppdb_decoding --create"
         execute_cmd = f'''source {macro.DB_ENV_PATH}
@@ -113,12 +128,18 @@ class LogicalReplication(unittest.TestCase):
         self.log.info(execute_cmd)
         exec_msg = self.standby_node.sh(execute_cmd).result()
         self.log.info(exec_msg)
-        self.assertIn('FATAL', exec_msg)
+        self.assertIn('FATAL', exec_msg, '执行失败:' + text)
 
     def tearDown(self):
-        self.log.info('--步骤5:清理环境--')
-        sql_cmd = Primary_SH.execut_db_sql('''drop role if exists rep;''')
+        text = '--step4:清理环境;expect:清理环境完成--'
+        self.log.info(text)
+        sql_cmd = Primary_SH.execut_db_sql(f'''drop role if exists \
+            {self.us_name};''')
         self.log.info(sql_cmd)
+        del_msg = f"sed -i '/{self.us_name}/d' {self.pg_hba}"
+        self.log.info(del_msg)
+        msg = self.standby_node.sh(del_msg).result()
+        self.log.info(msg)
         restore_cmd = Primary_SH.execute_gsguc('set',
                                                self.constant.GSGUC_SUCCESS_MSG,
                                                'wal_level=hot_standby')
@@ -130,6 +151,7 @@ class LogicalReplication(unittest.TestCase):
         restart_msg = Primary_SH.restart_db_cluster()
         self.log.info(restart_msg)
         status = Primary_SH.get_db_cluster_status()
-        self.assertTrue("Degraded" in status or "Normal" in status)
+        self.assertTrue("Degraded" in status or "Normal" in status,
+                        '执行失败:' + text)
         self.log.info(
             '-Opengauss_Function_Standby_Logical_Replication_Case0002finish-')

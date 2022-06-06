@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -27,6 +27,7 @@ Expect      :
     4.清理环境
 History     :
 """
+import os
 import unittest
 
 from testcase.utils.ComThread import ComThread
@@ -38,7 +39,7 @@ from testcase.utils.Logger import Logger
 class DmlTestCase(unittest.TestCase):
     def setUp(self):
         self.log = Logger()
-        self.log.info('Opengauss_Function_DML_Lock_Case0008开始')
+        self.log.info(f'-----{os.path.basename(__file__)} start-----')
         self.constant = Constant()
         self.commonsh1 = CommonSH('PrimaryDbUser')
         self.commonsh2 = CommonSH('PrimaryDbUser')
@@ -62,12 +63,13 @@ class DmlTestCase(unittest.TestCase):
                 '待session2 执行加锁操作后查看加锁是否成功; expect: 加锁成功-----'
         self.log.info(text2)
         sql = f"start transaction;" \
-              f"lock table {self.tb_name} in exclusive mode;" \
-              f"select pg_sleep(5);" \
-              f"select locktype,database,relation,transactionid,classid," \
-              f"virtualtransaction,pid,sessionid,mode," \
-              f"granted,fastpath from pg_locks;" \
-              f"select pg_sleep(5);"
+            f"lock table {self.tb_name} in exclusive mode;" \
+            f"select pg_sleep(5);" \
+            f"select locktype,database,relation,transactionid,classid," \
+            f"virtualtransaction,pid,sessionid,mode," \
+            f"granted,fastpath from pg_locks " \
+            f"where sessionid=(select pg_current_sessid());" \
+            f"select pg_sleep(5);"
         thread_1 = ComThread(self.commonsh1.execut_db_sql, args=(sql, ''))
         thread_1.setDaemon(True)
         thread_1.start()
@@ -75,9 +77,9 @@ class DmlTestCase(unittest.TestCase):
         text3 = '-----step3: 开启新的事务，对表加access share锁,不做提交; expect: 加锁成功-----'
         self.log.info(text3)
         sql = f"select pg_sleep(3);" \
-              f"start transaction;" \
-              f"lock table {self.tb_name} in access share mode;" \
-              f"select pg_sleep(5);"
+            f"start transaction;" \
+            f"lock table {self.tb_name} in access share mode;" \
+            f"select pg_sleep(5);"
         thread_2 = ComThread(self.commonsh2.execut_db_sql, args=(sql, ''))
         thread_2.setDaemon(True)
         thread_2.start()
@@ -100,9 +102,9 @@ class DmlTestCase(unittest.TestCase):
                       msg_result_2, '执行失败:' + text3)
 
     def tearDown(self):
-        text = '--step4: 清理环境; expect: 清理成功--'
+        text = '-----step4: 清理环境; expect: 清理成功-----'
         self.log.info(text)
         sql_cmd = self.commonsh1.execut_db_sql(
             f"drop table if exists {self.tb_name};")
         self.log.info(sql_cmd)
-        self.log.info('Opengauss_Function_DML_Lock_Case0008结束')
+        self.log.info(f'-----{os.path.basename(__file__)} end-----')

@@ -1,0 +1,103 @@
+-- @testpoint: range_list二级分区表：列存表/压缩,测试点合理报错
+
+--test1: 列存表with ( {storage_parameter = value} [, ... ] ) ]
+--step1: 创建二级分区列存表; expect:合理报错
+drop table if exists t_subpartition_0199;
+create   table if not exists t_subpartition_0199
+(
+    col_1 int ,
+    col_2 int  ,
+	col_3 int ,
+    col_4 int 
+)
+with(orientation = column)
+partition by range (col_1) subpartition by list (col_2)
+(
+  partition p_range_1 values less than( 10 )
+  (
+    subpartition p_list_1_1 values ( '1','2','3','4','5'),
+    subpartition p_list_1_2 values ( default )
+  ),
+  partition p_range_2 values less than( 20 )
+  (
+    subpartition p_list_2_1 values ( '6','7','8','9','10'),
+    subpartition p_list_2_2 values ( default )
+  ),
+   partition p_range_3 values less than( 30 )
+   (
+    subpartition p_list_3_1 values ( default )
+  ),
+   partition p_range_4 values less than( 40 )
+   (
+    subpartition p_list_4_1 values ( default )
+  ),
+  partition p_range_5 values less than( maxvalue )
+) enable row movement;
+--step2: 创建二级分区列存表，压缩; expect:合理报错
+drop table if exists t_subpartition_0199;
+create   table if not exists t_subpartition_0199
+(
+    col_1 int ,
+    col_2 int  ,
+	col_3 int ,
+    col_4 int 
+)
+with(orientation = column,compression=middle)
+partition by range (col_1) subpartition by list (col_2)
+(
+  partition p_range_1 values less than( 10 )
+  (
+    subpartition p_list_1_1 values ( '1','2','3','4','5'),
+    subpartition p_list_1_2 values ( default )
+  ),
+  partition p_range_2 values less than( 20 )
+  (
+    subpartition p_list_2_1 values ( '6','7','8','9','10'),
+    subpartition p_list_2_2 values ( default )
+  ),
+   partition p_range_3 values less than( 30 )
+   (
+    subpartition p_list_3_1 values ( default )
+  ),
+   partition p_range_4 values less than( 40 )
+   (
+    subpartition p_list_4_1 values ( default )
+  ),
+  partition p_range_5 values less than( maxvalue )
+) enable row movement;
+
+--test2: compress
+--step3: 创建二级分区表，压缩; expect:合理报错
+drop table if exists t_subpartition_0199;
+create   table if not exists t_subpartition_0199
+(
+    col_1 int ,
+    col_2 int  ,
+	col_3 int ,
+    col_4 int 
+)compress
+partition by range (col_1) subpartition by list (col_2)
+(
+  partition p_range_1 values less than( 10 )
+  (
+    subpartition p_list_1_1 values ( '1','2','3','4','5'),
+    subpartition p_list_1_2 values ( default )
+  ),
+  partition p_range_2 values less than( 20 )
+  (
+    subpartition p_list_2_1 values ( '6','7','8','9','10'),
+    subpartition p_list_2_2 values ( default )
+  ),
+   partition p_range_3 values less than( 30 )
+   (
+    subpartition p_list_3_1 values ( default )
+  ),
+   partition p_range_4 values less than( 40 )
+   (
+    subpartition p_list_4_1 values ( default )
+  ),
+  partition p_range_5 values less than( maxvalue )
+) enable row movement;
+
+--step4: 清理环境; expect:成功
+drop table if exists t_subpartition_0199;

@@ -22,7 +22,13 @@ CREATE TABLE sales
 );
 SQL SUCCESS
 -- testpoint1:建表后会计数
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -49,7 +55,13 @@ select pg_stat_reset();
 +---------------+
 create index test_index1 on sales (channel_id);
 SQL SUCCESS
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -77,7 +89,13 @@ select pg_stat_reset();
 -- 数据插入sales
 INSERT INTO sales VALUES(1, 12, '2019-02-01 00:00:00', 'b', 1, 1, 1);
 SQL SUCCESS
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -104,7 +122,13 @@ select pg_stat_reset();
 +---------------+
 update sales set time_id = '2019-06-02 10:00:00' where channel_id = 'b';
 SQL SUCCESS
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -135,7 +159,13 @@ INSERT INTO sales VALUES(1, 12, '2019-02-03 00:00:00', 'd', 1, 1, 1);
 SQL SUCCESS
 INSERT INTO sales VALUES(1, 12, '2019-02-05 00:00:00', 'e', 1, 1, 3);
 SQL SUCCESS
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -166,7 +196,13 @@ update sales set time_id = '2013-06-02 10:00:00' where channel_id = 'd';
 SQL SUCCESS
 update sales set time_id = '2012-06-02 10:00:00' where amount_sold = 3;
 SQL SUCCESS
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -219,7 +255,13 @@ delete from sales where channel_id = 'd';
 SQL SUCCESS
 delete from sales where channel_id = 'e';
 SQL SUCCESS
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -249,7 +291,13 @@ select * from sales;
 | prod_id | cust_id | time_id | channel_id | promo_id | quantity_sold | amount_sold |
 +---------+---------+---------+------------+----------+---------------+-------------+
 +---------+---------+---------+------------+----------+---------------+-------------+
-SELECT pg_sleep(10);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+

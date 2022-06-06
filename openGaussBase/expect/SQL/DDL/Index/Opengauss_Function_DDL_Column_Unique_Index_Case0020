@@ -12,7 +12,7 @@ partition by range(id)
 SQL SUCCESS
 --创建非分区唯一索引，合理报错
 create unique index column_index20 on column_part_tab20 using btree(name) local;
-?.*ERROR: unique index columns must contain the partition key and collation must be default collation
+?.*ERROR: unique local index columns must contain all the partition keys and collation must be default collation
 --删除表
 drop table column_part_tab20 cascade;
 SQL SUCCESS

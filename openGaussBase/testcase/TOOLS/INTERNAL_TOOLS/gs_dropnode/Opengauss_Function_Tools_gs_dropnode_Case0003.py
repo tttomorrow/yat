@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -57,7 +57,6 @@ class Gstoolstestcase(unittest.TestCase):
         self.standby_node1 = Node("Standby1DbUser")
         self.standby_node2 = Node("Standby2DbUser")
         self.temp_file = f"/home/{self.user_node.ssh_user}/test_dropnode.sh"
-        self.hostip = "1.2.3.4"
 
     def test_tool(self):
         LOGGER.info("步骤1：host参数为主机ip 期望:合理报错")
@@ -81,7 +80,7 @@ class Gstoolstestcase(unittest.TestCase):
             echo "source {macro.DB_ENV_PATH}" >> {self.temp_file};\
             echo "gs_dropnode -U {self.user_node.ssh_user} \
             -G {self.user_node.ssh_user} \
-            -h {self.hostip}" >> {self.temp_file};\
+            -h 100.99.81.76" >> {self.temp_file};\
             chmod +x {self.temp_file};ls {self.temp_file}'''
         LOGGER.info(sql_cmd)
         sql_cmd = self.user_node.sh(sql_cmd).result()

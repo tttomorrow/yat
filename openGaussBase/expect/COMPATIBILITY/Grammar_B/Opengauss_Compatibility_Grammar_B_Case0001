@@ -1,0 +1,57 @@
+-- @testpoint: 不同表类型，建表指定engine参数
+--testpoint1:
+--step1:创建一种复合类型;expect:成功
+drop type if exists ty_grammar0001;
+SQL SUCCESS
+create type ty_grammar0001 as (a int, b text);
+SQL SUCCESS
+--step2:创建普通行存表，engine参数值为加引号的字符串;expect:成功
+drop table if exists tb_b_grammar_0001;
+SQL SUCCESS
+create table tb_b_grammar_0001(a text(10),b tinytext,c mediumtext,d longtext, e ty_grammar0001) engine ='myisam';
+SQL SUCCESS
+--step3:插入数据;expect:成功
+insert tb_b_grammar_0001 value('测试1','测试2$','测试3','测试acv', (827,'复合类型'));
+SQL SUCCESS
+--testpoint2:
+--step1:创建列存表，engine参数值为不加引号的字符串;expect:成功
+drop table if exists tb_b_grammar_0001_01;
+SQL SUCCESS
+create table tb_b_grammar_0001_01(a int) with(orientation=column) engine = innodb ;
+SQL SUCCESS
+--testpoint3:
+--step1:创建unlogged表,复制已有表数据;expect:成功
+drop table if exists tb_b_grammar_0001_02;
+SQL SUCCESS
+create unlogged table tb_b_grammar_0001_02 engine = 'case0001' as select * from tb_b_grammar_0001;
+SQL SUCCESS
+--testpoint4:
+--step1:创建全局临时表指定engine参数;expect:成功
+drop table if exists tb_b_grammar_0001_03;
+SQL SUCCESS
+create global temp table tb_b_grammar_0001_03(a text(10),b tinytext,c mediumtext,d longtext)engine ='全局临时表';
+SQL SUCCESS
+--step2:创建本地临时表指定engine参数;expect:成功
+drop table if exists tb_b_grammar_0001_03;
+SQL SUCCESS
+create temporary  table tb_b_grammar_0001_03(a text(10),b tinytext,c mediumtext,d longtext)engine ='本地临时表';
+SQL SUCCESS
+--testpoint5:
+--step1:创建ustore表指定engine参数;expect:成功
+drop table if exists tb_b_grammar_0001_04;
+SQL SUCCESS
+create temp table tb_b_grammar_0001_04(a text(10),b tinytext,c mediumtext,d longtext)with (storage_type=ustore)engine ='case0001';
+SQL SUCCESS
+--step1:清理环境;expect:成功
+drop table if exists tb_b_grammar_0001;
+SQL SUCCESS
+drop table if exists tb_b_grammar_0001_01;
+SQL SUCCESS
+drop table if exists tb_b_grammar_0001_02;
+SQL SUCCESS
+drop table if exists tb_b_grammar_0001_03;
+SQL SUCCESS
+drop table if exists tb_b_grammar_0001_04;
+SQL SUCCESS
+drop type ty_grammar0001;
+SQL SUCCESS

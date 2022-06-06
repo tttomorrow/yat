@@ -1,0 +1,69 @@
+-- @testpoint: hash_hash二级分区键列联合约束/表联合约束
+
+--test1: 二级分区列联合约束
+--step1: 创建二级分区表，二级分区键为主键约束，一级分区键为check约束; expect:成功
+drop table if exists t_subpartition_0004 cascade;
+create table t_subpartition_0004(jid int,jn int primary key,check(jn>=6),name varchar2)partition by hash (jid) subpartition by hash(jn)
+(partition hr1(subpartition hr11 ,subpartition hr12 ),partition hr2(subpartition hr21 ,subpartition hr22 ));
+--step2: 创建二级分区表，二级分区键为唯一约束和check约束; expect:成功
+drop table if exists t_subpartition_0004 cascade;
+create table t_subpartition_0004(jid int,jn int unique,check(jn>=6),name varchar2)partition by hash (jid) subpartition by hash(jn)
+(partition hr1(subpartition hr11 ,subpartition hr12 ),partition hr2(subpartition hr21 ,subpartition hr22 ));
+--step3: 创建二级分区表，二级分区键为default约束和check约束; expect:成功
+drop table if exists t_subpartition_0004 cascade;
+create table t_subpartition_0004(jid int,jn int default 6,check(jn>=6),name varchar2)partition by hash (jid) subpartition by hash(jn)
+(partition hr1(subpartition hr11 ,subpartition hr12 ),partition hr2(subpartition hr21 ,subpartition hr22 ));
+--step4: 创建二级分区表，二级分区键为非空约束和check约束; expect:成功
+drop table if exists t_subpartition_0004 cascade;
+create table t_subpartition_0004(jid int,jn int not null,check(jn>=6),name varchar2)partition by hash (jid) subpartition by hash(jn)
+(partition hr1(subpartition hr11 ,subpartition hr12 ),partition hr2(subpartition hr21 ,subpartition hr22 ));
+--step5: 创建二级分区表，二级分区键为外键约束和check约束; expect:成功
+drop table if exists t_subpartition_0004 cascade;
+drop table if exists t_subpartition_0004_01;
+create table if not exists t_subpartition_0004_01(jid int,jn int unique,name varchar2);
+create table t_subpartition_0004(jid int,jn int references t_subpartition_0004_01(jn),check(jn>=6),name varchar2)partition by hash (jid) subpartition by hash(jn)
+(partition hr1(subpartition hr11 ,subpartition hr12 ),partition hr2(subpartition hr21 ,subpartition hr22 ));
+
+--test2: 二级分区表联合约束
+--step6: 创建二级分区表，二级分区键作为主键约束和check约束来确认约束名; expect:成功
+drop table if exists t_subpartition_0004 cascade;
+create table t_subpartition_0004(jid int,jn int,name varchar2,constraint ucp primary key(jn),constraint ucc check(jn>=6))partition by hash (jid) subpartition by hash(jn)
+(partition hr1(subpartition hr11 ,subpartition hr12 ),partition hr2(subpartition hr21 ,subpartition hr22 ));
+--step7: 创建二级分区表，二级分区键作为主键约束和check约束为默认约束名; expect:成功
+drop table if exists t_subpartition_0004 cascade;
+create table t_subpartition_0004(jid int,jn int,name varchar2,primary key(jn),check(jn>=6))partition by hash (jid) subpartition by hash(jn)
+(partition hr1(subpartition hr11 ,subpartition hr12 ),partition hr2(subpartition hr21 ,subpartition hr22 ));
+--step8: 创建二级分区表，二级分区键作为唯一约束和check约束为默认约束名; expect:成功
+drop table if exists t_subpartition_0004 cascade;
+create table t_subpartition_0004(jid int,jn int,name varchar2,unique(jn),check(jn>=6))partition by hash (jid) subpartition by hash(jn)
+(partition hr1(subpartition hr11 ,subpartition hr12 ),partition hr2(subpartition hr21 ,subpartition hr22 ));
+--step9: 创建二级分区表，二级分区键作为唯一约束和check约束为默认约束名; expect:成功
+drop table if exists t_subpartition_0004 cascade;
+drop table if exists t_subpartition_0004_01 cascade;
+create table if not exists t_subpartition_0004_01(jid int,jn int unique,name varchar2);
+create table t_subpartition_0004(jid int,jn int,name varchar2,foreign key(jn)references t_subpartition_0004_01(jn),check(jn>=6))partition by hash (jid) subpartition by hash(jn)
+(partition hr1(subpartition hr11 ,subpartition hr12 ),partition hr2(subpartition hr21 ,subpartition hr22 ));
+--step10: 创建二级分区表，二级分区键作为主键约束和外键约束为默认约束名; expect:成功
+drop table if exists t_subpartition_0004 cascade;
+drop table if exists t_subpartition_0004_01 cascade;
+create table if not exists t_subpartition_0004_01(jid int,jn int unique,name varchar2);
+create table t_subpartition_0004(jid int,jn int,name varchar2,foreign key(jn)references t_subpartition_0004_01(jn),primary key(jn))partition by hash (jid) subpartition by hash(jn)
+(partition hr1(subpartition hr11 ,subpartition hr12 ),partition hr2(subpartition hr21 ,subpartition hr22 ));
+--step11: 创建二级分区表，二级分区键作为外键约束和唯一约束为默认约束名; expect:成功
+drop table if exists t_subpartition_0004 cascade;
+drop table if exists t_subpartition_0004_01 cascade;
+create table if not exists t_subpartition_0004_01(jid int,jn int unique,name varchar2);
+create table t_subpartition_0004(jid int,jn int,name varchar2,foreign key(jn)references t_subpartition_0004_01(jn),unique(jn))partition by hash (jid) subpartition by hash(jn)
+(partition hr1(subpartition hr11 ,subpartition hr12 ),partition hr2(subpartition hr21 ,subpartition hr22 ));
+--step12: 创建二级分区表，作复合约束，主键约束一列，唯一约束两列; expect:成功
+drop table if exists t_subpartition_0004 cascade;
+create table t_subpartition_0004(jid int,jn int,name varchar2,primary key(jn),unique(jn,jid))partition by hash (jid) subpartition by hash(jn)
+(partition hr1(subpartition hr11 ,subpartition hr12 ),partition hr2(subpartition hr21 ,subpartition hr22 ));
+--step13: 创建二级分区表，作复合约束，唯一约束一列，主键约束两列; expect:成功
+drop table if exists t_subpartition_0004 cascade;
+create table t_subpartition_0004(jid int,jn int,name varchar2,unique(jn),primary key(jn,jid))partition by hash (jid) subpartition by hash(jn)
+(partition hr1(subpartition hr11 ,subpartition hr12 ),partition hr2(subpartition hr21 ,subpartition hr22 ));
+
+--step14: 删除表; expect:成功
+drop table if exists t_subpartition_0004 cascade;
+drop table if exists t_subpartition_0004_01 cascade;

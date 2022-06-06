@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -18,9 +18,9 @@ Case Name   : 使用jdbcpgbackup -m dump导出指定数据库下的unlogged表
 Description :
         1.创建工具目录
         2.获取工具安装包并解压
-        3.创建数据库
-        4.指定数据库下建用户，建unlogged表
-        5.修改信任方式为sha256
+        3.修改信任方式为sha256
+        4.创建数据库
+        5.指定数据库下建用户，建unlogged表
         6.导出指定数据库
         7.删除表后执行导入
         8.查看导入表
@@ -28,14 +28,13 @@ Description :
 Expect      :
         1.创建成功
         2.解压成功
-        3.创建成功
+        3.修改成功
         4.创建成功
-        5.修改成功
+        5.创建成功
         6.导出成功
         7.导入成功
         8.表导入成功，数据正确
         9.清理环境完成
-History     :
 """
 import os
 import unittest
@@ -94,7 +93,29 @@ class ToolsBackup(unittest.TestCase):
         self.assertIn(f"‘{self.package}/openGauss-tools-backup.tar.gz’ saved"
                       , result, '执行失败:' + text)
 
-        text = '---step3:创建数据库;expect:创建成功---'
+        text = '---step3:修改信任方式为sha256;expect:修改成功---'
+        self.log.info(text)
+        cmd = f"grep -nr '127.0.0.1/32' " \
+              f"{os.path.join(macro.DB_INSTANCE_PATH, 'pg_hba.conf')}"
+        self.log.info(cmd)
+        line = self.Primary_Node.sh(
+            cmd).result().splitlines()[0].split(':')[0]
+        self.log.info(line)
+        cmd = f'sed -i "{str(int(line)+1)} ihost   all     all ' \
+              f'{self.Primary_Node.db_host}/32   sha256" ' \
+              f'{os.path.join(macro.DB_INSTANCE_PATH, "pg_hba.conf")}; ' \
+              f'cat {os.path.join(macro.DB_INSTANCE_PATH, "pg_hba.conf")};'
+        self.log.info(cmd)
+        result = self.Primary_Node.sh(cmd).result()
+        self.log.info(result)
+        restart_msg = self.pri_sh.restart_db_cluster()
+        self.log.info(restart_msg)
+        status = self.pri_sh.get_db_cluster_status()
+        self.assertTrue("Degraded" in status or "Normal" in status)
+        self.assertIn(f'{self.Primary_Node.db_host}/32   sha256', result,
+                      '执行失败:' + text)
+
+        text = '---step4:创建数据库;expect:创建成功---'
         self.log.info(text)
         sql_cmd = self.pri_sh.execut_db_sql(f'''drop database if exists \
             {self.db_name};
@@ -103,7 +124,7 @@ class ToolsBackup(unittest.TestCase):
         self.assertIn(self.constant.CREATE_DATABASE_SUCCESS, sql_cmd,
                       '执行失败:' + text)
 
-        text = '---step4:创建测试用户;创建unlogged表;expect:创建成功---'
+        text = '---step5:创建测试用户;创建unlogged表;expect:创建成功---'
         self.log.info(text)
         sql_cmd = f'''drop user if exists {self.user};
             create user {self.user} with sysadmin \
@@ -119,24 +140,6 @@ class ToolsBackup(unittest.TestCase):
         self.assertIn(self.constant.CREATE_ROLE_SUCCESS_MSG, sql_result,
                       '执行失败:' + text)
         self.assertIn(self.constant.TABLE_CREATE_SUCCESS, sql_result,
-                      '执行失败:' + text)
-
-        text = '---step5:修改信任方式为sha256;expect:修改成功---'
-        self.log.info(text)
-        cmd = f"grep -nr '127.0.0.1/32' " \
-              f"{os.path.join(macro.DB_INSTANCE_PATH, 'pg_hba.conf')}"
-        self.log.info(cmd)
-        line = self.Primary_Node.sh(
-            cmd).result().splitlines()[0].split(':')[0]
-        self.log.info(line)
-        cmd = f'sed -i "{str(int(line)+1)} ihost   all     all ' \
-              f'{self.Primary_Node.db_host}/32   sha256" ' \
-              f'{os.path.join(macro.DB_INSTANCE_PATH, "pg_hba.conf")}; ' \
-              f'cat {os.path.join(macro.DB_INSTANCE_PATH, "pg_hba.conf")};'
-        self.log.info(cmd)
-        result = self.Primary_Node.sh(cmd).result()
-        self.log.info(result)
-        self.assertIn(f'{self.Primary_Node.db_host}/32   sha256', result,
                       '执行失败:' + text)
 
         text = '---step6:导出;expect:导出成功---'

@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -18,12 +18,15 @@ Case Name   : 使用gs_guc set方法设置参数TimeZone为Australia/South ,
               观察预期结果
 Description :
         1.查询TimeZone默认值
-        2.修改参数值为Australia/South并查询当前时间
-        3.恢复参数默认值
+        2.修改参数值为Australia/South
+        3.查询当前时间
+        4.清理环境
 Expect      :
         1.显示默认值为PRC
         2.设置成功当前时间显示北京时间
-        3.默认值恢复成功
+        3.时区修改成功，和系统表pg_timezone_names相对于UTC的偏移量一致
+        4.清理环境完成
+             故Australia/South时区的偏移量会变化
 """
 import unittest
 
@@ -31,49 +34,67 @@ from testcase.utils.CommonSH import CommonSH
 from testcase.utils.Constant import Constant
 from testcase.utils.Logger import Logger
 
-LOG = Logger()
-commonsh = CommonSH('dbuser')
-
 
 class ClientConnection(unittest.TestCase):
     def setUp(self):
-        LOG.info(
+        self.log = Logger()
+        self.log.info(
             '---Opengauss_Function_Guc_ClientConnection_Case0130start----')
         self.constant = Constant()
+        self.commonsh = CommonSH('dbuser')
 
     def test_TimeZone(self):
-        LOG.info('--步骤1:查看默认值--')
-        sql_cmd = commonsh.execut_db_sql(f'''show TimeZone;''')
-        LOG.info(sql_cmd)
+        text = '--步骤1:查看默认值;expect:默认值为PRC--'
+        self.log.info(text)
+        sql_cmd = self.commonsh.execut_db_sql(f'''show TimeZone;''')
+        self.log.info(sql_cmd)
         self.res = sql_cmd.splitlines()[-2].strip()
-        LOG.info('--步骤2:修改参数值为Australia/South并重启数据库--')
-        msg = commonsh.execute_gsguc('set',
-                                     self.constant.GSGUC_SUCCESS_MSG,
-                                     "TimeZone = 'Australia/South'")
-        LOG.info(msg)
+        text = '--步骤2:修改参数值为Australia/South并重启数据库;' \
+               'expect:修改成功--'
+        self.log.info(text)
+        msg = self.commonsh.execute_gsguc('set',
+                                          self.constant.GSGUC_SUCCESS_MSG,
+                                          "TimeZone = 'Australia/South'")
+        self.log.info(msg)
         self.assertTrue(msg)
-        msg = commonsh.restart_db_cluster()
-        LOG.info(msg)
-        status = commonsh.get_db_cluster_status()
-        self.assertTrue("Degraded" in status or "Normal" in status)
-        LOG.info('--步骤3:查询修改后的参数值--')
-        sql_cmd = commonsh.execut_db_sql('''show TimeZone;
-            select now();''')
-        LOG.info(sql_cmd)
-        self.assertIn('Australia/South', sql_cmd)
-        self.assertIn('+09:30', sql_cmd)
+        msg = self.commonsh.restart_db_cluster()
+        self.log.info(msg)
+        status = self.commonsh.get_db_cluster_status()
+        self.assertTrue("Degraded" in status or "Normal" in status,
+                        '执行失败:' + text)
+        text = '--步骤3:查询修改后的参数值;expect:时区修改成功，和系统表' \
+               'pg_timezone_names相对于UTC的偏移量一致--'
+        self.log.info(text)
+        sql_cmd = self.commonsh.execut_db_sql('''show TimeZone;''')
+        self.log.info(sql_cmd)
+        self.assertIn('Australia/South', sql_cmd, '执行失败:' + text)
+        sql_cmd = self.commonsh.execut_db_sql('''select now();''')
+        self.log.info(sql_cmd)
+        msg1 = sql_cmd.splitlines()[-2].strip()
+        self.log.info(msg1)
+        res1 = msg1.split('+')[-1]
+        self.log.info(res1)
+        sql_cmd = self.commonsh.execut_db_sql('''select * from  \
+            pg_timezone_names where name= 'Australia/South';''')
+        self.log.info(sql_cmd)
+        msg2 = sql_cmd.splitlines()[-2].strip()
+        self.log.info(msg2)
+        res2 = msg2.split('|')[-2].strip().replace(':00', '')
+        self.log.info(res2)
+        self.assertEqual(res1, res2, '执行失败:' + text)
 
     def tearDown(self):
-        LOG.info('--步骤4:清理环境--')
-        msg = commonsh.execute_gsguc('set',
-                                     self.constant.GSGUC_SUCCESS_MSG,
-                                     f"TimeZone='{self.res}'")
-        LOG.info(msg)
-        msg = commonsh.restart_db_cluster()
-        LOG.info(msg)
-        status = commonsh.get_db_cluster_status()
+        text = '--步骤4:清理环境;expect:清理环境完成--'
+        self.log.info(text)
+        msg = self.commonsh.execute_gsguc('set',
+                                          self.constant.GSGUC_SUCCESS_MSG,
+                                          f"TimeZone='{self.res}'")
+        self.log.info(msg)
+        msg = self.commonsh.restart_db_cluster()
+        self.log.info(msg)
+        status = self.commonsh.get_db_cluster_status()
         self.assertTrue("Degraded" in status or "Normal" in status)
-        sql_cmd = commonsh.execut_db_sql('''show TimeZone;''')
-        LOG.info(sql_cmd)
-        LOG.info(
+        sql_cmd = self.commonsh.execut_db_sql('''show TimeZone;''')
+        self.log.info(sql_cmd)
+        self.log.info(
             '--Opengauss_Function_Guc_ClientConnection_Case0130执行完成-----')

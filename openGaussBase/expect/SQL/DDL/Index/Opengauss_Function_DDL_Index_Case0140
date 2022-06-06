@@ -32,19 +32,24 @@ select relname from PG_PARTITION where parentid=(select relfilenode from pg_clas
 | p3      |
 | p4      |
 +---------+
+ALTER INDEX if exists index_140_01 RENAME PARTITION p1 TO p123456789013245678901324567890123456789012345678901234567890123;
 SQL SUCCESS
 select relname from PG_PARTITION where parentid=(select relfilenode from pg_class where relname='index_140_01') order by relname asc;
 +-----------------------------------------------------------------+
 | relname                                                         |
 +-----------------------------------------------------------------+
+| p12345678901324567890132456789012345678901234567890123456789012 |
 | p2                                                              |
 | p3                                                              |
 | p4                                                              |
 +-----------------------------------------------------------------+
+ALTER INDEX if exists index_140_01 RENAME PARTITION p123456789013245678901324567890123456789012345678901234567890123 TO p123456789013245678901324567890123456789012345678901234567890123456;
+?.*ERROR: partition index "p12345678901324567890132456789012345678901234567890123456789012" already exists
 select relname from PG_PARTITION where parentid=(select relfilenode from pg_class where relname='index_140_01') order by relname asc;
 +-----------------------------------------------------------------+
 | relname                                                         |
 +-----------------------------------------------------------------+
+| p12345678901324567890132456789012345678901234567890123456789012 |
 | p2                                                              |
 | p3                                                              |
 | p4                                                              |

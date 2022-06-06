@@ -80,6 +80,7 @@ select EXP(SYN_FUN_SYN_017_001(SYN_FUN_SYN_017_002(SYN_FUN_SYN_017_003(SYN_FUN_S
 +--------------------+
 | exp                |
 +--------------------+
+| 0.3678794411714423 |
 +--------------------+
 select SYN_FUN_SYN_017_001(EXP(SYN_FUN_SYN_017_002(SYN_FUN_SYN_017_003(SYN_FUN_SYN_017_004(-1))))) from sys_dummy;
 +---------------------+

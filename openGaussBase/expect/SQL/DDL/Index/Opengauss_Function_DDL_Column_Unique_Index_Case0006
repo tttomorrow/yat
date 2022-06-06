@@ -37,8 +37,8 @@ partition by range(id1)
 (partition part_1 values less than(1000),
  partition part_2 values less than(2000),
  partition part_3 values less than(maxvalue));
-?.*ERROR: Invalid PRIMARY KEY/UNIQUE constraint for partitioned table
-  Detail: Columns of PRIMARY KEY/UNIQUE constraint Must contain PARTITION KEY
+?.*ERROR: multiple primary keys for table "columnd_part_tab06" are not allowed
+?.*
 --清理环境
 drop table columns_tab06 cascade;
 SQL SUCCESS

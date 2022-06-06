@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -69,12 +69,13 @@ class Gstoolstestcase(unittest.TestCase):
                         "gs_upgradectl -t auto-upgrade -X XMLFILE "
                         "[-l LOGFILE] [--grey]",
                         "gs_upgradectl -t auto-rollback -X XMLFILE "
-                        "[-l LOGFILE] [--force]"]
+                        "[-l LOGFILE] [--force]",
+                        "Path of log file."]
             for con in con_list:
                 self.assertIn(con, result)
             LOGGER.info("参数核对")
             con_list = ["-?, --help", "-V, --version", "-t", "-X", "--force",
-                        "--grey"]
+                        "--grey", "-l"]
             for con in con_list:
                 self.assertIn(con, result)
 

@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -16,9 +16,9 @@ See the Mulan PSL v2 for more details.
 Case Type   : 数据库系统
 Case Name   : 备机stop后，判断延迟是否生效
 Description :
-
+    见云龙，脚本过大无法写入
 Expect      :
-
+    见云龙，脚本过大无法写入
 History     :
 """
 import unittest

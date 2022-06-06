@@ -3,6 +3,7 @@ drop table if exists proc_binary_table_004;
 SQL SUCCESS
 create table proc_binary_table_004(t1 int,t2 raw(100));
 SQL SUCCESS
+insert into proc_binary_table_004 values(1,'01fabd011365489000');
 SQL SUCCESS
 --创建存储过程
 create or replace procedure proc_binary_004() is
@@ -31,6 +32,7 @@ select * from proc_binary_table_004;
 +----+--------------------+----+
 | t1 | t2                 | t3 |
 +----+--------------------+----+
+| 1  | 01FABD011365489000 |    |
 +----+--------------------+----+
 --更新表中数据
 update proc_binary_table_004 set t3=t2 ,t2=null;
@@ -39,6 +41,7 @@ select * from proc_binary_table_004;
 +----+----+--------------------+
 | t1 | t2 | t3                 |
 +----+----+--------------------+
+| 1  |    | 01FABD011365489000 |
 +----+----+--------------------+
 --调用存储过程
 call proc_binary_004();
@@ -57,6 +60,7 @@ select * from proc_binary_table_004;
 +----+--------------------+--------------------+
 | t1 | t2                 | t3                 |
 +----+--------------------+--------------------+
+| 1  | 01fabd011365489000 | 01FABD011365489000 |
 +----+--------------------+--------------------+
 --删除表中t3lie
 alter table proc_binary_table_004 drop column t3;
@@ -65,6 +69,7 @@ select * from proc_binary_table_004;
 +----+--------------------+
 | t1 | t2                 |
 +----+--------------------+
+| 1  | 01fabd011365489000 |
 +----+--------------------+
 --清理环境
 drop table if exists proc_binary_table_004;

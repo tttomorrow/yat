@@ -39,6 +39,7 @@ create table SYN_TAB_002
 --插入数据
 begin
 	for i in 1..1000 loop
+		insert into SYN_TAB_002 values (i,i+1,'acdfbgkhbjklhlljnnohgjjgtvvdesaafgaeagacdtbfacdfbgkhbjklhlljnnohgjjgtvvdesaafgaeagacdtbfacdfbgkhbjklhlljnnohgjjgtvvdesaafgaeagacdtbfacdfbgkhbjklhlljnnohgjjgtvvdesaafgaeagacdtbf','16166316161a131661131311ada');
 	end loop;
 end;
 /

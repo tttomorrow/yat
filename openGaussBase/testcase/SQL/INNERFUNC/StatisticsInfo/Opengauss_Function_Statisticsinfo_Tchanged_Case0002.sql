@@ -17,6 +17,7 @@ ANALYZE sales;
 select pg_stat_get_tuples_changed(a.oid,a.oid) from PG_CLASS a where a.relname = 'sales';
 -- analyse 后插入数据 1
 INSERT INTO sales VALUES(1, 12, '2019-01-10 00:00:00', 'a', 1, 1, 1);
+select pg_stat_get_tuples_changed(99876523456789087654) from PG_CLASS a where a.relname = 'sales';
 -- analyse 后删除一行
 delete  from  sales  where channel_id = 'a';
 select pg_stat_get_tuples_changed('’*&^#$%^&*‘') from PG_CLASS a where a.relname = 'sales';

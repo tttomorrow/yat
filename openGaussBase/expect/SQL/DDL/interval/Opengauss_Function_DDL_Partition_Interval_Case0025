@@ -43,7 +43,7 @@ order by relname;
 insert into partition_table_001 values (5,'eee',5,'2020-06-23',true,'eee',5.5);
 SQL SUCCESS
 insert into partition_table_001 values (6,'fff',6,'2020-06-23',false,'fff',6.6);
-?.*ERROR: duplicate key value violates unique constraint "partition_table_001_col_4_tableoid_idx"
+?.*ERROR: duplicate key value violates unique constraint "partition_table_001_col_4_idx"
   Detail: Key (col_4)=(2020-06-23 00:00:00) already exists.
 drop table if exists common_table_001;
 SQL SUCCESS

@@ -38,22 +38,34 @@ explain select i from  hash_tb;
 ?.*
 ?.*QUERY PLAN.*
 ?.*
-?.*Bitmap Heap Scan on hash_tb?.*
-?.*Bitmap Index Scan on i_idx?.*
+?.*
+?.*
+?.*Partitioned Bitmap Heap Scan on hash_tb.*
+?.*
+?.*Partitioned Bitmap Index Scan on i_idx.*
+?.*
 ?.*
 explain select x from range_tb;
 ?.*
-?.*QUERY PLAN.*
+?.*QUERY PLAN .*
 ?.*
-?.*Bitmap Heap Scan on range_tb.*
-?.*Bitmap Index Scan on x_range_idx?.*
+?.*
+?.*
+?.*Partitioned Bitmap Heap Scan on range_tb.*
+?.*
+?.*Partitioned Bitmap Index Scan on x_range_idx.*
+?.*
 ?.*
 explain select x from list_tb;
 ?.*
 ?.*QUERY PLAN.*
 ?.*
-?.*Bitmap Heap Scan on list_tb.*
-?.*Bitmap Index Scan on x_list_idx.*
+?.*
+?.*
+?.*Partitioned Bitmap Heap Scan on list_tb.*
+?.*
+?.*Partitioned Bitmap Index Scan on x_list_idx.*
+?.*
 ?.*
 --tearDown
 drop table if exists hash_tb cascade;

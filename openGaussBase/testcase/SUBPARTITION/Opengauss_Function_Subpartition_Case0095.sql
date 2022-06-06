@@ -1,0 +1,120 @@
+-- @testpoint: list_range二级分区表：分区数1个/分区键非顺序指定,部分测试点合理报错
+
+--step1: 创建表空间; expect:成功
+drop table if exists t_subpartition_0095;
+drop tablespace if exists ts_subpartition_0095;
+create tablespace ts_subpartition_0095 relative location 'subpartition_tablespace/subpartition_tablespace_0095';
+
+--test2: 分区数--1个
+--step2: 创建二级分区表,一级分区数和二级分区数各1个; expect:成功
+drop table if exists t_subpartition_0095;
+create   table if not exists t_subpartition_0095
+(
+    col_1 int ,
+    col_2 int  ,
+	col_3 int ,
+    col_4 int
+)
+tablespace ts_subpartition_0095
+partition by list (col_1) subpartition by range (col_2)
+(
+ partition p_list_1 values(-1,-2,-3,-4,-5,-6,-7,-8,-9,-10 )
+  (
+    subpartition p_range_1_1 values less than( -10 )
+)
+) enable row movement;
+--step3: 查询分区信息; expect:成功
+select relname, parttype, partstrategy, indisusable ,boundaries from pg_partition where parentid = (select oid from pg_class where relname = 't_subpartition_0095') order by relname;
+select a.relname,a.parttype,a.partstrategy,a.indisusable from pg_partition a,(select oid from pg_partition
+where parentid = (select oid from pg_class where relname = 't_subpartition_0095')) b where a.parentid = b.oid order by a.relname;
+
+--step4: 插入数据; expect:成功
+insert into t_subpartition_0095 values(-8,-18,1);
+--step5: 查询数据; expect:成功
+select * from t_subpartition_0095;
+--step6: 查询二级分区数据; expect:成功
+select * from t_subpartition_0095 subpartition (p_range_1_1);
+
+--step7: 创建二级分区表,一级分区数1个，二级分区数0; expect:成功
+drop table if exists t_subpartition_0095;
+create   table if not exists t_subpartition_0095
+(
+    col_1 int ,
+    col_2 int  ,
+	col_3 int ,
+    col_4 int
+)
+tablespace ts_subpartition_0095
+partition by list (col_1) subpartition by range (col_2)
+(
+ partition p_list_1 values(-1,-2,-3,-4,-5,-6,-7,-8,-9,-10 )
+ ) enable row movement;
+--step8: 查询分区信息; expect:成功
+select relname, parttype, partstrategy, indisusable from pg_partition where parentid = (select oid from pg_class where relname = 't_subpartition_0095') order by relname;
+select a.relname,a.parttype,a.partstrategy,a.indisusable from pg_partition a,(select oid from pg_partition
+where parentid = (select oid from pg_class where relname = 't_subpartition_0095')) b where a.parentid = b.oid order by a.relname;
+--step9: 插入数据; expect:成功
+insert into t_subpartition_0095 values(-1,-1,-1,1),(-5,5,5,5),(-8,8,8,8),(-9,9,9,9);
+--step10: 插入不在分区范围内的数据; expect:合理报错
+insert into t_subpartition_0095 values(11,1,1,1),(15,5,5,5),(18,8,8,8),(19,9,9,9);
+--step11: 插入不在分区范围内的数据; expect:合理报错
+insert into t_subpartition_0095 values(-21,1,1,1),(-25,5,5,5),(-28,8,8,8),(-29,9,9,9);
+--step12: 查询一级分区数据; expect:成功
+select * from t_subpartition_0095 partition(p_list_1);
+--step13: 查询二级分区default数据; expect:成功
+select * from t_subpartition_0095 subpartition(p_list_1_subpartdefault1);
+
+--test3: 分区键--非顺序指定
+--step14: 创建二级分区表,一级分区键非顺序指定; expect:成功
+drop table if exists t_subpartition_0095;
+CREATE   TABLE IF NOT EXISTS t_subpartition_0095
+(
+    col_1 int ,
+    col_2 int  ,
+	col_3 int ,
+    col_4 int ,
+	col_19 int
+)
+tablespace ts_subpartition_0095
+PARTITION BY list (col_19) SUBPARTITION BY range (col_2)
+(
+ PARTITION p_list_1 VALUES(-1,-2,-3,-4,-5,-6,-7,-8,-9,-10 )
+  (
+    SUBPARTITION p_range_1_1 VALUES LESS THAN( -10 ),
+    SUBPARTITION p_range_1_2 VALUES LESS THAN( 0 ),
+    SUBPARTITION p_range_1_3 VALUES LESS THAN( 10 ),
+    SUBPARTITION p_range_1_4 VALUES LESS THAN( 20 ),
+    SUBPARTITION p_range_1_5 VALUES LESS THAN( 50 )
+  ),
+  PARTITION p_list_2 VALUES(1,2,3,4,5,6,7,8,9,10 ),
+  PARTITION p_list_3 VALUES(11,12,13,14,15,16,17,18,19,20)
+  (
+    SUBPARTITION p_range_3_1 VALUES LESS THAN( 15 ),
+    SUBPARTITION p_range_3_2 VALUES LESS THAN( MAXVALUE )
+  ),
+    PARTITION p_list_4 VALUES(21,22,23,24,25,26,27,28,29,30)
+  (
+    SUBPARTITION p_range_4_1 VALUES LESS THAN( -10 ),
+    SUBPARTITION p_range_4_2 VALUES LESS THAN( 0 ),
+    SUBPARTITION p_range_4_3 VALUES LESS THAN( 10 ),
+    SUBPARTITION p_range_4_4 VALUES LESS THAN( 20 ),
+    SUBPARTITION p_range_4_5 VALUES LESS THAN( 50 )
+  ),
+   PARTITION p_list_5 VALUES(31,32,33,34,35,36,37,38,39,40)
+  (
+    SUBPARTITION p_range_5_1 VALUES LESS THAN( MAXVALUE )
+  ),
+   PARTITION p_list_6 VALUES(41,42,43,44,45,46,47,48,49,50)
+   (
+    SUBPARTITION p_range_6_1 VALUES LESS THAN( -10 ),
+    SUBPARTITION p_range_6_2 VALUES LESS THAN( 0 ),
+    SUBPARTITION p_range_6_3 VALUES LESS THAN( 10 ),
+    SUBPARTITION p_range_6_4 VALUES LESS THAN( 20 ),
+    SUBPARTITION p_range_6_5 VALUES LESS THAN( 50 )
+   ),
+   PARTITION p_list_7 VALUES(default)
+) ENABLE ROW MOVEMENT;
+
+--step15: 清理环境; expect:成功
+drop table if exists t_subpartition_0095;
+drop tablespace if exists ts_subpartition_0095;

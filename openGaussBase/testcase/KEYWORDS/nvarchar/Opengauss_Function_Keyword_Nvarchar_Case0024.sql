@@ -1,0 +1,50 @@
+-- @testpoint: opengauss关键字nvarchar(非保留)，作为存储过程名,部分测试点合理报错
+--step1:关键字不带引号;expect:合理报错
+create or replace  procedure nvarchar(
+section     number(6),
+salary_sum out number(8,2),
+staffs_count out integer)
+is
+begin
+   select sum(salary), count(*) into salary_sum, staffs_count from staffs where section_id = section;
+end;
+/
+
+--step2:关键字带双引号;expect:成功
+create or replace  procedure "nvarchar"(
+section     number(6),
+salary_sum out number(8,2),
+staffs_count out integer)
+is
+begin
+   select sum(salary), count(*) into salary_sum, staffs_count from staffs where section_id = section;
+end;
+/
+
+--step3:清理环境;expect:成功
+drop procedure if exists "nvarchar"(section numeric, out salary_sum numeric, out staffs_count integer);
+
+--step4:关键字带单引号;expect:合理报错
+create or replace  procedure 'nvarchar'(
+section     number(6),
+salary_sum out number(8,2),
+staffs_count out integer)
+is
+begin
+   select sum(salary), count(*) into salary_sum, staffs_count from staffs where section_id = section;
+end;
+/
+
+--step5:关键字带反引号;expect:合理报错
+create or replace  procedure `nvarchar`(
+section     number(6),
+salary_sum out number(8,2),
+staffs_count out integer)
+is
+begin
+   select sum(salary), count(*) into salary_sum, staffs_count from staffs where section_id = section;
+end;
+/
+
+
+

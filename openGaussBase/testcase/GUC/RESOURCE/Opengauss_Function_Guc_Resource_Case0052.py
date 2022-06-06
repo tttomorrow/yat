@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -17,6 +17,7 @@ Case Type   : GUC
 Case Name   : 修改参数sql_use_spacelimit为其他数据类型，观察预期结果；
 Description :
          1、查询sql_use_spacelimit默认值；
+         2、修改sql_use_spacelimit为false，"test",999999999、空值等，并校验其预期结果；
 Expect      :
         1、显示默认值；
         2、参数修改失败；
@@ -66,6 +67,8 @@ class Deletaduit(unittest.TestCase):
         sql_cmd = self.commonsh.execut_db_sql(f'''show sql_use_spacelimit;''')
         self.log.info(sql_cmd)
         self.assertIn(self.res, sql_cmd)
+        # 使用设置gs_guc set设置sql_use_spacelimit为9999999999
+        msg = self.commonsh.execute_gsguc('set', self.Constant.GSGUC_SUCCESS_MSG, 'sql_use_spacelimit=9999999999')
         self.log.info(msg)
         self.assertFalse(msg)
         msg = self.commonsh.restart_db_cluster()

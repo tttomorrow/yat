@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -59,6 +59,8 @@ class Function(unittest.TestCase):
         self.assertTrue(gsql1 != gsql2)
         self.log.info('------------校验PG_OS_THREADS各字段类型------------')
         gsql = list(map(lambda s: s.strip(), gsql2.split('|')))
+        self.assertTrue(0 < int(gsql[1]) < 9223372036854775807)  # bigint
+        self.assertTrue(0 < int(gsql[2]) < 2147483647)  # integer
         gsql2_time = gsql[-1].strip()
         cmd2 = f"select '{now}'::timestamp - '{gsql2_time}'::timestamp;"
         msg2 = self.commonsh.execut_db_sql(cmd2)

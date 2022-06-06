@@ -20,7 +20,13 @@ select func_add_sql(3,7);
 +--------------+
 | 10           |
 +--------------+
-SELECT pg_sleep(2);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+
@@ -38,7 +44,13 @@ select pg_stat_reset();
 +---------------+
 |               |
 +---------------+
-SELECT pg_sleep(2);
+SELECT pg_sleep(6);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+SELECT pg_sleep(6);
 +----------+
 | pg_sleep |
 +----------+

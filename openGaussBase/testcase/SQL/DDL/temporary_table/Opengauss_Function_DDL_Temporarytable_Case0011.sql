@@ -1,4 +1,5 @@
 -- @testpoint: 同时新增多列，数据类型包含blob、clob类型
+-- @modify at: 2020-11-23
 --建表
 drop table if exists temp_table_alter_011;
 create global temporary table temp_table_alter_011(c_id int, c_integer integer,c_real real,c_float float, c_double binary_double

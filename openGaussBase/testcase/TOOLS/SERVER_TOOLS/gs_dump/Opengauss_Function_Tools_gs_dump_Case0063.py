@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -14,88 +14,100 @@ See the Mulan PSL v2 for more details.
 """
 """
 Case Type   : 服务端工具
-Case Name   : 转储数据需用AES128进行加密，但不指定密钥
+Case Name   : 导出数据需用AES128进行加密，不指定密钥
 Description :
-    1.连接数据库
-    2.创建数据库test
-    3.切换到数据库test
-    4.创建表插入数据
-    5.退出数据库
-    6.source环境变
-    7.转储数据需用AES128进行加密，但不指定密钥
-    8.连接数据库，清理环境
+    1.创建测试数据
+    2.导出数据需用AES128进行加密，不指定密钥
+    3.清理环境
 Expect      :
-    1.数据库连接成功
-    2.创建数据库test成功
-    3.切换到数据库test
-    4.创建表成功
-    5.创建视图成功
-    6.source环境变量
-    7.导出失败
-    8.清理环境成功
+    1.创建测试数据成功
+    2.输入密码后导出成功
+    3.清理环境成功
 History     :
+    modified：2022/1/11 by 5318639 优化用例适配新代码
 """
 
+import os
 import unittest
 
-from testcase.utils.Constant import Constant
-from testcase.utils.Logger import Logger
 from yat.test import Node
 from yat.test import macro
 
-LOG = Logger()
+from testcase.utils.Constant import Constant
+from testcase.utils.Logger import Logger
 
 
 class Tools(unittest.TestCase):
     def setUp(self):
-        LOG.info('----opengauss_function_tools_gs_dump_case0063start------')
+        self.log = Logger()
+        self.log.info(
+            '----opengauss_function_tools_gs_dump_case0063_start----')
         self.dbuser_node = Node('dbuser')
         self.constant = Constant()
+        self.assert_msg = f'have been dumped'
+        self.key = f'12345qazxs!'
+        self.db_name = 'db_dump_0063'
+        self.t_name = 't_dump_0063'
 
     def test_server_tools(self):
-        LOG.info('----------------连接数据库并创建数据库----------------')
-        sql_cmd1 = '''          drop database if exists test;
-                                create database test;
-                                '''
-        excute_cmd1 = f'''      source {macro.DB_ENV_PATH} ;
-                                gsql -d {self.dbuser_node.db_name}\
-                                -p {self.dbuser_node.db_port} -c "{sql_cmd1}"
-                                        '''
-        LOG.info(excute_cmd1)
+        text = '----step1:创建测试数据;expect:创建成功----'
+        self.log.info(text)
+        text = '-----step1.1:连接数据库并创建数据库;expect:数据库创建成功-----'
+        self.log.info(text)
+        sql_cmd1 = f'drop database if exists {self.db_name};' \
+            f'create database {self.db_name};'
+        excute_cmd1 = f'source {macro.DB_ENV_PATH};' \
+            f'gsql -d {self.dbuser_node.db_name} ' \
+            f'-p {self.dbuser_node.db_port} ' \
+            f'-c "{sql_cmd1}"'
+        self.log.info(excute_cmd1)
         msg1 = self.dbuser_node.sh(excute_cmd1).result()
-        LOG.info(msg1)
-        self.assertIn(self.constant.CREATE_DATABASE_SUCCESS, msg1)
-        LOG.info('-----在创建好的数据库中创建表插入数据----')
-        sql_cmd2 = ''' 
-                        drop table  if exists t1;
-                        create table t1 (i int,d int );
-                        insert into t1 values(1,2),(2,3),(3,4);
-                        '''
-        excute_cmd2 = f'''source {macro.DB_ENV_PATH} ;
-        gsql -d test -p {self.dbuser_node.db_port} -c "{sql_cmd2}"
-                                        '''
-        LOG.info(excute_cmd2)
+        self.log.info(msg1)
+        self.assertIn(self.constant.CREATE_DATABASE_SUCCESS, msg1,
+                      '执行失败:' + text)
+        text = '-----step1.2:在创建好的数据库中创建表插入数据;expect:数据库插入成功-----'
+        self.log.info(text)
+        sql_cmd2 = f''' 
+                drop table  if exists {self.t_name};
+                create table {self.t_name} (i int,d int );
+                insert into {self.t_name} values(1,2),(2,3),(3,4);
+                '''
+        excute_cmd2 = f'source {macro.DB_ENV_PATH};' \
+            f'gsql -d {self.db_name} ' \
+            f'-p {self.dbuser_node.db_port} ' \
+            f'-c "{sql_cmd2}"'
+        self.log.info(excute_cmd2)
         msg2 = self.dbuser_node.sh(excute_cmd2).result()
-        LOG.info(msg2)
-        self.assertIn(self.constant.INSERT_SUCCESS_MSG, msg2)
-        LOG.info('-----转储数据需用AES128进行加密，但不指定密钥-----')
-        excute_cmd3 = f'''source {macro.DB_ENV_PATH} ;
-        gs_dump -p {self.dbuser_node.db_port} test -F p\
-        --with-encryption=AES128;
-                      '''
-        LOG.info(excute_cmd3)
-        msg3 = self.dbuser_node.sh(excute_cmd3).result()
-        LOG.info(msg3)
-        self.assertIn('No key for encryption,please input the key', msg3)
+        self.log.info(msg2)
+        self.assertIn(self.constant.INSERT_SUCCESS_MSG, msg2, '执行失败:' + text)
+
+        text = '----step2:导出数据需用AES128进行加密，不指定密钥;expect:导出成功----'
+        self.log.info(text)
+        dump_cmd = f'''source {macro.DB_ENV_PATH};
+                expect <<EOF
+                set timeout -1
+                spawn gs_dump -p {self.dbuser_node.db_port} \
+                {self.db_name} --with-encryption=AES128
+                expect "*Key:"
+                send "{macro.GAUSSDB_INIT_USER_PASSWD}\n"
+                expect eof\n''' + "EOF"
+        self.log.info(dump_cmd)
+        dump_result = self.dbuser_node.sh(dump_cmd).result()
+        self.log.info(dump_result)
+        self.assertIn(self.assert_msg, dump_result, '执行失败:' + text)
 
     def tearDown(self):
-        LOG.info('-----------------清理环境：删除数据库-----------------')
-        sql_cmd4 = '''  drop database if exists test; '''
+        text = '----step3:清理环境;expect:清理成功----'
+        self.log.info(text)
+        sql_cmd4 = f'drop database if exists {self.db_name};'
         excute_cmd4 = f'''source {macro.DB_ENV_PATH} ;
-                        gsql -d {self.dbuser_node.db_name}\
-                        -p {self.dbuser_node.db_port} -c "{sql_cmd4}";
-                                       '''
-        LOG.info(excute_cmd4)
+                gsql -d {self.dbuser_node.db_name}\
+                -p {self.dbuser_node.db_port} -c "{sql_cmd4}";
+                '''
+        self.log.info(excute_cmd4)
         msg4 = self.dbuser_node.sh(excute_cmd4).result()
-        LOG.info(msg4)
-        LOG.info('----opengauss_function_tools_gs_dump_case0063finish----')
+        self.log.info(msg4)
+        self.assertIn(self.constant.DROP_DATABASE_SUCCESS, msg4,
+                      '执行失败:' + text)
+        self.log.info(
+            '----opengauss_function_tools_gs_dump_case0063_finish----')

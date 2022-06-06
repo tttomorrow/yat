@@ -10,7 +10,7 @@ SQL SUCCESS
 --error
 insert into table_alter_014(ad) values (3);
 ?.*ERROR: new row for relation "table_alter_014" violates check constraint "table_alter_014_check".*
-  Detail: Failing row contains (null, 3, null).
+  Detail: N/A
 alter table table_alter_014 drop constraint table_alter_014_check;
 SQL SUCCESS
 insert into table_alter_014(ad) values(1);

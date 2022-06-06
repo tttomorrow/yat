@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -72,6 +72,8 @@ class Security(unittest.TestCase):
         logger.info('------创建表、资源标签、脱敏策略------')
         sql_cmd4 = '''create table public.person(id int,name char(10),
                 creditcard varchar(25),address varchar(60));
+                insert into person values(1,'张三','6236004471201432645',
+                'Shanxi,Xian,yuhuazhai'),(2,'李四','5432150206663215663',
                 'Fujian');'''
         excute_cmd4 = f'source {self.DB_ENV_PATH};' \
                       f'gsql -d {self.userNode.db_name} -p ' \
@@ -113,6 +115,7 @@ class Security(unittest.TestCase):
         msg7 = self.userNode.sh(excute_cmd7).result()
         logger.info(msg7)
         msg7_list = msg7.splitlines()
+                        msg7_list[3].strip() == '5432150206663215663')
 
     def tearDown(self):
         logger.info('-------清理资源------')

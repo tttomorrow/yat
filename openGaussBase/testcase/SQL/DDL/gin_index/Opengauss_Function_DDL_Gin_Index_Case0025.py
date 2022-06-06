@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -12,51 +12,59 @@ EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
 MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 See the Mulan PSL v2 for more details.
 """
+"""
+Case Type   : 基础功能
+Case Name   : 设置gin_fuzzy_search_limit为异常值
+Description :
+    1.设置gin_fuzzy_search_limit=-1
+    2.设置gin_fuzzy_search_limit=2147483648
+Expect      :
+    1.设置失败
+    2.设置失败
+History     :
+"""
 
-'''
-
-Case Type： 数据库系统
-Case Name： 设置gin_fuzzy_search_limit为异常值
-Case No:    Opengauss_Gin_Index_0024
-Descption:  1.设置gin_fuzzy_search_limit=2 2.重启数据库3.执行Opengauss_Gin_Index_0024.sql脚本
-
-history：
-'''
-import os
 import unittest
+import os
 from yat.test import Node
-import time
-import _thread
-import queue
-from yat.test import macro
-import sys
-sys.path.append(sys.path[0] + "/../")
 from testcase.utils.Logger import Logger
-from testcase.utils.Constant import Constant
 from testcase.utils.Common import Common
 from testcase.utils.CommonSH import CommonSH
+from testcase.utils.Constant import Constant
 logger = Logger()
 common = Common()
-TPCC_RES = queue.Queue()
 
 
 class set_search_limit(unittest.TestCase):
-
     dbPrimaryUserNode = Node(node='PrimaryDbUser')
     dbPrimaryRootNode = Node(node='PrimaryRoot')
-    FUZZY_SEARCH_LIMIT_MSG = Constant.FUZZY_SEARCH_LIMIT_MSG
     commsh = CommonSH('PrimaryDbUser')
 
     def setUp(self):
         logger.info("-----------this is setup-----------")
-        logger.info("-----------Opengauss_Gin_Index_0024 start-----------")
+        logger.info(f"-{os.path.basename(__file__)[:-3]}  start---")
+        self.constant = Constant()
 
     def test_set_search_limit(self):
-        logger.info("-----------gin_fuzzy_search_limit=-1-----------")
-        self.commsh.execute_gsguc('set', self.FUZZY_SEARCH_LIMIT_MSG, 'gin_fuzzy_search_limit=-1')
-        
-        
+        text = "--step1:设置gin_fuzzy_search_limit=-1 expect:设置失败--"
+        logger.info(text)
+        result = self.commsh.execute_gsguc('set', '',
+                                           'gin_fuzzy_search_limit=-1',
+                                           get_detail=True)
+        logger.info(result)
+        self.assertIn(self.constant.SQL_WRONG_MSG[1], result, "执行失败"+text)
+        self.assertIn(self.constant.FUZZY_SEARCH_LIMIT_MSG,
+                      result, "执行失败"+text)
+        text = "--step2:设置gin_fuzzy_search_limit=2147483648 expect:设置失败--"
+        logger.info(text)
+        result = self.commsh.execute_gsguc(
+            'set', '', 'gin_fuzzy_search_limit=2147483648', get_detail=True)
+        logger.info(result)
+        self.assertIn(self.constant.SQL_WRONG_MSG[1], result, "执行失败" + text)
+        self.assertIn(self.constant.FUZZY_SEARCH_LIMIT_MSG,
+                      result, "执行失败" + text)
 
     def tearDown(self):
         logger.info('----------------this is tearDown-----------------------')
+        logger.info(f"-{os.path.basename(__file__)[:-3]}  end---")
         

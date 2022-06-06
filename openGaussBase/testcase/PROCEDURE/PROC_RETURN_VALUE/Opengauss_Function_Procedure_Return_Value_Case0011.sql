@@ -14,6 +14,7 @@ create table table_004(
 
 create unique index  indx_t41 on table_004(t1);
 create index indx_t42 on table_004(t2);
+insert into table_004 values(0,-9223372036854775808,9223372036854775807,-2147483648,2147483647,21474836469065,9223372036854775807.00,-0.001);
 
 --创建存储过程
 create or replace procedure proc_return_value_011  as

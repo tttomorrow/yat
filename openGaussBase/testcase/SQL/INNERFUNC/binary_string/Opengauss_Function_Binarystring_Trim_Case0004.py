@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -84,7 +84,9 @@ class byte_string_function(unittest.TestCase):
         Normal_SqlMdg3 = self.commonsh.execut_db_sql("""SELECT trim(lpad('open', 5000, 'gauss') from lpad('open', 18, 'gauss')) AS RESULT;""")
         logger.info(Normal_SqlMdg3)
         self.assertTrue(Normal_SqlMdg3.splitlines()[2].strip() == '')
+        Normal_SqlMdg2 = self.commonsh.execut_db_sql("""SELECT trim(left('HABCDEFGHIJK', 6)::TEXT from rawcat(left('0ABCDEFGHIJK', 6)::RAW,'0123456789'::RAW)::TEXT) AS RESULT;""")
         logger.info(Normal_SqlMdg2)
+        self.assertTrue(Normal_SqlMdg2.splitlines()[2].strip(' ') == '0ABCDE0123456789')
 
     def tearDown(self):
 

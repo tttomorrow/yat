@@ -1,0 +1,132 @@
+-- @testpoint: 重复truncate清空同一张表
+--step1: 查询enable_recyclebin默认值; expect:显示默认值off
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+
+--step2: 修改enable_recyclebin为on; expect:修改成功
+alter system set enable_recyclebin to on;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| on                |
++-------------------+
+--step3: 清除回收站; expect:回收站清除成功
+purge recyclebin;
+SQL SUCCESS
+--step4: 创建表、插入数据并truncate表; expect:表创建成功、数据插入成功且表清空成功
+drop table if exists t_timecapsule_0012;
+SQL SUCCESS
+create table t_timecapsule_0012(a int);
+SQL SUCCESS
+insert into t_timecapsule_0012 values(1);
+SQL SUCCESS
+truncate table t_timecapsule_0012;
+SQL SUCCESS
+--step5: 在回收站中统计原始对象名称t_timecapsule_0012和操作类型为truncate; expect:预期结果为1
+select count(*) from gs_recyclebin where rcyoriginname = 't_timecapsule_0012' and rcyoperation = 't';
++-------+
+| count |
++-------+
+| 1     |
++-------+
+--step6: 向插入数据并清空表; expect:数据插入成功且表清空成功
+insert into t_timecapsule_0012 values(2);
+SQL SUCCESS
+truncate table t_timecapsule_0012;
+SQL SUCCESS
+--step7: 在回收站中统计名称t_timecapsule_0012和操作类型为truncate; expect:预期结果为2
+select count(*) from gs_recyclebin where rcyoriginname = 't_timecapsule_0012' and rcyoperation = 't';
++-------+
+| count |
++-------+
+| 2     |
++-------+
+--step8: 向表插入数据并清空表; expect:数据插入成功且表删除成功
+insert into t_timecapsule_0012 values(3);
+SQL SUCCESS
+truncate table t_timecapsule_0012;
+SQL SUCCESS
+--step9: 在回收站中统计名称t_timecapsule_0012和操作类型为truncate; expect:预期结果为3
+select count(*) from gs_recyclebin where rcyoriginname = 't_timecapsule_0012' and rcyoperation = 't';
++-------+
+| count |
++-------+
+| 3     |
++-------+
+--step10: 执行闪回truncate; expect:闪回成功
+timecapsule table t_timecapsule_0012 to before truncate;
+SQL SUCCESS
+--step11: 在回收站中统计名称t_timecapsule_0012和操作类型为truncate; expect:预期结果为3
+select count(*) from gs_recyclebin where rcyoriginname = 't_timecapsule_0012' and rcyoperation = 't';
++-------+
+| count |
++-------+
+| 3     |
++-------+
+--step12: 查询闪回后的表; expect:显示值为1与预期结果一致
+select * from t_timecapsule_0012 order by a;
++---+
+| a |
++---+
+| 1 |
++---+
+--step13: 执行闪回truncate; expect:闪回成功
+timecapsule table t_timecapsule_0012 to before truncate;
+SQL SUCCESS
+--step14: 查询闪回后的表; expect:显示值为2与预期结果一致
+select * from t_timecapsule_0012 order by a;
++---+
+| a |
++---+
+| 2 |
++---+
+--step15: 执行闪回truncate; expect:闪回成功
+timecapsule table t_timecapsule_0012 to before truncate;
+SQL SUCCESS
+--step16: 查询闪回后的表; expect:显示值为3与预期结果一致
+select * from t_timecapsule_0012 order by a;
++---+
+| a |
++---+
+| 3 |
++---+
+--step17: 执行闪回truncate; expect:闪回成功
+timecapsule table t_timecapsule_0012 to before truncate;
+SQL SUCCESS
+--step18: 查询闪回后的表; expect:查询结果为空
+select * from t_timecapsule_0012 order by a;
++---+
+| a |
++---+
++---+
+--step19: 清理环境; expect:清理成功
+drop table if exists t_timecapsule_0012 purge;
+SQL SUCCESS
+purge recyclebin;
+SQL SUCCESS
+--step20: 恢复默认值; expect:默认值恢复成功
+alter system set enable_recyclebin to off;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+

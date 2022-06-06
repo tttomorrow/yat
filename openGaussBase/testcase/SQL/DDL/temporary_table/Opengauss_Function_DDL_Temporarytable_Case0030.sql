@@ -1,4 +1,5 @@
 -- @testpoint: 删除主外键约束，添加cascade constraints参数
+-- @modify at: 2020-11-24
 --创建全局临时表1
 drop table if exists temp_table_030;
 create global temporary table temp_table_030(

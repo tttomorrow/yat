@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -116,7 +116,7 @@ class Gpcclass(unittest.TestCase):
             f"select * from {self.tb_name1} where i<\$1;' "
         result = self.commonshpri.execut_db_sql(cmd)
         self.log.info(result)
-        self.assertIn('(1 row)', result)
+        self.assertIn('(0 rows)', result)
 
         self.log.info("------------9.创建prepare语句5.执行prepare-------------")
         cmd = f"prepare {self.pre_name}(int, int) as " \

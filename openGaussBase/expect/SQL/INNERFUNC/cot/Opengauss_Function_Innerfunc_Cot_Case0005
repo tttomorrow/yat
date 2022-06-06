@@ -21,6 +21,8 @@ select distinct cot(b) from cos_test_01 order by cot(b);
 +---------------------+
 | cot                 |
 +---------------------+
+| -0.6420926159343306 |
+| 0.6420926159343306  |
 +---------------------+
 drop table if exists cos_test_01;
 SQL SUCCESS

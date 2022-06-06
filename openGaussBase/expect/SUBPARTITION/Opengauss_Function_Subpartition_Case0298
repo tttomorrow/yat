@@ -1,0 +1,173 @@
+-- @testpoint: range_range二级分区表：自治事务/匿名块
+--step1: 创建表空间; expect:成功
+drop table if exists t_subpartition_0298;
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0298;
+SQL SUCCESS
+create tablespace ts_subpartition_0298 relative location 'subpartition_tablespace/subpartition_tablespace_0298';
+SQL SUCCESS
+--test1: 自治事务
+--step2: 创建二级分区表; expect:成功
+create table t_subpartition_0298
+(
+    col_1 int ,
+    col_2 int ,
+    col_3 varchar2 ( 30 ) ,
+    col_4 int
+)
+tablespace ts_subpartition_0298
+partition by range (col_1) subpartition by range (col_2)
+(
+  partition p_range_1 values less than( 10 )
+  (
+    subpartition p_range_1_1 values less than( 50 ),
+    subpartition p_range_1_2 values less than( maxvalue )
+  ),
+  partition p_range_2 values less than( 80 )
+  (
+    subpartition p_range_2_1 values less than( 50 ),
+    subpartition p_range_2_2 values less than( maxvalue )
+  )
+);
+SQL SUCCESS
+--step3: 插入数据; expect:成功
+insert into t_subpartition_0298 values(1,2);
+SQL SUCCESS
+--step4: 查询数据; expect:成功
+select * from t_subpartition_0298;
++-------+-------+-------+-------+
+| col_1 | col_2 | col_3 | col_4 |
++-------+-------+-------+-------+
+| 1     | 2     |       |       |
++-------+-------+-------+-------+
+--step5: 创建包含自治事务的存储过程; expect:成功
+drop function if exists autonomous_4();
+SQL SUCCESS
+create or replace procedure autonomous_4(a int, b int) as
+declare
+num3 int := a;
+num4 int := b;
+pragma autonomous_transaction;
+begin
+insert into t_subpartition_0298 values(num3, num4);
+end;
+/
+SQL SUCCESS
+--step6: 创建调用自治事务存储过程的普通存储过程; expect:成功
+drop function if exists autonomous_5();
+SQL SUCCESS
+create or replace procedure autonomous_5(a int, b int) as
+declare
+begin
+insert into t_subpartition_0298 values(66, 66);
+autonomous_4(a,b);
+rollback;
+end;
+/
+SQL SUCCESS
+--step7: 调用普通存储过程; expect:成功
+select autonomous_5(11,22);
++--------------+
+| autonomous_5 |
++--------------+
+|              |
++--------------+
+--step8: 查看表结果; expect:成功,2条数据
+select * from t_subpartition_0298 order by col_1;
++-------+-------+-------+-------+
+| col_1 | col_2 | col_3 | col_4 |
++-------+-------+-------+-------+
+| 1     | 2     |       |       |
+| 11    | 22    |       |       |
++-------+-------+-------+-------+
+--step9: 删除函数; expect:成功
+drop function if exists autonomous_4();
+SQL SUCCESS
+drop function if exists autonomous_5();
+SQL SUCCESS
+--test2: 匿名块
+--step10: 创建匿名块; expect:成功
+start transaction;
+SQL SUCCESS
+declare
+pragma autonomous_transaction;
+begin
+insert into t_subpartition_0298 values(1,2,'you are so cute,will commit!');
+end;
+/
+SQL SUCCESS
+--step11: 插入数据; expect:成功
+insert into t_subpartition_0298 values(1,4,'you will rollback!');
+SQL SUCCESS
+--step12: 回滚当前事务并取消当前事务中的所有更新; expect:成功
+rollback;
+SQL SUCCESS
+--step13: 查询数据; expect:成功,3条数据
+select * from t_subpartition_0298;
++-------+-------+------------------------------+-------+
+| col_1 | col_2 | col_3                        | col_4 |
++-------+-------+------------------------------+-------+
+| 1     | 2     |                              |       |
+| 1     | 2     | you are so cute,will commit! |       |
+| 11    | 22    |                              |       |
++-------+-------+------------------------------+-------+
+--test3: 函数
+--step14: 创建函数; expect:成功
+drop function if exists autonomous_32();
+SQL SUCCESS
+create or replace function autonomous_32(a int ,b int ,c text) return int as
+declare
+pragma autonomous_transaction;
+begin
+insert into t_subpartition_0298 values(a, b, c);
+return 1;
+end;
+/
+SQL SUCCESS
+--step15: 创建函数; expect:成功
+drop function if exists autonomous_33();
+SQL SUCCESS
+create or replace function autonomous_33(num1 int) return int as
+declare
+num3 int := 22;
+tmp int;
+pragma autonomous_transaction;
+begin
+num3 := num3/num1;
+return num3;
+exception
+when division_by_zero then
+select autonomous_32(num3, num1, sqlerrm) into tmp;
+return 0;
+end;
+/
+SQL SUCCESS
+--step16: 调用函数; expect:成功
+select autonomous_33(0);
++---------------+
+| autonomous_33 |
++---------------+
+| 0             |
++---------------+
+--step17: 查询数据; expect:成功,4条数据
+select * from t_subpartition_0298;
++-------+-------+------------------------------+-------+
+| col_1 | col_2 | col_3                        | col_4 |
++-------+-------+------------------------------+-------+
+| 1     | 2     |                              |       |
+| 1     | 2     | you are so cute,will commit! |       |
+| 11    | 22    |                              |       |
+| 22    | 0     | division by zero             |       |
++-------+-------+------------------------------+-------+
+--step18: 删除函数; expect:成功,4条数据
+drop function if exists autonomous_32();
+SQL SUCCESS
+drop function if exists autonomous_33();
+SQL SUCCESS
+--step19: 清理环境; expect:成功
+drop table if exists t_subpartition_0298_01;
+SQL SUCCESS
+drop table if exists t_subpartition_0298;
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0298;
+SQL SUCCESS

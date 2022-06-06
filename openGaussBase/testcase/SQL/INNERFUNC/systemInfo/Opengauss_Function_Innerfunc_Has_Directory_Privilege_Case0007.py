@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -63,6 +63,7 @@ class Function(unittest.TestCase):
             select has_directory_privilege('xixihaha', 'dir','write');
             select has_directory_privilege('hong', 'direct_none','write');
             select has_directory_privilege('hong', 'dir','execute');
+            select has_directory_privilege(9999999999, 'dir','write');
             select has_directory_privilege('hong', 'dir','吃茶去');
             select has_directory_privilege(null, 'dir','write');
             '''

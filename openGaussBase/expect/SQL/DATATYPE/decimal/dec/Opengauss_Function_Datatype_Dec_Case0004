@@ -13,8 +13,7 @@ select * from dec_04;
 +-------+
 --修改dec数据类型为boolean
 alter table dec_04 alter column id type boolean;
-?.*ERROR: column "id" cannot be cast automatically to type boolean
-  Hint: Specify a USING expression to perform the conversion.
+SQL SUCCESS
 --修改dec数据类型为date
 alter table dec_04 alter column id type date;
 ?.*ERROR: column "id" cannot be cast automatically to type timestamp without time zone

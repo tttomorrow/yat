@@ -1,0 +1,270 @@
+-- @testpoint: vacuum full表后执行csn闪回及闪回查询,合理报错
+--step1: 查询参数默认值; expect:显示默认值依次为off/0/0
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+
+show vacuum_defer_cleanup_age;
++--------------------------+
+| vacuum_defer_cleanup_age |
++--------------------------+
+| 0                        |
++--------------------------+
+show version_retention_age;
++-----------------------+
+| version_retention_age |
++-----------------------+
+| 0                     |
++-----------------------+
+--step2: 修改参数值; expect:显示结果依次为on/1000/1000
+alter system set enable_recyclebin to on;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| on                |
++-------------------+
+alter system set vacuum_defer_cleanup_age to 1000;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show vacuum_defer_cleanup_age;
++--------------------------+
+| vacuum_defer_cleanup_age |
++--------------------------+
+| 1000                     |
++--------------------------+
+alter system set version_retention_age to 1000;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show version_retention_age;
++-----------------------+
+| version_retention_age |
++-----------------------+
+| 1000                  |
++-----------------------+
+--step3: 清空回收站; expect:回收站清空成功
+purge recyclebin;
+SQL SUCCESS
+--step4: 创建表t_timecapsule_0080_01; expect:表创建成功
+drop table if exists t_timecapsule_0080_01;
+SQL SUCCESS
+create table t_timecapsule_0080_01(id int, snaptime timestamptz, snapcsn bigint);
+SQL SUCCESS
+--step5: 创建表t_timecapsule_0080_02后向t_timecapsule_0080_01中插入记录; expect:表创建成功且记录插入成功
+create table t_timecapsule_0080_02
+(
+   stuno     int,
+   classno   int
+);
+SQL SUCCESS
+select pg_sleep(4);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+insert into t_timecapsule_0080_01 select 1, now(), int8in(xidout(next_csn)) from gs_get_next_xid_csn();
+SQL SUCCESS
+--step6: 向表t_timecapsule_0080_02插入数据后向t_timecapsule_0080_01中插入记录; expect:插入成功
+insert into t_timecapsule_0080_02 values(1,1);
+SQL SUCCESS
+insert into t_timecapsule_0080_02 values(2,2);
+SQL SUCCESS
+insert into t_timecapsule_0080_02 values(3,3);
+SQL SUCCESS
+select pg_sleep(4);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+insert into t_timecapsule_0080_01 select 2, now(), int8in(xidout(next_csn)) from gs_get_next_xid_csn();
+SQL SUCCESS
+--step7: 更新表数据后向t_timecapsule_0080_01插入记录; expect:表结构改变成功且记录插入成功
+update t_timecapsule_0080_02 set classno = classno*2;
+SQL SUCCESS
+update t_timecapsule_0080_02 set classno = classno*2;
+SQL SUCCESS
+update t_timecapsule_0080_02 set classno = classno*2;
+SQL SUCCESS
+select pg_sleep(4);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+insert into t_timecapsule_0080_01 select 3, now(), int8in(xidout(next_csn)) from gs_get_next_xid_csn();
+SQL SUCCESS
+--step8: 向表t_timecapsule_0080_02插入数据后向t_timecapsule_0080_01中插入记录; expect:插入成功
+insert into t_timecapsule_0080_02 values(1,1);
+SQL SUCCESS
+insert into t_timecapsule_0080_02 values(2,2);
+SQL SUCCESS
+insert into t_timecapsule_0080_02 values(3,3);
+SQL SUCCESS
+select pg_sleep(4);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+insert into t_timecapsule_0080_01 select 4, now(), int8in(xidout(next_csn)) from gs_get_next_xid_csn();
+SQL SUCCESS
+--step9: 清空表数据后向t_timecapsule_0080_01中插入记录; expect:表数据清空成功且插入成功
+delete from t_timecapsule_0080_02 where stuno = 1;
+SQL SUCCESS
+delete from t_timecapsule_0080_02 where stuno = 2;
+SQL SUCCESS
+delete from t_timecapsule_0080_02 where stuno = 3;
+SQL SUCCESS
+select pg_sleep(4);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+insert into t_timecapsule_0080_01 select 5, now(), int8in(xidout(next_csn)) from gs_get_next_xid_csn();
+SQL SUCCESS
+--step10: vacuum full表后向t_timecapsule_0080_01中插入记录; expect:vacuum full表成功且插入成功
+vacuum full t_timecapsule_0080_02;
+SQL SUCCESS
+select pg_sleep(4);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+insert into t_timecapsule_0080_01 select 6, now(), int8in(xidout(next_csn)) from gs_get_next_xid_csn();
+SQL SUCCESS
+--step10: 创建函数f_timecapsule_0080_01(); expect:函数创建成功
+create or replace function f_timecapsule_0080_01(int8)
+  returns integer
+  language plpgsql
+as
+$body$
+declare
+  count integer;
+begin
+  count = (select snapcsn from t_timecapsule_0080_01 where id =  $1);
+  return count;
+end;
+$body$;
+/
+SQL SUCCESS
+--step11: 创建函数f_timecapsule_0080_02(); expect:函数创建成功
+create or replace function f_timecapsule_0080_02(int8)
+  returns timestamptz
+  language plpgsql
+as
+$body$
+declare
+  count timestamptz;
+begin
+  count = (select snaptime from t_timecapsule_0080_01 where id =  $1);
+  return count;
+end;
+$body$;
+/
+SQL SUCCESS
+--step12: 对表执行vacuum full后执行闪回及闪回查询; expect:合理报错
+timecapsule table t_timecapsule_0080_02 to csn f_timecapsule_0080_01(1);
+?.*ERROR: The table definition of "t_timecapsule_0080_02" has been changed.*
+select * from t_timecapsule_0080_02 timecapsule csn f_timecapsule_0080_01(1) order by stuno;
+?.*ERROR: The table definition of "t_timecapsule_0080_02" has been changed.*
+timecapsule table t_timecapsule_0080_02 to csn f_timecapsule_0080_01(2);
+?.*ERROR: The table definition of "t_timecapsule_0080_02" has been changed.*
+select * from t_timecapsule_0080_02 timecapsule csn f_timecapsule_0080_01(2) order by stuno;
+?.*ERROR: The table definition of "t_timecapsule_0080_02" has been changed.*
+timecapsule table t_timecapsule_0080_02 to csn f_timecapsule_0080_01(3);
+?.*ERROR: The table definition of "t_timecapsule_0080_02" has been changed.*
+select * from t_timecapsule_0080_02 timecapsule csn f_timecapsule_0080_01(3) order by stuno;
+?.*ERROR: The table definition of "t_timecapsule_0080_02" has been changed.*
+timecapsule table t_timecapsule_0080_02 to csn f_timecapsule_0080_01(4);
+?.*ERROR: The table definition of "t_timecapsule_0080_02" has been changed.*
+select * from t_timecapsule_0080_02 timecapsule csn f_timecapsule_0080_01(4) order by stuno;
+?.*ERROR: The table definition of "t_timecapsule_0080_02" has been changed.*
+timecapsule table t_timecapsule_0080_02 to csn f_timecapsule_0080_01(5);
+?.*ERROR: The table definition of "t_timecapsule_0080_02" has been changed.*
+select * from t_timecapsule_0080_02 timecapsule csn f_timecapsule_0080_01(5) order by stuno;
+?.*ERROR: The table definition of "t_timecapsule_0080_02" has been changed.*
+--step13: 对表未执行vacuum full执行闪回及闪回查询; expect:闪回及闪回成功
+timecapsule table t_timecapsule_0080_02 to csn f_timecapsule_0080_01(6);
+SQL SUCCESS
+select * from t_timecapsule_0080_02 timecapsule csn f_timecapsule_0080_01(6) order by stuno;
++-------+---------+
+| stuno | classno |
++-------+---------+
++-------+---------+
+--step14: 清理环境 expect:环境清理成功
+drop table if exists t_timecapsule_0080_02;
+SQL SUCCESS
+drop table if exists t_timecapsule_0080_01;
+SQL SUCCESS
+drop function if exists f_timecapsule_0080_02();
+SQL SUCCESS
+drop function if exists f_timecapsule_0080_01();
+SQL SUCCESS
+purge recyclebin;
+SQL SUCCESS
+--step15: 恢复默认值; expect:恢复成功，依次显示结果为off/0/0
+alter system set enable_recyclebin to off;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+
+alter system set vacuum_defer_cleanup_age to 0;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show vacuum_defer_cleanup_age;
++--------------------------+
+| vacuum_defer_cleanup_age |
++--------------------------+
+| 0                        |
++--------------------------+
+alter system set version_retention_age to 0;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show version_retention_age;
++-----------------------+
+| version_retention_age |
++-----------------------+
+| 0                     |
++-----------------------+

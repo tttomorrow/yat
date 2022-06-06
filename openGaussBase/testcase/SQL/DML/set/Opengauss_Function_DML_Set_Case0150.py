@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -26,6 +26,7 @@ Expect      :
     然后关闭数据库节点。
 """
 
+import os
 import unittest
 
 from testcase.utils.CommonSH import CommonSH
@@ -43,7 +44,7 @@ class Function(unittest.TestCase):
         self.user = Node('dbuser')
         self.env = macro.DB_ENV_PATH
         self.constant = Constant()
-        self.log.info('---Opengauss_Function_DML_Set_Case0150开始---')
+        self.log.info(f'-----{os.path.basename(__file__)} start-----')
 
     def test_shutdown(self):
         self.log.info('-----------查询数据库创建用户是超级用户管理员---------')
@@ -57,7 +58,7 @@ class Function(unittest.TestCase):
         shutdown_list = ['shutdown;', 'shutdown fast;']
         check = 'select sysdate;'
         info1 = 'SHUTDOWN'
-        info2 = 'failed to connect Unknown'
+        info2 = 'failed to connect'
         info3 = 'Broken pipe'
 
         for i in range(2):
@@ -109,4 +110,4 @@ class Function(unittest.TestCase):
             self.commonsh.restart_db_cluster()
         cmd = f'drop user if exists xi cascade;'
         self.commonsh.execut_db_sql(cmd)
-        self.log.info('------Opengauss_Function_DML_Set_Case0150结束------')
+        self.log.info(f'-----{os.path.basename(__file__)} end-----')

@@ -1,0 +1,185 @@
+-- @testpoint: 闪回表和DML并发,开启两个事务,一个做闪回表,另一个做insert操作
+--step1: 查询参数默认值; expect:显示默认值依次为off/0/0
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+
+show vacuum_defer_cleanup_age;
++--------------------------+
+| vacuum_defer_cleanup_age |
++--------------------------+
+| 0                        |
++--------------------------+
+show version_retention_age;
++-----------------------+
+| version_retention_age |
++-----------------------+
+| 0                     |
++-----------------------+
+--step2: 修改参数值; expect:显示结果依次为on/1000/1000
+alter system set enable_recyclebin to on;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| on                |
++-------------------+
+alter system set vacuum_defer_cleanup_age to 1000;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show vacuum_defer_cleanup_age;
++--------------------------+
+| vacuum_defer_cleanup_age |
++--------------------------+
+| 1000                     |
++--------------------------+
+alter system set version_retention_age to 1000;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show version_retention_age;
++-----------------------+
+| version_retention_age |
++-----------------------+
+| 1000                  |
++-----------------------+
+--step3: 清空回收站; expect:回收站清空成功
+purge recyclebin;
+SQL SUCCESS
+--step4: 创建函数f_timecapsule_0093(); expect:函数创建成功
+create or replace function f_timecapsule_0093(int8)
+  returns integer
+  language plpgsql
+as
+$body$
+declare
+  count integer;
+begin
+  count = (select snapcsn from t_timecapsule_0093_01 where id =  $1);
+  return count;
+end;
+$body$;
+/
+SQL SUCCESS
+--step5: 创建表; expect:表创建成功
+create table t_timecapsule_0093_01(id int, snaptime timestamptz, snapcsn bigint);
+SQL SUCCESS
+--step6: 创建表并向t_timecapsule_0093_01表中插入数据; expect:表创建成功且数据插入成功
+drop table if exists t_timecapsule_0093_02;
+SQL SUCCESS
+create table t_timecapsule_0093_02
+(
+  r_reason_sk    integer,
+  r_reason_id    character(16),
+  r_reason_desc  character(100)
+);
+SQL SUCCESS
+select pg_sleep(4);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+insert into t_timecapsule_0093_01 select 1, now(), int8in(xidout(next_csn)) from gs_get_next_xid_csn();
+SQL SUCCESS
+--step7: 再次向表中插入数据; expect:数据插入成功
+insert into t_timecapsule_0093_02(r_reason_sk, r_reason_id, r_reason_desc) values (1, 'aaaaaaaaaaaaaaaa', 'reason1');
+SQL SUCCESS
+select pg_sleep(4);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+insert into t_timecapsule_0093_01 select 2, now(), int8in(xidout(next_csn)) from gs_get_next_xid_csn();
+SQL SUCCESS
+--step8: 开启事务执行csn闪回; expect:闪回成功
+start transaction;
+SQL SUCCESS
+timecapsule table t_timecapsule_0093_02 to csn f_timecapsule_0093(1);
+SQL SUCCESS
+commit;
+SQL SUCCESS
+--step9: 查询闪回后的表; expect:查询结果与预期结果一致
+select * from t_timecapsule_0093_02 ;
++-------------+-------------+---------------+
+| r_reason_sk | r_reason_id | r_reason_desc |
++-------------+-------------+---------------+
++-------------+-------------+---------------+
+--step10: 开启事务插入语句; expect:数据插入成功
+start transaction;
+SQL SUCCESS
+insert into t_timecapsule_0093_02(r_reason_sk, r_reason_id, r_reason_desc) values (2, 'abbbbbbbbbbbbbba', 'reason2');
+SQL SUCCESS
+commit;
+SQL SUCCESS
+--step11: 清理环境 expect:环境清理成功
+drop table if exists t_timecapsule_0093_02 purge;
+SQL SUCCESS
+drop table if exists t_timecapsule_0093_01 cascade;
+SQL SUCCESS
+drop function if exists  f_timecapsule_0093();
+SQL SUCCESS
+purge recyclebin;
+SQL SUCCESS
+--step12: 恢复默认值; expect:恢复成功，依次显示结果为off/0/0
+alter system set enable_recyclebin to off;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show enable_recyclebin;
++-------------------+
+| enable_recyclebin |
++-------------------+
+| off               |
++-------------------+
+alter system set vacuum_defer_cleanup_age to 0;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show vacuum_defer_cleanup_age;
++--------------------------+
+| vacuum_defer_cleanup_age |
++--------------------------+
+| 0                        |
++--------------------------+
+alter system set version_retention_age to 0;
+SQL SUCCESS
+select pg_sleep(2);
++----------+
+| pg_sleep |
++----------+
+|          |
++----------+
+show version_retention_age;
++-----------------------+
+| version_retention_age |
++-----------------------+
+| 0                     |
++-----------------------+

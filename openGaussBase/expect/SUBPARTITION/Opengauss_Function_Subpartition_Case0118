@@ -1,0 +1,340 @@
+-- @testpoint: list_range二级分区表：计划裁剪
+--step1: 创建表空间; expect:成功
+drop table if exists t_subpartition_0118;
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0118;
+SQL SUCCESS
+create tablespace ts_subpartition_0118 relative location 'subpartition_tablespace/subpartition_tablespace_0118';
+SQL SUCCESS
+--step2: 创建二级分区表; expect:成功
+create table if not exists t_subpartition_0118
+(
+    col_1 int ,
+    col_2 int,
+    col_3 varchar2 ( 30 ) ,
+    col_4 int
+)tablespace ts_subpartition_0118
+partition by list (col_1) subpartition by range (col_2)
+(
+ partition p_list_1 values(-1,-2,-3,-4,-5,-6,-7,-8,-9,-10 )
+  (
+    subpartition p_range_1_1 values less than( -10 ),
+    subpartition p_range_1_2 values less than( 0 ),
+    subpartition p_range_1_3 values less than( 10 ),
+    subpartition p_range_1_4 values less than( 20 ),
+    subpartition p_range_1_5 values less than( 50 )
+  ),
+  partition p_list_2 values(1,2,3,4,5,6,7,8,9,10 ),
+  partition p_list_3 values(11,12,13,14,15,16,17,18,19,20)
+  (
+    subpartition p_range_3_1 values less than( 15 ),
+    subpartition p_range_3_2 values less than( maxvalue )
+  ),
+    partition p_list_4 values(21,22,23,24,25,26,27,28,29,30)
+  (
+    subpartition p_range_4_1 values less than( -10 ),
+    subpartition p_range_4_2 values less than( 0 ),
+    subpartition p_range_4_3 values less than( 10 ),
+    subpartition p_range_4_4 values less than( 20 ),
+    subpartition p_range_4_5 values less than( 50 )
+  ),
+   partition p_list_5 values(31,32,33,34,35,36,37,38,39,40)
+  (
+    subpartition p_range_5_1 values less than( maxvalue )
+  ),
+   partition p_list_6 values(41,42,43,44,45,46,47,48,49,50)
+   (
+    subpartition p_range_6_1 values less than( -10 ),
+    subpartition p_range_6_2 values less than( 0 ),
+    subpartition p_range_6_3 values less than( 10 ),
+    subpartition p_range_6_4 values less than( 20 ),
+    subpartition p_range_6_5 values less than( 50 )
+   ),
+   partition p_list_7 values(default)
+) enable row movement;
+SQL SUCCESS
+--step3: 插入数据; expect:成功
+insert into t_subpartition_0118 values(0,0,0,0);
+SQL SUCCESS
+insert into t_subpartition_0118 values(-11,1,1,1),(-14,1,4,4),(-25,15,5,5),(-808,8,8,8),(-9,9,9,9);
+SQL SUCCESS
+insert into t_subpartition_0118 values(1,11,1,1),(4,41,4,4),(5,54,5,5),(8,87,8,8),(9,19,9,9);
+SQL SUCCESS
+insert into t_subpartition_0118 values(11,1,1,1),(14,1,4,4),(15,5,5,5),(18,8,8,8),(19,1,9,9);
+SQL SUCCESS
+--test1: 执行算子--prepare
+--step4: 创建预备语句1; expect:成功
+prepare p_subpartition_0118_01 as select * from (select col_1 from t_subpartition_0118 subpartition(p_list_2_subpartdefault1) where col_1 >10 and col_2 <8000) order by 1;
+SQL SUCCESS
+--step5: 查看预备语句1的执行计划; expect:成功,filter: ((col_1 > 10) and (col_2 < 8000))
+explain execute p_subpartition_0118_01;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.* Sort  .*
+?.*   Sort Key: t_subpartition_0118.col_1 .*
+?.*   ->  Partition Iterator  .*
+?.*         Iterations: .*
+?.*         ->  Partitioned Seq Scan on t_subpartition_0118  .*
+?.*               Filter: \(\(col_1 > 10\) AND \(col_2 < 8000\)\) .*
+?.*               Selected Partitions: .*
+?.*               Selected Subpartitions: .*
+?.*
+--step6: 创建预备语句2; expect:成功
+prepare p_subpartition_0118_02 as select * from t_subpartition_0118 where col_2 in  (select col_1 from t_subpartition_0118 subpartition(p_list_2_subpartdefault1) where col_1 >10);
+SQL SUCCESS
+--step7: 查看预备语句2的执行计划; expect:成功,filter: (col_1 > 10)
+explain execute p_subpartition_0118_02;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.* Hash Join  .*
+?.*   Hash Cond: \(public.t_subpartition_0118.col_2 = public.t_subpartition_0118.col_1\) .*
+?.*   ->  Partition Iterator  .*
+?.*         Iterations: .*
+?.*         ->  Partitioned Seq Scan on t_subpartition_0118  .*
+?.*               Filter: \(col_2 > 10\) .*
+?.*               Selected Partitions: .*
+?.*               Selected Subpartitions: .*
+?.*   ->  Hash  .*
+?.*         ->  HashAggregate  .*
+?.*               Group By Key: public.t_subpartition_0118.col_1 .*
+?.*               ->  Partition Iterator  .*
+?.*                     Iterations: .*
+?.*                     ->  Partitioned Seq Scan on t_subpartition_0118  .*
+?.*                           Filter: \(col_1 > 10\) .*
+?.*                           Selected Partitions: .*
+?.*                           Selected Subpartitions: .*
+?.*
+--step8: 创建预备语句3; expect:成功
+prepare p_subpartition_0118_03 as select * from t_subpartition_0118 where col_2 in  (select col_1 from t_subpartition_0118 subpartition(p_list_2_subpartdefault1) where col_1 >$1);
+SQL SUCCESS
+--step9: 查看预备语句3的执行计划; expect:成功,filter: (col_1 > $1)
+explain execute p_subpartition_0118_03(100);
+?.*
+?.*QUERY PLAN.*
+?.*
+?.* Hash Join  .*
+?.*   Hash Cond: \(public.t_subpartition_0118.col_2 = public.t_subpartition_0118.col_1\) .*
+?.*   ->  Partition Iterator  .*
+?.*         Iterations: .*
+?.*         ->  Partitioned Seq Scan on t_subpartition_0118  .*
+?.*               Filter: \(col_2 > \$1\) .*
+?.*               Selected Partitions: .*
+?.*               Selected Subpartitions: .*
+?.*   ->  Hash  .*
+?.*         ->  HashAggregate  .*
+?.*               Group By Key: public.t_subpartition_0118.col_1 .*
+?.*               ->  Partition Iterator  .*
+?.*                     Iterations: .*
+?.*                     ->  Partitioned Seq Scan on t_subpartition_0118  .*
+?.*                           Filter: \(col_1 > \$1\) .*
+?.*                           Selected Partitions: .*
+?.*                           Selected Subpartitions: .*
+?.*
+--step10: 删除预备语句; expect:成功
+deallocate p_subpartition_0118_01;
+SQL SUCCESS
+deallocate p_subpartition_0118_02;
+SQL SUCCESS
+deallocate p_subpartition_0118_03;
+SQL SUCCESS
+--test2: 计划裁剪
+--step11: 清空表数据; expect:成功
+truncate t_subpartition_0118;
+SQL SUCCESS
+--step12: generate_series插入大量数据; expect:成功
+insert into t_subpartition_0118 values (generate_series(0, 19),generate_series(0, 1000),generate_series(0, 99));
+SQL SUCCESS
+--step13: 查看分区信息; expect:成功
+select relname,parttype,partstrategy,indisusable,interval from pg_partition where parentid = (select oid from pg_class where relname = 't_subpartition_0118') order by relname;
++---------------------+----------+--------------+-------------+----------+
+| relname             | parttype | partstrategy | indisusable | interval |
++---------------------+----------+--------------+-------------+----------+
+| p_list_1            | p        | l            | true        |          |
+| p_list_2            | p        | l            | true        |          |
+| p_list_3            | p        | l            | true        |          |
+| p_list_4            | p        | l            | true        |          |
+| p_list_5            | p        | l            | true        |          |
+| p_list_6            | p        | l            | true        |          |
+| p_list_7            | p        | l            | true        |          |
+| t_subpartition_0118 | r        | l            | true        |          |
++---------------------+----------+--------------+-------------+----------+
+select a.relname,a.parttype,a.partstrategy,a.indisusable from pg_partition a,(select oid from pg_partition
+where parentid = (select oid from pg_class where relname = 't_subpartition_0118')) b where a.parentid = b.oid order by a.relname;
++--------------------------+----------+--------------+-------------+
+| relname                  | parttype | partstrategy | indisusable |
++--------------------------+----------+--------------+-------------+
+| p_list_2_subpartdefault1 | s        | r            | true        |
+| p_list_7_subpartdefault1 | s        | r            | true        |
+| p_range_1_1              | s        | r            | true        |
+| p_range_1_2              | s        | r            | true        |
+| p_range_1_3              | s        | r            | true        |
+| p_range_1_4              | s        | r            | true        |
+| p_range_1_5              | s        | r            | true        |
+| p_range_3_1              | s        | r            | true        |
+| p_range_3_2              | s        | r            | true        |
+| p_range_4_1              | s        | r            | true        |
+| p_range_4_2              | s        | r            | true        |
+| p_range_4_3              | s        | r            | true        |
+| p_range_4_4              | s        | r            | true        |
+| p_range_4_5              | s        | r            | true        |
+| p_range_5_1              | s        | r            | true        |
+| p_range_6_1              | s        | r            | true        |
+| p_range_6_2              | s        | r            | true        |
+| p_range_6_3              | s        | r            | true        |
+| p_range_6_4              | s        | r            | true        |
+| p_range_6_5              | s        | r            | true        |
++--------------------------+----------+--------------+-------------+
+--step14: 查询指定二级分区数据; expect:成功
+select count(*) from t_subpartition_0118 subpartition(p_range_1_1) ;
++-------+
+| count |
++-------+
+| 0     |
++-------+
+--step15: 查询指定二级分区数据; expect:成功
+select count(*) from t_subpartition_0118 subpartition(p_range_1_2) ;
++-------+
+| count |
++-------+
+| 0     |
++-------+
+--step16: 查询指定二级分区数据; expect:成功
+select count(*) from t_subpartition_0118 subpartition(p_range_1_3) ;
++-------+
+| count |
++-------+
+| 0     |
++-------+
+--step17: 查询指定二级分区数据; expect:成功
+select count(*) from t_subpartition_0118 subpartition(p_range_1_4) ;
++-------+
+| count |
++-------+
+| 0     |
++-------+
+--step18: 查询指定二级分区数据; expect:成功
+select count(*) from t_subpartition_0118 subpartition(p_range_1_5) ;
++-------+
+| count |
++-------+
+| 0     |
++-------+
+--step19: 查询指定二级分区数据; expect:成功
+select count(*) from t_subpartition_0118 subpartition(p_list_2_subpartdefault1) ;
++-------+
+| count |
++-------+
+| 50050 |
++-------+
+--step20: 查询指定二级分区数据; expect:成功
+select count(*) from t_subpartition_0118 subpartition(p_range_3_1) ;
++-------+
+| count |
++-------+
+| 675   |
++-------+
+--step21: 查询指定二级分区数据; expect:成功
+select count(*) from t_subpartition_0118 subpartition(p_range_3_2) ;
++-------+
+| count |
++-------+
+| 44370 |
++-------+
+--step22: 查询指定二级分区数据; expect:成功
+select count(*) from t_subpartition_0118 subpartition(p_range_4_1) ;
++-------+
+| count |
++-------+
+| 0     |
++-------+
+--step23: 查询指定二级分区数据; expect:成功
+select count(*) from t_subpartition_0118 subpartition(p_range_4_2) ;
++-------+
+| count |
++-------+
+| 0     |
++-------+
+--step24: 查询指定二级分区数据; expect:成功
+select count(*) from t_subpartition_0118 subpartition(p_range_4_3) ;
++-------+
+| count |
++-------+
+| 0     |
++-------+
+--step25: 查询指定二级分区数据; expect:成功
+select count(*) from t_subpartition_0118 subpartition(p_range_4_4) ;
++-------+
+| count |
++-------+
+| 0     |
++-------+
+--step26: 查询指定二级分区数据; expect:成功
+select count(*) from t_subpartition_0118 subpartition(p_range_4_5) ;
++-------+
+| count |
++-------+
+| 0     |
++-------+
+--step27: 查询指定二级分区数据; expect:成功
+select count(*) from t_subpartition_0118 subpartition(p_range_5_1) ;
++-------+
+| count |
++-------+
+| 0     |
++-------+
+--step28: 查询指定二级分区数据; expect:成功
+select count(*) from t_subpartition_0118 subpartition(p_range_6_1) ;
++-------+
+| count |
++-------+
+| 0     |
++-------+
+--step29: 查询指定二级分区数据; expect:成功
+select count(*) from t_subpartition_0118 subpartition(p_range_6_2) ;
++-------+
+| count |
++-------+
+| 0     |
++-------+
+--step30: 查询指定二级分区数据; expect:成功
+select count(*) from t_subpartition_0118 subpartition(p_range_6_3) ;
++-------+
+| count |
++-------+
+| 0     |
++-------+
+--step31: 查询指定二级分区数据; expect:成功
+select count(*) from t_subpartition_0118 subpartition(p_range_6_4) ;
++-------+
+| count |
++-------+
+| 0     |
++-------+
+--step32: 查询指定二级分区数据; expect:成功
+select count(*) from t_subpartition_0118 subpartition(p_range_6_5) ;
++-------+
+| count |
++-------+
+| 0     |
++-------+
+--step33: 查询指定二级分区数据; expect:成功
+select count(*) from t_subpartition_0118 subpartition(p_list_7_subpartdefault1) ;
++-------+
+| count |
++-------+
+| 5005  |
++-------+
+--step34: 查询数据; expect:成功,数据数量为上面二级分区数据数量之和100100
+select count(*) from t_subpartition_0118;
++--------+
+| count  |
++--------+
+| 100100 |
++--------+
+--step35: 清理环境; expect:成功
+drop table if exists t_subpartition_0118;
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0118;
+SQL SUCCESS

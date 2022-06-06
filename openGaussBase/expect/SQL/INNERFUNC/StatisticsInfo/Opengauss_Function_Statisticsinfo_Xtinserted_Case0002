@@ -14,6 +14,7 @@ select pg_stat_get_xact_tuples_inserted('') from PG_CLASS a where a.relname = 's
 | pg_stat_get_xact_tuples_inserted |
 +----------------------------------+
 +----------------------------------+
+select pg_stat_get_xact_tuples_inserted(9999999999999) from PG_CLASS a where a.relname = 'sales';
 ?.*ERROR: OID out of range
   Where: referenced column: pg_stat_get_xact_tuples_inserted
 select pg_stat_get_xact_tuples_inserted('**&&^') from PG_CLASS a where a.relname = 'sales';

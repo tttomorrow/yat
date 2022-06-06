@@ -22,6 +22,9 @@ set deadlock_timeout to 123.859;
 set deadlock_timeout to 'test';
 ?.*ERROR: invalid value for parameter "deadlock_timeout": "test"
 set deadlock_timeout to -1;
+?.*ERROR: -1 is outside the valid range for parameter "deadlock_timeout" \(1 .. 2147483647\)
+set deadlock_timeout to 2147483648;
+?.*ERROR: invalid value for parameter "deadlock_timeout": "2147483648"
   Hint: Value exceeds integer range.
 set deadlock_timeout to '123&^$#';
 ?.*ERROR: invalid value for parameter "deadlock_timeout": "123\&\^\$\#"

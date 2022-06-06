@@ -2,3 +2,4 @@
 --查看默认
 show gin_fuzzy_search_limit;
 --设置，报错
+ALTER SYSTEM SET gin_fuzzy_search_limit to 2147483647;

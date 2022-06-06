@@ -1,0 +1,5 @@
+test:CONNECTORS/ODBC/Opengauss_Function_Connect_Odbc_Case0001
+test:CONNECTORS/ODBC/Opengauss_Function_Connect_Odbc_Case0002
+test:CONNECTORS/ODBC/Opengauss_Function_Connect_Odbc_Case0003
+test:CONNECTORS/ODBC/Opengauss_Function_Connect_Odbc_Case0004
+test:CONNECTORS/ODBC/Opengauss_Function_Connect_Odbc_Case0005

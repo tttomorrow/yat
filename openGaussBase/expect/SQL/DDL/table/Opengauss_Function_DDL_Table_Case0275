@@ -38,7 +38,7 @@ where c.relname = 't1' and a.attrelid = c.oid and a.attnum>0;
 --插入数据，不符合检查约束，报错
 insert into t1(ad) values (3);
 ?.*ERROR: new row for relation "t1" violates check constraint "cc"?.*
-  Detail: Failing row contains (null, null, 3).
+  Detail: N/A
 insert into t1(ad) values (null);
 ?.*ERROR: null value in column "ad" violates not-null constraint?.*
   Detail: Failing row contains (null, null, null).

@@ -1,0 +1,463 @@
+-- @testpoint: range_list二级分区表：索引,部分测试点合理报错
+--step1: 创建表空间; expect:成功
+drop table if exists t_subpartition_0251;
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0251;
+SQL SUCCESS
+create tablespace ts_subpartition_0251 relative location 'subpartition_tablespace/subpartition_tablespace_0251';
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0251_01;
+SQL SUCCESS
+create tablespace ts_subpartition_0251_01 relative location 'subpartition_tablespace/subpartition_tablespace_0251_01';
+SQL SUCCESS
+--step2: 创建二级分区表; expect:成功
+create table t_subpartition_0251
+(
+    col_1 int ,
+    col_2 int ,
+    col_3 varchar2 ( 30 ) ,
+    col_4 int
+)
+tablespace ts_subpartition_0251
+partition by range (col_1) subpartition by list (col_2)
+(
+  partition p_range_1 values less than( -10 )
+  (
+    subpartition p_list_1_1 values ( '-1','-2','-3','-4','-5'),
+    subpartition p_list_1_2 values ( default )
+  ),
+  partition p_range_2 values less than( 20 )
+  (
+    subpartition p_list_2_1 values ( '6','7','8','9','10'),
+    subpartition p_list_2_2 values ( default )
+  ),
+   partition p_range_3 values less than( 30 )
+   (
+    subpartition p_list_3_1 values ( default )
+  ),
+   partition p_range_4 values less than( 40 )
+   (
+    subpartition p_list_4_1 values ( default )
+  ),
+  partition p_range_5 values less than( maxvalue )
+) enable row movement;
+SQL SUCCESS
+--step3: 插入数据; expect:成功
+insert into t_subpartition_0251 values (generate_series(-100, 100),generate_series(400, 200,-1),generate_series(700, 500,-1));
+SQL SUCCESS
+insert into t_subpartition_0251 values (generate_series(200, 400),generate_series(800, 600,-1),generate_series(900, 700,-1));
+SQL SUCCESS
+insert into t_subpartition_0251 values (generate_series(2200, 4400),generate_series(4800, 2600,-1),generate_series(4900, 2700,-1));
+SQL SUCCESS
+--step4: 创建唯一索引; expect:成功
+create unique index on t_subpartition_0251(col_1);
+SQL SUCCESS
+--step5: 索引键不包含分区键创建local索引; expect:合理报错
+create unique index on t_subpartition_0251(col_2) local;
+?.*ERROR: unique local index columns must contain all the partition keys and collation must be default collatio.*
+create unique index on t_subpartition_0251(col_1,col_2);
+SQL SUCCESS
+--step6: 索引键不包含分区键创建local索引; expect:合理报错
+create  unique index on t_subpartition_0251(col_1) local;
+?.*ERROR: unique local index columns must contain all the partition keys and collation must be default collatio.*
+--step7: 已存在local索引,创建global索引; expect:合理报错
+create unique index on t_subpartition_0251(col_1,col_2) global;
+?.*ERROR: Global and local partition index should not be on same colum.*
+--step8: 删除索引; expect:成功
+drop index t_subpartition_0251_col_1_col_2_idx;
+SQL SUCCESS
+--step9: 不存在local索引,创建global索引; expect:成功
+create unique index on t_subpartition_0251(col_1,col_2) global;
+SQL SUCCESS
+--step10: 删除索引; expect:成功
+drop index t_subpartition_0251_col_1_col_2_tableoid_idx;
+SQL SUCCESS
+--step11: 创建不同部分索引; expect:成功
+create unique index  on t_subpartition_0251 (col_1,col_2 nulls first) tablespace ts_subpartition_0251_01 where col_2 < 4;
+SQL SUCCESS
+--step12: 查看执行计划; expect:成功
+explain  analyze select * from t_subpartition_0251 where col_2 in  (select col_1 from t_subpartition_0251  where col_1 >10 and col_1<100 ) and col_2 <4 order by 1 limit 100;
+?.*
+?.*QUERY PLAN.*
+?.*
+?.*Limit .*
+?.*  ->  Sort .*
+?.*        Sort Key: public.t_subpartition_0251.col_1  .*
+?.*        Sort Method: quicksort  Memory:.*
+?.*        ->  Hash Join .*
+?.*              Hash Cond: .*
+?.*              ->  Partition Iterator .*
+?.*                    Iterations: .*
+?.*                    ->  Partitioned Bitmap Heap Scan on t_subpartition_0251 .*
+?.*                          Recheck Cond: \(\(col_2 < 4\) AND \(col_2 > 10\) AND \(col_2 < 100\)\) .*
+?.*                          Selected Partitions: .*
+?.*                          Selected Subpartitions: .*
+?.*                          ->  Partitioned Bitmap Index Scan on t_subpartition_0251_col_1_col_2_idx .*
+?.*                                Index Cond: \(\(col_2 < 4\) AND \(col_2 > 10\) AND \(col_2 < 100\)\) .*
+?.*                                Selected Partitions: .*
+?.*                                Selected Subpartitions: .*
+?.*              ->  Hash .*
+?.*                     Buckets: .*
+?.*                    ->  Bitmap Heap Scan on t_subpartition_0251 .*
+?.*                          Recheck Cond: \(\(col_1 > 10\) AND \(col_1 < 100\) AND \(col_1 < 4\)\) .*
+?.*                          ->  Bitmap Index Scan on t_subpartition_0251_col_1_tableoid_idx .*
+?.*                                Index Cond: \(\(col_1 > 10\) AND \(col_1 < 100\) AND \(col_1 < 4\)\) .*
+?.*Total runtime: .*
+?.*
+query plan
+
+--step13: 创建不同部分索引; expect:合理报错
+
+create unique index  on t_subpartition_0251 (col_2 nulls first) tablespace ts_subpartition_0251_01 where col_2 < 4;
+?.*ERROR: syntax error at or near "query.*
+?.*
+--step14: 创建不同部分索引; expect:成功
+create unique index  on t_subpartition_0251 (col_1,col_2 nulls first) tablespace ts_subpartition_0251_01 where col_2 is not null;
+SQL SUCCESS
+--step15: 查看执行计划; expect:成功
+explain  analyze select * from t_subpartition_0251 where col_2 in  (select col_1 from t_subpartition_0251  where col_1 >10 and col_1<100 ) and col_2 <4 order by 1 limit 100;
+?.*
+?.*QUERY PLAN  .*
+?.*
+?.*Limit .*
+?.*  ->  Sort .*
+?.*        Sort Key: public.t_subpartition_0251.col_1  .*
+?.*        Sort Method: quicksort  Memory: .*
+?.*        ->  Hash Join .*
+?.*              Hash Cond: \(public.t_subpartition_0251.col_2 = public.t_subpartition_0251.col_1\) .*
+?.*              ->  Partition Iterator .*
+?.*                    Iterations: .*
+?.*                    ->  Partitioned Bitmap Heap Scan on t_subpartition_0251 .*
+?.*                          Recheck Cond: \(\(col_2 < 4\) AND \(col_2 > 10\) AND \(col_2 < 100\)\) .*
+?.*                          Selected Partitions: .*
+?.*                          Selected Subpartitions: .*
+?.*                          ->  Partitioned Bitmap Index Scan on t_subpartition_0251_col_1_col_2_idx1 .*
+?.*                                Index Cond: \(\(col_2 < 4\) AND \(col_2 > 10\) AND \(col_2 < 100\)\) .*
+?.*                                Selected Partitions: .*
+?.*                                Selected Subpartitions: .*
+?.*              ->  Hash .*
+?.*                     Buckets: .*
+?.*                    ->  Bitmap Heap Scan on t_subpartition_0251 .*
+?.*                          Recheck Cond: \(\(col_1 > 10\) AND \(col_1 < 100\) AND \(col_1 < 4\)\) .*
+?.*                          ->  Bitmap Index Scan on t_subpartition_0251_col_1_tableoid_idx .*
+?.*                                Index Cond: \(\(col_1 > 10\) AND \(col_1 < 100\) AND \(col_1 < 4\)\) .*
+?.*Total runtime: .*
+?.*
+--step16: 创建不同部分索引; expect:成功
+create unique index  on t_subpartition_0251 (col_1,col_2 nulls first) tablespace ts_subpartition_0251_01 where col_2 is  null;
+SQL SUCCESS
+--step17: 查看执行计划; expect:成功
+explain  analyze select * from t_subpartition_0251 where col_2 in  (select col_1 from t_subpartition_0251  where col_1 >10 and col_1<100 ) and col_2 is null order by 1 limit 100;
+?.*
+?.*QUERY PLAN .*
+?.*
+?.*Limit .*
+?.*  ->  Sort .*
+?.*        Sort Key: public.t_subpartition_0251.col_1 .*
+?.*        Sort Method: quicksort  Memory: .*
+?.*        ->  Hash Semi Join .*
+?.*              Hash Cond: \(public.t_subpartition_0251.col_2 = public.t_subpartition_0251.col_1\) .*
+?.*              ->  Partition Iterator .*
+?.*                    Iterations: .*
+?.*                    ->  Partitioned Index Scan using t_subpartition_0251_col_1_col_2_idx2 on t_subpartition_0251 .*
+?.*                          Index Cond: \(\(col_2 IS NULL\) AND \(col_2 > 10\) AND \(col_2 < 100\)\) .*
+?.*                          Selected Partitions: .*
+?.*                          Selected Subpartitions: .*
+?.*              ->  Hash .*
+?.*                     Buckets: .*
+?.*                    ->  Index Only Scan using t_subpartition_0251_col_1_tableoid_idx on t_subpartition_0251 .*
+?.*                          Index Cond: \(\(col_1 > 10\) AND \(col_1 < 100\) AND \(col_1 IS NULL\)\) .*
+?.*                          Heap Fetches: .*
+?.*Total runtime:.*
+?.*
+--step18: 创建不同部分索引; expect:合理报错
+create unique index  on t_subpartition_0251 (col_1,col_2 nulls first) tablespace ts_subpartition_0251_01 where col_2 in  (select col_1 from t_subpartition_0251  where col_1 >10 and col_1<100 );
+?.*ERROR: cannot use subquery in index predicat.*
+--step19: 创建不同部分索引; expect:成功
+create unique index  on t_subpartition_0251 (col_1,col_2 nulls first) tablespace ts_subpartition_0251_01 where col_2 in  (100,200,300 );
+SQL SUCCESS
+--step20: 查看执行计划; expect:成功
+explain  analyze select * from t_subpartition_0251 where col_2 in  (select col_1 from t_subpartition_0251  where col_1 >10 and col_1<100 ) and col_2  in  (100,200,300 ) order by 1 limit 100;
+?.*
+?.*QUERY PLAN .*
+?.*
+?.*Limit .*
+?.*  ->  Sort .*
+?.*        Sort Key: public.t_subpartition_0251.col_1  .*
+?.*        Sort Method: quicksort  Memory: .*
+?.*        ->  Hash Semi Join .*
+?.*              Hash Cond: \(public.t_subpartition_0251.col_2 = public.t_subpartition_0251.col_1\) .*
+?.*              ->  Partition Iterator .*
+?.*                    Iterations: .*
+?.*                    ->  Partitioned Index Scan using t_subpartition_0251_col_1_col_2_idx3 on t_subpartition_0251 .*
+?.*                          Index Cond: .*
+?.*                          Selected Partitions: .*
+?.*                          Selected Subpartitions: .*
+?.*              ->  Hash .*
+?.*                     Buckets: .*
+?.*                    ->  Index Only Scan using t_subpartition_0251_col_1_tableoid_idx on t_subpartition_0251 .*
+?.*                          Index Cond: .*
+?.*                          Heap Fetches: .*
+?.*Total runtime: .*
+?.*
+--step21: 查看执行计划; expect:成功,走索引
+explain  analyze select * from t_subpartition_0251 where col_2 in  (select col_1 from t_subpartition_0251  where col_1 >10 and col_1<100 ) and col_2  in  (100,200 ) order by 1 limit 100;
+?.*
+?.*QUERY PLAN  .*
+?.*
+?.*Limit .*
+?.*  ->  Sort .*
+?.*        Sort Key: public.t_subpartition_0251.col_1 .*
+?.*        Sort Method: quicksort  Memory: .*
+?.*        ->  Hash Semi Join .*
+?.*              Hash Cond: \(public.t_subpartition_0251.col_2 = public.t_subpartition_0251.col_1\)  .*
+?.*              ->  Partition Iterator .*
+?.*                    Iterations: .*
+?.*                    ->  Partitioned Index Scan using t_subpartition_0251_col_1_col_2_idx3 on t_subpartition_0251 .*
+?.*                          Index Cond: .*
+?.*                          Selected Partitions: .*
+?.*                          Selected Subpartitions: .*
+?.*              ->  Hash .*
+?.*                     Buckets: .*
+?.*                    ->  Index Only Scan using t_subpartition_0251_col_1_tableoid_idx on t_subpartition_0251 .*
+?.*                          Index Cond: .*
+?.*                          Heap Fetches: .*
+?.*Total runtime: .*
+?.*
+--step22: 创建不同部分索引; expect:成功
+create unique index  on t_subpartition_0251 (col_1,col_2 nulls first) tablespace ts_subpartition_0251_01 where col_2 = 100;
+SQL SUCCESS
+--step23: 查看执行计划; expect:成功
+explain  analyze select * from t_subpartition_0251 where col_2 in  (select col_1 from t_subpartition_0251  where col_1 >10 and col_1<100 ) and col_2 = 100 order by 1 limit 100;
+?.*
+?.*QUERY PLAN .*
+?.*
+?.*Limit .*
+?.*  ->  Nested Loop Semi Join .*
+?.*        ->  Partition Iterator .*
+?.*              Iterations: .*
+?.*              ->  Partitioned Index Scan using t_subpartition_0251_col_1_col_2_idx4 on t_subpartition_0251 .*
+?.*                    Index Cond: \(\(col_2 = 100\) AND \(col_2 > 10\) AND \(col_2 < 100\)\) .*
+?.*                    Selected Partitions: .*
+?.*                    Selected Subpartitions: .*
+?.*        ->  Index Only Scan using t_subpartition_0251_col_1_tableoid_idx on t_subpartition_0251 .*
+?.*              Index Cond: \(\(col_1 > 10\) AND \(col_1 < 100\) AND \(col_1 = 100\)\) .*
+?.*              Heap Fetches:.*
+?.*Total runtime:.*
+?.*
+--test1:  method
+--step25: 使用不同method创建索引; expect:合理报错
+create index on t_subpartition_0251 using gin(col_2 asc) local;
+?.*ERROR: data type integer has no default operator class for access method "gin.*
+  Hint: You must specify an operator class for the index or define a default operator class for the data type.
+--step26: 使用不同method创建索引; expect:合理报错
+create index on t_subpartition_0251 using gist(col_2 asc) local;
+?.*ERROR: data type integer has no default operator class for access method "gist.*
+  Hint: You must specify an operator class for the index or define a default operator class for the data type.
+--step27: 使用不同method创建索引; expect:合理报错
+create index on t_subpartition_0251 using psort(col_2 asc) local;
+?.*ERROR: access method "psort" does not support row stor.*
+--step28: 使用不同method创建索引; expect:成功
+create index on t_subpartition_0251 using btree(col_2 asc) local;
+SQL SUCCESS
+--step29: 查看执行计划; expect:成功
+explain  analyze select * from t_subpartition_0251 where col_2 in  (select col_1 from t_subpartition_0251  where col_1 >10 and col_1<100) order by 1 limit 100;
+?.*
+?.*QUERY PLAN .*
+?.*
+?.*Limit .*
+?.*  ->  Sort .*
+?.*        Sort Key: public.t_subpartition_0251.col_1  .*
+?.*        Sort Method: quicksort  Memory: .*
+?.*        ->  Hash Join .*
+?.*              Hash Cond: \(public.t_subpartition_0251.col_2 = public.t_subpartition_0251.col_1\) .*
+?.*              ->  Partition Iterator .*
+?.*                    Iterations: 5, Sub Iterations: .*
+?.*                    ->  Partitioned Bitmap Heap Scan on t_subpartition_0251 .*
+?.*                          Recheck Cond: \(\(col_2 > 10\) AND \(col_2 < 100\)\) .*
+?.*                          Selected Partitions: .*
+?.*                          Selected Subpartitions: .*
+?.*                          ->  Partitioned Bitmap Index Scan on t_subpartition_0251_col_1_col_2_idx1 .*
+?.*                                Index Cond: \(\(col_2 > 10\) AND \(col_2 < 100\)\) .*
+?.*                                Selected Partitions: .*
+?.*                                Selected Subpartitions: .*
+?.*              ->  Hash .*
+?.*                     Buckets:.*
+?.*                    ->  Bitmap Heap Scan on t_subpartition_0251 .*
+?.*                          Recheck Cond: \(\(col_1 > 10\) AND \(col_1 < 100\)\) .*
+?.*                          ->  Bitmap Index Scan on t_subpartition_0251_col_1_tableoid_idx .*
+?.*                                Index Cond: \(\(col_1 > 10\) AND \(col_1 < 100\)\)  .*
+?.*Total runtime: .*
+?.*
+--step30: 创建索引; expect:成功
+create unique index t_subpartition_0251_ind_04 on t_subpartition_0251 (col_1 nulls first) ;
+SQL SUCCESS
+--step31: 修改索引; expect:合理报错
+alter table t_subpartition_0251 add constraint t_subpartition_0251_pkey primary key using index t_subpartition_0251_ind_04;
+?.*ERROR: index "t_subpartition_0251_ind_04" does not have default sorting behavio.*
+  Detail: Cannot create a primary key or unique constraint using such an index.
+?.*
+--step32: 删除索引; expect:成功
+drop index t_subpartition_0251_col_2_idx;
+SQL SUCCESS
+--step33: 创建索引; expect:成功
+create unique index t_subpartition_0251_ind_05 on t_subpartition_0251 (col_2 ) ;
+SQL SUCCESS
+--step34: 修改索引; expect:成功
+alter table t_subpartition_0251 add constraint t_subpartition_0251_pkey primary key using index t_subpartition_0251_ind_05;
+SQL SUCCESS
+--step35: 查看执行计划; expect:成功
+explain  analyze  select * from t_subpartition_0251 where col_2 in  (select col_1 from t_subpartition_0251  where col_1 >10 and col_1<100) order by 1 limit 100;
+?.*
+?.*QUERY PLAN .*
+?.*
+?.*Limit .*
+?.*  ->  Sort .*
+?.*        Sort Key: public.t_subpartition_0251.col_1 .*
+?.*        Sort Method: quicksort  Memory: .*
+?.*        ->  Hash Join  .*
+?.*              Hash Cond: \(public.t_subpartition_0251.col_2 = public.t_subpartition_0251.col_1\)  .*
+?.*              ->  Partition Iterator .*
+?.*                    Iterations: .*
+?.*                    ->  Partitioned Bitmap Heap Scan on t_subpartition_0251 .*
+?.*                          Recheck Cond: \(\(col_2 > 10\) AND \(col_2 < 100\)\) .*
+?.*                          Selected Partitions: .*
+?.*                          Selected Subpartitions: .*
+?.*                          ->  Partitioned Bitmap Index Scan on t_subpartition_0251_col_1_col_2_idx1 .*
+?.*                                Index Cond: \(\(col_2 > 10\) AND \(col_2 < 100\)\) .*
+?.*                                Selected Partitions: .*
+?.*                                Selected Subpartitions:  .*
+?.*              ->  Hash .*
+?.*                     Buckets: .*
+?.*                    ->  Bitmap Heap Scan on t_subpartition_0251 .*
+?.*                          Recheck Cond: \(\(col_1 > 10\) AND \(col_1 < 100\)\) .*
+?.*                          ->  Bitmap Index Scan on t_subpartition_0251_ind_04  .*
+?.*                                Index Cond: \(\(col_1 > 10\) AND \(col_1 < 100\)\)  .*
+?.*Total runtime: .*
+?.*
+--step36: 创建二级分区表; expect:成功
+drop table if exists t_subpartition_0251;
+SQL SUCCESS
+create table t_subpartition_0251
+(
+    col_1 int ,
+    col_2 int ,
+    col_3 varchar2 ( 30 ) ,
+    col_4 int
+)
+tablespace ts_subpartition_0251
+partition by range (col_1) subpartition by list (col_2)
+(
+  partition p_range_1 values less than( -10 )
+  (
+    subpartition p_list_1_1 values ( '-1','-2','-3','-4','-5'),
+    subpartition p_list_1_2 values ( default )
+  ),
+  partition p_range_2 values less than( 20 )
+  (
+    subpartition p_list_2_1 values ( '6','7','8','9','10'),
+    subpartition p_list_2_2 values ( default )
+  ),
+   partition p_range_3 values less than( 30 )
+   (
+    subpartition p_list_3_1 values ( default )
+  ),
+   partition p_range_4 values less than( 40 )
+   (
+    subpartition p_list_4_1 values ( default )
+  ),
+  partition p_range_5 values less than( maxvalue )
+) enable row movement;
+SQL SUCCESS
+--step37: 插入数据; expect:成功
+insert into t_subpartition_0251 values (generate_series(-100, 100),generate_series(400, 200,-1),generate_series(700, 500,-1));
+SQL SUCCESS
+insert into t_subpartition_0251 values (generate_series(200, 400),generate_series(800, 600,-1),generate_series(900, 700,-1));
+SQL SUCCESS
+insert into t_subpartition_0251 values (generate_series(2200, 4400),generate_series(4800, 2600,-1),generate_series(4900, 2700,-1));
+SQL SUCCESS
+--step38: 创建索引; expect:成功
+create index on t_subpartition_0251(col_2) local;
+SQL SUCCESS
+--step39: 查看分析计划; expect:使用 local索引t_subpartition_0251_col_2_idx
+explain  analyze select * from t_subpartition_0251 where col_2 in  (select col_1 from t_subpartition_0251  where col_1 >10 and col_1<100) order by 1 limit 100;
+?.*
+?.*QUERY PLAN  .*
+?.*
+?.*Limit .*
+?.*  ->  Sort .*
+?.*        Sort Key: public.t_subpartition_0251.col_1  .*
+?.*        Sort Method: quicksort  Memory: .*
+?.*        ->  Nested Loop .*
+?.*              ->  HashAggregate .*
+?.*                    Group By Key: public.t_subpartition_0251.col_1 .*
+?.*                    ->  Partition Iterator .*
+?.*                          Iterations: .*
+?.*                          ->  Partitioned Seq Scan on t_subpartition_0251 .*
+?.*                                Filter: \(\(col_1 > 10\) AND \(col_1 < 100\)\) .*
+?.*                                Rows Removed by Filter: .*
+?.*                                Selected Partitions: .*
+?.*                                Selected Subpartitions: .*
+?.*              ->  Partition Iterator .*
+?.*                    Iterations: .*
+?.*                    ->  Partitioned Index Scan using t_subpartition_0251_col_2_idx on t_subpartition_0251 .*
+?.*                          Index Cond: \(\(col_2 = public.t_subpartition_0251.col_1\) AND \(col_2 > 10\) AND \(col_2 < 100\)\) .*
+?.*                          Selected Partitions: .*
+?.*                          Selected Subpartitions: .*
+?.*Total runtime: .*
+?.*
+--step40: 设置local索引某分区索引不可用; expect:成功
+alter index t_subpartition_0251_col_2_idx modify partition p_list_4_1_col_2_idx  unusable;
+SQL SUCCESS
+--step41: 查看分析计划; expect:不使用 local索引t_subpartition_0251_col_2_idx
+explain  analyze select * from t_subpartition_0251 where col_2 in  (select col_1 from t_subpartition_0251  where col_1 >10 and col_1<100) order by 1 limit 100;
+?.*
+?.*QUERY PLAN .*
+?.*
+?.* Limit .*
+?.*   ->  Sort .*
+?.*         Sort Key: public.t_subpartition_0251.col_1 .*
+?.*         Sort Method: quicksort  Memory: .*
+?.*         ->  Nested Loop .*
+?.*               ->  HashAggregate .*
+?.*                     Group By Key: public.t_subpartition_0251.col_1 .*
+?.*                     ->  Partition Iterator .*
+?.*                           Iterations: .*
+?.*                           ->  Partitioned Seq Scan on t_subpartition_0251 .*
+?.*                                 Filter: \(\(col_1 > 10\) AND \(col_1 < 100\)\) .*
+?.*                                 Rows Removed by Filter: .*
+?.*                                 Selected Partitions: .*
+?.*                                 Selected Subpartitions: .*
+?.*               ->  Partition Iterator .*
+?.*                     Iterations: .*
+?.*                     ->  Partitioned Seq Scan on t_subpartition_0251 .*
+?.*                           Filter: \(\(col_2 > 10\) AND \(col_2 < 100\) AND \(public.t_subpartition_0251.col_1 = col_2\)\) .*
+?.*                           Rows Removed by Filter:.*
+?.*                           Selected Partitions:.*
+?.*                           Selected Subpartitions: .*
+?.* Total runtime: .*
+?.*
+--step42: 重置分区索引可用; expect:成功
+alter index t_subpartition_0251_col_2_idx rebuild  partition p_list_4_1_col_2_idx ;
+SQL SUCCESS
+--step43: 重命名分区索引; expect:成功
+alter index t_subpartition_0251_col_2_idx rename partition p_list_4_1_col_2_idx to  ztt;
+SQL SUCCESS
+--step44: collation索引; expect:合理报错
+create index index_01 on i_subpartition_0251(col_2) collation local;
+?.*ERROR: syntax error at or near "collation.*
+?.*
+--step45: 二级分区键创建local索引,指定索引分区名的数量不正确; expect:合理报错
+drop index if exists i_subpartition_0251;
+SQL SUCCESS
+create index i_subpartition_0251 on t_subpartition_0251(col_2)local(partition p_range_1,partition p_range_2,partition p_range_3,partition p_range_4,partition p_range_5);
+?.*ERROR: Cannot match subpartitions when create subpartition indexes.*
+--step46: 清理环境; expect:成功
+drop table if exists t_subpartition_0251_01;
+SQL SUCCESS
+drop table if exists t_subpartition_0251;
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0251;
+SQL SUCCESS
+drop tablespace if exists ts_subpartition_0251_01;
+SQL SUCCESS

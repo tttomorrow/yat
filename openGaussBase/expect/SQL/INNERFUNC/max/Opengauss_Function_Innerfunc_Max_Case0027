@@ -1,0 +1,86 @@
+-- @testpoint: max输入存在空值
+--step1:创建表; expect:成功
+drop table if exists t_max_case0027;
+SQL SUCCESS
+create table t_max_case0027(c cidr, i inet);
+SQL SUCCESS
+--step2:插入数据; expect:空
+insert into t_max_case0027 values(NULL, NULL);
+SQL SUCCESS
+select max(c) from  t_max_case0027;
++-----+
+| max |
++-----+
+|     |
++-----+
+select max(i) from  t_max_case0027;
++-----+
+| max |
++-----+
+|     |
++-----+
+--step3:插入数据; expect:0.0.0.0
+insert into t_max_case0027 values('0.0.0.0', '0.0.0.0');
+SQL SUCCESS
+select max(c) from  t_max_case0027;
++---------+
+| max     |
++---------+
+| 0.0.0.0 |
++---------+
+select max(i) from  t_max_case0027;
++---------+
+| max     |
++---------+
+| 0.0.0.0 |
++---------+
+--step4:插入数据; expect:255.255.255.1
+insert into t_max_case0027 values('255.255.255.1/32', '255.255.255.1/32');
+SQL SUCCESS
+select max(c) from  t_max_case0027;
++---------------+
+| max           |
++---------------+
+| 255.255.255.1 |
++---------------+
+select max(i) from  t_max_case0027;
++---------------+
+| max           |
++---------------+
+| 255.255.255.1 |
++---------------+
+--step5:插入数据; expect:::
+delete from t_max_case0027;
+SQL SUCCESS
+insert into t_max_case0027 values(NULL, NULL),('::', '::');
+SQL SUCCESS
+select max(c) from  t_max_case0027;
++-----+
+| max |
++-----+
+| ::  |
++-----+
+select max(i) from  t_max_case0027;
++-----+
+| max |
++-----+
+| ::  |
++-----+
+--step6:插入数据; expect:ffff::ffff
+insert into t_max_case0027 values(NULL, NULL),('ffff::ffff/128', 'ffff::ffff/128');
+SQL SUCCESS
+select max(c) from  t_max_case0027;
++------------+
+| max        |
++------------+
+| ffff::ffff |
++------------+
+select max(i) from  t_max_case0027;
++------------+
+| max        |
++------------+
+| ffff::ffff |
++------------+
+--tearDown
+drop table if exists t_max_case0027;
+SQL SUCCESS

@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -31,6 +31,7 @@ Expect      :
     "log_rotation_size" (0 .. 2097151)
     2.返回报错：ERROR: The value 2097152 is outside the valid range for
     parameter "log_rotation_size" (0 .. 2097151)
+    3.返回报错ERROR: The value 2147482624 is outside the valid range for
     parameter "log_rotation_size" (0 .. 2097151)
     4.返回报错ERROR: The parameter "log_rotation_size" requires an integer value
     5.返回报错ERROR: The value "2GB" for parameter "log_rotation_size" is
@@ -84,6 +85,7 @@ class Errorlog(unittest.TestCase):
         msg3 = self.userNode.sh(excute_cmd3).result()
         self.logger.info(msg3)
         self.assertTrue(
+            msg3.find("The value 2147482624 is outside the valid range for "
                       "parameter \"log_rotation_size\" (0 .. 2097151)") > -1)
         self.logger.info('--------修改参数log_rotation_size值为10.5MB-----')
         excute_cmd3 = f'source {self.DB_ENV_PATH};' \

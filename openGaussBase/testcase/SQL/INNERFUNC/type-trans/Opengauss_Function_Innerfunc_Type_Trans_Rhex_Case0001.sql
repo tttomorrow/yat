@@ -9,6 +9,7 @@ select rawtohex('AaBb');
 select rawtohex('1');
 select rawtohex('3');
 
+--1234567:31323334353637
 select rawtohex('1234567');
 
 -- #:35:23

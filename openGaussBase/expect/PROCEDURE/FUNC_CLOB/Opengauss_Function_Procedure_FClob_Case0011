@@ -7,6 +7,7 @@ create table fvt_func_clob_table_011(
   t3 clob
   );
 SQL SUCCESS
+insert into fvt_func_clob_table_011 values(1,'01010101111100000100000010000000100111111111字符串字符串字符串#￥%……&*（——）（*&……gv个国家级科技控股及港口价格可加工客','ukagcccccccfttttayyygdbbbbuyu7885445112');
 SQL SUCCESS
 --创建自定义函数
 create or replace function fvt_func_clob_011(p1 int) return varchar2

@@ -6,6 +6,6 @@ FirstName varchar(255), address varchar(255), City varchar(255) );
 SQL SUCCESS
 insert into Persons values(0,'Mary','','','');
 ?.*ERROR: new row for relation "persons" violates check constraint "persons_id_p_check"
-  Detail: Failing row contains (0, Mary, null, null, null).
+  Detail: N/A
 drop table Persons cascade;
 SQL SUCCESS

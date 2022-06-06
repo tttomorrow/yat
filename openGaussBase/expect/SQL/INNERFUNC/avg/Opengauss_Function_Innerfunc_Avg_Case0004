@@ -5,6 +5,7 @@ drop table if exists t_function_1;
 SQL SUCCESS
 create table t_function_1(f0 bigint, f1 int, f2 double precision, f3 char(10), f4 varchar(10), f5 number(10,6), f6 date, f7 timestamp);
 SQL SUCCESS
+insert into t_function_1(f0, f1, f2, f3, f4, f5, f6, f7) values(1, 1, 3.333, '4', '5asdf', 6.666666666, '2018-01-16 12:13:14', '2017-03-30 12:13:14.456');
 SQL SUCCESS
 insert into t_function_1(f0, f1, f2, f3, f4, f5, f6, f7) values(null, null, 2.22, '5', 'test', 87.223, null, '2018-02-28 12:13:14.456');
 SQL SUCCESS
@@ -25,17 +26,21 @@ select avg(-92.4567/3.87763+8.9999) from sys_dummy limit 1;
 +----------------------+
 | avg                  |
 +----------------------+
+| -14.8437106590881544 |
 +----------------------+
 SELECT avg(sin(0.988271))AS RESULT from sys_dummy;
 +--------------------+
 | result             |
 +--------------------+
+| 0.8350760446793903 |
 +--------------------+
 select avg(acos(-1)) AS RESULT from sys_dummy;
 +-------------------+
 | result            |
 +-------------------+
+| 3.141592653589793 |
 +-------------------+
+select avg(COS(180 * 3.14159265359/180)) AS RESULT from sys_dummy;
 +--------+
 | result |
 +--------+
@@ -45,7 +50,9 @@ select avg(exp(3)) as RESULT from sys_dummy;
 +--------------------+
 | result             |
 +--------------------+
+| 20.085536923187668 |
 +--------------------+
+select avg(abs(-SIN(30 * 3.14159265359/180))) as result from sys_dummy;
 +--------------------+
 | result             |
 +--------------------+

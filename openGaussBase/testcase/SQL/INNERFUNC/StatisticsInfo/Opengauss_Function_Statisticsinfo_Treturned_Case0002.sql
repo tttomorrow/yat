@@ -4,4 +4,5 @@ select pg_stat_get_tuples_returned('') from PG_CLASS a where a.relname = 'sales'
 select pg_stat_get_tuples_returned(a.oid,a.oid,a.oid) from PG_CLASS a where a.relname = 'sales';
 select pg_stat_get_tuples_returned() from PG_CLASS a where a.relname = 'sales';
 select pg_stat_get_tuples_returned('&^%^&*') from PG_CLASS a where a.relname = 'sales';
+select pg_stat_get_tuples_returned(99999999999998789) from PG_CLASS a where a.relname = 'sales';
 select pg_stat_get_tuples_returned(a.oid) from PG_CLASS a where a.relname = 'sales';

@@ -1,16 +1,16 @@
 -- @testpoint: opengauss关键字resource(非保留)，设置角色使用的resource pool名称
---查看资源池信息
+--step1：查看资源池信息; expect:成功
 select * from pg_resource_pool;
-+--------------+-------------+--------------+---------------------+-------------------+---------+--------------+----------+-----------+-------------+--------------+------------+
-| respool_name | mem_percent | cpu_affinity | control_group       | active_statements | max_dop | memory_limit | parentid | io_limits | io_priority | nodegroup    | is_foreign |
-+--------------+-------------+--------------+---------------------+-------------------+---------+--------------+----------+-----------+-------------+--------------+------------+
-| default_pool | 100         | -1           | DefaultClass:Medium | -1                | 1       | 8GB          | 0        | 0         | None        | installation | false      |
-+--------------+-------------+--------------+---------------------+-------------------+---------+--------------+----------+-----------+-------------+--------------+------------+
---设置角色使用的resource pool名称
++--------------+-------------+--------------+---------------------+-------------------+---------+--------------+----------+-----------+-------------+--------------+------------+------------+
+| respool_name | mem_percent | cpu_affinity | control_group       | active_statements | max_dop | memory_limit | parentid | io_limits | io_priority | nodegroup    | is_foreign | max_worker |
++--------------+-------------+--------------+---------------------+-------------------+---------+--------------+----------+-----------+-------------+--------------+------------+------------+
+| default_pool | 100         | -1           | DefaultClass:Medium | -1                | 1       | 8GB          | 0        | 0         | None        | installation | false      |            |
++--------------+-------------+--------------+---------------------+-------------------+---------+--------------+----------+-----------+-------------+--------------+------------+------------+
+--step2：设置角色使用的resource pool名称; expect:成功
 DROP ROLE if exists manager;
 SQL SUCCESS
 CREATE ROLE manager RESOURCE POOL 'default_pool' IDENTIFIED BY 'Bigdata@123';
 SQL SUCCESS
---清理环境
+--step4：清理环境; expect:成功
 DROP ROLE manager;
 SQL SUCCESS

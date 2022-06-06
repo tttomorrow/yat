@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -17,8 +17,7 @@ Case Type   : policy
 Case Name   : 密码特殊字符的最少要求个数password_min_special=0
 Description :
     1.在postgres.conf中设置password_min_special=0，重启数据库生效
-    2.初始用户执行：create user wf with password 'Qazwsx@123';
-    create user user001 with password 'Qazwsx123';
+    2.初始用户执行：create user wf with password '$PASSWORD';
 Expect      :
     1.设置成功，数据库重启成功
     2.CREATE ROLE,不限制密码策略

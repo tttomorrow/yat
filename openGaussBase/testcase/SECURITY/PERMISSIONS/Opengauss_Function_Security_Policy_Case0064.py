@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -17,9 +17,9 @@ Case Type   : Separation_policy
 Case Name   : 设置密码不可重用天数为0
 Description :
     1.登录数据库gsql -d $database -p $port -r
-    2.创建用户user02,create user user001 with password "Qazwsx@123";
-    3.设置不可重用天数默认值为0天，gs_guc reload -N all -I all -c "password_reuse_time=0“
-    4.修改2次用户密码，第2次将用户密码改回Qazwsx@123
+    2.创建用户user02,create user user001 with password "$PASSWORD1";
+    3.设置不可重用天数默认值为0天，gs_guc reload -D $PATH -c "password_reuse_time=0“
+    4.修改2次用户密码，第2次将用户密码改回PASSWORD1
 Expect      :
     1.登录数据库成功
     2.创建成功

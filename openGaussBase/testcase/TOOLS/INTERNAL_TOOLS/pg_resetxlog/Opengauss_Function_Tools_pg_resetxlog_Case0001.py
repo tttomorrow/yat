@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -34,7 +34,7 @@ Primary_SH = CommonSH('PrimaryDbUser')
 Logger = Logger()
 
 
-@unittest.skipIf(1 == Primary_SH.get_node_num(),
+@unittest.skipIf('Standby' not in Primary_SH.get_db_cluster_status('detail'),
                  '单机环境不执行')
 class Tools(unittest.TestCase):
     def setUp(self):

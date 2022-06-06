@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Huawei Technologies Co.,Ltd.
+Copyright (c) 2022 Huawei Technologies Co.,Ltd.
 
 openGauss is licensed under Mulan PSL v2.
 You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -29,12 +29,16 @@ Expect      :
     步骤3:恢复默认值成功
 History     :
 """
+import os
 import time
 import unittest
 
 from testcase.utils.CommonSH import CommonSH
+from testcase.utils.Common import Common
 from testcase.utils.Constant import Constant
 from testcase.utils.Logger import Logger
+from yat.test import Node
+from yat.test import macro
 
 LOGGER = Logger()
 COMMONSH = CommonSH("PrimaryDbUser")
@@ -44,27 +48,52 @@ class GucTestCase(unittest.TestCase):
     def setUp(self):
         LOGGER.info("==Opengauss_Function_Guc_Run_Statistics_Case0069开始执行==")
         self.constant = Constant()
+        self.common = Common()
+        self.com = CommonSH("PrimaryDbUser")
+        self.user_node = Node("PrimaryDbUser")
         status = COMMONSH.get_db_cluster_status()
         self.assertTrue("Degraded" in status or "Normal" in status)
         self.param = "enable_save_datachanged_timestamp"
 
-    # 判断查询到的t为空 或为时间
-    def is_timestamp(self, t):
-        if t == "":
-            return True
-        LOGGER.info("last_data_changed:" + t)
-        d_time = t.split('.')[0].strip()  # 2021-01-08 14:57:24.228786+08
-        sql_cmd = COMMONSH.execut_db_sql(f"select date '{d_time}';")
-        LOGGER.info(sql_cmd)
-        return  "ERROR" not in sql_cmd
-
+        text = "备份pg_hba.conf文件"
+        LOGGER.info(text)
+        self.hba = os.path.join(macro.DB_INSTANCE_PATH, "pg_hba.conf")
+        result = self.common.get_sh_result(self.user_node,
+                                           f"cp {self.hba} {self.hba}backup")
+        self.assertNotIn("bash", result, "执行失败:" + text)
+        self.assertNotIn("ERROR", result, "执行失败:" + text)
+        
     def test_guc(self):
-        LOGGER.info("步骤1:查询enable_save_datachanged_timestamp 期望：默认值on")
+        LOGGER.info(f"--修改参数 确认落盘--")
+        result = COMMONSH.execute_gsguc("set",
+                                       self.constant.GSGUC_SUCCESS_MSG,
+                                       f"synchronous_standby_names='*'")
+        self.assertTrue(result)
+        result = COMMONSH.execute_gsguc("set",
+                                       self.constant.GSGUC_SUCCESS_MSG,
+                                       f"synchronous_commit='remote_apply'")
+        self.assertTrue(result)
+        result = COMMONSH.execute_gsguc("set",
+                                       self.constant.GSGUC_SUCCESS_MSG,
+                                       f"hot_standby=on")
+        self.assertTrue(result)
+        result = COMMONSH.execute_gsguc("set",
+                                       self.constant.GSGUC_SUCCESS_MSG,
+                                       f"wal_level='hot_standby'")
+        self.assertTrue(result)
+        status = COMMONSH.restart_db_cluster()
+        LOGGER.info(status)
+        status = COMMONSH.get_db_cluster_status()
+        LOGGER.info(status)
+        self.assertTrue("Normal" in status or "Degraded" in status)
+
+        LOGGER.info(f"--step1:查询{self.param};expect:默认值on")
         sql_cmd = COMMONSH.execut_db_sql(f"show {self.param};")
         LOGGER.info(sql_cmd)
+        self.assertNotIn(self.constant.SQL_WRONG_MSG[1], sql_cmd)
         self.assertEqual("on", sql_cmd.splitlines()[-2].strip())
 
-        LOGGER.info("步骤2:方式四修改参数enable_save_datachanged_timestamp为off")
+        LOGGER.info(f"--step2:方式四修改参数{self.param}为off;expect:失败")
         sql_cmd = COMMONSH.execut_db_sql(f"alter system "
             f"set {self.param} to off;show {self.param};")
         self.assertIn("ERROR", sql_cmd)
@@ -99,10 +128,9 @@ class GucTestCase(unittest.TestCase):
             LOGGER.info(sql_cmd)
             self.assertNotIn("ERROR", sql_cmd)
             data1 = sql_cmd.splitlines()[-2].strip()
-            self.assertTrue(self.is_timestamp(data1))
 
             time.sleep(3)
-            LOGGER.info("步骤3:创建表做DML")
+            LOGGER.info("--校验功能")
             sql_cmd = COMMONSH.execut_db_sql(f'''{sql}''')
             LOGGER.info(sql_cmd)
             self.assertNotIn("ERROR", sql_cmd)
@@ -113,33 +141,27 @@ class GucTestCase(unittest.TestCase):
             LOGGER.info(sql_cmd)
             self.assertNotIn("ERROR", sql_cmd)
             data2 = sql_cmd.splitlines()[-2].strip()
-            self.assertTrue(self.is_timestamp(data2))
             LOGGER.info("判断前后时间不同 操作时间已更新")
             self.assertNotEqual(data1, data2)
 
-        LOGGER.info("步骤3:恢复默认值")
-        LOGGER.info("步骤3:恢复默认值")
-        sql_cmd = COMMONSH.execut_db_sql("drop table test cascade;"
-            "drop table test1 cascade;")
-        LOGGER.info(sql_cmd)
-        self.assertNotIn("ERROR", sql_cmd)
-        data1 = sql_cmd.splitlines()[-2].strip()
-        result = COMMONSH.execute_gsguc("reload",
-                                       self.constant.GSGUC_SUCCESS_MSG,
-                                       f"{self.param}='on'")
-        self.assertTrue(result)
-        COMMONSH.restart_db_cluster()
-        result = COMMONSH.get_db_cluster_status()
-        self.assertTrue("Degraded" in result or "Normal" in result)
-
     def tearDown(self):
-        LOGGER.info("恢复默认值")
-        sql_cmd = COMMONSH.execut_db_sql(f"show {self.param};")
-        if "on" != sql_cmd.splitlines()[-2].strip():
-            COMMONSH.execute_gsguc("reload",
-                                  self.constant.GSGUC_SUCCESS_MSG,
-                                  f"{self.param}='on'")
-            COMMONSH.restart_db_cluster()
+        LOGGER.info("--step3:恢复默认值;expect:成功")
+        LOGGER.info(f"恢复pg_hba.conf文件")
+        cmd_result = self.common.get_sh_result(self.user_node,
+                                           f"mv {self.hba}backup {self.hba}")
+        LOGGER.info(cmd_result)
+
+        sql_result = COMMONSH.execut_db_sql("drop table test cascade;"
+                                            "drop table test1 cascade;")
+        LOGGER.info(sql_result)
+        COMMONSH.execute_gsguc("reload",
+                              self.constant.GSGUC_SUCCESS_MSG,
+                              f"{self.param}='on'")
+        COMMONSH.restart_db_cluster()
+        result = COMMONSH.execut_db_sql(f"show {self.param};")
+        LOGGER.info(result)
         status = COMMONSH.get_db_cluster_status()
+        self.assertTrue("on\n" in result)
+        self.assertNotIn("ERROR", sql_result)
         self.assertTrue("Degraded" in status or "Normal" in status)
         LOGGER.info("==Opengauss_Function_Guc_Run_Statistics_Case0069执行结束==")

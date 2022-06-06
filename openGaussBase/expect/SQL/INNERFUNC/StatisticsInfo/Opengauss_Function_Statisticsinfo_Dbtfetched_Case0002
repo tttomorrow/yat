@@ -7,6 +7,7 @@ select pg_stat_get_db_tuples_fetched(999999);
 +-------------------------------+
 | 0                             |
 +-------------------------------+
+select pg_stat_get_db_tuples_fetched(999999999999999999);
 ?.*ERROR: OID out of range
   Where: referenced column: pg_stat_get_db_tuples_fetched
 select pg_stat_get_db_tuples_fetched(a.oid,a.oid) from PG_DATABASE a where a.datname = CURRENT_CATALOG;
