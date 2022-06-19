@@ -245,7 +245,6 @@ test:SQL/DDL/Index/Opengauss_Function_DDL_Index_Case0247
 test:SQL/DDL/Index/Opengauss_Function_DDL_Index_Case0248
 test:SQL/DDL/Index/Opengauss_Function_DDL_Index_Case0249
 test:SQL/DDL/Index/Opengauss_Function_DDL_Index_Case0250
-test:SQL/DDL/Index/Opengauss_Function_DDL_Index_Case0251
 test:SQL/DDL/Index/Opengauss_Function_DDL_Index_Case0252
 test:SQL/DDL/Index/Opengauss_Function_DDL_Index_Case0253
 test:SQL/DDL/Index/Opengauss_Function_DDL_Index_Case0254

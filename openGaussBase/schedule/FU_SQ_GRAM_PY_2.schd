@@ -272,7 +272,6 @@ test:SQL/DML/set/Opengauss_Function_DML_Set_Case0015
 test:SQL/DML/set/Opengauss_Function_DML_Set_Case0017
 test:SQL/DML/set/Opengauss_Function_DML_Set_Case0029
 test:SQL/DML/set/Opengauss_Function_DML_Set_Case0030
-test:SQL/DML/set/Opengauss_Function_DML_Set_Case0031
 test:SQL/DML/set/Opengauss_Function_DML_Set_Case0032
 test:SQL/DML/set/Opengauss_Function_DML_Set_Case0033
 test:SQL/DML/set/Opengauss_Function_DML_Set_Case0034
@@ -358,5 +357,4 @@ test:SQL/DML/set/Opengauss_Function_DML_Set_Case0138
 test:SQL/DML/set/Opengauss_Function_DML_Set_Case0139
 test:SQL/DML/set/Opengauss_Function_DML_Set_Case0140
 test:SQL/DML/set/Opengauss_Function_DML_Set_Case0150
-test:SQL/DML/set/Opengauss_Function_DML_Set_Case0151
 test:SQL/DML/set/Opengauss_Function_DML_Set_Case0152

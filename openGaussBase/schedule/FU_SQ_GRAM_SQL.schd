@@ -2422,17 +2422,12 @@ test:SQL/DML/modify_unique/Opengauss_Function_DML_Unique_Case0013
 test:SQL/DML/modify_unique/Opengauss_Function_DML_Unique_Case0014
 test:SQL/DML/modify_unique/Opengauss_Function_DML_Unique_Case0015
 test:SQL/DML/modify_unique/Opengauss_Function_DML_Unique_Case0016
-test:SQL/DML/set/Opengauss_Function_DML_Set_Case0016
 test:SQL/DML/set/Opengauss_Function_DML_Set_Case0018
 test:SQL/DML/set/Opengauss_Function_DML_Set_Case0019
 test:SQL/DML/set/Opengauss_Function_DML_Set_Case0020
 test:SQL/DML/set/Opengauss_Function_DML_Set_Case0021
-test:SQL/DML/set/Opengauss_Function_DML_Set_Case0022
-test:SQL/DML/set/Opengauss_Function_DML_Set_Case0023
-test:SQL/DML/set/Opengauss_Function_DML_Set_Case0024
 test:SQL/DML/set/Opengauss_Function_DML_Set_Case0025
 test:SQL/DML/set/Opengauss_Function_DML_Set_Case0026
-test:SQL/DML/set/Opengauss_Function_DML_Set_Case0027
 test:SQL/DML/set/Opengauss_Function_DML_Set_Case0028
 test:SQL/DML/set/Opengauss_Function_DML_Set_Case0035
 test:SQL/DML/set/Opengauss_Function_DML_Set_Case0036
