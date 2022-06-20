@@ -33,6 +33,7 @@ from .comment_parser import CommentParser
 from .errors import MetaParseError
 from .meta import CaseMeta, DTS
 from .meta_lex import Token
+from .meta_lex import MetaLex
 
 
 class MetaParser:

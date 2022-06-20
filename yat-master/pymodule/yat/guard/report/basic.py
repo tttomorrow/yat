@@ -15,6 +15,7 @@ MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 See the Mulan PSL v2 for more details.
 """
 
+import os
 import re
 import stat
 from .report_manager import reporter
