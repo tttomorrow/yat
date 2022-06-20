@@ -35,7 +35,7 @@ class TestGroup(val suite: TestSuite) : Iterable<TestCase> {
         properties.forEach { (k, v) ->
             when (k) {
                 "valid" -> testCase.properties.valid = getBoolean(k, v)
-                "diff" -> testCase.properties.valid = getBoolean(k, v)
+                "diff" -> testCase.properties.diff = getBoolean(k, v)
                 "timeout" -> testCase.properties.timeout = getLong(k, v)
             }
         }
