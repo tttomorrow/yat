@@ -40,13 +40,11 @@ def make_schedule(test_dir, force=False):
     flags = os.O_WRONLY | os.O_CREAT | os.O_TRUNC
     mode = stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IROTH
     with os.fdopen(os.open(schedule_file, flags, mode), 'w') as schedule:
-        for case in os.listdir(test_case_dir):
-            real_path = os.path.join(test_case_dir, case)
-            if os.path.isdir(real_path):
-                groups = ("%s/%s" % (case, os.path.splitext(group_case)[0])
-                          for group_case in os.listdir(real_path)
-                          if os.path.isfile(os.path.join(real_path, group_case)))
-                schedule.write("test: %s\n" % "\n      ".join(groups))
-            else:
-                name, ext = os.path.splitext(case)
-                schedule.write("test: %s\n" % name)
+        for current_dir, dirs, test_cases in os.walk(test_case_dir):
+            groups = ("%s" % os.path.splitext(os.path.join(current_dir, group_case))[0].replace('./testcase/', '')
+                      for group_case in test_cases
+                      if os.path.isfile(os.path.join(current_dir, group_case))
+                     )
+            test_groups = "\n      ".join(groups)
+            if len(test_groups.strip()) != 0:
+                schedule.write("test: %s\n" % test_groups)
