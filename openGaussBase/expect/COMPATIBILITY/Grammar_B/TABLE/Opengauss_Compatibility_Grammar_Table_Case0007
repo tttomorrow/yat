@@ -1,0 +1,33 @@
+-- @testpoint: 删除列存表的索引添加on table
+--step1:建表;expect:成功
+drop table if exists t_plugin0007;
+SQL SUCCESS
+create table t_plugin0007 (a text(10), b int) with(orientation=column);
+SQL SUCCESS
+--step2:创建psort索引;expect:成功
+drop index if exists id_plugin0007_01;
+SQL SUCCESS
+create index id_plugin0007_01 on t_plugin0007 using psort(a);
+SQL SUCCESS
+--step3:删除索引,添加on table;expect:成功
+drop index id_plugin0007_01 on  id_plugin0007;
+SQL SUCCESS
+--step4:创建btree索引;expect:成功
+drop index if exists id_plugin0007_02;
+SQL SUCCESS
+create index id_plugin0007_02 on t_plugin0007 using btree(a);
+SQL SUCCESS
+--step5:删除索引,添加on table;expect:成功
+drop index id_plugin0007_02 on id_plugin0007;
+SQL SUCCESS
+--step6:创建gin索引;expect:成功
+drop index if exists id_plugin0007_03;
+SQL SUCCESS
+create index id_plugin0007_03 on t_plugin0007 using gin(to_tsvector('ngram', a));
+SQL SUCCESS
+--step7:删除索引,添加on table;expect:成功
+drop index id_plugin0007_03 on id_plugin0007;
+SQL SUCCESS
+--step8:清理环境;expect:成功
+drop table if exists t_plugin0007;
+SQL SUCCESS
