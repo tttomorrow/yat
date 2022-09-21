@@ -1,0 +1,85 @@
+-- @testpoint: 时间函数sec_to_time功能测试,部分测试步骤合理报错
+--step1:创建用于存储函数结果的表;expect:成功
+drop table if exists func_test;
+SQL SUCCESS
+create table func_test(functionName varchar(256),result varchar(256));
+SQL SUCCESS
+--step2:插入sec_to_time执行结果;expect:成功
+insert into func_test(functionName, result) values ('sec_to_time(''1000'')', sec_to_time('1000'));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('sec_to_time(''1000.5'')', sec_to_time('1000.5'));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('sec_to_time(1000.5)', sec_to_time(1000.5));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('sec_to_time(''abcd'')', sec_to_time('abcd'));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('sec_to_time(true)', sec_to_time(true));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('sec_to_time(B''1111'')', sec_to_time(B'1111'));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('sec_to_time(NULL)', sec_to_time(NULL));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('sec_to_time(pow(10,18))', sec_to_time(pow(10,18)));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('sec_to_time(pow(10,18)-1)', sec_to_time(pow(10,18)-1));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('sec_to_time(1000)', sec_to_time(1000));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('sec_to_time(0)', sec_to_time(0));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('sec_to_time(-1000000)', sec_to_time(-1000000));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('sec_to_time(1000000.499)', sec_to_time(1000000.499));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('sec_to_time(1000000.4990000)', sec_to_time(1000000.4990000));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('sec_to_time(1000000.4999994999)', sec_to_time(1000000.4999994999));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('sec_to_time(1000000.499999500)', sec_to_time(1000000.499999500));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('sec_to_time(1000000.499998500)', sec_to_time(1000000.499998500));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('sec_to_time(0.999999500)', sec_to_time(0.999999500));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('sec_to_time(59.999999600)', sec_to_time(59.999999600));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('sec_to_time(3599.999999700)', sec_to_time(3599.999999700));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('sec_to_time(3020399)', sec_to_time(3020399));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('sec_to_time(3020399 + 1)', sec_to_time(3020399 + 1));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('sec_to_time(3020399.000000500)', sec_to_time(3020399.000000500));
+SQL SUCCESS
+--step3:查看sec_to_time函数执行结果是否正确;expect:成功
+select * from func_test;
++---------------------------------+------------------+
+| functionname                    | result           |
++---------------------------------+------------------+
+| sec_to_time('1000')             | 00:16:40         |
+| sec_to_time('1000.5')           | 00:16:40.5       |
+| sec_to_time(1000.5)             | 00:16:40.5       |
+| sec_to_time('abcd')             | 00:00:00         |
+| sec_to_time(true)               | 00:00:01         |
+| sec_to_time(B'1111')            | 00:00:15         |
+| sec_to_time(NULL)               |                  |
+| sec_to_time(pow(10,18))         | 838:59:59        |
+| sec_to_time(pow(10,18)-1)       | 838:59:59        |
+| sec_to_time(1000)               | 00:16:40         |
+| sec_to_time(0)                  | 00:00:00         |
+| sec_to_time(-1000000)           | -277:46:40       |
+| sec_to_time(1000000.499)        | 277:46:40.499    |
+| sec_to_time(1000000.4990000)    | 277:46:40.499    |
+| sec_to_time(1000000.4999994999) | 277:46:40.499999 |
+| sec_to_time(1000000.499999500)  | 277:46:40.5      |
+| sec_to_time(1000000.499998500)  | 277:46:40.499999 |
+| sec_to_time(0.999999500)        | 00:00:01         |
+| sec_to_time(59.999999600)       | 00:01:00         |
+| sec_to_time(3599.999999700)     | 01:00:00         |
+| sec_to_time(3020399)            | 838:59:59        |
+| sec_to_time(3020399 + 1)        | 838:59:59        |
+| sec_to_time(3020399.000000500)  | 838:59:59        |
++---------------------------------+------------------+
+--step4:清理环境;expect:成功
+drop table if exists func_test;
+SQL SUCCESS

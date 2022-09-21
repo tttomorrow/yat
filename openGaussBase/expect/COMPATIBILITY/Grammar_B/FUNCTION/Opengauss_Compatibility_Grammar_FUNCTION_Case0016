@@ -1,0 +1,114 @@
+-- @testpoint: 时间函数to_seconds功能测试,部分测试步骤合理报错
+--step1:创建用于存储函数结果的表;expect:成功
+drop table if exists func_test;
+SQL SUCCESS
+create table func_test(functionName varchar(256),result varchar(256));
+SQL SUCCESS
+--step2:插入合法入参时to_seconds执行结果;expect:成功
+insert into func_test(functionName, result) values('TO_SECONDS(''2022-07-27'')', TO_SECONDS('2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TO_SECONDS(''20220727'')', TO_SECONDS('20220727'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TO_SECONDS(''2022-07-27 15:25:30'')', TO_SECONDS('2022-07-27 15:25:30'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TO_SECONDS(''2022-07-27 15:25:30.8888855'')', TO_SECONDS('2022-07-27 15:25:30.8888855'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TO_SECONDS(''20220727152530'')', TO_SECONDS('20220727152530'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TO_SECONDS(''2022-07-27 15:25:30.8888854'')', TO_SECONDS('2022-07-27 15:25:30.8888854'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TO_SECONDS(050505)', TO_SECONDS(050505));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TO_SECONDS(20220801)', TO_SECONDS(20220801));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TO_SECONDS(20220801182030)', TO_SECONDS(20220801182030));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TO_SECONDS(20220801182030.8888855)', TO_SECONDS(20220801182030.8888855));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TO_SECONDS(''9999-12-31'')', TO_SECONDS('9999-12-31'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TO_SECONDS(''9999-12-31 23:59:59'')', TO_SECONDS('9999-12-31 23:59:59'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TO_SECONDS(''9999-12-31 23:59:59.999999'')', TO_SECONDS('9999-12-31 23:59:59.999999'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TO_SECONDS(''0000-01-01 00:00:00'')', TO_SECONDS('0000-01-01 00:00:00'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TO_SECONDS(''0000-01-01'')', TO_SECONDS('0000-01-01'));
+SQL SUCCESS
+--step3:插入入参为特殊类型的to_seconds用例执行结果;expect:成功
+insert into func_test(functionName, result) values('TO_SECONDS(null)', TO_SECONDS(null));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TO_SECONDS(date''2022-04-05'')', TO_SECONDS(date'2022-04-05'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TO_SECONDS(cast(''2022-04-05 14:35:00'' as datetime))', TO_SECONDS(cast('2022-04-05 14:35:00' as datetime)));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TO_SECONDS(cast(''2022-04-05 14:35:00.888'' as datetime))', TO_SECONDS(cast('2022-04-05 14:35:00.888' as datetime)));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TO_SECONDS(time''1:1:1'')', TO_SECONDS(time'1:1:1'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TO_SECONDS(time''25:00:00'')', TO_SECONDS(time'25:00:00'));
+SQL SUCCESS
+--step4:插入非法入参时to_seconds用例执行结果;expect:合理报错
+insert into func_test(functionName, result) values('TO_SECONDS(''2022-07-32'')', TO_SECONDS('2022-07-32'));
+?.*ERROR: date/time field value out of range: "2022-07-32"
+  Hint: Perhaps you need a different "datestyle" setting.
+  Where: referenced column: result
+insert into func_test(functionName, result) values('TO_SECONDS(''2022-13-27'')', TO_SECONDS('2022-13-27'));
+?.*ERROR: date/time field value out of range: "2022-13-27"
+  Hint: Perhaps you need a different "datestyle" setting.
+  Where: referenced column: result
+insert into func_test(functionName, result) values('TO_SECONDS(''2022-07-27 12:00:61'')', TO_SECONDS('2022-07-27 12:00:61'));
+?.*ERROR: date/time field value out of range: "2022-07-27 12:00:61"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('TO_SECONDS(''2022-07-27 12:61:00'')', TO_SECONDS('2022-07-27 12:61:00'));
+?.*ERROR: date/time field value out of range: "2022-07-27 12:61:00"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('TO_SECONDS(''2022-07-27 25:00:00'')', TO_SECONDS('2022-07-27 25:00:00'));
+?.*ERROR: date/time field value out of range: "2022-07-27 25:00:00"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('TO_SECONDS(true)', TO_SECONDS(true));
+?.*ERROR: date/time field value out of range: "000001"
+  Hint: Perhaps you need a different "datestyle" setting.
+  Where: referenced column: result
+--step5:插入to_seconds涉及时间类型值超出范围的用例执行结果;expect:合理报错
+insert into func_test(functionName, result) values('TO_SECONDS(''10000-01-01'')', TO_SECONDS('10000-01-01'));
+?.*ERROR: date/time value out of range
+  Where: referenced column: result
+insert into func_test(functionName, result) values('TO_SECONDS(''0000-00-00'')', TO_SECONDS('0000-00-00'));
+?.*ERROR: date/time field value out of range: "0000-00-00"
+  Hint: Perhaps you need a different "datestyle" setting.
+  Where: referenced column: result
+insert into func_test(functionName, result) values('TO_SECONDS(''0000-00-00 00:00:00'')', TO_SECONDS('0000-00-00 00:00:00'));
+?.*ERROR: date/time field value out of range: "0000-00-00 00:00:00"
+  Hint: Perhaps you need a different "datestyle" setting.
+  Where: referenced column: result
+--step6:查看to_seconds函数执行结果是否正确;expect:成功
+select * from func_test;
++---------------------------------------------------------+--------------+
+| functionname                                            | result       |
++---------------------------------------------------------+--------------+
+| TO_SECONDS('2022-07-27')                                | 63826099200  |
+| TO_SECONDS('20220727')                                  | 63826099200  |
+| TO_SECONDS('2022-07-27 15:25:30')                       | 63826154730  |
+| TO_SECONDS('2022-07-27 15:25:30.8888855')               | 63826154730  |
+| TO_SECONDS('20220727152530')                            | 63826154730  |
+| TO_SECONDS('2022-07-27 15:25:30.8888854')               | 63826154730  |
+| TO_SECONDS(050505)                                      | 63282470400  |
+| TO_SECONDS(20220801)                                    | 63826531200  |
+| TO_SECONDS(20220801182030)                              | 63826597230  |
+| TO_SECONDS(20220801182030.8888855)                      | 63826597230  |
+| TO_SECONDS('9999-12-31')                                | 315569433600 |
+| TO_SECONDS('9999-12-31 23:59:59')                       | 315569519999 |
+| TO_SECONDS('9999-12-31 23:59:59.999999')                | 315569519999 |
+| TO_SECONDS('0000-01-01 00:00:00')                       | 86400        |
+| TO_SECONDS('0000-01-01')                                | 86400        |
+| TO_SECONDS(null)                                        |              |
+| TO_SECONDS(date'2022-04-05')                            | 63816336000  |
+| TO_SECONDS(cast('2022-04-05 14:35:00' as datetime))     | 63816388500  |
+| TO_SECONDS(cast('2022-04-05 14:35:00.888' as datetime)) | 63816388501  |
+?.*| TO_SECONDS(time'1:1:1')                                 | .* |
+?.*| TO_SECONDS(time'25:00:00')                              | .* |
++---------------------------------------------------------+--------------+
+--step7:清理环境;expect:成功
+drop table if exists func_test;
+SQL SUCCESS
