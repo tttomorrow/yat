@@ -35,7 +35,7 @@ select distinctrow on(subject / 10)id,name,subject,score from tb_grammar0017 ord
 ?.*ERROR: invalid input syntax for type bigint.*
 --step5:排序列顺序不对，;expect:合理报错
 select distinctrow on(subject)id,name,subject,score from tb_grammar0017 order by score desc,subject;
-?.*ERROR: SELECT DISTINCT ON expression must match initial ORDER BY	expressions
+?.*ERROR: SELECT DISTINCT ON expressions must match initial ORDER BY expressions
 ?.*
 --step6:distinctrowrow on（括号里跟2个参数）;expect:成功
 select distinctrow on(id,subject)id,name,subject,score from tb_grammar0017 order by id, subject,score desc;
