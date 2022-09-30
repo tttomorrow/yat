@@ -1,7 +1,7 @@
 -- @testpoint: 不同表类型，建表指定engine参数
 --testpoint1:
 --step1:创建一种复合类型;expect:成功
-drop type if exists ty_grammar0001;
+drop type if exists ty_grammar0001 cascade;
 SQL SUCCESS
 create type ty_grammar0001 as (a int, b text);
 SQL SUCCESS
