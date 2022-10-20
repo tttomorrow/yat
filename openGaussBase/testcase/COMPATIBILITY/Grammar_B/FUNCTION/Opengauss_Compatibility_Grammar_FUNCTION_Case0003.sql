@@ -28,6 +28,9 @@ insert into func_test(functionName, result) values ('period_add(pow(2,60), 20)',
 
 --step3:插入非法入参时maketime执行结果;expect:合理报错
 insert into func_test(functionName, result) values ('period_add(''abcd'', 1)', period_add('abcd', 1));
+insert into func_test(functionName, result) values ('period_add(''a'', 1)', period_add('a', 1));
+insert into func_test(functionName, result) values ('period_add(200000, ''abcd'')', period_add(200000, 'abcd'));
+insert into func_test(functionName, result) values ('period_add(200000, ''a'')', period_add(200000, 'a'));
 
 --step4:查看makedate函数执行结果是否正确;expect:成功
 select * from func_test;

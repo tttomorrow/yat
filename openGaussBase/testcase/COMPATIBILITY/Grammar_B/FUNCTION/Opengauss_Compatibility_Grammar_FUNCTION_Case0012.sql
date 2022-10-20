@@ -38,8 +38,24 @@ insert into func_test(functionName, result) values('TIMESTAMP(''abcd'', ''010101
 insert into func_test(functionName, result) values('TIMESTAMP(true, false)', TIMESTAMP(true, false));
 insert into func_test(functionName, result) values('TIMESTAMP(B''1'', B''1'')', TIMESTAMP(B'1', B'1'));
 
---step6:查看timestamp函数执行结果是否正确;expect:成功
+--step6: og时间类型与格式测试;expect:部分类型合理报错
+insert into func_test(functionName, result) values('timestamp(datetime''2000-1-1 00:00:00'', timetz''1:1:1+05'')', timestamp(datetime'2000-1-1 00:00:00', timetz'1:1:1+05'));
+insert into func_test(functionName, result) values('timestamp(timestamptz''2000-1-1 1:1:1+05'',  time''00:00:00'')', timestamp(timestamptz'2000-1-1 1:1:1+05',  time'00:00:00'));
+insert into func_test(functionName, result) values('timestamp(reltime''2000 years 1 mons 1 days 1:1:1'', time''00:00:00'')', timestamp(reltime'2000 years 1 mons 1 days 1:1:1', time'00:00:00'));
+insert into func_test(functionName, result) values('timestamp(reltime''2000 years 1 mons 1 days 1:1:1'', reltime''2000 years 1 mons 1 days 1:1:1'')', timestamp(reltime'2000 years 1 mons 1 days 1:1:1', reltime'2000 years 1 mons 1 days 1:1:1'));
+insert into func_test(functionName, result) values('timestamp(abstime''2000-1-1 1:1:1+05'', time''00:00:00'')', timestamp(abstime'2000-1-1 1:1:1+05', time'00:00:00'));
+insert into func_test(functionName, result) values('timestamp(abstime''2000-1-1 1:1:1+05'', abstime''2000-1-1 1:1:1+05'')', timestamp(abstime'2000-1-1 1:1:1+05', abstime'2000-1-1 1:1:1+05'));
+insert into func_test(functionName, result) values('timestamp(''2000-1-1 1:1:1'', ''23:1:1+05'')', timestamp('2000-1-1 1:1:1', '23:1:1+05'));
+insert into func_test(functionName, result) values('timestamp(''2000 years 1 mons 1 days 1:1:1'', ''00:00:00'')', timestamp('2000 years 1 mons 1 days 1:1:1', '00:00:00'));
+insert into func_test(functionName, result) values('timestamp(''2000-1-1 23:1:1+05'', ''00:00:00'')', timestamp('2000-1-1 23:1:1+05', '00:00:00'));
+
+--step7: og时间边界测试;expect:合理报错
+insert into func_test(functionName, result) values('timestamp(datetime''4714-11-24 00:00:00 bc'', time''0:0:0'')', timestamp(datetime'4714-11-24 00:00:00 bc', time'0:0:0'));
+insert into func_test(functionName, result) values('timestamp(datetime''294277-1-9 4:00:54.775807'', time''0:0:0'')', timestamp(datetime'294277-1-9 4:00:54.775807', time'0:0:0'));
+insert into func_test(functionName, result) values('timestamp(datetime''294277-1-9 4:00:54.775806'', time''0:0:0'')', timestamp(datetime'294277-1-9 4:00:54.775806', time'0:0:0'));
+
+--step8:查看timestamp函数执行结果是否正确;expect:成功
 select * from func_test;
 
---step7:清理环境;expect:成功
+--step9:清理环境;expect:成功
 drop table if exists func_test;

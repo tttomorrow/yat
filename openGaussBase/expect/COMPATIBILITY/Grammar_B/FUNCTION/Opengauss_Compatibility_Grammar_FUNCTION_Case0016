@@ -82,7 +82,41 @@ insert into func_test(functionName, result) values('TO_SECONDS(''0000-00-00 00:0
 ?.*ERROR: date/time field value out of range: "0000-00-00 00:00:00"
   Hint: Perhaps you need a different "datestyle" setting.
   Where: referenced column: result
---step6:查看to_seconds函数执行结果是否正确;expect:成功
+--step6: og时间类型与格式测试;expect:部分类型合理报错
+insert into func_test(functionName, result) values('to_seconds(timetz''1:0:0+05'')', to_seconds(timetz'1:0:0+05'));
+?.*ERROR: invalid input syntax for type timestamp: "01:00:00\+05"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('to_seconds(timestamptz''2000-1-1 1:1:1+05'')', to_seconds(timestamptz'2000-1-1 1:1:1+05'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('to_seconds(reltime''2000 years 1 mons 1 days 1:1:1'')', to_seconds(reltime'2000 years 1 mons 1 days 1:1:1'));
+?.*ERROR: time zone displacement out of range: "-41 years -4 mons -27 days -18:02:59"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('to_seconds(abstime''2000-1-1 1:1:1+05'')', to_seconds(abstime'2000-1-1 1:1:1+05'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('to_seconds(''23:0:0+05'')', to_seconds('23:0:0+05'));
+?.*ERROR: invalid input syntax for type timestamp: "23:0:0\+05"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('to_seconds(''2000 years 1 mons 1 days 1:1:1'')', to_seconds('2000 years 1 mons 1 days 1:1:1'));
+?.*ERROR: invalid input syntax for type timestamp: "2000 years 1 mons 1 days 1:1:1"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('to_seconds(''2000-1-1 23:1:1+05'')', to_seconds('2000-1-1 23:1:1+05'));
+SQL SUCCESS
+--step7: og时间边界测试;expect:合理报错
+insert into func_test(functionName, result) values('to_seconds(date''4714-11-24bc'')', to_seconds(date'4714-11-24bc'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('to_seconds(date''5874897-12-31'')', to_seconds(date'5874897-12-31'));
+?.*ERROR: timestamp out of range: "5874897-12-31"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('to_seconds(datetime''4714-11-24 00:00:00 bc'')', to_seconds(datetime'4714-11-24 00:00:00 bc'));
+?.*ERROR: date/time value out of range
+  Where: referenced column: result
+insert into func_test(functionName, result) values('to_seconds(datetime''294277-1-9 4:00:54.775807'')', to_seconds(datetime'294277-1-9 4:00:54.775807'));
+?.*ERROR: date/time value out of range
+  Where: referenced column: result
+insert into func_test(functionName, result) values('to_seconds(datetime''294277-1-9 4:00:54.775806'')', to_seconds(datetime'294277-1-9 4:00:54.775806'));
+?.*ERROR: date/time value out of range
+  Where: referenced column: result
+--step8:查看to_seconds函数执行结果是否正确;expect:成功
 select * from func_test;
 +---------------------------------------------------------+--------------+
 | functionname                                            | result       |
@@ -108,7 +142,11 @@ select * from func_test;
 | TO_SECONDS(cast('2022-04-05 14:35:00.888' as datetime)) | 63816388501  |
 ?.*| TO_SECONDS(time'1:1:1')                                 | .* |
 ?.*| TO_SECONDS(time'25:00:00')                              | .* |
+| to_seconds(timestamptz'2000-1-1 1:1:1+05')              | 63113907661  |
+| to_seconds(abstime'2000-1-1 1:1:1+05')                  | 63113918461  |
+| to_seconds('2000-1-1 23:1:1+05')                        | 63113986861  |
+| to_seconds(date'4714-11-24bc')                          | 148787712000 |
 +---------------------------------------------------------+--------------+
---step7:清理环境;expect:成功
+--step9:清理环境;expect:成功
 drop table if exists func_test;
 SQL SUCCESS

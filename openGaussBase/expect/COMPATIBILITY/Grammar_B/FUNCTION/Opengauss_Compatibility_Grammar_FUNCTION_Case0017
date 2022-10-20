@@ -86,7 +86,38 @@ insert into func_test(functionName, result) values('UNIX_TIMESTAMP(''1970-01-01 
 SQL SUCCESS
 insert into func_test(functionName, result) values('UNIX_TIMESTAMP(''1969-12-31'')', UNIX_TIMESTAMP('1969-12-31'));
 SQL SUCCESS
---step6:查看unix_timestamp函数执行结果是否正确;expect:成功
+--step6: og时间类型与格式测试;expect:部分类型合理报错
+insert into func_test(functionName, result) values('unix_timestamp(timetz''1:0:0+05'')', unix_timestamp(timetz'1:0:0+05'));
+?.*ERROR: invalid input syntax for type timestamp: "01:00:00\+05"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('unix_timestamp(timestamptz''2000-1-1 1:1:1+05'')', unix_timestamp(timestamptz'2000-1-1 1:1:1+05'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('unix_timestamp(reltime''2000 years 1 mons 1 days 1:1:1'')', unix_timestamp(reltime'2000 years 1 mons 1 days 1:1:1'));
+?.*ERROR: time zone displacement out of range: "-41 years -4 mons -27 days -18:02:59"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('unix_timestamp(abstime''2000-1-1 1:1:1+05'')', unix_timestamp(abstime'2000-1-1 1:1:1+05'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('unix_timestamp(''23:0:0+05'')', unix_timestamp('23:0:0+05'));
+?.*ERROR: invalid input syntax for type timestamp: "23:0:0\+05"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('unix_timestamp(''2000 years 1 mons 1 days 1:1:1'')', unix_timestamp('2000 years 1 mons 1 days 1:1:1'));
+?.*ERROR: invalid input syntax for type timestamp: "2000 years 1 mons 1 days 1:1:1"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('unix_timestamp(''2000-1-1 23:1:1+05'')', unix_timestamp('2000-1-1 23:1:1+05'));
+SQL SUCCESS
+--step7: og时间边界测试;expect:部分用例合理报错
+insert into func_test(functionName, result) values('unix_timestamp(date''4714-11-24bc'')', unix_timestamp(date'4714-11-24bc'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('unix_timestamp(date''5874897-12-31'')', unix_timestamp(date'5874897-12-31'));
+?.*ERROR: timestamp out of range: "5874897-12-31"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('unix_timestamp(datetime''4714-11-24 00:00:00 bc'')', unix_timestamp(datetime'4714-11-24 00:00:00 bc'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('unix_timestamp(datetime''294277-1-9 4:00:54.775807'')', unix_timestamp(datetime'294277-1-9 4:00:54.775807'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('unix_timestamp(datetime''294277-1-9 4:00:54.775806'')', unix_timestamp(datetime'294277-1-9 4:00:54.775806'));
+SQL SUCCESS
+--step8:查看unix_timestamp函数执行结果是否正确;expect:成功
 select * from func_test;
 +-------------------------------------------------------------+-------------------+
 | functionname                                                | result            |
@@ -118,7 +149,14 @@ select * from func_test;
 | UNIX_TIMESTAMP('1970-01-01 08:00:00.999999')                | 0                 |
 | UNIX_TIMESTAMP('1970-01-01 07:59:59')                       | 0                 |
 | UNIX_TIMESTAMP('1969-12-31')                                | 0                 |
+| unix_timestamp(timestamptz'2000-1-1 1:1:1+05')              | 946659661.05      |
+| unix_timestamp(abstime'2000-1-1 1:1:1+05')                  | 946670461.08      |
+| unix_timestamp('2000-1-1 23:1:1+05')                        | 946738861.05      |
+| unix_timestamp(date'4714-11-24bc')                          | 0                 |
+| unix_timestamp(datetime'4714-11-24 00:00:00 bc')            | 0                 |
+| unix_timestamp(datetime'294277-1-9 4:00:54.775807')         | 0                 |
+| unix_timestamp(datetime'294277-1-9 4:00:54.775806')         | 0                 |
 +-------------------------------------------------------------+-------------------+
---step7:清理环境;expect:成功
+--step9:清理环境;expect:成功
 drop table if exists func_test;
 SQL SUCCESS

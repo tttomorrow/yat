@@ -103,7 +103,56 @@ insert into func_test(functionName, result) values('TIMESTAMPADD(MINUTE,1,''2022
 insert into func_test(functionName, result) values('TIMESTAMPADD(SECOND,1,''2022-07-27 08:30:60'')', TIMESTAMPADD(SECOND,1,'2022-07-27 08:30:60'));
 ?.*ERROR: date/time field value out of range: "2022-07-27 08:30:60"
   Where: referenced column: result
---step6:查看timestampadd函数执行结果是否正确;expect:成功
+--step6: og时间类型与格式测试;expect:部分类型合理报错
+insert into func_test(functionName, result) values('timestampadd(day, 1, timetz''1:1:0+05'')', timestampadd(day, 1, timetz'1:1:0+05'));
+?.*ERROR: invalid input syntax for type timestamp: "01:01:00\+05"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('timestampadd(day, 1, timestamptz''2000-1-1 1:1:1+05'')', timestampadd(day, 1, timestamptz'2000-1-1 1:1:1+05'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('timestampadd(day, 1, reltime''2000 years 1 mons 1 days 1:1:1'')', timestampadd(day, 1, reltime'2000 years 1 mons 1 days 1:1:1'));
+?.*ERROR: time zone displacement out of range: "-41 years -4 mons -27 days -18:02:59"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('timestampadd(day, 1, abstime''2000-1-1 1:1:1+05'')', timestampadd(day, 1, abstime'2000-1-1 1:1:1+05'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('timestampadd(day, 1, ''23:1:1+05'')', timestampadd(day, 1, '23:1:1+05'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('timestampadd(day, 1, ''2000 years 1 mons 1 days 1:1:1'')', timestampadd(day, 1, '2000 years 1 mons 1 days 1:1:1'));
+?.*ERROR: invalid input syntax for type timestamp: "2000 years 1 mons 1 days 1:1:1"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('timestampadd(day, 1, ''2000-1-1 23:1:1+05'')', timestampadd(day, 1, '2000-1-1 23:1:1+05'));
+SQL SUCCESS
+--step7: og时间边界测试;expect:合理报错
+insert into func_test(functionName, result) values('timestampadd(day, 1, date''4714-11-24bc'')', timestampadd(day, 1, date'4714-11-24bc'));
+?.*ERROR: date/time field overflow
+  Where: referenced column: result
+insert into func_test(functionName, result) values('timestampadd(day, 1, date''5874897-12-31'')', timestampadd(day, 1, date'5874897-12-31'));
+?.*ERROR: date/time field overflow
+  Where: referenced column: result
+insert into func_test(functionName, result) values('timestampadd(day, 1, datetime''4714-11-24 00:00:00 bc'')', timestampadd(day, 1, datetime'4714-11-24 00:00:00 bc'));
+?.*ERROR: date/time field overflow
+  Where: referenced column: result
+insert into func_test(functionName, result) values('timestampadd(day, 1, datetime''294277-1-9 4:00:54.775807'')', timestampadd(day, 1, datetime'294277-1-9 4:00:54.775807'));
+?.*ERROR: date/time field overflow
+  Where: referenced column: result
+insert into func_test(functionName, result) values('timestampadd(day, 1, datetime''294277-1-9 4:00:54.775806'')', timestampadd(day, 1, datetime'294277-1-9 4:00:54.775806'));
+?.*ERROR: date/time field overflow
+  Where: referenced column: result
+insert into func_test(functionName, result) values('timestampadd(day, -1, date''4714-11-24bc'')', timestampadd(day, -1, date'4714-11-24bc'));
+?.*ERROR: date/time field overflow
+  Where: referenced column: result
+insert into func_test(functionName, result) values('timestampadd(day, -1, date''5874897-12-31'')', timestampadd(day, -1, date'5874897-12-31'));
+?.*ERROR: date/time field overflow
+  Where: referenced column: result
+insert into func_test(functionName, result) values('timestampadd(day, -1, datetime''4714-11-24 00:00:00 bc'')', timestampadd(day, -1, datetime'4714-11-24 00:00:00 bc'));
+?.*ERROR: date/time field overflow
+  Where: referenced column: result
+insert into func_test(functionName, result) values('timestampadd(day, -1, datetime''294277-1-9 4:00:54.775807'')', timestampadd(day, -1, datetime'294277-1-9 4:00:54.775807'));
+?.*ERROR: date/time field overflow
+  Where: referenced column: result
+insert into func_test(functionName, result) values('timestampadd(day, -1, datetime''294277-1-9 4:00:54.775806'')', timestampadd(day, -1, datetime'294277-1-9 4:00:54.775806'));
+?.*ERROR: date/time field overflow
+  Where: referenced column: result
+--step8:查看timestampadd函数执行结果是否正确;expect:成功
 select * from func_test;
 +------------------------------------------------------+----------------------------+
 | functionname                                         | result                     |
@@ -142,7 +191,11 @@ select * from func_test;
 | TIMESTAMPADD(HOUR,1,date'2022-04-05')                | 2022-04-05 01:00:00        |
 | TIMESTAMPADD(DAY,1,cast('2022-04-05' as datetime))   | 2022-04-06 00:00:00        |
 | TIMESTAMPADD(DAY,1,time'14:30:00')                   | 38:30:00                   |
+| timestampadd(day, 1, timestamptz'2000-1-1 1:1:1+05') | 2000-01-02 01:01:01.05     |
+| timestampadd(day, 1, abstime'2000-1-1 1:1:1+05')     | 2000-01-02 04:01:01.08     |
+| timestampadd(day, 1, '23:1:1+05')                    | 2023-01-02 05:00:00        |
+| timestampadd(day, 1, '2000-1-1 23:1:1+05')           | 2000-01-02 23:01:01.05     |
 +------------------------------------------------------+----------------------------+
---step7:清理环境;expect:成功
+--step9:清理环境;expect:成功
 drop table if exists func_test;
 SQL SUCCESS

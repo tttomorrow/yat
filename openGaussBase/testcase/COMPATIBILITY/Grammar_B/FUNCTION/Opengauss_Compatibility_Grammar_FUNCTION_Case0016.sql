@@ -41,8 +41,24 @@ insert into func_test(functionName, result) values('TO_SECONDS(''10000-01-01'')'
 insert into func_test(functionName, result) values('TO_SECONDS(''0000-00-00'')', TO_SECONDS('0000-00-00'));
 insert into func_test(functionName, result) values('TO_SECONDS(''0000-00-00 00:00:00'')', TO_SECONDS('0000-00-00 00:00:00'));
 
---step6:查看to_seconds函数执行结果是否正确;expect:成功
+--step6: og时间类型与格式测试;expect:部分类型合理报错
+insert into func_test(functionName, result) values('to_seconds(timetz''1:0:0+05'')', to_seconds(timetz'1:0:0+05'));
+insert into func_test(functionName, result) values('to_seconds(timestamptz''2000-1-1 1:1:1+05'')', to_seconds(timestamptz'2000-1-1 1:1:1+05'));
+insert into func_test(functionName, result) values('to_seconds(reltime''2000 years 1 mons 1 days 1:1:1'')', to_seconds(reltime'2000 years 1 mons 1 days 1:1:1'));
+insert into func_test(functionName, result) values('to_seconds(abstime''2000-1-1 1:1:1+05'')', to_seconds(abstime'2000-1-1 1:1:1+05'));
+insert into func_test(functionName, result) values('to_seconds(''23:0:0+05'')', to_seconds('23:0:0+05'));
+insert into func_test(functionName, result) values('to_seconds(''2000 years 1 mons 1 days 1:1:1'')', to_seconds('2000 years 1 mons 1 days 1:1:1'));
+insert into func_test(functionName, result) values('to_seconds(''2000-1-1 23:1:1+05'')', to_seconds('2000-1-1 23:1:1+05'));
+
+--step7: og时间边界测试;expect:合理报错
+insert into func_test(functionName, result) values('to_seconds(date''4714-11-24bc'')', to_seconds(date'4714-11-24bc'));
+insert into func_test(functionName, result) values('to_seconds(date''5874897-12-31'')', to_seconds(date'5874897-12-31'));
+insert into func_test(functionName, result) values('to_seconds(datetime''4714-11-24 00:00:00 bc'')', to_seconds(datetime'4714-11-24 00:00:00 bc'));
+insert into func_test(functionName, result) values('to_seconds(datetime''294277-1-9 4:00:54.775807'')', to_seconds(datetime'294277-1-9 4:00:54.775807'));
+insert into func_test(functionName, result) values('to_seconds(datetime''294277-1-9 4:00:54.775806'')', to_seconds(datetime'294277-1-9 4:00:54.775806'));
+
+--step8:查看to_seconds函数执行结果是否正确;expect:成功
 select * from func_test;
 
---step7:清理环境;expect:成功
+--step9:清理环境;expect:成功
 drop table if exists func_test;

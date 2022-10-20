@@ -23,7 +23,10 @@ insert into func_test(functionName, result) values ('period_diff(30, 0)', period
 insert into func_test(functionName, result) values ('period_diff(pow(2,62), pow(2,60))', period_diff(pow(2,62), pow(2,60)));
 
 --step3:插入非法入参时period_diff执行结果;expect:合理报错
-insert into func_test(functionName, result) values ('period_diff(''abcd'', ''abcd'')', period_diff('abcd', 'abcd'));
+insert into func_test(functionName, result) values ('period_diff(''abcd'', 200001)', period_diff('abcd', 200001));
+insert into func_test(functionName, result) values ('period_diff(''a'', 200001)', period_diff('a', 200001));
+insert into func_test(functionName, result) values ('period_diff(200001, ''abcd'')', period_diff(200001, 'abcd'));
+insert into func_test(functionName, result) values ('period_diff(200001, ''a'')', period_diff(200001, 'a'));
 
 --step4:查看makedate函数执行结果是否正确;expect:成功
 select * from func_test;

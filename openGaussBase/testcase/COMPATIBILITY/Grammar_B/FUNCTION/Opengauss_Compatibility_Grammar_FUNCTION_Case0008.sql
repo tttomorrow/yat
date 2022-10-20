@@ -83,8 +83,23 @@ insert into func_test(functionName, result) values('TIMEDIFF(''02:61:00.000000''
 
 insert into func_test(functionName, result) values('TIMEDIFF(''2000-01-01'', ''2022-01-01'')', TIMEDIFF('2000-01-01', '2022-01-01') );
 
---step8:查看timediff函数执行结果是否正确;expect:成功
+--step8: og时间类型与格式测试;expect:部分类型合理报错
+insert into func_test(functionName, result) values('timediff(timetz''1:0:0+05'', timetz''2:0:0+05'')', timediff(timetz'1:0:0+05', timetz'2:0:0+05'));
+insert into func_test(functionName, result) values('timediff(timestamptz''2000-1-1 1:1:1+05'', timestamptz''2000-1-1 1:1:1+05'')', timediff(timestamptz'2000-1-1 1:1:1+05', timestamptz'2000-1-1 1:1:1+05'));
+insert into func_test(functionName, result) values('timediff(reltime''2000 years 1 mons 1 days 1:1:1'', reltime''2000 years 1 mons 1 days 1:1:1'')', timediff(reltime'2000 years 1 mons 1 days 1:1:1', reltime'2000 years 1 mons 1 days 1:1:1'));
+insert into func_test(functionName, result) values('timediff(abstime''2000-1-1 1:1:1+05'', abstime''2000-1-1 1:1:1+05'')', timediff(abstime'2000-1-1 1:1:1+05', abstime'2000-1-1 1:1:1+05'));
+insert into func_test(functionName, result) values('timediff(''23:0:0+05'', ''24:0:0+05'')', timediff('23:0:0+05', '24:0:0+05'));
+insert into func_test(functionName, result) values('timediff(''2000 years 1 mons 1 days 1:1:1'', ''2000 years 1 mons 1 days 1:1:1'')', timediff('2000 years 1 mons 1 days 1:1:1', '2000 years 1 mons 1 days 1:1:1'));
+insert into func_test(functionName, result) values('timediff(''2000-1-1 23:1:1+05'', ''2000-1-1 23:1:1+05'')', timediff('2000-1-1 23:1:1+05', '2000-1-1 23:1:1+05'));
+
+--step9: og时间边界测试;expect:合理报错
+insert into func_test(functionName, result) values('timediff(datetime''4714-11-24 00:00:00 bc'', datetime''2000-1-1 1:1:1'')', timediff(datetime'4714-11-24 00:00:00 bc', datetime'2000-1-1 1:1:1'));
+insert into func_test(functionName, result) values('timediff(datetime''2000-1-1 1:1:1'', datetime''294277-1-9 4:00:54.775807'')', timediff(datetime'2000-1-1 1:1:1', datetime'294277-1-9 4:00:54.775807'));
+insert into func_test(functionName, result) values('timediff(datetime''294277-1-9 4:00:54.775806'', datetime''2000-1-1 1:1:1'')', timediff(datetime'294277-1-9 4:00:54.775806', datetime'2000-1-1 1:1:1'));
+insert into func_test(functionName, result) values('timediff(date''4714-11-24bc'', date''4714-11-24bc'')', timediff(date'4714-11-24bc', date'4714-11-24bc'));
+
+--step10:查看timediff函数执行结果是否正确;expect:成功
 select * from func_test;
 
---step9:清理环境;expect:成功
+--step11:清理环境;expect:成功
 drop table if exists func_test;

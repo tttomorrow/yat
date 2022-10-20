@@ -1,0 +1,148 @@
+-- @testpoint: 时间函数参数数量与指定数量不一致测试, 合理报错
+--step1: 测试非法参数数量的时间函数;expect:合理报错
+select makedate(1);
+?.*ERROR: function makedate\(integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position:.*
+  Where: referenced column: makedate
+select makedate(1, 1, 1);
+?.*ERROR: function makedate\(integer, integer, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position:.*
+  Where: referenced column: makedate
+select maketime(1, 1);
+?.*ERROR: function maketime\(integer, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position:.*
+  Where: referenced column: maketime
+select maketime(1, 1, 1, 1);
+?.*ERROR: function maketime\(integer, integer, integer, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position:.*
+  Where: referenced column: maketime
+select period_add(1);
+?.*ERROR: function period_add\(integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position:.*
+  Where: referenced column: period_add
+select period_add(1, 1, 1);
+?.*ERROR: function period_add\(integer, integer, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position:.*
+  Where: referenced column: period_add
+select period_diff(1);
+?.*ERROR: function period_diff\(integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position:.*
+  Where: referenced column: period_diff
+select period_diff(1, 1, 1);
+?.*ERROR: function period_diff\(integer, integer, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position:.*
+  Where: referenced column: period_diff
+select sec_to_time();
+?.*ERROR: function sec_to_time\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position:.*
+  Where: referenced column: sec_to_time
+select sec_to_time(1, 1);
+?.*ERROR: function sec_to_time\(integer, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position:.*
+  Where: referenced column: sec_to_time
+select subdate('2022-1-1');
+?.*ERROR: function subdate\(unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position:.*
+  Where: referenced column: subdate
+select subdate('2022-1-1', 1, 1);
+?.*ERROR: function subdate\(unknown, integer, integer\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position:.*
+  Where: referenced column: subdate
+select subtime('1:1:1');
+?.*ERROR: function subtime\(unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position:.*
+  Where: referenced column: subtime
+select subtime('1:1:1', '1:1:1', '1:1:1');
+?.*ERROR: function subtime\(unknown, unknown, unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position:.*
+  Where: referenced column: subtime
+select time();
+?.*ERROR: syntax error at or near "\)"
+?.*Position:.*
+select time('1:1:1', '1:1:1');
+?.*ERROR: syntax error at or near ","
+?.*Position:.*
+select time_format('1:1:1', '%T', '');
+?.*ERROR: function time_format\(unknown, unknown, unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position:.*
+  Where: referenced column: time_format
+select time_format('1:1:1');
+?.*ERROR: function time_format\(unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position:.*
+  Where: referenced column: time_format
+select timediff('1:1:1');
+?.*ERROR: function timediff\(unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position:.*
+  Where: referenced column: timediff
+select timediff('1:1:1', '2:2:2', '');
+?.*ERROR: function timediff\(unknown, unknown, unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position:.*
+  Where: referenced column: timediff
+select timestmap();
+?.*ERROR: function timestmap\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position:.*
+  Where: referenced column: timestmap
+select timestmap('2000-1-1 1:1:1', '2:2:2', '');
+?.*ERROR: function timestmap\(unknown, unknown, unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position:.*
+  Where: referenced column: timestmap
+select TIMESTAMPADD(YEAR,1);
+?.*ERROR: syntax error at or near "\)"
+?.*Position:.*
+select TIMESTAMPADD(YEAR,1,'2022-07-27', '');
+?.*ERROR: syntax error at or near ","
+?.*Position:.*
+select TO_DAYS();
+?.*ERROR: function to_days\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position:.*
+  Where: referenced column: to_days
+select TO_DAYS('2022-1-1', '');
+?.*ERROR: function to_days\(unknown, unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position:.*
+  Where: referenced column: to_days
+select TO_SECONDS();
+?.*ERROR: function to_seconds\(\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position:.*
+  Where: referenced column: to_seconds
+select TO_SECONDS('2022-07-27', '');
+?.*ERROR: function to_seconds\(unknown, unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position:.*
+  Where: referenced column: to_seconds
+select UNIX_TIMESTAMP('2022-07-27', '');
+?.*ERROR: function unix_timestamp\(unknown, unknown\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position:.*
+  Where: referenced column: unix_timestamp
+select utc_date(1);
+?.*ERROR: syntax error at or near "1"
+?.*Position:.*
+select utc_time(1, 1);
+?.*ERROR: syntax error at or near ","
+?.*Position:.*
+select utc_timestamp(1, 1);
+?.*ERROR: syntax error at or near ","
+?.*Position:.*

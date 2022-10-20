@@ -43,6 +43,15 @@ SQL SUCCESS
 insert into func_test(functionName, result) values ('makedate(''abcd'', ''61'')', makedate('abcd', '61'));
 ?.*ERROR: invalid input syntax for type bigint: "abcd"
 ?.*
+insert into func_test(functionName, result) values ('makedate(''a'', 0)', makedate('a', 0));
+?.*ERROR: invalid input syntax for type bigint: "a"
+?.*
+insert into func_test(functionName, result) values ('makedate(2000, ''abcd'')', makedate(2000, 'abcd'));
+?.*ERROR: invalid input syntax for type bigint: "abcd"
+?.*
+insert into func_test(functionName, result) values ('makedate(2000, ''abcd'')', makedate(2000, 'a'));
+?.*ERROR: invalid input syntax for type bigint: "a"
+?.*
 --step4:查看makedate函数执行结果是否正确;expect:成功
 select * from func_test;
 +--------------------------+------------+
