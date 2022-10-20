@@ -1,0 +1,171 @@
+-- @testpoint: 时间函数subtime功能测试,部分测试步骤合理报错
+--step1:创建用于存储函数结果的表;expect:成功
+drop table if exists func_test;
+SQL SUCCESS
+create table func_test(functionName varchar(256),result varchar(256));
+SQL SUCCESS
+--step2:插入subtime(datetime, time)参数格式且入参合法的用例执行结果;expect:成功
+insert into func_test(functionName, result) values('subtime(''2000-02-28 20:59:59'', ''-25:00'')', subtime('2000-02-28 20:59:59', '-25:00') );
+SQL SUCCESS
+insert into func_test(functionName, result) values('subtime(''2000-02-28 20:59:59'', ''25:00'')', subtime('2000-02-28 20:59:59', '25:00') );
+SQL SUCCESS
+insert into func_test(functionName, result) values('subtime(''2007-12-31 23:59:59.999999'',''1 1:1:1.000002'')', subtime('2007-12-31 23:59:59.999999','1 1:1:1.000002'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('subtime(''2007-12-31 0:0:0.999999'',''1 1:1:1.000002'')', subtime('2007-12-31 0:0:0.999999','1 1:1:1.000002'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('subtime(''2007-12-31 23:59:59.999999'',''1 1:1:1.000002'')', subtime('2007-12-31 23:59:59.999999','1 1:1:1.000002'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('subtime(''20000228205959'', ''250000'')', subtime('20000228205959', '250000') );
+SQL SUCCESS
+insert into func_test(functionName, result) values('subtime(''20000228205959.000002'', ''250000.000001'')', subtime('20000228205959.000002', '250000.000001') );
+SQL SUCCESS
+insert into func_test(functionName, result) values('subtime(20000228205959, 250000)', subtime(20000228205959, 250000) );
+SQL SUCCESS
+insert into func_test(functionName, result) values('subtime(20000228205959.000002, 250000.000001)', subtime(20000228205959.000002, 250000.000001) );
+SQL SUCCESS
+insert into func_test(functionName, result) values('subtime(''2000-02-28 20:59:59'', NULL)', subtime('2000-02-28 20:59:59', NULL) );
+SQL SUCCESS
+insert into func_test(functionName, result) values('subtime(NULL, ''-25:00'')', subtime(NULL, '-25:00') );
+SQL SUCCESS
+insert into func_test(functionName, result) values('subtime(''0001-01-1 20:59:59'', ''21:00'');', subtime('0001-01-1 20:59:59', '21:00')   );
+SQL SUCCESS
+--step3:插入subtime(datetime, time)参数格式但涉及时间类型值超出范围的用例执行结果;expect:合理报错
+insert into func_test(functionName, result) values('subtime(''2007-12-31 23:59:59.999999'',''100 1:1:1.000002'')',subtime('2007-12-31 23:59:59.999999','100 1:1:1.000002'));
+?.*ERROR: invalid input syntax "100 1:1:1.000002"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('subtime(''9999-12-31 20:59:59'', ''-3:00:1'')', subtime('9999-12-31 20:59:59', '-3:00:1') );
+?.*ERROR: date/time field overflow
+  Where: referenced column: result
+insert into func_test(functionName, result) values('subtime(''10000-1-1 20:59:59'', ''30:00:1'')', subtime('10000-1-1 20:59:59', '30:00:1') );
+?.*ERROR: date/time field overflow
+  Where: referenced column: result
+insert into func_test(functionName, result) values('subtime(''9999-12-31 20:59:59'', ''839:59:59'')', subtime('9999-12-31 20:59:59', '839:59:59') );
+?.*ERROR: invalid input syntax "839:59:59"
+  Where: referenced column: result
+--step4:插入subtime(time, time)参数格式且入参合法的用例执行结果;expect:成功
+insert into func_test(functionName, result) values('subtime(''-37:59:59'', ''-39:59:59'')', subtime('-37:59:59', '-39:59:59') );
+SQL SUCCESS
+insert into func_test(functionName, result) values('subtime(''-37:59:59'', ''39:59:59'')', subtime('-37:59:59', '39:59:59') );
+SQL SUCCESS
+insert into func_test(functionName, result) values('subtime(''37:59:59'', ''-39:59:59'')', subtime('37:59:59', '-39:59:59') );
+SQL SUCCESS
+insert into func_test(functionName, result) values('subtime(''375959'', ''395959'')', subtime('375959', '395959') );
+SQL SUCCESS
+insert into func_test(functionName, result) values('subtime(''010000.999999'', ''020000.999998'')', subtime('010000.999999', '020000.999998'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('subtime(''24:00:00.999999'', ''02:00:00.999998'')', subtime('24:00:00.999999', '02:00:00.999998'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('subtime(''01:00:00.000000'', ''02:00:00.999999'')', subtime('01:00:00.000000', '02:00:00.999999'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('subtime(''60:00:00.000000'', ''02:00:00.999999'')', subtime('60:00:00.000000', '02:00:00.999999'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('subtime(''-375959'', ''-395959'')', subtime('-375959', '395959') );
+SQL SUCCESS
+insert into func_test(functionName, result) values('subtime(''-375959.000001'', ''-395959.000002'')', subtime('-375959.000001', '395959.000002') );
+SQL SUCCESS
+insert into func_test(functionName, result) values('subtime(-375959, 395959)', subtime(-375959, 395959) );
+SQL SUCCESS
+insert into func_test(functionName, result) values('subtime(-375959.000001, 395959.000002)', subtime(-375959.000001, 395959.000002) );
+SQL SUCCESS
+insert into func_test(functionName, result) values('subtime(NULL, ''-839:59:59'')', subtime(NULL, '-839:59:59') );
+SQL SUCCESS
+insert into func_test(functionName, result) values('subtime(''-837:59:59'', NULL)', subtime('-837:59:59', NULL) );
+SQL SUCCESS
+--step5:插入subtime(time, time)参数格式但涉及时间类型值超出范围的的用例执行结果;expect:合理报错
+insert into func_test(functionName, result) values('subtime(''838:59:59'', ''-25:00'')', subtime('838:59:59', '-25:00') );
+?.*ERROR: date/time field overflow
+  Where: referenced column: result
+insert into func_test(functionName, result) values('subtime(''-838:59:59'', ''25:00'')', subtime('-838:59:59', '25:00') );
+?.*ERROR: date/time field overflow
+  Where: referenced column: result
+insert into func_test(functionName, result) values('subtime(''839:59:59'', ''837:59:59'')', subtime('839:59:59', '837:59:59') );
+?.*ERROR: invalid input syntax "839:59:59"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('subtime(''-837:59:59'', ''-839:59:59'')', subtime('-837:59:59', '-839:59:59') );
+?.*ERROR: invalid input syntax "-839:59:59"
+  Where: referenced column: result
+--step6:插入入参为特殊类型的subtime用例执行结果;expect:成功
+insert into func_test(functionName, result) values('subtime(false, true)', subtime(false, true) );
+SQL SUCCESS
+insert into func_test(functionName, result) values('subtime(B''0'', B''1'')', subtime(B'0', B'1'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('subtime(cast(''2000-02-28 20:59:59'' as datetime), time''-25:00'')', subtime(cast('2000-02-28 20:59:59' as datetime), time'-25:00') );
+SQL SUCCESS
+insert into func_test(functionName, result) values('subtime(date''2000-02-28'', time''-25:00'')', subtime(date'2000-02-28', time'-25:00') );
+SQL SUCCESS
+insert into func_test(functionName, result) values('subtime(time''20:59:59'', time''-25:00'')', subtime(time'20:59:59', time'-25:00') );
+SQL SUCCESS
+insert into func_test(functionName, result) values('subtime(cast(''2000-02-28 20:59:59'' as datetime), date''2000-01-01'')', subtime(cast('2000-02-28 20:59:59' as datetime), date'2000-01-01') );
+SQL SUCCESS
+insert into func_test(functionName, result) values('subtime(cast(''2000-02-28 20:59:59'' as datetime), cast(''2000-01-01 11:00:00'' as datetime))', subtime(cast('2000-02-28 20:59:59' as datetime), cast('2000-01-01 11:00:00' as datetime)));
+SQL SUCCESS
+--step7:插入非法入参时subtime执行结果;expect:合理报错
+insert into func_test(functionName, result) values('subtime(''abcd'', ''-25:00'')', subtime('abcd', '-25:00') );
+?.*ERROR: invalid input syntax "abcd"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('subtime(''2000-02-28 20:59:59'', ''abcd'')', subtime('2000-02-28 20:59:59', 'abcd') );
+?.*ERROR: invalid input syntax "abcd"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('subtime(''abcd'', ''-839:59:59'')', subtime('abcd', '-839:59:59') );
+?.*ERROR: invalid input syntax "-839:59:59"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('subtime(''-837:59:59'', ''abcd'')', subtime('-837:59:59', 'abcd') );
+?.*ERROR: invalid input syntax "abcd"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('subtime(''2007-13-31 23:59:59.999999'',''1 1:1:1.000002'')', subtime('2007-13-31 23:59:59.999999','1 1:1:1.000002'));
+?.*ERROR: invalid input syntax "2007-13-31 23:59:59.999999"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('subtime(''2007-12-40 23:59:59.999999'',''1 1:1:1.000002'')', subtime('2007-12-40 23:59:59.999999','1 1:1:1.000002'));
+?.*ERROR: invalid input syntax "2007-12-40 23:59:59.999999"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('subtime(''02:00:61.000000'', ''02:00:00.999999'')', subtime('02:00:61.000000', '02:00:00.999999'));
+?.*ERROR: invalid input syntax "02:00:61.000000"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('subtime(''02:61:00.000000'', ''02:00:00.999999'')', subtime('02:61:00.000000', '02:00:00.999999'));
+?.*ERROR: invalid input syntax "02:61:00.000000"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('subtime(''2000-01-01'', ''2022-01-01'')', subtime('2000-01-01', '2022-01-01') );
+?.*ERROR: invalid input syntax "2022-01-01"
+  Where: referenced column: result
+--step8:查看subtime函数执行结果是否正确;expect:成功
+select * from func_test;
++-------------------------------------------------------------------------------------------+----------------------------+
+| functionname                                                                              | result                     |
++-------------------------------------------------------------------------------------------+----------------------------+
+| subtime('2000-02-28 20:59:59', '-25:00')                                                  | 2000-02-29 21:59:59        |
+| subtime('2000-02-28 20:59:59', '25:00')                                                   | 2000-02-27 19:59:59        |
+| subtime('2007-12-31 23:59:59.999999','1 1:1:1.000002')                                    | 2007-12-30 22:58:58.999997 |
+| subtime('2007-12-31 0:0:0.999999','1 1:1:1.000002')                                       | 2007-12-29 22:58:59.999997 |
+| subtime('2007-12-31 23:59:59.999999','1 1:1:1.000002')                                    | 2007-12-30 22:58:58.999997 |
+| subtime('20000228205959', '250000')                                                       | 2000-02-27 19:59:59        |
+| subtime('20000228205959.000002', '250000.000001')                                         | 2000-02-27 19:59:59.000001 |
+| subtime(20000228205959, 250000)                                                           | 2000-02-27 19:59:59        |
+| subtime(20000228205959.000002, 250000.000001)                                             | 2000-02-27 19:59:59.000001 |
+| subtime('2000-02-28 20:59:59', NULL)                                                      |                            |
+| subtime(NULL, '-25:00')                                                                   |                            |
+| subtime('0001-01-1 20:59:59', '21:00');                                                   |                            |
+| subtime('-37:59:59', '-39:59:59')                                                         | 02:00:00                   |
+| subtime('-37:59:59', '39:59:59')                                                          | -77:59:58                  |
+| subtime('37:59:59', '-39:59:59')                                                          | 77:59:58                   |
+| subtime('375959', '395959')                                                               | -02:00:00                  |
+| subtime('010000.999999', '020000.999998')                                                 | -00:59:59.999999           |
+| subtime('24:00:00.999999', '02:00:00.999998')                                             | 22:00:00.000001            |
+| subtime('01:00:00.000000', '02:00:00.999999')                                             | -01:00:00.999999           |
+| subtime('60:00:00.000000', '02:00:00.999999')                                             | 57:59:59.000001            |
+| subtime('-375959', '-395959')                                                             | -77:59:58                  |
+| subtime('-375959.000001', '-395959.000002')                                               | -77:59:58.000003           |
+| subtime(-375959, 395959)                                                                  | -77:59:58                  |
+| subtime(-375959.000001, 395959.000002)                                                    | -77:59:58.000003           |
+| subtime(NULL, '-839:59:59')                                                               |                            |
+| subtime('-837:59:59', NULL)                                                               |                            |
+| subtime(false, true)                                                                      | -00:00:01                  |
+| subtime(B'0', B'1')                                                                       | -00:00:01                  |
+| subtime(cast('2000-02-28 20:59:59' as datetime), time'-25:00')                            | 2000-02-29 21:59:59        |
+| subtime(date'2000-02-28', time'-25:00')                                                   | 25:00:00                   |
+| subtime(time'20:59:59', time'-25:00')                                                     | 45:59:59                   |
+| subtime(cast('2000-02-28 20:59:59' as datetime), date'2000-01-01')                        | 2000-02-28 20:59:59        |
+| subtime(cast('2000-02-28 20:59:59' as datetime), cast('2000-01-01 11:00:00' as datetime)) | 2000-02-28 09:59:59        |
++-------------------------------------------------------------------------------------------+----------------------------+
+--step9:清理环境;expect:成功
+drop table if exists func_test;
+SQL SUCCESS

@@ -1,0 +1,189 @@
+-- @testpoint: 时间函数subdate功能测试,部分测试步骤合理报错
+--step1:创建用于存储函数结果的表;expect:成功
+drop table if exists func_test;
+SQL SUCCESS
+drop table if exists insert_subdate;
+SQL SUCCESS
+create table func_test(functionName varchar(256),result varchar(256));
+SQL SUCCESS
+create table insert_subdate(date_col date, datetime_col datetime);
+SQL SUCCESS
+--step2:插入合法入参时subdate执行结果;expect:成功
+insert into func_test(functionName, result) values ('subdate(''2022-1-1'', 20)',subdate('2022-1-1', '20'));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('subdate(''2022-1-1'', ''20.5'')',subdate('2022-1-1', '20.5'));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('subdate(''2022-1-1'', 20.5)',subdate('2022-1-1', 20.5));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('subdate(''2022-1-1'', true)',subdate('2022-1-1', true));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('subdate(''2022-1-1'', B''1111'')',subdate('2022-1-1', B'1111'));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('subdate(date''2022-1-1'', 1)',subdate(date'2022-1-1', 1));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('subdate(cast(''2022-1-1 1:1:1'' as datetime), 1)',subdate(cast('2022-1-1 1:1:1' as datetime), 1));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('subdate(NULL, 20)',subdate(NULL, 20));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('subdate(''2022-1-1'', NULL)',subdate('2022-1-1', NULL));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('subdate(''2022-1-1 6:05:05'', INTERVAL ''10 20:20'' DAY TO SECOND)',subdate('2022-1-1 6:05:05', INTERVAL '10 20:20' DAY TO SECOND));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('subdate(20220101010101.555, 1)',subdate(20220101010101.555, 1));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('subdate(20220101, 1)',subdate(20220101, 1));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('subdate(''2022-1-1 6:05:05'', INTERVAL ''6'' SECOND)',subdate('2022-1-1 6:05:05', INTERVAL '-6' SECOND));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('subdate(''2022-6-1 6:05:05.5555555'', INTERVAL 6.444444 SECOND)',subdate('2022-6-1 6:05:05.5555555', INTERVAL 6.444444 SECOND));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('subdate(''2022-6-1 6:05:05.444444'', INTERVAL ''6.555555'' HOUR TO SECOND)',subdate('2022-6-1 6:05:05.444444', INTERVAL '1:1:6.555555' HOUR TO SECOND));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('subdate(''0001-1-1 00:00:01'', INTERVAL 1 SECOND)', subdate('0001-1-1 00:00:01', INTERVAL 1 SECOND));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('subdate(''2020-2-28 23:59:59'', INTERVAL ''-1:1'' MINUTE TO SECOND)',subdate('2020-2-28 23:59:59', INTERVAL '-1:1' MINUTE TO SECOND));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('subdate(''2020-2-29'', INTERVAL ''366'' DAY)',subdate('2020-2-29', INTERVAL '366' DAY));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('subdate(''2020-2-29'', INTERVAL ''-366'' DAY)',subdate('2020-2-29', INTERVAL '-366' DAY));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('subdate(''0001-1-2 1:1:1'', INTERVAL ''1'' DAY)',subdate('0001-1-2 1:1:1', INTERVAL '1' DAY));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('subdate(''2020-2-29'', INTERVAL ''-365'' MONTH)',subdate('2020-2-29', INTERVAL '-365' MONTH));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('subdate(''0001-1-31'', INTERVAL ''1'' MONTH)',subdate('0001-1-31', INTERVAL '1' MONTH));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('subdate(''0001-2-1'', INTERVAL ''1'' MONTH)',subdate('0001-2-1', INTERVAL '1' MONTH));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('subdate(''2020-2-29'', INTERVAL 3 YEAR)',subdate('2020-2-29', INTERVAL '3' YEAR));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('subdate(''2020-2-29'', INTERVAL -3 YEAR)',subdate('2020-2-29', INTERVAL '-3' YEAR));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('subdate(''0001-12-31'', INTERVAL ''1'' YEAR)',subdate('0001-12-31', INTERVAL '1' YEAR));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('subdate(time''100:59:59'', INTERVAL ''1 20:50:50.888888'' DAY To SECOND)',subdate(time'100:59:59', INTERVAL '1 20:50:50.888888' DAY TO SECOND));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('subdate(time''100:59:59'', INTERVAL ''-1 20:50:50.888888'' HOUR To SECOND)',subdate(time'100:59:59', INTERVAL '-20:50:50.888888' HOUR TO SECOND));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('subdate(time(6)''100:59:59.555'', 2',subdate(time(6)'100:59:59.555', 2));
+SQL SUCCESS
+--step3:插入非法入参时subdate执行结果;expect:合理报错
+insert into func_test(functionName, result) values ('subdate(''abcd'', ''abcd'')',subdate('abcd', 'abcd'));
+?.*ERROR: invalid input syntax for type bigint: "abcd"
+  Where: SQL function "subdate" during inlining
+referenced column: result
+insert into func_test(functionName, result) values ('subdate(''-0001-1-1'', INTERVAL ''6'' SECOND)', subdate('-0001-1-1', INTERVAL '6' SECOND));
+?.*ERROR: invalid input syntax for type timestamp: "-0001-1-1"
+  Where: referenced column: result
+insert into func_test(functionName, result) values ('subdate(''2022-11-30 25:00:00'', 20)',subdate('2022-11-30 25:00:00', 20));
+?.*ERROR: date/time field value out of range: "2022-11-30 25:00:00"
+  Where: referenced column: result
+insert into func_test(functionName, result) values ('subdate(''2022-11-30 00:60:00", 20)',subdate('2022-11-30 00:60:00', 20));
+?.*ERROR: date/time field value out of range: "2022-11-30 00:60:00"
+  Where: referenced column: result
+insert into func_test(functionName, result) values ('subdate(''2022-11-30 00:00:60'', 20)',subdate('2022-11-30 00:00:60', 20));
+?.*ERROR: date/time field value out of range: "2022-11-30 00:00:60"
+  Where: referenced column: result
+insert into func_test(functionName, result) values ('subdate(''2022-2-29'', INTERVAL ''6'' SECOND)',subdate('2022-2-29', INTERVAL '6' SECOND));
+?.*ERROR: date/time field value out of range: "2022-2-29"
+  Where: referenced column: result
+insert into func_test(functionName, result) values ('subdate(''2022-4-31'', 20)',subdate('2022-4-31', 20));
+?.*ERROR: date/time field value out of range: "2022-4-31"
+  Where: referenced column: result
+insert into func_test(functionName, result) values ('subdate("2022-0-1 6:05:05", 20)',subdate('2022-0-1 6:05:05', 20));
+?.*ERROR: date/time field value out of range: "2022-0-1 6:05:05"
+  Hint: Perhaps you need a different "datestyle" setting.
+  Where: referenced column: result
+insert into func_test(functionName, result) values ('subdate("2022-1-0 6:05:05", INTERVAL ''6'' SECOND)',subdate('2022-1-0 6:05:05', INTERVAL '6' SECOND));
+?.*ERROR: date/time field value out of range: "2022-1-0 6:05:05"
+  Hint: Perhaps you need a different "datestyle" setting.
+  Where: referenced column: result
+--step4:插入subdate返回时间类型结果超出范围执行结果;expect:合理报错
+insert into func_test(functionName, result) values ('subdate(''10000-1-1'', INTERVAL ''6'' SECOND)', subdate('10000-1-1', INTERVAL '6' SECOND));
+?.*ERROR: date/time field value out of range
+  Where: referenced column: result
+insert into func_test(functionName, result) values ('subdate(''0001-1-1 00:00:01.555555'', INTERVAL ''1.555556'' SECOND)',subdate('0001-1-1 00:00:01.555555', INTERVAL '1.555556' SECOND));
+?.*ERROR: date/time field value out of range
+  Where: referenced column: result
+insert into func_test(functionName, result) values ('subdate(''9999-12-1 22:01:01.111111'', INTERVAL ''-30 1:58:58.888889'' DAY TO SECOND)',subdate('9999-12-1 22:01:01.111111', INTERVAL '-30 1:58:58.888889' DAY TO SECOND));
+?.*ERROR: date/time field value out of range
+  Where: referenced column: result
+insert into func_test(functionName, result) values ('subdate(''0001-1-1 22:01:01'', INTERVAL ''366 22:01:02'' DAY TO SECOND)',subdate('0001-1-1 22:01:01', INTERVAL '366 22:01:02' DAY TO SECOND));
+?.*ERROR: date/time field value out of range
+  Where: referenced column: result
+insert into func_test(functionName, result) values ('subdate(''0001-1-1 1:1:1'', INTERVAL ''1'' DAY)',subdate('0001-1-1 1:1:1', INTERVAL '1' DAY));
+?.*ERROR: date/time field value out of range
+  Where: referenced column: result
+insert into func_test(functionName, result) values ('subdate(''9999-12-1'', -31)',subdate('9999-12-1', -31));
+?.*ERROR: date/time field value out of range
+  Where: referenced column: result
+insert into func_test(functionName, result) values ('subdate(''0001-1-1'', 367)',subdate('0001-1-1', 367));
+?.*ERROR: date/time field value out of range
+  Where: referenced column: result
+insert into func_test(functionName, result) values ('subdate(''9999-12-1'', INTERVAL ''-1'' MONTH)',subdate('9999-12-1', INTERVAL '-1' MONTH));
+?.*ERROR: date/time field value out of range
+  Where: referenced column: result
+insert into func_test(functionName, result) values ('subdate(''0001-1-31'', INTERVAL ''13'' MONTH)',subdate('0001-1-31', INTERVAL '13' MONTH));
+?.*ERROR: date/time field value out of range
+  Where: referenced column: result
+insert into func_test(functionName, result) values ('subdate(''9999-1-1'', INTERVAL ''-1'' YEAR)',subdate('9999-1-1', INTERVAL '-1' YEAR));
+?.*ERROR: date/time field value out of range
+  Where: referenced column: result
+insert into func_test(functionName, result) values ('subdate(''2020-1-1'', INTERVAL ''2021'' YEAR)',subdate('2020-1-1', INTERVAL '2021' YEAR));
+?.*ERROR: date/time field value out of range
+  Where: referenced column: result
+insert into func_test(functionName, result) values ('subdate(time''22:11:11'', INTERVAL ''1'' YEAR)',subdate(time'22:11:11', INTERVAL '1' YEAR));
+?.*ERROR: time field value out of range
+  Where: referenced column: result
+insert into func_test(functionName, result) values ('subdate(time''22:11:11'', INTERVAL ''-1'' MONTH)',subdate(time'22:11:11', INTERVAL '-1' MONTH));
+?.*ERROR: time field value out of range
+  Where: referenced column: result
+insert into func_test(functionName, result) values ('subdate(time''815:0:0'', -1)',subdate(time'815:0:0', -1));
+?.*ERROR: time field value out of range
+  Where: referenced column: result
+insert into func_test(functionName, result) values ('subdate(time''-838:59:59'', INTERVAL ''1'' SECOND)',subdate(time'-838:59:59', INTERVAL '1' SECOND));
+?.*ERROR: time field value out of range
+  Where: referenced column: result
+--step5:测试subdate返回结果能否正确插入表中;expect:成功
+insert into insert_subdate(date_col, datetime_col) values (subdate('2021-1-1', 1), subdate('2021-1-1 01:01:01', 1));
+SQL SUCCESS
+--step6:查看makedate函数执行结果是否正确;expect:成功
+select * from func_test;
++------------------------------------------------------------------------+----------------------------+
+| functionname                                                           | result                     |
++------------------------------------------------------------------------+----------------------------+
+| subdate('2022-1-1', 20)                                                | 2021-12-12                 |
+| subdate('2022-1-1', '20.5')                                            | 2021-12-11                 |
+| subdate('2022-1-1', 20.5)                                              | 2021-12-11                 |
+| subdate('2022-1-1', true)                                              | 2021-12-31                 |
+| subdate('2022-1-1', B'1111')                                           | 2021-12-17                 |
+| subdate(date'2022-1-1', 1)                                             | 2021-12-31                 |
+| subdate(cast('2022-1-1 1:1:1' as datetime), 1)                         | 2021-12-31 01:01:01        |
+| subdate(NULL, 20)                                                      |                            |
+| subdate('2022-1-1', NULL)                                              |                            |
+| subdate('2022-1-1 6:05:05', INTERVAL '10 20:20' DAY TO SECOND)         | 2021-12-21 09:45:05        |
+| subdate(20220101010101.555, 1)                                         | 2021-12-31 01:01:01.555    |
+| subdate(20220101, 1)                                                   | 2021-12-31                 |
+| subdate('2022-1-1 6:05:05', INTERVAL '6' SECOND)                       | 2022-01-01 06:05:11        |
+| subdate('2022-6-1 6:05:05.5555555', INTERVAL 6.444444 SECOND)          | 2022-06-01 06:04:59.111112 |
+| subdate('2022-6-1 6:05:05.444444', INTERVAL '6.555555' HOUR TO SECOND) | 2022-06-01 05:03:58.888889 |
+| subdate('0001-1-1 00:00:01', INTERVAL 1 SECOND)                        | 0001-01-01 00:00:00        |
+| subdate('2020-2-28 23:59:59', INTERVAL '-1:1' MINUTE TO SECOND)        | 2020-02-29 00:01:00        |
+| subdate('2020-2-29', INTERVAL '366' DAY)                               | 2019-02-28                 |
+| subdate('2020-2-29', INTERVAL '-366' DAY)                              | 2021-03-01                 |
+| subdate('0001-1-2 1:1:1', INTERVAL '1' DAY)                            | 0001-01-01 01:01:01        |
+| subdate('2020-2-29', INTERVAL '-365' MONTH)                            | 2050-07-29                 |
+| subdate('0001-1-31', INTERVAL '1' MONTH)                               | 0000-12-31                 |
+| subdate('0001-2-1', INTERVAL '1' MONTH)                                | 0001-01-01                 |
+| subdate('2020-2-29', INTERVAL 3 YEAR)                                  | 2017-02-28                 |
+| subdate('2020-2-29', INTERVAL -3 YEAR)                                 | 2023-02-28                 |
+| subdate('0001-12-31', INTERVAL '1' YEAR)                               | 0000-12-31                 |
+| subdate(time'100:59:59', INTERVAL '1 20:50:50.888888' DAY To SECOND)   | 56:09:08.111112            |
+| subdate(time'100:59:59', INTERVAL '-1 20:50:50.888888' HOUR To SECOND) | 121:50:49.888888           |
+| subdate(time(6)'100:59:59.555', 2                                      | 52:59:59.555               |
++------------------------------------------------------------------------+----------------------------+
+--step7:清理环境;expect:成功
+drop table if exists insert_subdate;
+SQL SUCCESS
+drop table if exists func_test;
+SQL SUCCESS

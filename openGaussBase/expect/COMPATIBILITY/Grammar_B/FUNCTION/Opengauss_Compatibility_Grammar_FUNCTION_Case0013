@@ -1,0 +1,290 @@
+-- @testpoint: 时间函数timestampadd(入参为date格式)功能测试,部分测试步骤合理报错
+--step1:创建用于存储函数结果的表;expect:成功
+drop table if exists func_test;
+SQL SUCCESS
+create table func_test(functionName varchar(256),result varchar(256));
+SQL SUCCESS
+--step2:插入timestampadd正常执行结果;expect:成功
+insert into func_test(functionName, result) values('TIMESTAMPADD(YEAR,1,''2022-07-27'')', TIMESTAMPADD(YEAR,1,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(YEAR,-1,''2022-07-27'')', TIMESTAMPADD(YEAR,-1,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(MONTH,1,''2022-07-27'')', TIMESTAMPADD(MONTH,1,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(MONTH,-1,''2022-07-27'')', TIMESTAMPADD(MONTH,-1,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(WEEK,1,''2022-07-27'')', TIMESTAMPADD(WEEK,1,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(WEEK,-1,''2022-07-27'')', TIMESTAMPADD(WEEK,-1,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(DAY,1,''2022-07-27'')', TIMESTAMPADD(DAY,1,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(DAY,-1,''2022-07-27'')', TIMESTAMPADD(DAY,-1,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(HOUR,1,''2022-07-27'')', TIMESTAMPADD(HOUR,1,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(HOUR,-1,''2022-07-27'')', TIMESTAMPADD(HOUR,-1,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(MINUTE,1,''2022-07-27'')', TIMESTAMPADD(MINUTE,1,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(MINUTE,-1,''2022-07-27'')', TIMESTAMPADD(MINUTE,-1,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(SECOND,1,''2022-07-27'')', TIMESTAMPADD(SECOND,1,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(SECOND,-1,''2022-07-27'')', TIMESTAMPADD(SECOND,-1,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(SECOND,-1, 2022-07-27)', TIMESTAMPADD(SECOND,-1, 20220727));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(MONTH,2,''2022-07-31'')', TIMESTAMPADD(MONTH,2,'2022-07-31'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(YEAR,1,''2020-02-29'')', TIMESTAMPADD(YEAR,1,'2020-02-29'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(MONTH,3,''2019-12-31'')', TIMESTAMPADD(MONTH,3,'2019-12-31'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(YEAR,1.1,''2022-07-27'')', TIMESTAMPADD(YEAR,1.1,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(YEAR,-1.1,''2022-07-27'')', TIMESTAMPADD(YEAR,-1.1,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(YEAR,1.6,''2022-07-27'')', TIMESTAMPADD(YEAR,1.6,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(YEAR,-1.6,''2022-07-27'')', TIMESTAMPADD(YEAR,-1.6,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(MONTH,1.1,''2022-07-27'')', TIMESTAMPADD(MONTH,1.1,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(MONTH,-1.1,''2022-07-27'')', TIMESTAMPADD(MONTH,-1.1,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(MONTH,1.6,''2022-07-27'')', TIMESTAMPADD(MONTH,1.6,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(MONTH,-1.6,''2022-07-27'')', TIMESTAMPADD(MONTH,-1.6,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(WEEK,1.1,''2022-07-27'')', TIMESTAMPADD(WEEK,1.1,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(WEEK,-1.1,''2022-07-27'')', TIMESTAMPADD(WEEK,-1.1,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(WEEK,1.6,''2022-07-27'')', TIMESTAMPADD(WEEK,1.6,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(WEEK,-1.6,''2022-07-27'')', TIMESTAMPADD(WEEK,-1.6,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(DAY,1.1,''2022-07-27'')', TIMESTAMPADD(DAY,1.1,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(DAY,-1.1,''2022-07-27'')', TIMESTAMPADD(DAY,-1.1,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(DAY,1.6,''2022-07-27'')', TIMESTAMPADD(DAY,1.6,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(DAY,-1.6,''2022-07-27'')', TIMESTAMPADD(DAY,-1.6,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(HOUR,1.1,''2022-07-27'')', TIMESTAMPADD(HOUR,1.1,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(HOUR,-1.1,''2022-07-27'')', TIMESTAMPADD(HOUR,-1.1,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(HOUR,1.6,''2022-07-27'')', TIMESTAMPADD(HOUR,1.6,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(HOUR,-1.6,''2022-07-27'')', TIMESTAMPADD(HOUR,-1.6,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(MINUTE,1.1,''2022-07-27'')', TIMESTAMPADD(MINUTE,1.1,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(MINUTE,-1.1,''2022-07-27'')', TIMESTAMPADD(MINUTE,-1.1,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(MINUTE,1.6,''2022-07-27'')', TIMESTAMPADD(MINUTE,1.6,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(MINUTE,-1.6,''2022-07-27'')', TIMESTAMPADD(MINUTE,-1.6,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(SECOND,1.1,''2022-07-27'')', TIMESTAMPADD(SECOND,1.1,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(SECOND,-1.1,''2022-07-27'')', TIMESTAMPADD(SECOND,-1.1,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(SECOND,1.6,''2022-07-27'')', TIMESTAMPADD(SECOND,1.6,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(SECOND,-1.6,''2022-07-27'')', TIMESTAMPADD(SECOND,-1.6,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(YEAR,1,''2020-02-29'')', TIMESTAMPADD(YEAR,1,'2020-02-29'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(YEAR,-1,''2020-02-29'')', TIMESTAMPADD(YEAR,-1,'2020-02-29'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(MONTH,1,''2022-08-31'')', TIMESTAMPADD(MONTH,1,'2022-08-31'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(MONTH,-1,''2022-07-31'')', TIMESTAMPADD(MONTH,-1,'2022-07-31'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(MONTH,1,''2022-12-31'')', TIMESTAMPADD(MONTH,1,'2022-12-31'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(MONTH,-1,''2022-01-31'')', TIMESTAMPADD(MONTH,-1,'2022-01-31'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(DAY,-1,''2022-01-01'')', TIMESTAMPADD(DAY,-1,'2022-01-01'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(HOUR,49,''2022-10-30'')', TIMESTAMPADD(HOUR,49,'2022-10-30'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(HOUR,-56,''2022-07-01'')', TIMESTAMPADD(HOUR,-56,'2022-07-01'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(HOUR,1,''2022-07-27 23:30:00'')', TIMESTAMPADD(HOUR,1,'2022-07-27 23:30:00'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(HOUR,-1,''2022-07-27 00:30:00'')', TIMESTAMPADD(HOUR,-1,'2022-07-27 00:30:00'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(MINUTE,1,''2022-07-27 08:59:59'')', TIMESTAMPADD(MINUTE,1,'2022-07-27 08:59:59'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(MINUTE,-1,''2022-07-27 08:00:00'')', TIMESTAMPADD(MINUTE,-1,'2022-07-27 08:00:00'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(SECOND,1,''2022-07-27 08:30:59'')', TIMESTAMPADD(SECOND,1,'2022-07-27 08:30:59'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(SECOND,-1,''2022-07-27 00:00:00'')', TIMESTAMPADD(SECOND,-1,'2022-07-27 00:00:00'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(SECOND,0.001,''2022-07-27 08:30:59.999'')', TIMESTAMPADD(SECOND,0.001,'2022-07-27 08:30:59.999'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(SECOND,-0.001,''2022-07-27 00:00:00'')', TIMESTAMPADD(SECOND,-0.001,'2022-07-27 00:00:00'));
+SQL SUCCESS
+--step3:插入入参为date格式但返回值为datetime格式的timestampadd用例执行结果;expect:成功
+insert into func_test(functionName, result) values('TIMESTAMPADD(HOUR,3,''2022-07-27'')', TIMESTAMPADD(HOUR,3,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(HOUR,0.3,''2022-07-27'')', TIMESTAMPADD(HOUR,0.3,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(MINUTE,3,''2022-07-27'')', TIMESTAMPADD(MINUTE,3,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(MINUTE,0.3,''2022-07-27'')', TIMESTAMPADD(MINUTE,0.3,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(SECOND,3,''2022-07-27'')', TIMESTAMPADD(SECOND,3,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(SECOND,0.03,''2022-07-27'')', TIMESTAMPADD(SECOND,0.03,'2022-07-27'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('TIMESTAMPADD(SECOND,0.000000003,''2022-07-27'')', TIMESTAMPADD(SECOND,0.000000003,'2022-07-27'));
+SQL SUCCESS
+--step4:插入timestampadd涉及时间类型值超出范围的用例执行结果;expect:合理报错
+insert into func_test(functionName, result) values('TIMESTAMPADD(DAY,1,''9999-12-31'')', TIMESTAMPADD(DAY,1,'9999-12-31'));
+?.*ERROR: date/time field overflow
+  Where: referenced column: result
+insert into func_test(functionName, result) values('TIMESTAMPADD(DAY,-1,''0001-01-01'')', TIMESTAMPADD(DAY,-1,'0001-01-01'));
+?.*ERROR: date/time field overflow
+  Where: referenced column: result
+--step5:插入非法入参时timestampadd执行结果;expect:合理报错
+insert into func_test(functionName, result) values('TIMESTAMPADD(YEAR,1,''2022-07-36'')', TIMESTAMPADD(YEAR,1,'2022-07-36'));
+?.*ERROR: date/time field value out of range: "2022-07-36"
+  Hint: Perhaps you need a different "datestyle" setting.
+  Where: referenced column: result
+insert into func_test(functionName, result) values('TIMESTAMPADD(YEAR,-1,''2022-14-27'')', TIMESTAMPADD(YEAR,-1,'2022-14-27'));
+?.*ERROR: date/time field value out of range: "2022-14-27"
+  Hint: Perhaps you need a different "datestyle" setting.
+  Where: referenced column: result
+insert into func_test(functionName, result) values('TIMESTAMPADD(MONTH,1,''2022-12-32'')', TIMESTAMPADD(MONTH,1,'2022-12-32'));
+?.*ERROR: date/time field value out of range: "2022-12-32"
+  Hint: Perhaps you need a different "datestyle" setting.
+  Where: referenced column: result
+insert into func_test(functionName, result) values('TIMESTAMPADD(MONTH,-1,''2022-01-00'')', TIMESTAMPADD(MONTH,-1,'2022-01-00'));
+?.*ERROR: date/time field value out of range: "2022-01-00"
+  Hint: Perhaps you need a different "datestyle" setting.
+  Where: referenced column: result
+insert into func_test(functionName, result) values('TIMESTAMPADD(DAY,1,''2022-02-29'')', TIMESTAMPADD(DAY,1,'2022-02-29'));
+?.*ERROR: date/time field value out of range: "2022-02-29"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('TIMESTAMPADD(DAY,-1,''2022-14-32'')', TIMESTAMPADD(DAY,-1,'2022-14-32'));
+?.*ERROR: date/time field value out of range: "2022-14-32"
+  Hint: Perhaps you need a different "datestyle" setting.
+  Where: referenced column: result
+insert into func_test(functionName, result) values('TIMESTAMPADD(HOUR,1,''2022-14-32'')', TIMESTAMPADD(HOUR,1,'2022-14-32'));
+?.*ERROR: date/time field value out of range: "2022-14-32"
+  Hint: Perhaps you need a different "datestyle" setting.
+  Where: referenced column: result
+insert into func_test(functionName, result) values('TIMESTAMPADD(HOUR,-1,''2022-02-29'')', TIMESTAMPADD(HOUR,-1,'2022-02-29'));
+?.*ERROR: date/time field value out of range: "2022-02-29"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('TIMESTAMPADD(YEAR,10000000000,''9999999999-12-31'')', TIMESTAMPADD(YEAR,10000000000,'9999999999-12-31'));
+?.*ERROR: date/time field value out of range: "9999999999-12-31"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('TIMESTAMPADD(YEAR,-1000000000,''999999999-99999-999999'')', TIMESTAMPADD(YEAR,-1000000000,'999999999-99999-999999'));
+?.*ERROR: date/time field value out of range: "999999999-99999-999999"
+  Hint: Perhaps you need a different "datestyle" setting.
+  Where: referenced column: result
+insert into func_test(functionName, result) values('TIMESTAMPADD(MONTH,1000000000000000000000000000000000,''2022-12-28'')', TIMESTAMPADD(MONTH,1000000000000000000000000000000000,'2022-12-28'));
+?.*ERROR: interval out of range
+  Where: referenced column: result
+insert into func_test(functionName, result) values('TIMESTAMPADD(MONTH,-10000000000000000000000000000000,''2022-01-01'')', TIMESTAMPADD(MONTH,-10000000000000000000000000000000,'2022-01-01'));
+?.*ERROR: interval out of range
+  Where: referenced column: result
+insert into func_test(functionName, result) values('TIMESTAMPADD(DAY,99999999999999999,''2022-02-06'')', TIMESTAMPADD(DAY,99999999999999999,'2022-02-06'));
+?.*ERROR: timestamp out of range
+  Where: referenced column: result
+insert into func_test(functionName, result) values('TIMESTAMPADD(DAY,-1000000000000000000000000000000,''2022-06-07'')', TIMESTAMPADD(DAY,-1000000000000000000000000000000,'2022-06-07'));
+?.*ERROR: interval out of range
+  Where: referenced column: result
+insert into func_test(functionName, result) values('TIMESTAMPADD(HOUR,1000000000000000000000000000000,''2022-11-21'')', TIMESTAMPADD(HOUR,1000000000000000000000000000000,'2022-11-21'));
+?.*ERROR: interval out of range
+  Where: referenced column: result
+insert into func_test(functionName, result) values('TIMESTAMPADD(HOUR,-10000000000000000000000000000,''2022-04-05'')', TIMESTAMPADD(HOUR,-10000000000000000000000000000,'2022-04-05'));
+?.*ERROR: interval out of range
+  Where: referenced column: result
+--step6:查看timestampadd函数执行结果是否正确;expect:成功
+select * from func_test;
++------------------------------------------------------+-------------------------+
+| functionname                                         | result                  |
++------------------------------------------------------+-------------------------+
+| TIMESTAMPADD(YEAR,1,'2022-07-27')                    | 2023-07-27              |
+| TIMESTAMPADD(YEAR,-1,'2022-07-27')                   | 2021-07-27              |
+| TIMESTAMPADD(MONTH,1,'2022-07-27')                   | 2022-08-27              |
+| TIMESTAMPADD(MONTH,-1,'2022-07-27')                  | 2022-06-27              |
+| TIMESTAMPADD(WEEK,1,'2022-07-27')                    | 2022-08-03              |
+| TIMESTAMPADD(WEEK,-1,'2022-07-27')                   | 2022-07-20              |
+| TIMESTAMPADD(DAY,1,'2022-07-27')                     | 2022-07-28              |
+| TIMESTAMPADD(DAY,-1,'2022-07-27')                    | 2022-07-26              |
+| TIMESTAMPADD(HOUR,1,'2022-07-27')                    | 2022-07-27 01:00:00     |
+| TIMESTAMPADD(HOUR,-1,'2022-07-27')                   | 2022-07-26 23:00:00     |
+| TIMESTAMPADD(MINUTE,1,'2022-07-27')                  | 2022-07-27 00:01:00     |
+| TIMESTAMPADD(MINUTE,-1,'2022-07-27')                 | 2022-07-26 23:59:00     |
+| TIMESTAMPADD(SECOND,1,'2022-07-27')                  | 2022-07-27 00:00:01     |
+| TIMESTAMPADD(SECOND,-1,'2022-07-27')                 | 2022-07-26 23:59:59     |
+| TIMESTAMPADD(SECOND,-1, 2022-07-27)                  | 2022-07-26 23:59:59     |
+| TIMESTAMPADD(MONTH,2,'2022-07-31')                   | 2022-09-30              |
+| TIMESTAMPADD(YEAR,1,'2020-02-29')                    | 2021-02-28              |
+| TIMESTAMPADD(MONTH,3,'2019-12-31')                   | 2020-03-31              |
+| TIMESTAMPADD(YEAR,1.1,'2022-07-27')                  | 2023-07-27              |
+| TIMESTAMPADD(YEAR,-1.1,'2022-07-27')                 | 2021-07-27              |
+| TIMESTAMPADD(YEAR,1.6,'2022-07-27')                  | 2024-07-27              |
+| TIMESTAMPADD(YEAR,-1.6,'2022-07-27')                 | 2020-07-27              |
+| TIMESTAMPADD(MONTH,1.1,'2022-07-27')                 | 2022-08-27              |
+| TIMESTAMPADD(MONTH,-1.1,'2022-07-27')                | 2022-06-27              |
+| TIMESTAMPADD(MONTH,1.6,'2022-07-27')                 | 2022-09-27              |
+| TIMESTAMPADD(MONTH,-1.6,'2022-07-27')                | 2022-05-27              |
+| TIMESTAMPADD(WEEK,1.1,'2022-07-27')                  | 2022-08-03              |
+| TIMESTAMPADD(WEEK,-1.1,'2022-07-27')                 | 2022-07-20              |
+| TIMESTAMPADD(WEEK,1.6,'2022-07-27')                  | 2022-08-10              |
+| TIMESTAMPADD(WEEK,-1.6,'2022-07-27')                 | 2022-07-13              |
+| TIMESTAMPADD(DAY,1.1,'2022-07-27')                   | 2022-07-28              |
+| TIMESTAMPADD(DAY,-1.1,'2022-07-27')                  | 2022-07-26              |
+| TIMESTAMPADD(DAY,1.6,'2022-07-27')                   | 2022-07-29              |
+| TIMESTAMPADD(DAY,-1.6,'2022-07-27')                  | 2022-07-25              |
+| TIMESTAMPADD(HOUR,1.1,'2022-07-27')                  | 2022-07-27 01:00:00     |
+| TIMESTAMPADD(HOUR,-1.1,'2022-07-27')                 | 2022-07-26 23:00:00     |
+| TIMESTAMPADD(HOUR,1.6,'2022-07-27')                  | 2022-07-27 02:00:00     |
+| TIMESTAMPADD(HOUR,-1.6,'2022-07-27')                 | 2022-07-26 22:00:00     |
+| TIMESTAMPADD(MINUTE,1.1,'2022-07-27')                | 2022-07-27 00:01:00     |
+| TIMESTAMPADD(MINUTE,-1.1,'2022-07-27')               | 2022-07-26 23:59:00     |
+| TIMESTAMPADD(MINUTE,1.6,'2022-07-27')                | 2022-07-27 00:02:00     |
+| TIMESTAMPADD(MINUTE,-1.6,'2022-07-27')               | 2022-07-26 23:58:00     |
+| TIMESTAMPADD(SECOND,1.1,'2022-07-27')                | 2022-07-27 00:00:01.1   |
+| TIMESTAMPADD(SECOND,-1.1,'2022-07-27')               | 2022-07-26 23:59:58.9   |
+| TIMESTAMPADD(SECOND,1.6,'2022-07-27')                | 2022-07-27 00:00:01.6   |
+| TIMESTAMPADD(SECOND,-1.6,'2022-07-27')               | 2022-07-26 23:59:58.4   |
+| TIMESTAMPADD(YEAR,1,'2020-02-29')                    | 2021-02-28              |
+| TIMESTAMPADD(YEAR,-1,'2020-02-29')                   | 2019-02-28              |
+| TIMESTAMPADD(MONTH,1,'2022-08-31')                   | 2022-09-30              |
+| TIMESTAMPADD(MONTH,-1,'2022-07-31')                  | 2022-06-30              |
+| TIMESTAMPADD(MONTH,1,'2022-12-31')                   | 2023-01-31              |
+| TIMESTAMPADD(MONTH,-1,'2022-01-31')                  | 2021-12-31              |
+| TIMESTAMPADD(DAY,-1,'2022-01-01')                    | 2021-12-31              |
+| TIMESTAMPADD(HOUR,49,'2022-10-30')                   | 2022-11-01 01:00:00     |
+| TIMESTAMPADD(HOUR,-56,'2022-07-01')                  | 2022-06-28 16:00:00     |
+| TIMESTAMPADD(HOUR,1,'2022-07-27 23:30:00')           | 2022-07-28 00:30:00     |
+| TIMESTAMPADD(HOUR,-1,'2022-07-27 00:30:00')          | 2022-07-26 23:30:00     |
+| TIMESTAMPADD(MINUTE,1,'2022-07-27 08:59:59')         | 2022-07-27 09:00:59     |
+| TIMESTAMPADD(MINUTE,-1,'2022-07-27 08:00:00')        | 2022-07-27 07:59:00     |
+| TIMESTAMPADD(SECOND,1,'2022-07-27 08:30:59')         | 2022-07-27 08:31:00     |
+| TIMESTAMPADD(SECOND,-1,'2022-07-27 00:00:00')        | 2022-07-26 23:59:59     |
+| TIMESTAMPADD(SECOND,0.001,'2022-07-27 08:30:59.999') | 2022-07-27 08:31:00     |
+| TIMESTAMPADD(SECOND,-0.001,'2022-07-27 00:00:00')    | 2022-07-26 23:59:59.999 |
+| TIMESTAMPADD(HOUR,3,'2022-07-27')                    | 2022-07-27 03:00:00     |
+| TIMESTAMPADD(HOUR,0.3,'2022-07-27')                  | 2022-07-27 00:00:00     |
+| TIMESTAMPADD(MINUTE,3,'2022-07-27')                  | 2022-07-27 00:03:00     |
+| TIMESTAMPADD(MINUTE,0.3,'2022-07-27')                | 2022-07-27 00:00:00     |
+| TIMESTAMPADD(SECOND,3,'2022-07-27')                  | 2022-07-27 00:00:03     |
+| TIMESTAMPADD(SECOND,0.03,'2022-07-27')               | 2022-07-27 00:00:00.03  |
+| TIMESTAMPADD(SECOND,0.000000003,'2022-07-27')        | 2022-07-27 00:00:00     |
++------------------------------------------------------+-------------------------+
+--step7:清理环境;expect:成功
+drop table if exists func_test;
+SQL SUCCESS

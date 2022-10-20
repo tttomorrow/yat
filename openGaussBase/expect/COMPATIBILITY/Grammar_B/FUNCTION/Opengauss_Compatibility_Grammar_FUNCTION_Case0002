@@ -1,0 +1,107 @@
+-- @testpoint: 时间函数maketime功能测试,部分测试步骤合理报错
+--step1:创建用于存储函数结果的表;expect:成功
+drop table if exists func_test;
+SQL SUCCESS
+create table func_test(functionName varchar(256),result varchar(256));
+SQL SUCCESS
+--step2:插入合法入参时maketime执行结果;expect:成功
+insert into func_test(functionName, result) values ('maketime(''25.5'', ''30.4'', ''30'')', maketime('25.5', '30.4', '30'));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('maketime(25.5, 30.4, 30)', maketime(25.5, 30.4, 30));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('maketime(false, true, true)', maketime(false, true, true));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('maketime(B''111'', B''111'', B''111'')', maketime(B'111', B'111', B'111'));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('maketime(null, 0, 0)', maketime(null, 0, 0));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('maketime(0, null, 0)', maketime(0, null, 0));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('maketime(0, 0, null)', maketime(0, 0, null));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('maketime(0, -1, 0)', maketime(0, -1, 0));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('maketime(0, 60, 0)', maketime(0, 60, 0));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('maketime(0, 60, 0)', maketime(0, 59.5, 0));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('maketime(0, 0, -1)', maketime(0, 0, -1));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('maketime(0, 0, 60)', maketime(0, 0, 60));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('maketime(0, 0, pow(10,18))', maketime(0, 0, pow(10,18)));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('maketime(0, 0, 59.9999)', maketime(0, 0, 59.9999));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('maketime(0, 0, 59.999999001)', maketime(0, 0, 59.999999001));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('maketime(838, 59, 58.999999)', maketime(838, 59, 58.999999));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('maketime(-838, 59, 58.999999)', maketime(-838, 59, 58.999999));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('maketime(25, 30, 30)', maketime(25, 30, 30));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('maketime(-25, 30, 30)', maketime(-25, 30, 30));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('maketime(pow(2, 32),0,0)', maketime(pow(2, 32),0,0));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('maketime(-pow(2, 32),0,0)', maketime(-pow(2, 32),0,0));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('maketime(0, 59, 59.9999994999)', maketime(0, 59, 59.9999994999));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('maketime(0, 10, 59.999999500)', maketime(0, 10, 59.999999500));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('maketime(0, 59, 59.999999500)', maketime(0, 59, 59.999999500));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('maketime(0, 59, 59.999998500)', maketime(0, 59, 59.999998500));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('maketime(839, 0, 0)', maketime(839, 0, 0));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('maketime(-839, 0, 0)', maketime(-839, 0, 0));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('maketime(838, 59, 59.000001)', maketime(838, 59, 59.000001));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('maketime(838, 59, 59.000000600)', maketime(838, 59, 59.000000600));
+SQL SUCCESS
+--step3:插入非法入参时maketime执行结果;expect:合理报错
+insert into func_test(functionName, result) values ('maketime(''ABCD'', ''30.4'', ''30.123'')', maketime('ABCD', '30.4', '30.123'));
+?.*ERROR: invalid input syntax for type bigint: "ABCD"
+?.*
+--step4:查看maketime函数执行结果是否正确;expect:成功
+select * from func_test;
++----------------------------------+-------------------+
+| functionname                     | result            |
++----------------------------------+-------------------+
+| maketime('25.5', '30.4', '30')   | 26:30:30          |
+| maketime(25.5, 30.4, 30)         | 26:30:30          |
+| maketime(false, true, true)      | 00:01:01          |
+| maketime(B'111', B'111', B'111') | 07:07:07          |
+| maketime(null, 0, 0)             |                   |
+| maketime(0, null, 0)             |                   |
+| maketime(0, 0, null)             |                   |
+| maketime(0, -1, 0)               |                   |
+| maketime(0, 60, 0)               |                   |
+| maketime(0, 60, 0)               |                   |
+| maketime(0, 0, -1)               |                   |
+| maketime(0, 0, 60)               |                   |
+| maketime(0, 0, pow(10,18))       |                   |
+| maketime(0, 0, 59.9999)          | 00:00:59.9999     |
+| maketime(0, 0, 59.999999001)     | 00:00:59.999999   |
+| maketime(838, 59, 58.999999)     | 838:59:58.999999  |
+| maketime(-838, 59, 58.999999)    | -838:59:58.999999 |
+| maketime(25, 30, 30)             | 25:30:30          |
+| maketime(-25, 30, 30)            | -25:30:30         |
+| maketime(pow(2, 32),0,0)         | 838:59:59         |
+| maketime(-pow(2, 32),0,0)        | -838:59:59        |
+| maketime(0, 59, 59.9999994999)   | 00:59:59.999999   |
+| maketime(0, 10, 59.999999500)    | 00:11:00          |
+| maketime(0, 59, 59.999999500)    | 01:00:00          |
+| maketime(0, 59, 59.999998500)    | 00:59:59.999999   |
+| maketime(839, 0, 0)              | 838:59:59         |
+| maketime(-839, 0, 0)             | -838:59:59        |
+| maketime(838, 59, 59.000001)     | 838:59:59         |
+| maketime(838, 59, 59.000000600)  | 838:59:59         |
++----------------------------------+-------------------+
+--step5:清理环境;expect:成功
+drop table if exists func_test;
+SQL SUCCESS

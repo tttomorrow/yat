@@ -1,0 +1,71 @@
+-- @testpoint: 时间函数period_diff功能测试,部分测试步骤合理报错
+--step1:创建用于存储函数结果的表;expect:成功
+drop table if exists func_test;
+SQL SUCCESS
+create table func_test(functionName varchar(256),result varchar(256));
+SQL SUCCESS
+--step2:插入合法入参时period_diff执行结果;expect:成功
+insert into func_test(functionName, result) values ('period_diff(''202101'', ''202102'')', period_diff('202101', '202102'));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('period_diff(''202101.4'', ''202102.5'')', period_diff('202101.4', '202102.5'));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('period_diff(202101.4, 202102.5)', period_diff(202101.4, 202102.5));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('period_diff(true, false)', period_diff(true, false));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('period_diff(B''1111'', B''11111''))', period_diff(B'1111', B'11111'));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('period_diff(NULL, 200001)', period_diff(NULL, 200001));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('period_diff(202011, NULL)', period_diff(202011, NULL));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('period_diff(-202011, 200001)', period_diff(-202011, 200001));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('period_diff(202011, -200001)', period_diff(202011, -200001));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('period_diff(707712, 202201)', period_diff(707712, 202201));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('period_diff(6912, 10001)', period_diff(6912, 10001));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('period_diff(7001, 10001)', period_diff(7001, 10001));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('period_diff(10002, 6901)', period_diff(10002, 6901));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('period_diff(10002, 7001)', period_diff(10002, 7001));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('period_diff(0, 30)', period_diff(0, 30));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('period_diff(30, 0)', period_diff(30, 0));
+SQL SUCCESS
+insert into func_test(functionName, result) values ('period_diff(pow(2,62), pow(2,60))', period_diff(pow(2,62), pow(2,60)));
+SQL SUCCESS
+--step3:插入非法入参时period_diff执行结果;expect:合理报错
+insert into func_test(functionName, result) values ('period_diff(''abcd'', ''abcd'')', period_diff('abcd', 'abcd'));
+?.*ERROR: invalid input syntax for type bigint: "abcd"
+  Position: 100
+--step4:查看makedate函数执行结果是否正确;expect:成功
+select * from func_test;
++-------------------------------------+----------------------+
+| functionname                        | result               |
++-------------------------------------+----------------------+
+| period_diff('202101', '202102')     | -1                   |
+| period_diff('202101.4', '202102.5') | -2                   |
+| period_diff(202101.4, 202102.5)     | -2                   |
+| period_diff(true, false)            | 24000                |
+| period_diff(B'1111', B'11111'))     | -16                  |
+| period_diff(NULL, 200001)           |                      |
+| period_diff(202011, NULL)           |                      |
+| period_diff(-202011, 200001)        | 2213609288845097956  |
+| period_diff(202011, -200001)        | -2213609288845097956 |
+| period_diff(707712, 202201)         | 60671                |
+| period_diff(6912, 10001)            | 23639                |
+| period_diff(7001, 10001)            | 22440                |
+| period_diff(10002, 6901)            | -23627               |
+| period_diff(10002, 7001)            | -22439               |
+| period_diff(0, 30)                  | -24029               |
+| period_diff(30, 0)                  | 24029                |
+| period_diff(pow(2,62), pow(2,60))   | 415051741658464848   |
++-------------------------------------+----------------------+
+--step5:清理环境;expect:成功
+drop table if exists func_test;
+SQL SUCCESS
