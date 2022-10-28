@@ -34,8 +34,24 @@ insert into func_test(functionName, result) values('TIMESTAMP(''asdasd'')', TIME
 insert into func_test(functionName, result) values('TIMESTAMP(true)', TIMESTAMP(true));
 insert into func_test(functionName, result) values('TIMESTAMP(B''1'')', TIMESTAMP(B'1'));
 
---step6:查看timestamp函数执行结果是否正确;expect:成功
+--step6: og时间类型与格式测试;expect:部分类型合理报错
+insert into func_test(functionName, result) values('timestamp(timetz''1:1:1+05'')', timestamp(timetz'1:1:1+05'));
+insert into func_test(functionName, result) values('timestamp(timestamptz''2000-1-1 1:1:1+05'')', timestamp(timestamptz'2000-1-1 1:1:1+05'));
+insert into func_test(functionName, result) values('timestamp(reltime''2000 years 1 mons 1 days 1:1:1'')', timestamp(reltime'2000 years 1 mons 1 days 1:1:1'));
+insert into func_test(functionName, result) values('timestamp(abstime''2000-1-1 1:1:1+05'')', timestamp(abstime'2000-1-1 1:1:1+05'));
+insert into func_test(functionName, result) values('timestamp(''23:1:1+05'')', timestamp('23:1:1+05'));
+insert into func_test(functionName, result) values('timestamp(''2000 years 1 mons 1 days 1:1:1'')', timestamp('2000 years 1 mons 1 days 1:1:1'));
+insert into func_test(functionName, result) values('timestamp(''2000-1-1 23:1:1+05'')', timestamp('2000-1-1 23:1:1+05'));
+
+--step7: og时间边界测试;expect:合理报错
+insert into func_test(functionName, result) values('timestamp(date''4714-11-24bc'')', timestamp(date'4714-11-24bc'));
+insert into func_test(functionName, result) values('timestamp(date''5874897-12-31'')', timestamp(date'5874897-12-31'));
+insert into func_test(functionName, result) values('timestamp(datetime''4714-11-24 00:00:00 bc'')', timestamp(datetime'4714-11-24 00:00:00 bc'));
+insert into func_test(functionName, result) values('timestamp(datetime''294277-1-9 4:00:54.775807'')', timestamp(datetime'294277-1-9 4:00:54.775807'));
+insert into func_test(functionName, result) values('timestamp(datetime''294277-1-9 4:00:54.775806'')', timestamp(datetime'294277-1-9 4:00:54.775806'));
+
+--step8:查看timestamp函数执行结果是否正确;expect:成功
 select * from func_test;
 
---step7:清理环境;expect:成功
+--step9:清理环境;expect:成功
 drop table if exists func_test;

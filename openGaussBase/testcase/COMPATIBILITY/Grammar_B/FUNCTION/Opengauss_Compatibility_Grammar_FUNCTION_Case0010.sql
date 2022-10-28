@@ -54,8 +54,24 @@ insert into func_test(functionName, result) values(' TIME_FORMAT(''100:59:59.012
 insert into func_test(functionName, result) values(' TIME_FORMAT(''100:59:59.0123'', ''%U|%u|%V|%v|%W|%w|%X|%x|%Y|%y'')    ', TIME_FORMAT('100:59:59.0123', '%c|%d|%e|%m|%Y|%y'));
 insert into func_test(functionName, result) values(' TIME_FORMAT(''100:59:59.0123'', ''%N|%n abcd'')    ', TIME_FORMAT('100:59:59.0123', '%N|%n abcd'));
 
---step6:查看time_format函数执行结果是否正确;expect:成功
+--step7: og时间类型与格式测试;expect:部分类型合理报错
+insert into func_test(functionName, result) values('time_format(timetz''1:0:0+05'', ''%T|%r|%h|%h'')', time_format(timetz'1:0:0+05', '%T|%r|%h|%h'));
+insert into func_test(functionName, result) values('time_format(timestamptz''2000-1-1 1:1:1+05'', ''%T|%r|%h|%h'')', time_format(timestamptz'2000-1-1 1:1:1+05', '%T|%r|%h|%h'));
+insert into func_test(functionName, result) values('time_format(reltime''2000 years 1 mons 1 days 1:1:1'', ''%T|%r|%h|%h'')', time_format(reltime'2000 years 1 mons 1 days 1:1:1', '%T|%r|%h|%h'));
+insert into func_test(functionName, result) values('time_format(abstime''2000-1-1 1:1:1+05'', ''%T|%r|%h|%h'')', time_format(abstime'2000-1-1 1:1:1+05', '%T|%r|%h|%h'));
+insert into func_test(functionName, result) values('time_format(''23:0:0+05'', ''%T|%r|%h|%h'')', time_format('23:0:0+05', '%T|%r|%h|%h'));
+insert into func_test(functionName, result) values('time_format(''2000 years 1 mons 1 days 1:1:1'', ''%T|%r|%h|%h'')', time_format('2000 years 1 mons 1 days 1:1:1', '%T|%r|%h|%h'));
+insert into func_test(functionName, result) values('time_format(''2000-1-1 23:1:1+05'', ''%T|%r|%h|%h'')', time_format('2000-1-1 23:1:1+05', '%T|%r|%h|%h'));
+
+--step8: og时间边界测试;expect:合理报错
+insert into func_test(functionName, result) values('time_format(date''4714-11-24bc'', ''%T|%r|%h|%h'')', time_format(date'4714-11-24bc', '%T|%r|%h|%h'));
+insert into func_test(functionName, result) values('time_format(date''5874897-12-31'', ''%T|%r|%h|%h'')', time_format(date'5874897-12-31', '%T|%r|%h|%h'));
+insert into func_test(functionName, result) values('time_format(datetime''4714-11-24 00:00:00 bc'', ''%T|%r|%h|%h'')', time_format(datetime'4714-11-24 00:00:00 bc', '%T|%r|%h|%h'));
+insert into func_test(functionName, result) values('time_format(datetime''294277-1-9 4:00:54.775807'', ''%T|%r|%h|%h'')', time_format(datetime'294277-1-9 4:00:54.775807', '%T|%r|%h|%h'));
+insert into func_test(functionName, result) values('time_format(datetime''294277-1-9 4:00:54.775806'', ''%T|%r|%h|%h'')', time_format(datetime'294277-1-9 4:00:54.775806', '%T|%r|%h|%h'));
+
+--step9:查看time_format函数执行结果是否正确;expect:成功
 select * from func_test;
 
---step7:清理环境;expect:成功
+--step10:清理环境;expect:成功
 drop table if exists func_test;

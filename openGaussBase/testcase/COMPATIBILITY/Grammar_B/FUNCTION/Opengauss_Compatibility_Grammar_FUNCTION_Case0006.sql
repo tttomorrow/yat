@@ -67,9 +67,25 @@ insert into func_test(functionName, result) values ('subdate(time''-838:59:59'',
 --step5:测试subdate返回结果能否正确插入表中;expect:成功
 insert into insert_subdate(date_col, datetime_col) values (subdate('2021-1-1', 1), subdate('2021-1-1 01:01:01', 1));
 
---step6:查看makedate函数执行结果是否正确;expect:成功
+
+--step6: og时间类型与格式测试;expect:部分类型合理报错
+insert into func_test(functionName, result) values('subdate(timetz''1:0:0+05'', 1)', subdate(timetz'1:0:0+05', 1));
+insert into func_test(functionName, result) values('subdate(timestamptz''2000-1-1 1:1:1+05'', 1)', subdate(timestamptz'2000-1-1 1:1:1+05', 1));
+insert into func_test(functionName, result) values('subdate(reltime''2000 years 1 mons 1 days 1:1:1'', 1)', subdate(reltime'2000 years 1 mons 1 days 1:1:1', 1));
+insert into func_test(functionName, result) values('subdate(abstime''2000-1-1 1:1:1+05'', 1)', subdate(abstime'2000-1-1 1:1:1+05', 1));
+insert into func_test(functionName, result) values('subdate(''2000 years 1 mons 1 days 1:1:1'', 1)', subdate('2000 years 1 mons 1 days 1:1:1', 1));
+insert into func_test(functionName, result) values('subdate(''2000-1-1 23:1:1+05'', 1)', subdate('2000-1-1 23:1:1+05', 1));
+
+--step7: og时间边界测试;expect:合理报错
+insert into func_test(functionName, result) values('subdate(datetime''4714-11-24 00:00:00 bc'', 1)', subdate(datetime'4714-11-24 00:00:00 bc', 1));
+insert into func_test(functionName, result) values('subdate(datetime''294277-1-9 4:00:54.775807'', 1)', subdate(datetime'294277-1-9 4:00:54.775807', 1));
+insert into func_test(functionName, result) values('subdate(datetime''294277-1-9 4:00:54.775806'', 1)', subdate(datetime'294277-1-9 4:00:54.775806', 1));
+insert into func_test(functionName, result) values('subdate(date''4714-11-24bc'', 1)', subdate(date'4714-11-24bc', 1));
+insert into func_test(functionName, result) values('subdate(date''5874897-12-31'', 1)', subdate(date'5874897-12-31', 1));
+
+--step8:查看makedate函数执行结果是否正确;expect:成功
 select * from func_test;
 
---step7:清理环境;expect:成功
+--step9:清理环境;expect:成功
 drop table if exists insert_subdate;
 drop table if exists func_test;

@@ -16,6 +16,11 @@ insert into func_test(functionName, result) values('UTC_TIMESTAMP(6)', UTC_TIMES
 
 --step3:插入非法入参下UTC_TIME执行结果;expect:合理报错
 insert into func_test(functionName, result) values('UTC_TIMESTAMP(-1)', UTC_TIMESTAMP(-1));
+insert into func_test(functionName, result) values('UTC_TIMESTAMP(7)', UTC_TIMESTAMP(7));
+insert into func_test(functionName, result) values('UTC_TIMESTAMP(''1'')', UTC_TIMESTAMP('1'));
+insert into func_test(functionName, result) values('UTC_TIMESTAMP(True)', UTC_TIMESTAMP(True));
+insert into func_test(functionName, result) values('UTC_TIMESTAMP(b''1'')', UTC_TIMESTAMP(b'1'));
+insert into func_test(functionName, result) values('UTC_TIMESTAMP(null)', UTC_TIMESTAMP(null));
 
 --step4:查看UTC_TIME函数执行结果是否正确;expect:成功
 select * from func_test;

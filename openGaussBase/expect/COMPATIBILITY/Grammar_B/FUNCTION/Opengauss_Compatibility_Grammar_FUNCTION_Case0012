@@ -80,7 +80,42 @@ insert into func_test(functionName, result) values('TIMESTAMP(B''1'', B''1'')', 
 ?.*ERROR: function pg_catalog.timestamp_mysql\(bit, bit\) does not exist
   Hint: No function matches the given name and argument types. You might need to add explicit type casts.
 ?.*
---step6:查看timestamp函数执行结果是否正确;expect:成功
+--step6: og时间类型与格式测试;expect:部分类型合理报错
+insert into func_test(functionName, result) values('timestamp(datetime''2000-1-1 00:00:00'', timetz''1:1:1+05'')', timestamp(datetime'2000-1-1 00:00:00', timetz'1:1:1+05'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('timestamp(timestamptz''2000-1-1 1:1:1+05'',  time''00:00:00'')', timestamp(timestamptz'2000-1-1 1:1:1+05',  time'00:00:00'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('timestamp(reltime''2000 years 1 mons 1 days 1:1:1'', time''00:00:00'')', timestamp(reltime'2000 years 1 mons 1 days 1:1:1', time'00:00:00'));
+?.*ERROR: time zone displacement out of range: "-41 years -4 mons -27 days -18:02:59"
+  Where: SQL function "timestamp_mysql" during inlining
+referenced column: result
+insert into func_test(functionName, result) values('timestamp(reltime''2000 years 1 mons 1 days 1:1:1'', reltime''2000 years 1 mons 1 days 1:1:1'')', timestamp(reltime'2000 years 1 mons 1 days 1:1:1', reltime'2000 years 1 mons 1 days 1:1:1'));
+?.*ERROR: time zone displacement out of range: "-41 years -4 mons -27 days -18:02:59"
+  Where: SQL function "timestamp_mysql" during inlining
+referenced column: result
+insert into func_test(functionName, result) values('timestamp(abstime''2000-1-1 1:1:1+05'', time''00:00:00'')', timestamp(abstime'2000-1-1 1:1:1+05', time'00:00:00'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('timestamp(abstime''2000-1-1 1:1:1+05'', abstime''2000-1-1 1:1:1+05'')', timestamp(abstime'2000-1-1 1:1:1+05', abstime'2000-1-1 1:1:1+05'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('timestamp(''2000-1-1 1:1:1'', ''23:1:1+05'')', timestamp('2000-1-1 1:1:1', '23:1:1+05'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('timestamp(''2000 years 1 mons 1 days 1:1:1'', ''00:00:00'')', timestamp('2000 years 1 mons 1 days 1:1:1', '00:00:00'));
+?.*ERROR: invalid input syntax for type timestamp: "2000 years 1 mons 1 days 1:1:1"
+  Where: SQL function "timestamp_mysql" during inlining
+referenced column: result
+insert into func_test(functionName, result) values('timestamp(''2000-1-1 23:1:1+05'', ''00:00:00'')', timestamp('2000-1-1 23:1:1+05', '00:00:00'));
+SQL SUCCESS
+--step7: og时间边界测试;expect:合理报错
+insert into func_test(functionName, result) values('timestamp(datetime''4714-11-24 00:00:00 bc'', time''0:0:0'')', timestamp(datetime'4714-11-24 00:00:00 bc', time'0:0:0'));
+?.*ERROR: date/time field overflow
+  Where: referenced column: result
+insert into func_test(functionName, result) values('timestamp(datetime''294277-1-9 4:00:54.775807'', time''0:0:0'')', timestamp(datetime'294277-1-9 4:00:54.775807', time'0:0:0'));
+?.*ERROR: date/time field overflow
+  Where: referenced column: result
+insert into func_test(functionName, result) values('timestamp(datetime''294277-1-9 4:00:54.775806'', time''0:0:0'')', timestamp(datetime'294277-1-9 4:00:54.775806', time'0:0:0'));
+?.*ERROR: date/time field overflow
+  Where: referenced column: result
+--step8:查看timestamp函数执行结果是否正确;expect:成功
 select * from func_test;
 +---------------------------------------------------------------------------------------------+----------------------------+
 | functionname                                                                                | result                     |
@@ -100,7 +135,13 @@ select * from func_test;
 | TIMESTAMP(date'2003-01-01', date'2000-01-01')                                               | 2003-01-01 00:00:00        |
 | TIMESTAMP(cast('2007-12-10 23:59:59' as datetime), cast('2007-12-10 22:59:59' as datetime)) | 2007-12-11 22:59:58        |
 | TIMESTAMP(NULL, NULL)                                                                       |                            |
+| timestamp(datetime'2000-1-1 00:00:00', timetz'1:1:1+05')                                    | 2000-01-01 01:01:01        |
+| timestamp(timestamptz'2000-1-1 1:1:1+05',  time'00:00:00')                                  | 2000-01-01 01:01:01.05     |
+| timestamp(abstime'2000-1-1 1:1:1+05', time'00:00:00')                                       | 2000-01-01 04:01:01        |
+| timestamp(abstime'2000-1-1 1:1:1+05', abstime'2000-1-1 1:1:1+05')                           | 2000-01-01 08:02:02        |
+| timestamp('2000-1-1 1:1:1', '23:1:1+05')                                                    | 2000-01-02 00:02:02        |
+| timestamp('2000-1-1 23:1:1+05', '00:00:00')                                                 | 2000-01-01 23:01:01.05     |
 +---------------------------------------------------------------------------------------------+----------------------------+
---step7:清理环境;expect:成功
+--step9:清理环境;expect:成功
 drop table if exists func_test;
 SQL SUCCESS

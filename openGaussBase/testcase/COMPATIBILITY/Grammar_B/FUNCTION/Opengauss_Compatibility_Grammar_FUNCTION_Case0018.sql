@@ -9,6 +9,10 @@ insert into func_test(functionName, result) values('UTC_DATE()', UTC_DATE());
 
 --step3:插入非法入参下utc_date执行结果;expect:合理报错
 insert into func_test(functionName, result) values('UTC_DATE(1)', UTC_DATE(1));
+insert into func_test(functionName, result) values('UTC_DATE(-1)', UTC_DATE(-1));
+insert into func_test(functionName, result) values('UTC_DATE('''')', UTC_DATE(''));
+insert into func_test(functionName, result) values('UTC_DATE(True)', UTC_DATE(True));
+insert into func_test(functionName, result) values('UTC_DATE(null)', UTC_DATE(null));
 
 --step4:查看utc_date函数执行结果是否正确;expect:成功
 select * from func_test;

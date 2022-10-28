@@ -99,7 +99,37 @@ insert into func_test(functionName, result) values(' TIME_FORMAT(''100:59:59.012
 SQL SUCCESS
 insert into func_test(functionName, result) values(' TIME_FORMAT(''100:59:59.0123'', ''%N|%n abcd'')    ', TIME_FORMAT('100:59:59.0123', '%N|%n abcd'));
 SQL SUCCESS
---step6:查看time_format函数执行结果是否正确;expect:成功
+--step7: og时间类型与格式测试;expect:部分类型合理报错
+insert into func_test(functionName, result) values('time_format(timetz''1:0:0+05'', ''%T|%r|%h|%h'')', time_format(timetz'1:0:0+05', '%T|%r|%h|%h'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('time_format(timestamptz''2000-1-1 1:1:1+05'', ''%T|%r|%h|%h'')', time_format(timestamptz'2000-1-1 1:1:1+05', '%T|%r|%h|%h'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('time_format(reltime''2000 years 1 mons 1 days 1:1:1'', ''%T|%r|%h|%h'')', time_format(reltime'2000 years 1 mons 1 days 1:1:1', '%T|%r|%h|%h'));
+?.*ERROR: invalid input syntax for type time: "-41 years -4 mons -27 days -18:02:59"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('time_format(abstime''2000-1-1 1:1:1+05'', ''%T|%r|%h|%h'')', time_format(abstime'2000-1-1 1:1:1+05', '%T|%r|%h|%h'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('time_format(''23:0:0+05'', ''%T|%r|%h|%h'')', time_format('23:0:0+05', '%T|%r|%h|%h'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('time_format(''2000 years 1 mons 1 days 1:1:1'', ''%T|%r|%h|%h'')', time_format('2000 years 1 mons 1 days 1:1:1', '%T|%r|%h|%h'));
+?.*ERROR: invalid input syntax for type time: "2000 years 1 mons 1 days 1:1:1"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('time_format(''2000-1-1 23:1:1+05'', ''%T|%r|%h|%h'')', time_format('2000-1-1 23:1:1+05', '%T|%r|%h|%h'));
+SQL SUCCESS
+--step8: og时间边界测试;expect:合理报错
+insert into func_test(functionName, result) values('time_format(date''4714-11-24bc'', ''%T|%r|%h|%h'')', time_format(date'4714-11-24bc', '%T|%r|%h|%h'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('time_format(date''5874897-12-31'', ''%T|%r|%h|%h'')', time_format(date'5874897-12-31', '%T|%r|%h|%h'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('time_format(datetime''4714-11-24 00:00:00 bc'', ''%T|%r|%h|%h'')', time_format(datetime'4714-11-24 00:00:00 bc', '%T|%r|%h|%h'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('time_format(datetime''294277-1-9 4:00:54.775807'', ''%T|%r|%h|%h'')', time_format(datetime'294277-1-9 4:00:54.775807', '%T|%r|%h|%h'));
+?.*ERROR: invalid input syntax for type time: "infinity"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('time_format(datetime''294277-1-9 4:00:54.775806'', ''%T|%r|%h|%h'')', time_format(datetime'294277-1-9 4:00:54.775806', '%T|%r|%h|%h'));
+?.*ERROR: date/time field value out of range: "294277-01-09 04:00:54.775806"
+  Where: referenced column: result
+--step9:查看time_format函数执行结果是否正确;expect:成功
 select * from func_test;
 +-------------------------------------------------------------------------------+------------------------------------------------------+
 | functionname                                                                  | result                                               |
@@ -135,7 +165,16 @@ select * from func_test;
 |  TIME_FORMAT('100:59:59.0123', '%a|%b|%c|%D|%d|%e|%j|%M|%m')                  |                                                      |
 |  TIME_FORMAT('100:59:59.0123', '%U|%u|%V|%v|%W|%w|%X|%x|%Y|%y')               | 0|00|0|00|0000|00                                    |
 |  TIME_FORMAT('100:59:59.0123', '%N|%n abcd')                                  | N|n abcd                                             |
+| time_format(timetz'1:0:0+05', '%T|%r|%h|%h')                                  | 01:00:00|01:00:00 AM|01|01                           |
+| time_format(timestamptz'2000-1-1 1:1:1+05', '%T|%r|%h|%h')                    | 01:01:01|01:01:01 AM|01|01                           |
+| time_format(abstime'2000-1-1 1:1:1+05', '%T|%r|%h|%h')                        | 04:01:01|04:01:01 AM|04|04                           |
+| time_format('23:0:0+05', '%T|%r|%h|%h')                                       | 23:00:00|11:00:00 PM|11|11                           |
+| time_format('2000-1-1 23:1:1+05', '%T|%r|%h|%h')                              | 23:01:01|11:01:01 PM|11|11                           |
+| time_format(date'4714-11-24bc', '%T|%r|%h|%h')                                | 00:00:00|12:00:00 AM|12|12                           |
+| time_format(date'5874897-12-31', '%T|%r|%h|%h')                               | 00:00:00|12:00:00 AM|12|12                           |
+| time_format(datetime'4714-11-24 00:00:00 bc', '%T|%r|%h|%h')                  | 00:00:00|12:00:00 AM|12|12                           |
 +-------------------------------------------------------------------------------+------------------------------------------------------+
---step7:清理环境;expect:成功
+--step10:清理环境;expect:成功
 drop table if exists func_test;
 SQL SUCCESS
+

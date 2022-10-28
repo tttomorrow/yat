@@ -164,7 +164,37 @@ insert into func_test(functionName, result) values('TIMEDIFF(''02:61:00.000000''
 insert into func_test(functionName, result) values('TIMEDIFF(''2000-01-01'', ''2022-01-01'')', TIMEDIFF('2000-01-01', '2022-01-01') );
 ?.*ERROR: Incorrect datetime/time value: "2000-01-01"
   Where: referenced column: result
---step8:查看timediff函数执行结果是否正确;expect:成功
+--step8: og时间类型与格式测试;expect:部分类型合理报错
+insert into func_test(functionName, result) values('timediff(timetz''1:0:0+05'', timetz''2:0:0+05'')', timediff(timetz'1:0:0+05', timetz'2:0:0+05'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('timediff(timestamptz''2000-1-1 1:1:1+05'', timestamptz''2000-1-1 1:1:1+05'')', timediff(timestamptz'2000-1-1 1:1:1+05', timestamptz'2000-1-1 1:1:1+05'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('timediff(reltime''2000 years 1 mons 1 days 1:1:1'', reltime''2000 years 1 mons 1 days 1:1:1'')', timediff(reltime'2000 years 1 mons 1 days 1:1:1', reltime'2000 years 1 mons 1 days 1:1:1'));
+?.*ERROR: Incorrect datetime/time value: "-41 years -4 mons -27 days -18:02:59"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('timediff(abstime''2000-1-1 1:1:1+05'', abstime''2000-1-1 1:1:1+05'')', timediff(abstime'2000-1-1 1:1:1+05', abstime'2000-1-1 1:1:1+05'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('timediff(''23:0:0+05'', ''24:0:0+05'')', timediff('23:0:0+05', '24:0:0+05'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('timediff(''2000 years 1 mons 1 days 1:1:1'', ''2000 years 1 mons 1 days 1:1:1'')', timediff('2000 years 1 mons 1 days 1:1:1', '2000 years 1 mons 1 days 1:1:1'));
+?.*ERROR: Incorrect datetime/time value: "2000 years 1 mons 1 days 1:1:1"
+  Where: referenced column: result
+insert into func_test(functionName, result) values('timediff(''2000-1-1 23:1:1+05'', ''2000-1-1 23:1:1+05'')', timediff('2000-1-1 23:1:1+05', '2000-1-1 23:1:1+05'));
+SQL SUCCESS
+--step9: og时间边界测试;expect:合理报错
+insert into func_test(functionName, result) values('timediff(datetime''4714-11-24 00:00:00 bc'', datetime''2000-1-1 1:1:1'')', timediff(datetime'4714-11-24 00:00:00 bc', datetime'2000-1-1 1:1:1'));
+?.*ERROR: date/time field overflow
+  Where: referenced column: result
+insert into func_test(functionName, result) values('timediff(datetime''2000-1-1 1:1:1'', datetime''294277-1-9 4:00:54.775807'')', timediff(datetime'2000-1-1 1:1:1', datetime'294277-1-9 4:00:54.775807'));
+?.*ERROR: date/time field overflow
+  Where: referenced column: result
+insert into func_test(functionName, result) values('timediff(datetime''294277-1-9 4:00:54.775806'', datetime''2000-1-1 1:1:1'')', timediff(datetime'294277-1-9 4:00:54.775806', datetime'2000-1-1 1:1:1'));
+?.*ERROR: date/time field overflow
+  Where: referenced column: result
+insert into func_test(functionName, result) values('timediff(date''4714-11-24bc'', date''4714-11-24bc'')', timediff(date'4714-11-24bc', date'4714-11-24bc'));
+?.*ERROR: date/time field overflow
+  Where: referenced column: result
+--step10:查看timediff函数执行结果是否正确;expect:成功
 select * from func_test;
 +-----------------------------------------------------------------------------------------+-------------------+
 | functionname                                                                            | result            |
@@ -213,7 +243,12 @@ select * from func_test;
 | TIMEDIFF(date'2008-12-31', time'22:01:01.000002')                                       |                   |
 | TIMEDIFF('2000-02-28 20:59:59', '4:00')                                                 |                   |
 | TIMEDIFF('20:59:59', '2000-02-28 23:00')                                                | -02:00:01         |
+| timediff(timetz'1:0:0+05', timetz'2:0:0+05')                                            | -01:00:00         |
+| timediff(timestamptz'2000-1-1 1:1:1+05', timestamptz'2000-1-1 1:1:1+05')                | 00:00:00          |
+| timediff(abstime'2000-1-1 1:1:1+05', abstime'2000-1-1 1:1:1+05')                        | -00:00:00.08      |
+| timediff('23:0:0+05', '24:0:0+05')                                                      | -01:00:00         |
+| timediff('2000-1-1 23:1:1+05', '2000-1-1 23:1:1+05')                                    | 00:00:00          |
 +-----------------------------------------------------------------------------------------+-------------------+
---step9:清理环境;expect:成功
+--step11:清理环境;expect:成功
 drop table if exists func_test;
 SQL SUCCESS

@@ -35,7 +35,10 @@ insert into func_test(functionName, result) values ('maketime(838, 59, 59.000001
 insert into func_test(functionName, result) values ('maketime(838, 59, 59.000000600)', maketime(838, 59, 59.000000600));
 
 --step3:插入非法入参时maketime执行结果;expect:合理报错
-insert into func_test(functionName, result) values ('maketime(''ABCD'', ''30.4'', ''30.123'')', maketime('ABCD', '30.4', '30.123'));
+insert into func_test(functionName, result) values ('maketime(''ABCD'', 0, 0)', maketime('ABCD', 0, 0));
+insert into func_test(functionName, result) values ('maketime(''a'', 0, 0)', maketime('a', 0, 0));
+insert into func_test(functionName, result) values ('maketime(0, ''abcd'', 0)', maketime(0, 'abcd', 0));
+insert into func_test(functionName, result) values ('maketime(0, ''a'', 0)', maketime(0, 'a', 0));
 
 --step4:查看maketime函数执行结果是否正确;expect:成功
 select * from func_test;

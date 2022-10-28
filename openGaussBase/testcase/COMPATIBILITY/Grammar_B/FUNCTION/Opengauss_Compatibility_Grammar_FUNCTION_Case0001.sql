@@ -24,6 +24,9 @@ insert into func_test(functionName, result) values ('makedate(pow(2,62),366)', m
 
 --step3:插入非法入参时makedate执行结果;expect:合理报错
 insert into func_test(functionName, result) values ('makedate(''abcd'', ''61'')', makedate('abcd', '61'));
+insert into func_test(functionName, result) values ('makedate(''a'', 0)', makedate('a', 0));
+insert into func_test(functionName, result) values ('makedate(2000, ''abcd'')', makedate(2000, 'abcd'));
+insert into func_test(functionName, result) values ('makedate(2000, ''abcd'')', makedate(2000, 'a'));
 
 --step4:查看makedate函数执行结果是否正确;expect:成功
 select * from func_test;

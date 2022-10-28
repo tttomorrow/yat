@@ -69,7 +69,45 @@ insert into func_test(functionName, result) values('TIMESTAMP(B''1'')', TIMESTAM
 ?.*ERROR: function pg_catalog.timestamp_mysql\(bit\) does not exist
   Hint: No function matches the given name and argument types. You might need to add explicit type casts.
 ?.*
---step6:查看timestamp函数执行结果是否正确;expect:成功
+--step6: og时间类型与格式测试;expect:部分类型合理报错
+insert into func_test(functionName, result) values('timestamp(timetz''1:1:1+05'')', timestamp(timetz'1:1:1+05'));
+?.*ERROR: function pg_catalog.timestamp_mysql\(time with time zone\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position:.*
+insert into func_test(functionName, result) values('timestamp(timestamptz''2000-1-1 1:1:1+05'')', timestamp(timestamptz'2000-1-1 1:1:1+05'));
+?.*ERROR: function pg_catalog.timestamp_mysql\(timestamp with time zone\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position:.*
+insert into func_test(functionName, result) values('timestamp(reltime''2000 years 1 mons 1 days 1:1:1'')', timestamp(reltime'2000 years 1 mons 1 days 1:1:1'));
+?.*ERROR: function pg_catalog.timestamp_mysql\(reltime\) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*Position:.*
+insert into func_test(functionName, result) values('timestamp(abstime''2000-1-1 1:1:1+05'')', timestamp(abstime'2000-1-1 1:1:1+05'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('timestamp(''23:1:1+05'')', timestamp('23:1:1+05'));
+SQL SUCCESS
+insert into func_test(functionName, result) values('timestamp(''2000 years 1 mons 1 days 1:1:1'')', timestamp('2000 years 1 mons 1 days 1:1:1'));
+?.*ERROR: invalid input syntax for type timestamp: "2000 years 1 mons 1 days 1:1:1"
+?.*Position:.*
+insert into func_test(functionName, result) values('timestamp(''2000-1-1 23:1:1+05'')', timestamp('2000-1-1 23:1:1+05'));
+SQL SUCCESS
+--step7: og时间边界测试;expect:合理报错
+insert into func_test(functionName, result) values('timestamp(date''4714-11-24bc'')', timestamp(date'4714-11-24bc'));
+?.*ERROR: date/time field value out of range
+  Where: referenced column: result
+insert into func_test(functionName, result) values('timestamp(date''5874897-12-31'')', timestamp(date'5874897-12-31'));
+?.*ERROR: date out of range for timestamp
+  Where: referenced column: result
+insert into func_test(functionName, result) values('timestamp(datetime''4714-11-24 00:00:00 bc'')', timestamp(datetime'4714-11-24 00:00:00 bc'));
+?.*ERROR: date/time field value out of range
+  Where: referenced column: result
+insert into func_test(functionName, result) values('timestamp(datetime''294277-1-9 4:00:54.775807'')', timestamp(datetime'294277-1-9 4:00:54.775807'));
+?.*ERROR: date/time field value out of range
+  Where: referenced column: result
+insert into func_test(functionName, result) values('timestamp(datetime''294277-1-9 4:00:54.775806'')', timestamp(datetime'294277-1-9 4:00:54.775806'));
+?.*ERROR: date/time field value out of range
+  Where: referenced column: result
+--step8:查看timestamp函数执行结果是否正确;expect:成功
 select * from func_test;
 +----------------------------------------------------+----------------------------+
 | functionname                                       | result                     |
@@ -88,7 +126,10 @@ select * from func_test;
 | TIMESTAMP(date'2003-01-01')                        | 2003-01-01 00:00:00        |
 | TIMESTAMP(cast('2007-12-10 23:59:59' as datetime)) | 2007-12-10 23:59:59        |
 | TIMESTAMP(null)                                    |                            |
+| timestamp(abstime'2000-1-1 1:1:1+05')              | 2000-01-01 04:01:01        |
+| timestamp('23:1:1+05')                             | 2023-01-01 05:00:00        |
+| timestamp('2000-1-1 23:1:1+05')                    | 2000-01-01 23:01:01.05     |
 +----------------------------------------------------+----------------------------+
---step7:清理环境;expect:成功
+--step9:清理环境;expect:成功
 drop table if exists func_test;
 SQL SUCCESS
