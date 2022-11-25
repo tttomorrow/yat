@@ -1,0 +1,125 @@
+-- @testpoint: 验证原语法和MySQL兼容语法range分区增加分区(主表指定非默认tablespace)，部分场景合理报错
+-- 原语法
+drop table if exists b_range_t6;
+SQL SUCCESS
+create table b_range_t6(c1 int primary key,c2 int)
+tablespace b_tbsp1
+partition by range(c1) (
+  partition p1 values less than(100),
+  partition p2 values less than(200),
+  partition p3 values less than(300)
+  );
+SQL SUCCESS
+create index on b_range_t6 (c2) global;
+SQL SUCCESS
+create index on b_range_t6 (c1) local;
+SQL SUCCESS
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 'b_range_t6') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 'b_range_t6')) order by relname;
++------------+------------+----------+
+| relname    | boundaries | parttype |
++------------+------------+----------+
+| b_range_t6 |            | r        |
+| p1         | {100}      | p        |
+| p2         | {200}      | p        |
+| p3         | {300}      | p        |
++------------+------------+----------+
+-- 添加一个分区成功
+alter table b_range_t6 add partition p4 values less than(400);
+SQL SUCCESS
+-- 添加多个分区成功
+alter table b_range_t6 add partition p5 values less than(500),add partition p6 values less than(600);
+SQL SUCCESS
+-- 添加重名分区报错
+alter table b_range_t6 add partition p6 values less than(700);
+?.*ERROR: The partition name "p6" is duplicated with existing partition name
+  Detail: N/A
+-- 添加非法分区报错
+alter table b_range_t6 add partition p7 values less than(10);
+?.*ERROR: upper boundary of adding partition MUST overtop last existing partition
+-- 添加与分区键不同类型分区报错
+alter table b_range_t6 add partition p8 values less than('a');
+?.*ERROR: invalid input syntax for integer: "a"
+-- 指定表空间成功
+alter table b_range_t6 add partition p7 values less than(700) tablespace b_tbsp5;
+SQL SUCCESS
+-- 指定表空间为pg_global报错
+alter table b_range_t6 add partition p8 values less than(800) tablespace pg_global;
+?.*ERROR: only shared relations can be placed in pg_global tablespace
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 'b_range_t6') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 'b_range_t6')) order by relname;
++------------+------------+----------+
+| relname    | boundaries | parttype |
++------------+------------+----------+
+| b_range_t6 |            | r        |
+| p1         | {100}      | p        |
+| p2         | {200}      | p        |
+| p3         | {300}      | p        |
+| p4         | {400}      | p        |
+| p5         | {500}      | p        |
+| p6         | {600}      | p        |
+| p7         | {700}      | p        |
++------------+------------+----------+
+-- 清理环境
+drop table b_range_t6;
+SQL SUCCESS
+-- MySQL兼容语法
+drop table if exists b_range_t6;
+SQL SUCCESS
+create table b_range_t6(c1 int primary key,c2 int)
+tablespace b_tbsp1
+partition by range(c1) (
+  partition p1 values less than(100),
+  partition p2 values less than(200),
+  partition p3 values less than(300)
+  );
+SQL SUCCESS
+create index on b_range_t6 (c2) global;
+SQL SUCCESS
+create index on b_range_t6 (c1) local;
+SQL SUCCESS
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 'b_range_t6') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 'b_range_t6')) order by relname;
++------------+------------+----------+
+| relname    | boundaries | parttype |
++------------+------------+----------+
+| b_range_t6 |            | r        |
+| p1         | {100}      | p        |
+| p2         | {200}      | p        |
+| p3         | {300}      | p        |
++------------+------------+----------+
+-- 添加一个分区成功
+alter table b_range_t6 add partition (partition p4 values less than(400));
+SQL SUCCESS
+-- 添加多个分区成功
+alter table b_range_t6 add partition (partition p5 values less than(500),partition p6 values less than(600));
+SQL SUCCESS
+-- 添加重名分区报错
+alter table b_range_t6 add partition (partition p6 values less than(700));
+?.*ERROR: The partition name "p6" is duplicated with existing partition name
+  Detail: N/A
+-- 添加非法分区报错
+alter table b_range_t6 add partition (partition p7 values less than(10));
+?.*ERROR: upper boundary of adding partition MUST overtop last existing partition
+-- 添加与分区键不同类型分区报错
+alter table b_range_t6 add partition (partition p8 values less than('a'));
+?.*ERROR: invalid input syntax for integer: "a"
+-- 指定表空间成功
+alter table b_range_t6 add partition (partition p7 values less than(700) tablespace b_tbsp5);
+SQL SUCCESS
+-- 指定表空间为pg_global报错
+alter table b_range_t6 add partition (partition p8 values less than(800) tablespace pg_global);
+?.*ERROR: only shared relations can be placed in pg_global tablespace
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 'b_range_t6') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 'b_range_t6')) order by relname;
++------------+------------+----------+
+| relname    | boundaries | parttype |
++------------+------------+----------+
+| b_range_t6 |            | r        |
+| p1         | {100}      | p        |
+| p2         | {200}      | p        |
+| p3         | {300}      | p        |
+| p4         | {400}      | p        |
+| p5         | {500}      | p        |
+| p6         | {600}      | p        |
+| p7         | {700}      | p        |
++------------+------------+----------+
+-- 清理环境
+drop table b_range_t6;
+SQL SUCCESS

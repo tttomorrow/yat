@@ -9,3 +9,4 @@ create tablespace b_tbsp2 relative location 'b_tbsp2';
 create tablespace b_tbsp3 relative location 'b_tbsp3';
 create tablespace b_tbsp4 relative location 'b_tbsp4';
 create tablespace b_tbsp5 relative location 'b_tbsp5';
+
