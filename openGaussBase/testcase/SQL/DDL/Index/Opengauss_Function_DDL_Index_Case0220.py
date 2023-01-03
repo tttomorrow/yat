@@ -115,7 +115,7 @@ class Concurrently(unittest.TestCase):
 
         self.log.info('-----------------select new data-----------------------------')
         result = self.primary_sh.execut_db_sql(
-            f'SET ENABLE_SEQSCAN=off;select * from {self.tblname_no_relevance} where id=200000001;')
+            f'SET ENABLE_SEQSCAN=off;select * from {self.tblname_no_rel} where id=200000001;')
         self.log.info(result)
         self.assertIn('^c test 号', result)
         self.assertIn('\\test--', result)
