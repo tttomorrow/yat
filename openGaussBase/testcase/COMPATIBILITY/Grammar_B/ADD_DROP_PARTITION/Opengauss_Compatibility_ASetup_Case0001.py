@@ -68,3 +68,6 @@ class CompatibilityTest01(unittest.TestCase):
     def tearDown(self):
         self.log.info('--无须清理环境，待sql用例执行完后清理--')
         self.log.info(f'----{os.path.basename(__file__)} end-----')
+
+
+
