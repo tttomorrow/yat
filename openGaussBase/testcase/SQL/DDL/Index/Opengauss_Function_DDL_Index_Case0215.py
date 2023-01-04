@@ -115,6 +115,7 @@ update {self.tblname_no_relevance} set first_name=\'测试查询不阻塞\', las
 
         self.log.info('-----------------select new data-----------------------------')
         result = self.primary_sh.execut_db_sql(
+            f'SET ENABLE_SEQSCAN=off;select * from {self.tblname_no_relevance} where id=200000001;')
         self.log.info(result)
         self.assertIn('^c test 号', result)
         self.assertIn('\\test--', result)

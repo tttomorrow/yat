@@ -114,6 +114,8 @@ class Concurrently(unittest.TestCase):
         self.assertIn(self.idxname, result)
 
         self.log.info('-----------------select new data-----------------------------')
+        result = self.primary_sh.execut_db_sql(
+            f'SET ENABLE_SEQSCAN=off;select * from {self.tblname_no_rel} where id=200000001;')
         self.log.info(result)
         self.assertIn('^c test 号', result)
         self.assertIn('\\test--', result)
