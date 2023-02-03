@@ -1,8 +1,12 @@
 -- @testpoint: 验证原语法和MySQL兼容语法range分区增加分区(ustore)，部分场景合理报错
 -- 原语法
-drop table if exists b_range_t3;
+drop tablespace if exists ts_b_add_drop_par_0019;
 SQL SUCCESS
-create table b_range_t3(c1 int primary key,c2 int)
+create tablespace ts_b_add_drop_par_0019 relative location 'ts_b_add_drop_par_0019';
+SQL SUCCESS
+drop table if exists t_b_add_drop_par_0019;
+SQL SUCCESS
+create table t_b_add_drop_par_0019(c1 int primary key,c2 int)
 with (storage_type=ustore)
 partition by range(c1) (
   partition p1 values less than(100),
@@ -10,61 +14,61 @@ partition by range(c1) (
   partition p3 values less than(300)
   );
 SQL SUCCESS
-create index on b_range_t3 (c2) global;
+create index i_b_add_drop_par_0019_1 on t_b_add_drop_par_0019 (c2) global;
 SQL SUCCESS
-create index on b_range_t3 (c1) local;
+create index i_b_add_drop_par_0019_2 on t_b_add_drop_par_0019 (c1) local;
 SQL SUCCESS
-select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 'b_range_t3') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 'b_range_t3')) order by relname;
-+------------+------------+----------+
-| relname    | boundaries | parttype |
-+------------+------------+----------+
-| b_range_t3 |            | r        |
-| p1         | {100}      | p        |
-| p2         | {200}      | p        |
-| p3         | {300}      | p        |
-+------------+------------+----------+
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0019') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0019')) order by relname;
++-----------------------+------------+----------+
+| relname               | boundaries | parttype |
++-----------------------+------------+----------+
+| p1                    | {100}      | p        |
+| p2                    | {200}      | p        |
+| p3                    | {300}      | p        |
+| t_b_add_drop_par_0019 |            | r        |
++-----------------------+------------+----------+
 -- 添加一个分区成功
-alter table b_range_t3 add partition p4 values less than(400);
+alter table t_b_add_drop_par_0019 add partition p4 values less than(400);
 SQL SUCCESS
 -- 添加多个分区成功
-alter table b_range_t3 add partition p5 values less than(500),add partition p6 values less than(600);
+alter table t_b_add_drop_par_0019 add partition p5 values less than(500),add partition p6 values less than(600);
 SQL SUCCESS
 -- 添加重名分区报错
-alter table b_range_t3 add partition p6 values less than(700);
+alter table t_b_add_drop_par_0019 add partition p6 values less than(700);
 ?.*ERROR: The partition name "p6" is duplicated with existing partition name
   Detail: N/A
 -- 添加非法分区报错
-alter table b_range_t3 add partition p7 values less than(10);
+alter table t_b_add_drop_par_0019 add partition p7 values less than(10);
 ?.*ERROR: upper boundary of adding partition MUST overtop last existing partition
 -- 添加与分区键不同类型分区报错
-alter table b_range_t3 add partition p8 values less than('a');
+alter table t_b_add_drop_par_0019 add partition p8 values less than('a');
 ?.*ERROR: invalid input syntax for integer: "a"
 -- 指定表空间成功
-alter table b_range_t3 add partition p7 values less than(700) tablespace b_tbsp5;
+alter table t_b_add_drop_par_0019 add partition p7 values less than(700) tablespace ts_b_add_drop_par_0019;
 SQL SUCCESS
 -- 指定表空间为pg_global报错
-alter table b_range_t3 add partition p8 values less than(800) tablespace pg_global;
+alter table t_b_add_drop_par_0019 add partition p8 values less than(800) tablespace pg_global;
 ?.*ERROR: only shared relations can be placed in pg_global tablespace
-select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 'b_range_t3') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 'b_range_t3')) order by relname;
-+------------+------------+----------+
-| relname    | boundaries | parttype |
-+------------+------------+----------+
-| b_range_t3 |            | r        |
-| p1         | {100}      | p        |
-| p2         | {200}      | p        |
-| p3         | {300}      | p        |
-| p4         | {400}      | p        |
-| p5         | {500}      | p        |
-| p6         | {600}      | p        |
-| p7         | {700}      | p        |
-+------------+------------+----------+
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0019') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0019')) order by relname;
++-----------------------+------------+----------+
+| relname               | boundaries | parttype |
++-----------------------+------------+----------+
+| p1                    | {100}      | p        |
+| p2                    | {200}      | p        |
+| p3                    | {300}      | p        |
+| p4                    | {400}      | p        |
+| p5                    | {500}      | p        |
+| p6                    | {600}      | p        |
+| p7                    | {700}      | p        |
+| t_b_add_drop_par_0019 |            | r        |
++-----------------------+------------+----------+
 -- 清理环境
-drop table b_range_t3;
+drop table t_b_add_drop_par_0019;
 SQL SUCCESS
 -- MySQL兼容语法
-drop table if exists b_range_t3;
+drop table if exists t_b_add_drop_par_0019;
 SQL SUCCESS
-create table b_range_t3(c1 int primary key,c2 int)
+create table t_b_add_drop_par_0019(c1 int primary key,c2 int)
 with (storage_type=ustore)
 partition by range(c1) (
   partition p1 values less than(100),
@@ -72,54 +76,56 @@ partition by range(c1) (
   partition p3 values less than(300)
   );
 SQL SUCCESS
-create index on b_range_t3 (c2) global;
+create index i_b_add_drop_par_0019_3 on t_b_add_drop_par_0019 (c2) global;
 SQL SUCCESS
-create index on b_range_t3 (c1) local;
+create index i_b_add_drop_par_0019_4 on t_b_add_drop_par_0019 (c1) local;
 SQL SUCCESS
-select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 'b_range_t3') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 'b_range_t3')) order by relname;
-+------------+------------+----------+
-| relname    | boundaries | parttype |
-+------------+------------+----------+
-| b_range_t3 |            | r        |
-| p1         | {100}      | p        |
-| p2         | {200}      | p        |
-| p3         | {300}      | p        |
-+------------+------------+----------+
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0019') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0019')) order by relname;
++-----------------------+------------+----------+
+| relname               | boundaries | parttype |
++-----------------------+------------+----------+
+| p1                    | {100}      | p        |
+| p2                    | {200}      | p        |
+| p3                    | {300}      | p        |
+| t_b_add_drop_par_0019 |            | r        |
++-----------------------+------------+----------+
 -- 添加一个分区成功
-alter table b_range_t3 add partition (partition p4 values less than(400));
+alter table t_b_add_drop_par_0019 add partition (partition p4 values less than(400));
 SQL SUCCESS
 -- 添加多个分区成功
-alter table b_range_t3 add partition (partition p5 values less than(500),partition p6 values less than(600));
+alter table t_b_add_drop_par_0019 add partition (partition p5 values less than(500),partition p6 values less than(600));
 SQL SUCCESS
 -- 添加重名分区报错
-alter table b_range_t3 add partition (partition p6 values less than(700));
+alter table t_b_add_drop_par_0019 add partition (partition p6 values less than(700));
 ?.*ERROR: The partition name "p6" is duplicated with existing partition name
   Detail: N/A
 -- 添加非法分区报错
-alter table b_range_t3 add partition (partition p7 values less than(10));
+alter table t_b_add_drop_par_0019 add partition (partition p7 values less than(10));
 ?.*ERROR: upper boundary of adding partition MUST overtop last existing partition
 -- 添加与分区键不同类型分区报错
-alter table b_range_t3 add partition (partition p8 values less than('a'));
+alter table t_b_add_drop_par_0019 add partition (partition p8 values less than('a'));
 ?.*ERROR: invalid input syntax for integer: "a"
 -- 指定表空间成功
-alter table b_range_t3 add partition (partition p7 values less than(700) tablespace b_tbsp5);
+alter table t_b_add_drop_par_0019 add partition (partition p7 values less than(700) tablespace ts_b_add_drop_par_0019);
 SQL SUCCESS
 -- 指定表空间为pg_global报错
-alter table b_range_t3 add partition (partition p8 values less than(800) tablespace pg_global);
+alter table t_b_add_drop_par_0019 add partition (partition p8 values less than(800) tablespace pg_global);
 ?.*ERROR: only shared relations can be placed in pg_global tablespace
-select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 'b_range_t3') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 'b_range_t3')) order by relname;
-+------------+------------+----------+
-| relname    | boundaries | parttype |
-+------------+------------+----------+
-| b_range_t3 |            | r        |
-| p1         | {100}      | p        |
-| p2         | {200}      | p        |
-| p3         | {300}      | p        |
-| p4         | {400}      | p        |
-| p5         | {500}      | p        |
-| p6         | {600}      | p        |
-| p7         | {700}      | p        |
-+------------+------------+----------+
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0019') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0019')) order by relname;
++-----------------------+------------+----------+
+| relname               | boundaries | parttype |
++-----------------------+------------+----------+
+| p1                    | {100}      | p        |
+| p2                    | {200}      | p        |
+| p3                    | {300}      | p        |
+| p4                    | {400}      | p        |
+| p5                    | {500}      | p        |
+| p6                    | {600}      | p        |
+| p7                    | {700}      | p        |
+| t_b_add_drop_par_0019 |            | r        |
++-----------------------+------------+----------+
 -- 清理环境
-drop table b_range_t3;
+drop table t_b_add_drop_par_0019;
+SQL SUCCESS
+drop tablespace ts_b_add_drop_par_0019;
 SQL SUCCESS

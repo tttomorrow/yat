@@ -70,4 +70,3 @@ class CompatibilityTest01(unittest.TestCase):
         self.log.info(f'----{os.path.basename(__file__)} end-----')
 
 
-
