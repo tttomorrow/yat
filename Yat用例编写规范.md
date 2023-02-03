@@ -16,7 +16,35 @@
   - 表名：t\_[特性\_]用例名\_1、t\_[特性\_]用例名\_2
   - 索引名：i\_[特性\_]用例名\_1、i\_[特性\_]用例名\_2
   - 用户名：u\_[特性\_]用例名
-  - 以此类推……
+  - language：l_[特性_]用例名_1
+  - masking policy：mp_[特性_]用例名_1
+  - materialized view：mv_[特性_]用例名_1
+  - model：m_[特性_]用例名_1
+  - operator：o_[特性_]用例名_1
+  - package：pac_[特性_]用例名_1
+  - procedure：pro_[特性_]用例名_1
+  - publication：pub_[特性_]用例名_1
+  - resource label：rl_[特性_]用例名_1
+  - resource pool：rp_[特性_]用例名_1
+  - role：role_[特性_]用例名_1
+  - row level security policy：rlsp_[特性_]用例名_1
+  - rule：rule_[特性_]用例名_1
+  - schema：sch_[特性_]用例名_1
+  - sequence：seq_[特性_]用例名_1
+  - server：ser_[特性_]用例名_1
+  - subscription：ss_[特性_]用例名_1
+  - subtype：st_[特性_]用例名_1
+  - synonym：syn_[特性_]用例名_1
+  - table partition：tp_[特性_]用例名_1
+  - table subpartition：tsp_[特性_]用例名_1
+  - text search configuration：tsc_[特性_]用例名_1
+  - text search dictionary：tsd_[特性_]用例名_1
+  - trigger：tri_[特性_]用例名_1
+  - type：type_[特性_]用例名_1
+  - user mapping：um_[特性_]用例名_1
+  - view：v_[特性_]用例名_1
+  - weak password dictionary：wpd_[特性_]用例名_1
+  - function：f_[特性_]用例名_1
 
 2）保证用例的独立性，除特殊情况外（如兼容性用例增加整体setup和teardown文件）， 每个用例都需要能单独执行
 
