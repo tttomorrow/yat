@@ -1,6 +1,6 @@
 -- @testpoint: 验证MySQL创建key分区表语法，合理报错
 
-CREATE TABLE k1 (
+CREATE TABLE t_b_add_drop_par_0005 (
     id INT NOT NULL PRIMARY KEY,
     name VARCHAR(20)
 )
