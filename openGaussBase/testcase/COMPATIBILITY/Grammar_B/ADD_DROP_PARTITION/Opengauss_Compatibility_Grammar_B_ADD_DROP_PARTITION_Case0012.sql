@@ -1,8 +1,10 @@
 -- @testpoint: 验证间隔分区表增删分区原语法和MySQL兼容语法
-drop table if exists b_interval_t4;
+drop tablespace if exists ts_b_add_drop_par_0012;
+create tablespace ts_b_add_drop_par_0012 relative location 'ts_b_add_drop_par_0012';
+drop table if exists t_b_add_drop_par_0012;
 -- 指定表空间
-create table b_interval_t4(c1 int primary key,c2 timestamp)
-tablespace b_tbsp1
+create table t_b_add_drop_par_0012(c1 int primary key,c2 timestamp)
+tablespace ts_b_add_drop_par_0012
 partition by range(c2)
 interval('1 day')
 (
@@ -17,18 +19,19 @@ interval('1 day')
   partition p9 values less than ('1990-01-09 00:00:00'),
   partition p10 values less than ('1990-01-10 00:00:00')
 ) ;
-create index on b_interval_t4 (c1) global;
-create index on b_interval_t4 (c2) local;
-insert into b_interval_t4 values
+create index i_b_add_drop_par_0012_1 on t_b_add_drop_par_0012 (c1) global;
+create index i_b_add_drop_par_0012_2 on t_b_add_drop_par_0012 (c2) local;
+insert into t_b_add_drop_par_0012 values
   (1,'1990-01-01 00:00:00'),
   (2,'1990-01-02 00:00:00'),
   (3,'1990-01-03 00:00:00'),
   (4,'1990-01-04 00:00:00'),
   (5,'1990-01-05 00:00:00');
 -- @testpoint: MySQL语法 add partition 合理报错,间隔分区表不支持手动添加分区
-alter table b_interval_t4 add partition (partition pa1 values less than ('1990-02-01 00:00:00'));
-alter table b_interval_t4 add partition (partition pa1 values less than ('1990-02-01 00:00:00'),partition pa2 values less than ('1990-02-02 00:00:00'));
+alter table t_b_add_drop_par_0012 add partition (partition pa1 values less than ('1990-02-01 00:00:00'));
+alter table t_b_add_drop_par_0012 add partition (partition pa1 values less than ('1990-02-01 00:00:00'),partition pa2 values less than ('1990-02-02 00:00:00'));
 -- @testpoint: 原语法 add partition 合理报错，间隔分区表不支持手动添加分区
-alter table b_interval_t4 add partition pa1 values less than ('1990-02-01 00:00:00');
-alter table b_interval_t4 add partition pa1 values less than ('1990-02-01 00:00:00'),add partition pa2 values less than ('1990-02-02 00:00:00');
-drop table b_interval_t4;
+alter table t_b_add_drop_par_0012 add partition pa1 values less than ('1990-02-01 00:00:00');
+alter table t_b_add_drop_par_0012 add partition pa1 values less than ('1990-02-01 00:00:00'),add partition pa2 values less than ('1990-02-02 00:00:00');
+drop table t_b_add_drop_par_0012;
+drop tablespace ts_b_add_drop_par_0012;
