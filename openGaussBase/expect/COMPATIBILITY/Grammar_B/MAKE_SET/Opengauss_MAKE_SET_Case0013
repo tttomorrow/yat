@@ -1,0 +1,50 @@
+-- @testpoint:返回表的列bits位不输入参数时make_set的运算,部分测试用例合理报错
+-- 清理环境;expect: 清理环境成功
+drop table if exists t_Opengauss_MAKE_SET_Case0013_1;
+SQL SUCCESS
+-- 创建表 expect:创建成功
+create table t_Opengauss_MAKE_SET_Case0013_1(a int,b char(10));
+SQL SUCCESS
+-- 给表添加数据
+insert into t_Opengauss_MAKE_SET_Case0013_1 values(1,'to'),(2,'xi'),(3,'dao'),(3,'to'),(4,'ruai'),(5,'mi'),(6,'fa'),(7,'xi'),(8,'xi'),(9,'la'),(10,'to'),(11,'no'),(11,'no'),(12,'buy'),(13,'buy'),(14,'buy'),(15,'bear'),(16,'bear');
+SQL SUCCESS
+-- 有单引号
+select make_set('',false,1,'hello','hello','hello','hello') from t_Opengauss_MAKE_SET_Case0013_1 where b='xix';
+?.*ERROR: invalid input syntax for bigint: ""
+?.*
+  Where: referenced column: make_set
+select make_set('',1+6,true,'hello') from t_Opengauss_MAKE_SET_Case0013_1 where b sounds like('t');
+?.*ERROR: invalid input syntax for bigint: ""
+?.*
+  Where: referenced column: make_set
+select make_set('',1|6,'a','hello','hello','hello') from t_Opengauss_MAKE_SET_Case0013_1 where b='to';
+?.*ERROR: invalid input syntax for bigint: ""
+?.*
+  Where: referenced column: make_set
+select make_set('','hello','world') from t_Opengauss_MAKE_SET_Case0013_1 where b='xi';
+?.*ERROR: invalid input syntax for bigint: ""
+?.*
+  Where: referenced column: make_set
+select make_set('',1|6,'hello','hello','hello','hello') from t_Opengauss_MAKE_SET_Case0013_1 where b='to';
+?.*ERROR: invalid input syntax for bigint: ""
+?.*
+  Where: referenced column: make_set
+-- 无单引号
+select make_set(,false,1,'hello','hello','hello','hello') from t_Opengauss_MAKE_SET_Case0013_1 where b='xix';
+?.*ERROR: syntax error at or near ","
+?.*
+select make_set(,1+6,true,'hello') from t_Opengauss_MAKE_SET_Case0013_1 where b sounds like('t');
+?.*ERROR: syntax error at or near ","
+?.*
+select make_set(,1|6,'a','hello','hello','hello') from t_Opengauss_MAKE_SET_Case0013_1 where b='to';
+?.*ERROR: syntax error at or near ","
+?.*
+select make_set(,'hello','world') from t_Opengauss_MAKE_SET_Case0013_1 where b='xi';
+?.*ERROR: syntax error at or near ","
+?.*
+select make_set(,1|6,'hello','hello','hello','hello') from t_Opengauss_MAKE_SET_Case0013_1 where b='to';
+?.*ERROR: syntax error at or near ","
+?.*
+-- 清理环境;expect: 清理环境成功
+drop table t_Opengauss_MAKE_SET_Case0013_1;
+SQL SUCCESS
