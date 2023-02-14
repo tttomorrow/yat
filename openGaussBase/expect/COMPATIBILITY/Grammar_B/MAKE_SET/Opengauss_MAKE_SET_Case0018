@@ -1,0 +1,673 @@
+-- @testpoint:关于make_set的事物场景测试,部分测试用例合理报错
+-- 开启事物
+start transaction;
+SQL SUCCESS
+-- make_set正常输入数值
+select make_set(0,'a','b');
++----------+
+| make_set |
++----------+
+|          |
++----------+
+select make_set(31,'a','b','c','d','e','f');
++-----------+
+| make_set  |
++-----------+
+| a,b,c,d,e |
++-----------+
+select make_set(1,'a','b');
++----------+
+| make_set |
++----------+
+| a        |
++----------+
+select make_set(1,null,'b');
++----------+
+| make_set |
++----------+
+|          |
++----------+
+select make_set(2,'a',null);
++----------+
+| make_set |
++----------+
+|          |
++----------+
+select make_set(31,'a','b','c','d');
++----------+
+| make_set |
++----------+
+| a,b,c,d  |
++----------+
+select make_set(8,'a','b');
++----------+
+| make_set |
++----------+
+|          |
++----------+
+select make_set(3|1,'a','b','c','d');
++----------+
+| make_set |
++----------+
+| a,b      |
++----------+
+select make_set(8&2,'a','b');
++----------+
+| make_set |
++----------+
+|          |
++----------+
+select make_set(12+1,'a','b');
++----------+
+| make_set |
++----------+
+| a        |
++----------+
+select make_set(null,null,'b');
++----------+
+| make_set |
++----------+
+|          |
++----------+
+select make_set(null,'a',null);
++----------+
+| make_set |
++----------+
+|          |
++----------+
+select make_set(110,'a','b','c',null);
++----------+
+| make_set |
++----------+
+| b,c      |
++----------+
+select make_set(0,'a','b','[2010-01-01 14:30, 2010-01-01 15:30)','e');
++----------+
+| make_set |
++----------+
+|          |
++----------+
+select make_set(null,'null','2022-09-03');
++----------+
+| make_set |
++----------+
+|          |
++----------+
+select make_set(0,'a','null','non est');
++----------+
+| make_set |
++----------+
+|          |
++----------+
+select make_set(3,1/8/1999,2022-09-03);
++------------------------------+
+| make_set                     |
++------------------------------+
+| 6.25312656328164037e-05,2010 |
++------------------------------+
+select make_set(3,null,true);
++----------+
+| make_set |
++----------+
+| 1        |
++----------+
+-- 提交
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(a,'a','b','c',null);
+?.*ERROR: column "a" does not exist
+?.*
+  Where: referenced column: make_set
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交 
+start transaction;
+SQL SUCCESS
+select make_set(,'a','b','c','d');
+?.*ERROR: syntax error at or near ","
+?.*
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交 
+start transaction;
+SQL SUCCESS
+select make_set('','a','b','c','d');
+?.*ERROR: invalid input syntax for bigint: ""
+?.*
+  Where: referenced column: make_set
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(0,'a','b','[2010-01-01 14:30, 2010-01-01 15:30)','e');
++----------+
+| make_set |
++----------+
+|          |
++----------+
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(8&2,'a','b');
++----------+
+| make_set |
++----------+
+|          |
++----------+
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(12+1,'2022-09-03','b');
++------------+
+| make_set   |
++------------+
+| 2022-09-03 |
++------------+
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(null,'','2022-09-03');
++----------+
+| make_set |
++----------+
+|          |
++----------+
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(0,'a','','non est');
++----------+
+| make_set |
++----------+
+|          |
++----------+
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(null,'null','2022-09-03');
++----------+
+| make_set |
++----------+
+|          |
++----------+
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(0,'a','null','non est');
++----------+
+| make_set |
++----------+
+|          |
++----------+
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(3,3,2022-09-03);
++----------+
+| make_set |
++----------+
+| 3,2010   |
++----------+
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(null,1,4,6);
++----------+
+| make_set |
++----------+
+|          |
++----------+
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(3,false,true);
++----------+
+| make_set |
++----------+
+| 0,1      |
++----------+
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(null,trur);
+?.*ERROR: column "trur" does not exist
+?.*
+  Where: referenced column: make_set
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(0,2022-09-03);
++----------+
+| make_set |
++----------+
+|          |
++----------+
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(3,1/8/1999,2022-09-03);
++------------------------------+
+| make_set                     |
++------------------------------+
+| 6.25312656328164037e-05,2010 |
++------------------------------+
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(3,false,好);
+?.*ERROR: column "好" does not exist
+?.*
+  Where: referenced column: make_set
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(3,￥￥,true);
+?.*ERROR: column "￥￥" does not exist
+?.*
+  Where: referenced column: make_set
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(3,false,);
+?.*ERROR: syntax error at or near.*
+?.*
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(3,);
+?.*ERROR: syntax error at or near.*
+?.*
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(3,false,null);
++----------+
+| make_set |
++----------+
+| 0        |
++----------+
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(3,null,true);
++----------+
+| make_set |
++----------+
+| 1        |
++----------+
+commit;
+SQL SUCCESS
+-- 清理环境;expect: 清理环境成功
+drop table if exists t_Opengauss_MAKE_SET_Case0018_1;
+SQL SUCCESS
+-- 创建表 expect:创建成功
+create table t_Opengauss_MAKE_SET_Case0018_1(a int,b char(10));
+SQL SUCCESS
+-- 给表添加数据
+insert into t_Opengauss_MAKE_SET_Case0018_1 values(1,'to'),(2,'xi'),(3,'dao'),(3,'to'),(4,'ruai'),(5,'mi'),(6,'fa'),(7,'xi'),(8,'xi'),(9,'la'),(10,'to'),(11,'no'),(11,'no'),(12,'buy'),(13,'buy'),(14,'buy'),(15,'bear'),(16,'bear');
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(3,false,1) from t_Opengauss_MAKE_SET_Case0018_1 where b='xix';
++----------+
+| make_set |
++----------+
++----------+
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(2,1+6,true) from t_Opengauss_MAKE_SET_Case0018_1 where b sounds like('t');
++----------+
+| make_set |
++----------+
+| 1        |
+| 1        |
+| 1        |
++----------+
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(null,false,1,'hello','hello','hello','hello') from t_Opengauss_MAKE_SET_Case0018_1 where b='xix';
++----------+
+| make_set |
++----------+
++----------+
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(1+1,false,1,'hello','hello','hello','hello') from t_Opengauss_MAKE_SET_Case0018_1 where b='xix';
++----------+
+| make_set |
++----------+
++----------+
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(1+2,1+6,true,'hello') from t_Opengauss_MAKE_SET_Case0018_1 where b sounds like('t');
++----------+
+| make_set |
++----------+
+| 7,1      |
+| 7,1      |
+| 7,1      |
++----------+
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(l,false,1,'hello','hello','hello','hello') from t_Opengauss_MAKE_SET_Case0018_1 where b='xix';
+?.*ERROR: column "l" does not exist
+?.*
+  Where: referenced column: make_set
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(r,1+6,true,'hello') from t_Opengauss_MAKE_SET_Case0018_1 where b sounds like('t');
+?.*ERROR: column "r" does not exist
+?.*
+  Where: referenced column: make_set
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(00l,false,1,'hello','hello','hello','hello') from t_Opengauss_MAKE_SET_Case0018_1 where b='xix';
+?.*ERROR: syntax error at or near "l"
+?.*
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(011,1+6,true,'hello') from t_Opengauss_MAKE_SET_Case0018_1 where b sounds like('t');
++----------+
+| make_set |
++----------+
+| 7,1      |
+| 7,1      |
+| 7,1      |
++----------+
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set('',false,1,'hello','hello','hello','hello') from t_Opengauss_MAKE_SET_Case0018_1 where b='xix';
+?.*ERROR: invalid input syntax for bigint: ""
+?.*
+  Where: referenced column: make_set
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set('',1+6,true,'hello') from t_Opengauss_MAKE_SET_Case0018_1 where b sounds like('t');
+?.*ERROR: invalid input syntax for bigint: ""
+?.*
+  Where: referenced column: make_set
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set('',1|6,'a','hello','hello','hello') from t_Opengauss_MAKE_SET_Case0018_1 where b='to';
+?.*ERROR: invalid input syntax for bigint: ""
+?.*
+  Where: referenced column: make_set
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(3,'a','b') from t_Opengauss_MAKE_SET_Case0018_1 where b='xix';
++----------+
+| make_set |
++----------+
++----------+
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(3,'a','a') from t_Opengauss_MAKE_SET_Case0018_1 where b sounds like('t');
++----------+
+| make_set |
++----------+
+| a,a      |
+| a,a      |
+| a,a      |
++----------+
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(3,'b','b') from t_Opengauss_MAKE_SET_Case0018_1 where b='to';
++----------+
+| make_set |
++----------+
+| b,b      |
+| b,b      |
+| b,b      |
++----------+
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(3,'c','d') from t_Opengauss_MAKE_SET_Case0018_1 where b='xix';
++----------+
+| make_set |
++----------+
++----------+
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(3,'e','null') from t_Opengauss_MAKE_SET_Case0018_1 where b sounds like('t');
++----------+
+| make_set |
++----------+
+| e,null   |
+| e,null   |
+| e,null   |
++----------+
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(3,'too','null') from t_Opengauss_MAKE_SET_Case0018_1 where b='to';
++----------+
+| make_set |
++----------+
+| too,null |
+| too,null |
+| too,null |
++----------+
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set('3','&',(select table_name from information_schema.tables where table_schema='public'));
+?.*ERROR: more than one row returned by a subquery used as an expression
+  Where: referenced column: make_set
+commit;
+SQL SUCCESS
+-- 清理环境;expect: 清理环境成功
+drop table t_Opengauss_MAKE_SET_Case0018_1;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(3,'&',(select table_name from information_schema.tables where table_schema='public'));
+?.*ERROR: more than one row returned by a subquery used as an expression
+  Where: referenced column: make_set
+commit;
+SQL SUCCESS
+-- 创建表 expect:创建成功
+create table t_Opengauss_MAKE_SET_Case0018_1(a int,b char(10));
+SQL SUCCESS
+create table t_Opengauss_MAKE_SET_Case0018_2(a int,b char(10));
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(3,'&',(select table_name from information_schema.tables where table_schema='public'));
+?.*ERROR: more than one row returned by a subquery used as an expression
+  Where: referenced column: make_set
+commit;
+SQL SUCCESS
+-- 清理环境;expect: 清理环境成功
+drop table t_Opengauss_MAKE_SET_Case0018_1;
+SQL SUCCESS
+drop table t_Opengauss_MAKE_SET_Case0018_2;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(3,'&',(select column_name from information_schema.columns where table_name='t_Opengauss_MAKE_SET_Case0018_1'));
++----------+
+| make_set |
++----------+
+| &        |
++----------+
+commit;
+SQL SUCCESS
+-- 创建表 expect:创建成功
+create table t_Opengauss_MAKE_SET_Case0018_1(a int);
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(3,'&',(select column_name from information_schema.columns where table_name='t_Opengauss_MAKE_SET_Case0018_1'));
++----------+
+| make_set |
++----------+
+| &        |
++----------+
+commit;
+SQL SUCCESS
+-- 清理环境;expect: 清理环境成功
+drop table t_Opengauss_MAKE_SET_Case0018_1;
+SQL SUCCESS
+-- 创建表 expect:创建成功
+create table t_Opengauss_MAKE_SET_Case0018_1(a int,b char(10));
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(3,'&',(select column_name from information_schema.columns where table_name='t_Opengauss_MAKE_SET_Case0018_1'));
++----------+
+| make_set |
++----------+
+| &        |
++----------+
+commit;
+SQL SUCCESS
+-- 清理环境;expect: 清理环境成功
+drop table t_Opengauss_MAKE_SET_Case0018_1;
+SQL SUCCESS
+drop table if exists t_Opengauss_MAKE_SET_Case0018_1;
+SQL SUCCESS
+-- 创建表 expect:创建成功
+create table t_Opengauss_MAKE_SET_Case0018_1(a int,b char(10));
+SQL SUCCESS
+-- 给表添加数据
+insert into t_Opengauss_MAKE_SET_Case0018_1 values(1,null),(1,null),(1,null),(1,null),(2,'xi'),(3,'dao'),(3,'to'),(4,'ruai'),(5,'mi'),(6,'fa'),(7,'xi'),(8,'xi'),(9,'la'),(10,'to'),(11,'no'),(11,'no'),(12,'buy'),(13,'buy'),(14,'buy'),(15,'bear'),(16,'bear');
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(3,'&',(select b from public.t_Opengauss_MAKE_SET_Case0018_1));
+?.*ERROR: more than one row returned by a subquery used as an expression
+  Where: referenced column: make_set
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(3,'&',(select b from public.t_Opengauss_MAKE_SET_Case0018_1 where a=17));
++----------+
+| make_set |
++----------+
+| &        |
++----------+
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(3,'&',(select b from public.t_Opengauss_MAKE_SET_Case0018_1 where a=1));
+?.*ERROR: more than one row returned by a subquery used as an expression
+  Where: referenced column: make_set
+commit;
+SQL SUCCESS
+-- 1：开启事物2：执行make_set函数3：提交
+start transaction;
+SQL SUCCESS
+select make_set(3,'&',(select b from public.t_Opengauss_MAKE_SET_Case0018_1 where a=2));
++--------------+
+| make_set     |
++--------------+
+| &,xi         |
++--------------+
+commit;
+SQL SUCCESS
+-- 清理环境;expect: 清理环境成功
+drop table t_Opengauss_MAKE_SET_Case0018_1;
+SQL SUCCESS
