@@ -1,0 +1,21 @@
+-- @testpoint: cast用例,部分用例合理报错
+-- as前后有多个type及expr
+--新建表
+create table t_Opengauss_CAST_Case0045_1(a int,c money,b timestamp);
+SQL SUCCESS
+-- as前后有多个type及expr
+select cast(c,b as unsigned) from t_Opengauss_CAST_Case0045_1;
+?.*ERROR: syntax error at or near ","
+?.*
+select cast(b c as unsigned) from t_Opengauss_CAST_Case0045_1;
+?.*ERROR: syntax error at or near "c"
+?.*
+select cast(a as unsigned,timestamp) from t_Opengauss_CAST_Case0045_1;
+?.*ERROR: syntax error at or near ","
+?.*
+select cast(a as unsigned timestamp) from t_Opengauss_CAST_Case0045_1;
+?.*ERROR: syntax error at or near "timestamp"
+?.*
+-- 清理环境
+drop table t_Opengauss_CAST_Case0045_1;
+SQL SUCCESS
