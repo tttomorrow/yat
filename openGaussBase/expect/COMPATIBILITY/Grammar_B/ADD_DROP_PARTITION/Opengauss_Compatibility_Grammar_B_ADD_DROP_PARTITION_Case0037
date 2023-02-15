@@ -1,0 +1,125 @@
+-- @testpoint: 验证原语法和MySQL兼容语法hash分区增删分区，部分场景合理报错
+-- 原语法
+drop table if exists t_b_add_drop_par_0037;
+SQL SUCCESS
+create table t_b_add_drop_par_0037(c1 int,c2 int)
+partition by hash(c1) (
+  partition p1,
+  partition p2,
+  partition p3
+  );
+SQL SUCCESS
+create index i_b_add_drop_par_0037_1 on t_b_add_drop_par_0037 (c1) global;
+SQL SUCCESS
+create index i_b_add_drop_par_0037_2 on t_b_add_drop_par_0037 (c2) local;
+SQL SUCCESS
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0037') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0037')) order by relname;
++-----------------------+------------+----------+
+| relname               | boundaries | parttype |
++-----------------------+------------+----------+
+| p1                    | {0}        | p        |
+| p2                    | {1}        | p        |
+| p3                    | {2}        | p        |
+| t_b_add_drop_par_0037 |            | r        |
++-----------------------+------------+----------+
+-- 添加一个分区报错
+alter table t_b_add_drop_par_0037 add partition p4;
+?.*ERROR: syntax error at end of input
+?.*Position.*
+alter table t_b_add_drop_par_0037 add partition p4 values(1);
+?.*ERROR: can not add hash partition
+-- 添加多个分区报错
+alter table t_b_add_drop_par_0037 add partition p5,add partition p6;
+?.*ERROR: syntax error at or near ","
+?.*Position.*
+alter table t_b_add_drop_par_0037 add partition p5 values(1),add partition p6 values(1);
+?.*ERROR: can not add hash partition
+-- 指定表空间为pg_global报错
+alter table t_b_add_drop_par_0037 add partition p6 tablespace pg_global;
+?.*ERROR: syntax error at or near "tablespace"
+?.*Position.*
+alter table t_b_add_drop_par_0037 add partition p6 values(1) tablespace pg_global;
+?.*ERROR: can not add hash partition
+-- 删除一个分区报错
+alter table t_b_add_drop_par_0037 drop partition p1;
+?.*ERROR: Droping hash partition is unsupported.
+-- 删除多个分区报错
+alter table t_b_add_drop_par_0037 drop partition p2,drop partition p3;
+?.*ERROR: Droping hash partition is unsupported.
+-- 删除不存在的分区报错
+alter table t_b_add_drop_par_0037 drop partition p6;
+?.*ERROR: Droping hash partition is unsupported.
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0037') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0037')) order by relname;
++-----------------------+------------+----------+
+| relname               | boundaries | parttype |
++-----------------------+------------+----------+
+| p1                    | {0}        | p        |
+| p2                    | {1}        | p        |
+| p3                    | {2}        | p        |
+| t_b_add_drop_par_0037 |            | r        |
++-----------------------+------------+----------+
+-- 清理环境
+drop table t_b_add_drop_par_0037;
+SQL SUCCESS
+-- MySQL兼容语法
+drop table if exists t_b_add_drop_par_0037;
+SQL SUCCESS
+create table t_b_add_drop_par_0037(c1 int,c2 int)
+partition by hash(c1) (
+  partition p1,
+  partition p2,
+  partition p3
+  );
+SQL SUCCESS
+create index i_b_add_drop_par_0037_3 on t_b_add_drop_par_0037 (c1) global;
+SQL SUCCESS
+create index i_b_add_drop_par_0037_4 on t_b_add_drop_par_0037 (c2) local;
+SQL SUCCESS
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0037') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0037')) order by relname;
++-----------------------+------------+----------+
+| relname               | boundaries | parttype |
++-----------------------+------------+----------+
+| p1                    | {0}        | p        |
+| p2                    | {1}        | p        |
+| p3                    | {2}        | p        |
+| t_b_add_drop_par_0037 |            | r        |
++-----------------------+------------+----------+
+-- 添加一个分区报错
+alter table t_b_add_drop_par_0037 add partition (partition  p4);
+?.*ERROR: syntax error at or near "\)"
+?.*Position.*
+alter table t_b_add_drop_par_0037 add partition (partition  p4 values(1));
+?.*ERROR: can not add hash partition
+-- 添加多个分区报错
+alter table t_b_add_drop_par_0037 add partition (partition p5,partition p6);
+?.*ERROR: syntax error at or near ","
+?.*Position.*
+alter table t_b_add_drop_par_0037 add partition (partition p5 values(1),partition p6 values(1));
+?.*ERROR: can not add hash partition
+-- 指定表空间为pg_global报错
+alter table t_b_add_drop_par_0037 add partition (partition p6 tablespace pg_global);
+?.*ERROR: syntax error at or near "tablespace"
+?.*Position.*
+alter table t_b_add_drop_par_0037 add partition (partition p6 values(1) tablespace pg_global);
+?.*ERROR: can not add hash partition
+-- 删除一个分区报错
+alter table t_b_add_drop_par_0037 drop partition p1;
+?.*ERROR: Droping hash partition is unsupported.
+-- 删除多个分区报错
+alter table t_b_add_drop_par_0037 drop partition p2,p3;
+?.*ERROR: Droping hash partition is unsupported.
+-- 删除不存在的分区报错
+alter table t_b_add_drop_par_0037 drop partition p6;
+?.*ERROR: Droping hash partition is unsupported.
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0037') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0037')) order by relname;
++-----------------------+------------+----------+
+| relname               | boundaries | parttype |
++-----------------------+------------+----------+
+| p1                    | {0}        | p        |
+| p2                    | {1}        | p        |
+| p3                    | {2}        | p        |
+| t_b_add_drop_par_0037 |            | r        |
++-----------------------+------------+----------+
+-- 清理环境
+drop table t_b_add_drop_par_0037;
+SQL SUCCESS
