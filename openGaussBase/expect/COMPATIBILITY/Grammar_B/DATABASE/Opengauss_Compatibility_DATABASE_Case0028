@@ -1,4 +1,4 @@
--- @testpoint:选择不存在的数据库
+-- @testpoint:选择不存在的数据库，部分用例合理报错
 use schmea_Opengauss_DATABASE_Case0028_1;
 ?.*ERROR: Unknown database 'schmea_opengauss_database_case0028_1'
 select database();

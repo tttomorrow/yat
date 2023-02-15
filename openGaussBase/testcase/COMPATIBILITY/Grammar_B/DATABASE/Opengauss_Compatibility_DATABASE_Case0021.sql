@@ -1,4 +1,4 @@
--- @testpoint:创建模式
+-- @testpoint:创建模式，部分用例合理报错
 create schema sch_Opengauss_DATABASE_Case0021_1;
 create schema sch_Opengauss_DATABASE_Case0021_2;
 create schema sch_Opengauss_DATABASE_Case0021_3;
