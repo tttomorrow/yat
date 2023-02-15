@@ -65,4 +65,3 @@ class CompatibilityTest02(unittest.TestCase):
         self.assertIn(self.constant.CREATE_DATABASE_SUCCESS, sql_res,
                       '执行失败' + text)
         self.log.info(f'-----{os.path.basename(__file__)} end-----')
-
