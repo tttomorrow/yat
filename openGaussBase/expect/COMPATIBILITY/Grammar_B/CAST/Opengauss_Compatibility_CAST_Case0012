@@ -1,0 +1,32 @@
+-- @testpoint: cast用例
+-- 设置时区
+set time zone 'uct';
+SQL SUCCESS
+-- cast函数输入参数,timestamp转换为unsigned
+select cast('2022-11-10 18:03:20'::timestamp as unsigned);
++----------------+
+| uint8          |
++----------------+
+| 20221110180320 |
++----------------+
+-- 设置时区
+set time zone 'uct';
+SQL SUCCESS
+select cast('2022-11-10 18:03:20'::timestamp as unsigned);
++----------------+
+| uint8          |
++----------------+
+| 20221110180320 |
++----------------+
+select cast('2022-11-10'::timestamp as unsigned);
++----------------+
+| uint8          |
++----------------+
+| 20221110000000 |
++----------------+
+select cast('18:03:20'::timestamp as unsigned);
++----------------+
+| uint8          |
++----------------+
+| 20180320000000 |
++----------------+

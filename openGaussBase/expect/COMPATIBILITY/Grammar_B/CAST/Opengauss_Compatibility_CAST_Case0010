@@ -1,0 +1,29 @@
+-- @testpoint: cast用例,部分用例合理报错,部分用例合理报错
+-- cast函数输入参数，as前为expr，后为自定义type
+drop type if exists type_Opengauss_CAST_Case0010_1;
+SQL SUCCESS
+create type type_Opengauss_CAST_Case0010_1 as (t1 int, t2 text);
+SQL SUCCESS
+select cast('$2'::money as type_Opengauss_CAST_Case0010_1);
+?.*ERROR: cannot cast type money to type_opengauss_cast_case0010_1
+?.*
+  Where: referenced column: type_opengauss_cast_case0010_1
+select cast(cast('$2'::money as unsigned) as type_Opengauss_CAST_Case0010_1);
+?.*ERROR: cannot cast type uint8 to type_opengauss_cast_case0010_1
+?.*
+  Where: referenced column: type_opengauss_cast_case0010_1
+select cast('2022-11-10 18:03:20'::timestamp as type_Opengauss_CAST_Case0010_1);
+?.*ERROR: cannot cast type timestamp with time zone to type_opengauss_cast_case0010_1
+?.*
+  Where: referenced column: type_opengauss_cast_case0010_1
+select cast(current_timestamp::timestamp as type_Opengauss_CAST_Case0010_1);
+?.*ERROR: cannot cast type timestamp with time zone to type_opengauss_cast_case0010_1
+?.*
+  Where: referenced column: current_timestamp
+select cast(cast('2022-11-10 18:03:20'::timestamp as unsigned) as type_Opengauss_CAST_Case0010_1);
+?.*ERROR: cannot cast type uint8 to type_opengauss_cast_case0010_1
+?.*
+  Where: referenced column: type_opengauss_cast_case0010_1
+-- 清理环境
+drop type type_Opengauss_CAST_Case0010_1;
+SQL SUCCESS

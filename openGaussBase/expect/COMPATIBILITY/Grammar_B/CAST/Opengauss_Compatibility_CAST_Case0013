@@ -1,0 +1,23 @@
+-- @testpoint: cast用例,部分用例合理报错
+-- 转换不存在表中的某个字段
+--新建表
+create table t_Opengauss_CAST_Case0013_1(a int,c money,b timestamp);
+SQL SUCCESS
+--插入数据
+insert into t_Opengauss_CAST_Case0013_1 values(1,2,now());
+SQL SUCCESS
+insert into t_Opengauss_CAST_Case0013_1 values(2,'$33',now());
+SQL SUCCESS
+-- 转换不存在表中的某个字段
+select cast(d as unsigned) from t_Opengauss_CAST_Case0013_2;
+?.*ERROR: relation "t_opengauss_cast_case0013_2" does not exist on primary
+?.*
+select cast(e as unsigned) from t_Opengauss_CAST_Case0013_3;
+?.*ERROR: relation "t_opengauss_cast_case0013_3" does not exist on primary
+?.*
+select cast(f as unsigned) from t_Opengauss_CAST_Case0013_4;
+?.*ERROR: relation "t_opengauss_cast_case0013_4" does not exist on primary
+?.*
+-- 清理环境
+drop table t_Opengauss_CAST_Case0013_1;
+SQL SUCCESS

@@ -1,0 +1,26 @@
+-- @testpoint: cast用例
+-- cast函数输入参数,money转换为unsigned
+select cast('$2'::money as unsigned);
++-------+
+| uint8 |
++-------+
+| 2     |
++-------+
+select cast(cast('$2'::money as unsigned) as money);
++-------+
+| money |
++-------+
+| 2.0   |
++-------+
+select cast(cast('$90'::money as unsigned) as money);
++-------+
+| money |
++-------+
+| 90.0  |
++-------+
+select cast('$200'::money as unsigned);
++-------+
+| uint8 |
++-------+
+| 200   |
++-------+
