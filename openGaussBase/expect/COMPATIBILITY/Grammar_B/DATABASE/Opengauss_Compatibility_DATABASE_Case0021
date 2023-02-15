@@ -1,0 +1,34 @@
+-- @testpoint:创建模式
+create schema sch_Opengauss_DATABASE_Case0021_1;
+SQL SUCCESS
+create schema sch_Opengauss_DATABASE_Case0021_2;
+SQL SUCCESS
+create schema sch_Opengauss_DATABASE_Case0021_3;
+SQL SUCCESS
+--选择不存在的数据库
+use sch_Opengauss_DATABASE_Case0021_4;
+?.*ERROR: Unknown database 'sch_opengauss_database_case0021_4'
+-- 查询当前数据库
+select database();
++----------+
+| database |
++----------+
+| public   |
++----------+
+--选择不存在的数据库
+use sch_Opengauss_DATABASE_Case0021_5;
+?.*ERROR: Unknown database 'sch_opengauss_database_case0021_5'
+-- 查询当前数据库
+select database();
++----------+
+| database |
++----------+
+| public   |
++----------+
+-- 清理环境
+drop schema sch_Opengauss_DATABASE_Case0021_1;
+SQL SUCCESS
+drop schema sch_Opengauss_DATABASE_Case0021_2;
+SQL SUCCESS
+drop schema sch_Opengauss_DATABASE_Case0021_3;
+SQL SUCCESS
