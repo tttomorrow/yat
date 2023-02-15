@@ -1,0 +1,101 @@
+-- @testpoint: 验证原语法和MySQL兼容语法range分区删除分区(列存表)，部分场景合理报错
+-- 原语法
+drop table if exists t_b_add_drop_par_0024;
+SQL SUCCESS
+create table t_b_add_drop_par_0024(c1 int primary key,c2 int)
+with (orientation=column)
+partition by range(c1) (
+  partition p1 values less than(100),
+  partition p2 values less than(200),
+  partition p3 values less than(300),
+  partition p4 values less than(400),
+  partition p5 values less than(500)
+  );
+SQL SUCCESS
+create index i_b_add_drop_par_0024_1 on t_b_add_drop_par_0024 (c2) global;
+?.*ERROR: Global partition index does not support column store.
+create index i_b_add_drop_par_0024_2 on t_b_add_drop_par_0024 (c1) local;
+SQL SUCCESS
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0024') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0024')) order by relname;
++-----------------------+------------+----------+
+| relname               | boundaries | parttype |
++-----------------------+------------+----------+
+| p1                    | {100}      | p        |
+| p2                    | {200}      | p        |
+| p3                    | {300}      | p        |
+| p4                    | {400}      | p        |
+| p5                    | {500}      | p        |
+| t_b_add_drop_par_0024 |            | r        |
++-----------------------+------------+----------+
+-- 删除一个分区成功
+alter table t_b_add_drop_par_0024 drop partition p1;
+SQL SUCCESS
+-- 删除多个分区成功
+alter table t_b_add_drop_par_0024 drop partition p2,drop partition p3,drop partition p4;
+SQL SUCCESS
+-- 删除最后一个分区报错
+alter table t_b_add_drop_par_0024 drop partition p5;
+?.*ERROR: Cannot drop the only partition of a partitioned table
+-- 删除不存在的分区报错
+alter table t_b_add_drop_par_0024 drop partition p6;
+?.*ERROR: partition "p6" does not exist
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0024') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0024')) order by relname;
++-----------------------+------------+----------+
+| relname               | boundaries | parttype |
++-----------------------+------------+----------+
+| p5                    | {500}      | p        |
+| t_b_add_drop_par_0024 |            | r        |
++-----------------------+------------+----------+
+-- 清理环境
+drop table t_b_add_drop_par_0024;
+SQL SUCCESS
+-- MySQL兼容语法
+drop table if exists t_b_add_drop_par_0024;
+SQL SUCCESS
+create table t_b_add_drop_par_0024(c1 int primary key,c2 int)
+with (orientation=column)
+partition by range(c1) (
+  partition p1 values less than(100),
+  partition p2 values less than(200),
+  partition p3 values less than(300),
+  partition p4 values less than(400),
+  partition p5 values less than(500)
+  );
+SQL SUCCESS
+create index i_b_add_drop_par_0024_3 on t_b_add_drop_par_0024 (c2) global;
+?.*ERROR: Global partition index does not support column store.
+create index i_b_add_drop_par_0024_4 on t_b_add_drop_par_0024 (c1) local;
+SQL SUCCESS
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0024') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0024')) order by relname;
++-----------------------+------------+----------+
+| relname               | boundaries | parttype |
++-----------------------+------------+----------+
+| p1                    | {100}      | p        |
+| p2                    | {200}      | p        |
+| p3                    | {300}      | p        |
+| p4                    | {400}      | p        |
+| p5                    | {500}      | p        |
+| t_b_add_drop_par_0024 |            | r        |
++-----------------------+------------+----------+
+-- 删除一个分区成功
+alter table t_b_add_drop_par_0024 drop partition p1;
+SQL SUCCESS
+-- 删除多个分区成功
+alter table t_b_add_drop_par_0024 drop partition p2,p3,p4;
+SQL SUCCESS
+-- 删除最后一个分区报错
+alter table t_b_add_drop_par_0024 drop partition p5;
+?.*ERROR: Cannot drop the only partition of a partitioned table
+-- 删除不存在的分区报错
+alter table t_b_add_drop_par_0024 drop partition p6;
+?.*ERROR: partition "p6" does not exist
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0024') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0024')) order by relname;
++-----------------------+------------+----------+
+| relname               | boundaries | parttype |
++-----------------------+------------+----------+
+| p5                    | {500}      | p        |
+| t_b_add_drop_par_0024 |            | r        |
++-----------------------+------------+----------+
+-- 清理环境
+drop table t_b_add_drop_par_0024;
+SQL SUCCESS
