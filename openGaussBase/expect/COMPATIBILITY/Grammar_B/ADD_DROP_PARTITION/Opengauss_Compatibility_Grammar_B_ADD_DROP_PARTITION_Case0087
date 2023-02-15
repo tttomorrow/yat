@@ -1,0 +1,168 @@
+-- @testpoint: 验证原语法list-hash分区表增删分区(主表指定非默认tablespace)，部分场景合理报错
+drop tablespace if exists ts_b_add_drop_par_0087;
+SQL SUCCESS
+create tablespace ts_b_add_drop_par_0087 relative location 'ts_b_add_drop_par_0087';
+SQL SUCCESS
+drop table if exists t_b_add_drop_par_0087;
+SQL SUCCESS
+create table t_b_add_drop_par_0087(c1 char(1),c2 int,c3 int primary key)
+tablespace ts_b_add_drop_par_0087
+partition by list(c1) subpartition by hash(c2) 
+(
+  partition p1 values ('a')
+  (
+    subpartition p1_1,
+    subpartition p1_2
+  ),
+  partition p2 values ('b')
+  (
+    subpartition p2_1,
+    subpartition p2_2
+  )
+);
+SQL SUCCESS
+create index i_b_add_drop_par_0087_1 on t_b_add_drop_par_0087 (c1) global;
+SQL SUCCESS
+create index i_b_add_drop_par_0087_2 on t_b_add_drop_par_0087 (c2) local;
+SQL SUCCESS
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0087') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0087')) order by relname;
++-----------------------+------------+----------+
+| relname               | boundaries | parttype |
++-----------------------+------------+----------+
+| p1                    | {a}        | p        |
+| p1_1                  | {0}        | s        |
+| p1_2                  | {1}        | s        |
+| p2                    | {b}        | p        |
+| p2_1                  | {0}        | s        |
+| p2_2                  | {1}        | s        |
+| t_b_add_drop_par_0087 |            | r        |
++-----------------------+------------+----------+
+-- 合法添加一级、二级分区成功
+-- 添加一级分区不指定二级子分区
+alter table t_b_add_drop_par_0087 add partition p3 values ('c');
+SQL SUCCESS
+-- 添加一级分区指定一个二级分区
+alter table t_b_add_drop_par_0087 add partition p4 values ('d') (subpartition p4_1);
+SQL SUCCESS
+-- 添加一级分区指定多个二级分区
+alter table t_b_add_drop_par_0087 add partition p5 values ('e') (subpartition p5_1,subpartition p5_2,subpartition p5_3,subpartition p5_4,subpartition p5_5);
+SQL SUCCESS
+-- 添加多个一级分区
+alter table t_b_add_drop_par_0087 add partition p6 values ('f') (subpartition p6_1),add partition p7 values ('g');
+SQL SUCCESS
+-- 添加一级分区指定表空间
+alter table t_b_add_drop_par_0087 add partition p8 values ('h') tablespace ts_b_add_drop_par_0087;
+SQL SUCCESS
+-- 非法添加一级二级分区报错
+-- 为一级分区添加一个hash子分区
+alter table t_b_add_drop_par_0087 modify partition p6 add subpartition p6_2;
+?.*ERROR: syntax error at end of input
+?.*Position.*
+alter table t_b_add_drop_par_0087 modify partition p6 add subpartition p6_2 values(1);
+?.*ERROR: can not add hash partition
+-- 为一级分区添加多个hash子分区
+alter table t_b_add_drop_par_0087 modify partition p6 add subpartition p6_3,modify partition p6 add subpartition p6_4;
+?.*ERROR: syntax error at or near ","
+?.*Position.*
+alter table t_b_add_drop_par_0087 modify partition p6 add subpartition p6_3 values(1),modify partition p6 add subpartition p6_4 values(1);
+?.*ERROR: can not add hash partition
+-- 添加二级hash分区指定表空间
+alter table t_b_add_drop_par_0087 modify partition p6 add subpartition p6_5 tablespace ts_b_add_drop_par_0087;
+?.*ERROR: syntax error at or near "tablespace"
+?.*Position.*
+alter table t_b_add_drop_par_0087 modify partition p6 add subpartition p6_5 values ('l') tablespace ts_b_add_drop_par_0087;
+?.*ERROR: can not add hash partition
+-- 分区重名
+alter table t_b_add_drop_par_0087 add partition p8 values ('k');
+?.*ERROR: The partition name "p8" is duplicated with existing partition name
+  Detail: N/A
+-- 一级分区值非法
+alter table t_b_add_drop_par_0087 add partition p9 values ('a');
+?.*ERROR: list boundary of adding partition MUST NOT overlap with existing partition
+-- 一级分区数据类型非法
+alter table t_b_add_drop_par_0087 add partition p9 values ('aa') (subpartition p9_1);
+?.*ERROR: value too long for type character\(1\)
+-- 二级分区值非法
+alter table t_b_add_drop_par_0087 add partition p9 values ('k') (subpartition p9_1 values ('a'));
+?.*ERROR: The syntax format of subpartition is incorrect, the declaration and definition of the subpartition do not match.
+  Detail: The syntax format of subpartition p9_1 is incorrect.
+-- 一级分区指定表空间为pg_global
+alter table t_b_add_drop_par_0087 add partition p8 values ('k') tablespace pg_global;
+?.*ERROR: only shared relations can be placed in pg_global tablespace
+-- 二级分区指定表空间为pg_global
+alter table t_b_add_drop_par_0087 add partition p9 values ('k') (subpartition p9_1 tablespace pg_global);
+?.*ERROR: only shared relations can be placed in pg_global tablespace
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0087') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0087')) order by relname;
++-----------------------+------------+----------+
+| relname               | boundaries | parttype |
++-----------------------+------------+----------+
+| p1                    | {a}        | p        |
+| p1_1                  | {0}        | s        |
+| p1_2                  | {1}        | s        |
+| p2                    | {b}        | p        |
+| p2_1                  | {0}        | s        |
+| p2_2                  | {1}        | s        |
+| p3                    | {c}        | p        |
+| p3_subpartdefault1    | {0}        | s        |
+| p4                    | {d}        | p        |
+| p4_1                  | {0}        | s        |
+| p5                    | {e}        | p        |
+| p5_1                  | {0}        | s        |
+| p5_2                  | {1}        | s        |
+| p5_3                  | {2}        | s        |
+| p5_4                  | {3}        | s        |
+| p5_5                  | {4}        | s        |
+| p6                    | {f}        | p        |
+| p6_1                  | {0}        | s        |
+| p7                    | {g}        | p        |
+| p7_subpartdefault1    | {0}        | s        |
+| p8                    | {h}        | p        |
+| p8_subpartdefault1    | {0}        | s        |
+| t_b_add_drop_par_0087 |            | r        |
++-----------------------+------------+----------+
+-- 合法删除分区成功
+-- 删除一个一级分区
+alter table t_b_add_drop_par_0087 drop partition p8;
+SQL SUCCESS
+-- 删除多个一级分区
+alter table t_b_add_drop_par_0087 drop partition p1,drop partition p2;
+SQL SUCCESS
+-- 删除多个一级分区
+alter table t_b_add_drop_par_0087 drop partition p3,drop partition p4,drop partition p6,drop partition p7;
+SQL SUCCESS
+-- 非法删除分区报错
+-- 删除一个二级分区
+alter table t_b_add_drop_par_0087 drop subpartition p5_1;
+?.*ERROR: Un-support feature
+  Detail: The syntax is unsupported for hash subpartition
+-- 删除多个二级分区
+alter table t_b_add_drop_par_0087 drop subpartition p5_2,drop subpartition p5_3,drop subpartition p5_4;
+?.*ERROR: Un-support feature
+  Detail: The syntax is unsupported for hash subpartition
+-- 删除表的最后一个一级分区
+alter table t_b_add_drop_par_0087 drop partition p5;
+?.*ERROR: Cannot drop the only partition of a partitioned table
+-- 删除不存在的一级分区
+alter table t_b_add_drop_par_0087 drop partition pnull;
+?.*ERROR: partition "pnull" does not exist
+-- 删除不存在的二级分区
+alter table t_b_add_drop_par_0087 drop subpartition p_null;
+?.*ERROR: Un-support feature
+  Detail: The syntax is unsupported for hash subpartition
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0087') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0087')) order by relname;
++-----------------------+------------+----------+
+| relname               | boundaries | parttype |
++-----------------------+------------+----------+
+| p5                    | {e}        | p        |
+| p5_1                  | {0}        | s        |
+| p5_2                  | {1}        | s        |
+| p5_3                  | {2}        | s        |
+| p5_4                  | {3}        | s        |
+| p5_5                  | {4}        | s        |
+| t_b_add_drop_par_0087 |            | r        |
++-----------------------+------------+----------+
+-- 清理环境
+drop table t_b_add_drop_par_0087;
+SQL SUCCESS
+drop tablespace ts_b_add_drop_par_0087;
+SQL SUCCESS
