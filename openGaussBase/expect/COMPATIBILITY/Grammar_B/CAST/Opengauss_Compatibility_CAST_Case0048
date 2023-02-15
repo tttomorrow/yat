@@ -1,0 +1,20 @@
+-- @testpoint: cast用例,部分用例合理报错
+-- as前为expr，后为自定义type
+--定义数据类型
+create type type_Opengauss_CAST_Case0048_1 as (t_Opengauss_CAST_Case0048_1 int, t2 text);
+?.*ERROR: type "type_opengauss_cast_case0048_1" already exists
+create table t_Opengauss_CAST_Case0048_1(a money,c timpstamp,b money);
+?.*ERROR: type "timpstamp" does not exist
+-- 转换存在表的某个存在字段
+select cast(c as type_Opengauss_CAST_Case0048_1) from t_Opengauss_CAST_Case0048_1;
+?.*ERROR: relation "t_opengauss_cast_case0048_1" does not exist on primary
+?.*
+select cast(b as type_Opengauss_CAST_Case0048_1) from t_Opengauss_CAST_Case0048_1;
+?.*ERROR: relation "t_opengauss_cast_case0048_1" does not exist on primary
+?.*
+select cast(a as type_Opengauss_CAST_Case0048_1) from t_Opengauss_CAST_Case0048_1;
+?.*ERROR: relation "t_opengauss_cast_case0048_1" does not exist on primary
+?.*
+-- 清理环境
+drop table t_Opengauss_CAST_Case0048_1;
+?.*ERROR: table "t_opengauss_cast_case0048_1" does not exist
