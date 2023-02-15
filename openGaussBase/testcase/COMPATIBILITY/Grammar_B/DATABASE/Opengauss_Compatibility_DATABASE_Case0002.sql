@@ -1,4 +1,4 @@
--- @testpoint:选择不存在的数据库
+-- @testpoint:选择不存在的数据库，部分用例合理报错
 use sch_Opengauss_DATABASE_Case0002_1;
 select database();
 use sch_Opengauss_DATABASE_Case0002_2;
