@@ -1,0 +1,25 @@
+-- @testpoint:创建数据库,部分用例合理报错
+create schema sch_Opengauss_DATABASE_Case0015_1;
+SQL SUCCESS
+-- 使用
+use sch_Opengauss_DATABASE_Case0015_1;
+SQL SUCCESS
+select database();
++-----------------------------------+
+| database                          |
++-----------------------------------+
+| sch_opengauss_database_case0015_1 |
++-----------------------------------+
+-- use失败
+use ;
+?.*ERROR: syntax error at end of input
+?.*
+select database();
++-----------------------------------+
+| database                          |
++-----------------------------------+
+| sch_opengauss_database_case0015_1 |
++-----------------------------------+
+-- 清理环境
+drop schema sch_Opengauss_DATABASE_Case0015_1;
+SQL SUCCESS

@@ -1,0 +1,39 @@
+-- @testpoint:创建数据库
+create schema sch_Opengauss_DATABASE_Case0016_1;
+SQL SUCCESS
+create schema sch_Opengauss_DATABASE_Case0016_2;
+SQL SUCCESS
+create schema sch_Opengauss_DATABASE_Case0016_3;
+SQL SUCCESS
+-- 选择使用的的数据库并显示当前当前数据库
+use sch_Opengauss_DATABASE_Case0016_1;
+SQL SUCCESS
+select database();
++-----------------------------------+
+| database                          |
++-----------------------------------+
+| sch_opengauss_database_case0016_1 |
++-----------------------------------+
+use sch_Opengauss_DATABASE_Case0016_2;
+SQL SUCCESS
+select database();
++-----------------------------------+
+| database                          |
++-----------------------------------+
+| sch_opengauss_database_case0016_2 |
++-----------------------------------+
+use sch_Opengauss_DATABASE_Case0016_3;
+SQL SUCCESS
+select database();
++-----------------------------------+
+| database                          |
++-----------------------------------+
+| sch_opengauss_database_case0016_3 |
++-----------------------------------+
+-- 清理环境
+drop schema sch_Opengauss_DATABASE_Case0016_1;
+SQL SUCCESS
+drop schema sch_Opengauss_DATABASE_Case0016_2;
+SQL SUCCESS
+drop schema sch_Opengauss_DATABASE_Case0016_3;
+SQL SUCCESS
