@@ -1,6 +1,8 @@
 -- @testpoint: cast用例,部分用例合理报错
 -- as前为expr，后为自定义type
 --定义数据类型
+drop type if exists type_Opengauss_CAST_Case0025_1;
+SQL SUCCESS
 create type type_Opengauss_CAST_Case0025_1 as (t_Opengauss_CAST_Case0025_1 int, t2 text);
 ?.*ERROR: type "type_opengauss_cast_case0025_1" already exists
 --新建表

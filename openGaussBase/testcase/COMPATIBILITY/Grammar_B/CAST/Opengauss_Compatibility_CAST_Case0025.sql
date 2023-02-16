@@ -1,6 +1,7 @@
 -- @testpoint: cast用例,部分用例合理报错
 -- as前为expr，后为自定义type
 --定义数据类型
+drop type if exists type_Opengauss_CAST_Case0025_1;
 create type type_Opengauss_CAST_Case0025_1 as (t_Opengauss_CAST_Case0025_1 int, t2 text);
 --新建表
 create table t_Opengauss_CAST_Case0025_1(a int,c money,b timestamp);
