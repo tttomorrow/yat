@@ -4,7 +4,7 @@
 drop type if exists type_Opengauss_CAST_Case0025_1;
 SQL SUCCESS
 create type type_Opengauss_CAST_Case0025_1 as (t_Opengauss_CAST_Case0025_1 int, t2 text);
-?.*ERROR: type "type_opengauss_cast_case0025_1" already exists
+SQL SUCCESS
 --新建表
 create table t_Opengauss_CAST_Case0025_1(a int,c money,b timestamp);
 SQL SUCCESS
