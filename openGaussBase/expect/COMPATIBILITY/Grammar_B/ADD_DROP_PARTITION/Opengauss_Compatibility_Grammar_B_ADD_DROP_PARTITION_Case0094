@@ -1,0 +1,182 @@
+-- @testpoint: 验证MySQL兼容语法hash-range分区表增删分区(segment=on)，部分场景合理报错
+drop tablespace if exists ts_b_add_drop_par_0094;
+SQL SUCCESS
+create tablespace ts_b_add_drop_par_0094 relative location 'ts_b_add_drop_par_0094';
+SQL SUCCESS
+drop table if exists t_b_add_drop_par_0094;
+SQL SUCCESS
+create table t_b_add_drop_par_0094(c1 int primary key,c2 int,c3 int)
+with (segment=on)
+partition by hash(c1) subpartition by range(c2) 
+(
+  partition p1
+  (
+    subpartition p1_1 values less than (100),
+    subpartition p1_2 values less than (200)
+  ),
+  partition p2
+  (
+    subpartition p2_1 values less than (100),
+    subpartition p2_2 values less than (200)
+  ),
+  partition p3
+  (
+    subpartition p3_1 values less than (100),
+    subpartition p3_2 values less than (200)
+  )
+);
+SQL SUCCESS
+create index i_b_add_drop_par_0094_1 on t_b_add_drop_par_0094 (c1) global;
+SQL SUCCESS
+create index i_b_add_drop_par_0094_2 on t_b_add_drop_par_0094 (c2) local;
+SQL SUCCESS
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0094') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0094')) order by relname;
++-----------------------+------------+----------+
+| relname               | boundaries | parttype |
++-----------------------+------------+----------+
+| p1                    | {0}        | p        |
+| p1_1                  | {100}      | s        |
+| p1_2                  | {200}      | s        |
+| p2                    | {1}        | p        |
+| p2_1                  | {100}      | s        |
+| p2_2                  | {200}      | s        |
+| p3                    | {2}        | p        |
+| p3_1                  | {100}      | s        |
+| p3_2                  | {200}      | s        |
+| t_b_add_drop_par_0094 |            | r        |
++-----------------------+------------+----------+
+-- 合法添加一级、二级分区成功
+-- 为一级分区添加一个子分区
+alter table t_b_add_drop_par_0094 modify partition p1 add subpartition p1_3 values less than(300);
+SQL SUCCESS
+-- 为一级分区添加多个子分区
+alter table t_b_add_drop_par_0094 modify partition p1 add subpartition p1_4 values less than(400),modify partition p1 add subpartition p1_5 values less than(500);
+SQL SUCCESS
+-- 添加二级分区指定表空间
+alter table t_b_add_drop_par_0094 modify partition p1 add subpartition p1_6 values less than(600) tablespace ts_b_add_drop_par_0094;
+SQL SUCCESS
+-- 非法添加一级二级分区报错
+-- 添加一级分区不指定二级子分区
+alter table t_b_add_drop_par_0094 add partition (partition p4);
+?.*ERROR: syntax error at or near "\)"
+?.*Position.*
+alter table t_b_add_drop_par_0094 add partition (partition p4 values less than(300));
+?.*ERROR: can not add hash partition
+-- 添加一级分区指定一个二级分区
+alter table t_b_add_drop_par_0094 add partition (partition p4 (subpartition p4_1 values less than(400)));
+?.*ERROR: syntax error at or near "\("
+?.*Position.*
+alter table t_b_add_drop_par_0094 add partition (partition p4 values less than(400) (subpartition p4_1 values less than(400)));
+?.*ERROR: can not add hash partition
+-- 添加一级分区指定多个二级分区
+alter table t_b_add_drop_par_0094 add partition (partition p4 (subpartition p4_1 values less than(450),subpartition p4_2 values less than(500)));
+?.*ERROR: syntax error at or near "\("
+?.*Position.*
+alter table t_b_add_drop_par_0094 add partition (partition p4 values less than(500) (subpartition p4_1 values less than(450),subpartition p4_2 values less than(500)));
+?.*ERROR: can not add hash partition
+-- 添加多个一级分区
+alter table t_b_add_drop_par_0094 add partition (partition p4 (subpartition p4_1 values less than(510)),partition p5 values less than(100));
+?.*ERROR: syntax error at or near "\("
+?.*Position.*
+alter table t_b_add_drop_par_0094 add partition (partition p4 values less than(600) (subpartition p4_1 values less than(510)),partition p5 values less than(100));
+?.*ERROR: can not add hash partition
+-- 添加一级分区指定表空间
+alter table t_b_add_drop_par_0094 add partition (partition p4 tablespace ts_b_add_drop_par_0094);
+?.*ERROR: syntax error at or near "tablespace"
+?.*Position.*
+alter table t_b_add_drop_par_0094 add partition (partition p4 values less than(800) tablespace ts_b_add_drop_par_0094);
+?.*ERROR: can not add hash partition
+-- 分区重名
+alter table t_b_add_drop_par_0094 add partition (partition p1);
+?.*ERROR: syntax error at or near "\)"
+?.*Position.*
+alter table t_b_add_drop_par_0094 add partition (partition p1 values less than(900));
+?.*ERROR: can not add hash partition
+-- 二级分区值非法
+alter table t_b_add_drop_par_0094 add partition (partition p9 values (subpartition p9_1 values less than(100),subpartition p9_2 values less than(50)));
+?.*ERROR: syntax error at or near "p9_1"
+?.*Position.*
+alter table t_b_add_drop_par_0094 add partition (partition p9 values less than(900) (subpartition p9_1 values less than(100),subpartition p9_2 values less than(50)));
+?.*ERROR: can not add hash partition
+-- 一级分区数据类型非法
+alter table t_b_add_drop_par_0094 add partition (partition p9 values less than('a') (subpartition p9_1 values less than(100)));
+?.*ERROR: can not add hash partition
+-- 二级分区值非法
+alter table t_b_add_drop_par_0094 add partition (partition p9 (subpartition p9_1 values less than('a')));
+?.*ERROR: syntax error at or near "\("
+?.*Position.*
+alter table t_b_add_drop_par_0094 add partition (partition p9 values less than(900) (subpartition p9_1 values less than('a')));
+?.*ERROR: can not add hash partition
+-- 一级分区指定表空间为pg_global
+alter table t_b_add_drop_par_0094 add partition (partition p8 tablespace pg_global);
+?.*ERROR: syntax error at or near "tablespace"
+?.*Position.*
+alter table t_b_add_drop_par_0094 add partition (partition p8 values less than(900) tablespace pg_global);
+?.*ERROR: can not add hash partition
+-- 二级分区指定表空间为pg_global
+alter table t_b_add_drop_par_0094 add partition (partition p9 (subpartition p9_1 values less than(100) tablespace pg_global));
+?.*ERROR: syntax error at or near "\("
+?.*Position.*
+alter table t_b_add_drop_par_0094 add partition (partition p9 values less than(900) (subpartition p9_1 values less than(100) tablespace pg_global));
+?.*ERROR: can not add hash partition
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0094') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0094')) order by relname;
++-----------------------+------------+----------+
+| relname               | boundaries | parttype |
++-----------------------+------------+----------+
+| p1                    | {0}        | p        |
+| p1_1                  | {100}      | s        |
+| p1_2                  | {200}      | s        |
+| p1_3                  | {300}      | s        |
+| p1_4                  | {400}      | s        |
+| p1_5                  | {500}      | s        |
+| p1_6                  | {600}      | s        |
+| p2                    | {1}        | p        |
+| p2_1                  | {100}      | s        |
+| p2_2                  | {200}      | s        |
+| p3                    | {2}        | p        |
+| p3_1                  | {100}      | s        |
+| p3_2                  | {200}      | s        |
+| t_b_add_drop_par_0094 |            | r        |
++-----------------------+------------+----------+
+-- 合法删除分区成功
+-- 删除一个二级分区
+alter table t_b_add_drop_par_0094 drop subpartition p2_1;
+SQL SUCCESS
+-- 删除多个二级分区
+alter table t_b_add_drop_par_0094 drop subpartition p1_1,p1_2,p1_3,p1_4,p1_5;
+SQL SUCCESS
+-- 非法删除分区报错
+-- 删除一个一级分区
+alter table t_b_add_drop_par_0094 drop partition p2;
+?.*ERROR: Droping hash partition is unsupported.
+-- 删除多个一级分区
+alter table t_b_add_drop_par_0094 drop partition p1,p2;
+?.*ERROR: Droping hash partition is unsupported.
+-- 删除一级分区的最后一个二级分区
+alter table t_b_add_drop_par_0094 drop subpartition p1_6;
+?.*ERROR: Cannot drop the only subpartition of a partitioned table
+  Detail: N/A
+-- 删除不存在的一级分区
+alter table t_b_add_drop_par_0094 drop partition pnull;
+?.*ERROR: Droping hash partition is unsupported.
+-- 删除不存在的二级分区
+alter table t_b_add_drop_par_0094 drop subpartition p_null;
+?.*ERROR: subpartition "p_null" does not exist
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0094') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0094')) order by relname;
++-----------------------+------------+----------+
+| relname               | boundaries | parttype |
++-----------------------+------------+----------+
+| p1                    | {0}        | p        |
+| p1_6                  | {600}      | s        |
+| p2                    | {1}        | p        |
+| p2_2                  | {200}      | s        |
+| p3                    | {2}        | p        |
+| p3_1                  | {100}      | s        |
+| p3_2                  | {200}      | s        |
+| t_b_add_drop_par_0094 |            | r        |
++-----------------------+------------+----------+
+-- 清理环境
+drop table t_b_add_drop_par_0094;
+SQL SUCCESS
+drop tablespace ts_b_add_drop_par_0094;
+SQL SUCCESS
