@@ -1,0 +1,165 @@
+-- @testpoint: 验证MySQL兼容语法range-range分区表增删分区(主表指定非默认tablespace)，部分场景合理报错
+drop tablespace if exists ts_b_add_drop_par_0048;
+SQL SUCCESS
+create tablespace ts_b_add_drop_par_0048 relative location 'ts_b_add_drop_par_0048';
+SQL SUCCESS
+drop table if exists t_b_add_drop_par_0048;
+SQL SUCCESS
+create table t_b_add_drop_par_0048(c1 int primary key,c2 int,c3 int)
+tablespace ts_b_add_drop_par_0048
+partition by range(c1) subpartition by range(c2)
+( 
+  partition p1 values less than (100)
+  ( 
+    subpartition p1_1 values less than (50),
+    subpartition p1_2 values less than (100)
+  ),
+  partition p2 values less than (200)
+  ( 
+    subpartition p2_1 values less than (150),
+    subpartition p2_2 values less than (200)
+  )
+);
+SQL SUCCESS
+create index i_b_add_drop_par_0048_1 on t_b_add_drop_par_0048 (c1) global;
+SQL SUCCESS
+create index i_b_add_drop_par_0048_2 on t_b_add_drop_par_0048 (c2) local;
+SQL SUCCESS
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0048') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0048')) order by relname;
++-----------------------+------------+----------+
+| relname               | boundaries | parttype |
++-----------------------+------------+----------+
+| p1                    | {100}      | p        |
+| p1_1                  | {50}       | s        |
+| p1_2                  | {100}      | s        |
+| p2                    | {200}      | p        |
+| p2_1                  | {150}      | s        |
+| p2_2                  | {200}      | s        |
+| t_b_add_drop_par_0048 |            | r        |
++-----------------------+------------+----------+
+-- 合法添加一级、二级分区成功
+-- 添加一级分区不指定二级子分区
+alter table t_b_add_drop_par_0048 add partition (partition p3 values less than(300));
+SQL SUCCESS
+-- 添加一级分区指定一个二级分区
+alter table t_b_add_drop_par_0048 add partition (partition p4 values less than(400) (subpartition p4_1 values less than(400)));
+SQL SUCCESS
+-- 添加一级分区指定多个二级分区
+alter table t_b_add_drop_par_0048 add partition (partition p5 values less than(500) (subpartition p5_1 values less than(450),subpartition p5_2 values less than(500)));
+SQL SUCCESS
+-- 添加多个一级分区
+alter table t_b_add_drop_par_0048 add partition (partition p6 values less than(600) (subpartition p6_1 values less than(510)),partition p7 values less than(700));
+SQL SUCCESS
+-- 为一级分区添加一个子分区
+alter table t_b_add_drop_par_0048 modify partition p6 add subpartition p6_2 values less than(520);
+SQL SUCCESS
+-- 为一级分区添加多个子分区
+alter table t_b_add_drop_par_0048 modify partition p6 add subpartition p6_3 values less than(530),modify partition p6 add subpartition p6_4 values less than(540);
+SQL SUCCESS
+-- 添加一级分区指定表空间
+alter table t_b_add_drop_par_0048 add partition (partition p8 values less than(800) tablespace ts_b_add_drop_par_0048);
+SQL SUCCESS
+-- 添加二级分区指定表空间
+alter table t_b_add_drop_par_0048 modify partition p6 add subpartition p6_5 values less than(550) tablespace ts_b_add_drop_par_0048;
+SQL SUCCESS
+-- 非法添加一级二级分区报错
+-- 分区重名
+alter table t_b_add_drop_par_0048 add partition (partition p8 values less than(900));
+?.*ERROR: The partition name "p8" is duplicated with existing partition name
+  Detail: N/A
+-- 一级分区值非法
+alter table t_b_add_drop_par_0048 add partition (partition p9 values less than(100));
+?.*ERROR: upper boundary of adding partition MUST overtop last existing partition
+-- 一级分区值合法，二级分区值非法
+alter table t_b_add_drop_par_0048 add partition (partition p9 values less than(900) (subpartition p9_1 values less than(100),subpartition p9_2 values less than(50)));
+?.*ERROR: partition bound of partition "p9_2" is too low
+-- 一级分区值非法，二级分区值合法
+alter table t_b_add_drop_par_0048 add partition (partition p9 values less than(100) (subpartition p9_1 values less than(100),subpartition p9_2 values less than(200)));
+?.*ERROR: upper boundary of adding partition MUST overtop last existing partition
+-- 一级分区值非法，二级分区值非法
+alter table t_b_add_drop_par_0048 add partition (partition p9 values less than(100) (subpartition p9_1 values less than(100),subpartition p9_2 values less than(50)));
+?.*ERROR: upper boundary of adding partition MUST overtop last existing partition
+-- 一级分区数据类型非法
+alter table t_b_add_drop_par_0048 add partition (partition p9 values less than('a') (subpartition p9_1 values less than(100)));
+?.*ERROR: invalid input syntax for integer: "a"
+-- 二级分区值非法
+alter table t_b_add_drop_par_0048 add partition (partition p9 values less than(900) (subpartition p9_1 values less than('a')));
+?.*ERROR: invalid input syntax for integer: "a"
+-- 一级分区指定表空间为pg_global
+alter table t_b_add_drop_par_0048 add partition (partition p8 values less than(900) tablespace pg_global);
+?.*ERROR: only shared relations can be placed in pg_global tablespace
+-- 二级分区指定表空间为pg_global
+alter table t_b_add_drop_par_0048 add partition (partition p9 values less than(900) (subpartition p9_1 values less than(100) tablespace pg_global));
+?.*ERROR: only shared relations can be placed in pg_global tablespace
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0048') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0048')) order by relname;
++-----------------------+------------+----------+
+| relname               | boundaries | parttype |
++-----------------------+------------+----------+
+| p1                    | {100}      | p        |
+| p1_1                  | {50}       | s        |
+| p1_2                  | {100}      | s        |
+| p2                    | {200}      | p        |
+| p2_1                  | {150}      | s        |
+| p2_2                  | {200}      | s        |
+| p3                    | {300}      | p        |
+| p3_subpartdefault1    | {}         | s        |
+| p4                    | {400}      | p        |
+| p4_1                  | {400}      | s        |
+| p5                    | {500}      | p        |
+| p5_1                  | {450}      | s        |
+| p5_2                  | {500}      | s        |
+| p6                    | {600}      | p        |
+| p6_1                  | {510}      | s        |
+| p6_2                  | {520}      | s        |
+| p6_3                  | {530}      | s        |
+| p6_4                  | {540}      | s        |
+| p6_5                  | {550}      | s        |
+| p7                    | {700}      | p        |
+| p7_subpartdefault1    | {}         | s        |
+| p8                    | {800}      | p        |
+| p8_subpartdefault1    | {}         | s        |
+| t_b_add_drop_par_0048 |            | r        |
++-----------------------+------------+----------+
+-- 合法删除分区成功
+-- 删除一个一级分区
+alter table t_b_add_drop_par_0048 drop partition p8;
+SQL SUCCESS
+-- 删除多个一级分区
+alter table t_b_add_drop_par_0048 drop partition p1,p2;
+SQL SUCCESS
+-- 删除一个二级分区
+alter table t_b_add_drop_par_0048 drop subpartition p6_1;
+SQL SUCCESS
+-- 删除多个二级分区
+alter table t_b_add_drop_par_0048 drop subpartition p6_2,p6_3,p6_4;
+SQL SUCCESS
+-- 删除多个一级分区
+alter table t_b_add_drop_par_0048 drop partition p3,p4,p5,p7;
+SQL SUCCESS
+-- 非法删除分区报错
+-- 删除一级分区的最后一个二级分区
+alter table t_b_add_drop_par_0048 drop subpartition p6_5;
+?.*ERROR: Cannot drop the only subpartition of a partitioned table
+  Detail: N/A
+-- 删除表的最后一个一级分区
+alter table t_b_add_drop_par_0048 drop partition p6;
+?.*ERROR: Cannot drop the only partition of a partitioned table
+-- 删除不存在的一级分区
+alter table t_b_add_drop_par_0048 drop partition pnull;
+?.*ERROR: partition "pnull" does not exist
+-- 删除不存在的二级分区
+alter table t_b_add_drop_par_0048 drop subpartition p_null;
+?.*ERROR: subpartition "p_null" does not exist
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0048') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0048')) order by relname;
++-----------------------+------------+----------+
+| relname               | boundaries | parttype |
++-----------------------+------------+----------+
+| p6                    | {600}      | p        |
+| p6_5                  | {550}      | s        |
+| t_b_add_drop_par_0048 |            | r        |
++-----------------------+------------+----------+
+-- 清理环境
+drop table t_b_add_drop_par_0048;
+SQL SUCCESS
+drop tablespace ts_b_add_drop_par_0048;
+SQL SUCCESS
