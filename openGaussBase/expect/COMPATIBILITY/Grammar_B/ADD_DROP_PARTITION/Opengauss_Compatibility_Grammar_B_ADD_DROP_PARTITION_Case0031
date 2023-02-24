@@ -1,0 +1,131 @@
+-- @testpoint: 验证原语法和MySQL兼容语法list分区增加分区(segment=on)，部分场景合理报错
+-- 原语法
+drop tablespace if exists ts_b_add_drop_par_0031;
+SQL SUCCESS
+create tablespace ts_b_add_drop_par_0031 relative location 'ts_b_add_drop_par_0031';
+SQL SUCCESS
+drop table if exists t_b_add_drop_par_0031;
+SQL SUCCESS
+create table t_b_add_drop_par_0031(c1 int primary key,c2 int,c3 int)
+with (segment=on)
+partition by list(c3) (
+  partition p1 values(1),
+  partition p2 values(2),
+  partition p3 values(3)
+  );
+SQL SUCCESS
+create index i_b_add_drop_par_0031_1 ON t_b_add_drop_par_0031 (c1) global;
+SQL SUCCESS
+create index i_b_add_drop_par_0031_2 ON t_b_add_drop_par_0031 (c2) local;
+SQL SUCCESS
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0031') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0031')) order by relname;
++-----------------------+------------+----------+
+| relname               | boundaries | parttype |
++-----------------------+------------+----------+
+| p1                    | {1}        | p        |
+| p2                    | {2}        | p        |
+| p3                    | {3}        | p        |
+| t_b_add_drop_par_0031 |            | r        |
++-----------------------+------------+----------+
+-- 添加一个分区成功
+alter table t_b_add_drop_par_0031 add partition p4 values (4);
+SQL SUCCESS
+-- 添加多个分区成功
+alter table t_b_add_drop_par_0031 add partition p5 values (5),add partition p6 values (6);
+SQL SUCCESS
+-- 添加重名分区报错
+alter table t_b_add_drop_par_0031 add partition p6 values (7);
+?.*ERROR: The partition name "p6" is duplicated with existing partition name
+  Detail: N/A
+-- 添加非法分区报错
+alter table t_b_add_drop_par_0031 add partition p7 values (1);
+?.*ERROR: list boundary of adding partition MUST NOT overlap with existing partition
+-- 添加与分区键不同类型分区报错
+alter table t_b_add_drop_par_0031 add partition p8 values ('a');
+?.*ERROR: invalid input syntax for integer: "a"
+-- 指定表空间成功
+alter table t_b_add_drop_par_0031 add partition p7 values (7) tablespace ts_b_add_drop_par_0031;
+SQL SUCCESS
+-- 指定表空间为pg_global报错
+alter table t_b_add_drop_par_0031 add partition p8 values (8) tablespace pg_global;
+?.*ERROR: only shared relations can be placed in pg_global tablespace
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0031') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0031')) order by relname;
++-----------------------+------------+----------+
+| relname               | boundaries | parttype |
++-----------------------+------------+----------+
+| p1                    | {1}        | p        |
+| p2                    | {2}        | p        |
+| p3                    | {3}        | p        |
+| p4                    | {4}        | p        |
+| p5                    | {5}        | p        |
+| p6                    | {6}        | p        |
+| p7                    | {7}        | p        |
+| t_b_add_drop_par_0031 |            | r        |
++-----------------------+------------+----------+
+-- 清理环境
+drop table t_b_add_drop_par_0031;
+SQL SUCCESS
+-- MySQL兼容语法
+drop table if exists t_b_add_drop_par_0031;
+SQL SUCCESS
+create table t_b_add_drop_par_0031(c1 int primary key,c2 int,c3 int)
+with (segment=on)
+partition by list(c3) (
+  partition p1 values(1),
+  partition p2 values(2),
+  partition p3 values(3)
+  );
+SQL SUCCESS
+create index i_b_add_drop_par_0031_3 ON t_b_add_drop_par_0031 (c1) global;
+SQL SUCCESS
+create index i_b_add_drop_par_0031_4 ON t_b_add_drop_par_0031 (c2) local;
+SQL SUCCESS
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0031') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0031')) order by relname;
++-----------------------+------------+----------+
+| relname               | boundaries | parttype |
++-----------------------+------------+----------+
+| p1                    | {1}        | p        |
+| p2                    | {2}        | p        |
+| p3                    | {3}        | p        |
+| t_b_add_drop_par_0031 |            | r        |
++-----------------------+------------+----------+
+-- 添加一个分区成功
+alter table t_b_add_drop_par_0031 add partition (partition p4 values (4));
+SQL SUCCESS
+-- 添加多个分区成功
+alter table t_b_add_drop_par_0031 add partition (partition p5 values (5),partition p6 values (6));
+SQL SUCCESS
+-- 添加重名分区报错
+alter table t_b_add_drop_par_0031 add partition (partition p6 values (7));
+?.*ERROR: The partition name "p6" is duplicated with existing partition name
+  Detail: N/A
+-- 添加非法分区报错
+alter table t_b_add_drop_par_0031 add partition (partition p7 values (1));
+?.*ERROR: list boundary of adding partition MUST NOT overlap with existing partition
+-- 添加与分区键不同类型分区报错
+alter table t_b_add_drop_par_0031 add partition (partition p8 values ('a'));
+?.*ERROR: invalid input syntax for integer: "a"
+-- 指定表空间成功
+alter table t_b_add_drop_par_0031 add partition (partition p7 values (7) tablespace ts_b_add_drop_par_0031);
+SQL SUCCESS
+-- 指定表空间为pg_global报错
+alter table t_b_add_drop_par_0031 add partition (partition p8 values (8) tablespace pg_global);
+?.*ERROR: only shared relations can be placed in pg_global tablespace
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0031') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_add_drop_par_0031')) order by relname;
++-----------------------+------------+----------+
+| relname               | boundaries | parttype |
++-----------------------+------------+----------+
+| p1                    | {1}        | p        |
+| p2                    | {2}        | p        |
+| p3                    | {3}        | p        |
+| p4                    | {4}        | p        |
+| p5                    | {5}        | p        |
+| p6                    | {6}        | p        |
+| p7                    | {7}        | p        |
+| t_b_add_drop_par_0031 |            | r        |
++-----------------------+------------+----------+
+-- 清理环境
+drop table t_b_add_drop_par_0031;
+SQL SUCCESS
+drop tablespace ts_b_add_drop_par_0031;
+SQL SUCCESS
