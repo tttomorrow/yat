@@ -1,0 +1,41 @@
+-- @testpoint:database函数输入参数,部分用例合理报错
+-- 创建模式
+create schema sch_Opengauss_DATABASE_Case0004_1;
+SQL SUCCESS
+create schema sch_Opengauss_DATABASE_Case0004_2;
+SQL SUCCESS
+create schema sch_Opengauss_DATABASE_Case0004_3;
+SQL SUCCESS
+-- 选择当前数据库并且显示当前数据库
+select database(1);
+?.*ERROR: function database.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: database
+use sch_Opengauss_DATABASE_Case0004_1;
+SQL SUCCESS
+select database(null);
+?.*ERROR: function database.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: database
+use sch_Opengauss_DATABASE_Case0004_2;
+SQL SUCCESS
+select database('sch_Opengauss_DATABASE_Case0004_2');
+?.*ERROR: function database.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: database
+use sch_Opengauss_DATABASE_Case0004_3;
+SQL SUCCESS
+select database(sch_Opengauss_DATABASE_Case0004_3);
+?.*ERROR: column "sch_opengauss_database_case0004_3" does not exist
+?.*
+  Where: referenced column: database
+-- 清理环境
+drop schema sch_Opengauss_DATABASE_Case0004_1;
+SQL SUCCESS
+drop schema sch_Opengauss_DATABASE_Case0004_2;
+SQL SUCCESS
+drop schema sch_Opengauss_DATABASE_Case0004_3;
+SQL SUCCESS

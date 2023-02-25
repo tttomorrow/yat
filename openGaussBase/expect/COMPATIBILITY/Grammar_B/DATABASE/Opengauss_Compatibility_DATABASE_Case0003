@@ -1,0 +1,71 @@
+-- @testpoint:创建数据库
+create schema sch_Opengauss_DATABASE_Case0003_1;
+SQL SUCCESS
+create schema sch_Opengauss_DATABASE_Case0003_2;
+SQL SUCCESS
+create schema sch_Opengauss_DATABASE_Case0003_3;
+SQL SUCCESS
+create schema sch_Opengauss_DATABASE_Case0003_4;
+SQL SUCCESS
+create schema sch_Opengauss_DATABASE_Case0003_5;
+SQL SUCCESS
+-- 选择使用的的数据库并显示当前当前数据库
+use sch_Opengauss_DATABASE_Case0003_1;
+SQL SUCCESS
+select database();
++-----------------------------------+
+| database                          |
++-----------------------------------+
+| sch_opengauss_database_case0003_1 |
++-----------------------------------+
+use sch_Opengauss_DATABASE_Case0003_2;
+SQL SUCCESS
+select database();
++-----------------------------------+
+| database                          |
++-----------------------------------+
+| sch_opengauss_database_case0003_2 |
++-----------------------------------+
+use sch_Opengauss_DATABASE_Case0003_3;
+SQL SUCCESS
+select database();
++-----------------------------------+
+| database                          |
++-----------------------------------+
+| sch_opengauss_database_case0003_3 |
++-----------------------------------+
+use sch_Opengauss_DATABASE_Case0003_4;
+SQL SUCCESS
+select database();
++-----------------------------------+
+| database                          |
++-----------------------------------+
+| sch_opengauss_database_case0003_4 |
++-----------------------------------+
+use sch_Opengauss_DATABASE_Case0003_5;
+SQL SUCCESS
+select database();
++-----------------------------------+
+| database                          |
++-----------------------------------+
+| sch_opengauss_database_case0003_5 |
++-----------------------------------+
+use public;
+SQL SUCCESS
+select database();
++----------+
+| database |
++----------+
+| public   |
++----------+
+-- 清理环境
+drop schema sch_Opengauss_DATABASE_Case0003_1;
+SQL SUCCESS
+drop schema sch_Opengauss_DATABASE_Case0003_2;
+SQL SUCCESS
+drop schema sch_Opengauss_DATABASE_Case0003_3;
+SQL SUCCESS
+drop schema sch_Opengauss_DATABASE_Case0003_4;
+SQL SUCCESS
+drop schema sch_Opengauss_DATABASE_Case0003_5;
+SQL SUCCESS

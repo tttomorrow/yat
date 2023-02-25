@@ -1,0 +1,41 @@
+-- @testpoint:选择不存在的数据库，部分用例合理报错
+use sch_Opengauss_DATABASE_Case0002_1;
+?.*ERROR: Unknown database 'sch_opengauss_database_case0002_1'
+select database();
++----------+
+| database |
++----------+
+| public   |
++----------+
+use sch_Opengauss_DATABASE_Case0002_2;
+?.*ERROR: Unknown database 'sch_opengauss_database_case0002_2'
+select database();
++----------+
+| database |
++----------+
+| public   |
++----------+
+use sch_Opengauss_DATABASE_Case0002_3;
+?.*ERROR: Unknown database 'sch_opengauss_database_case0002_3'
+select database();
++----------+
+| database |
++----------+
+| public   |
++----------+
+use public;
+SQL SUCCESS
+select database();
++----------+
+| database |
++----------+
+| public   |
++----------+
+use sch_Opengauss_DATABASE_Case0002_4;
+?.*ERROR: Unknown database 'sch_opengauss_database_case0002_4'
+select database();
++----------+
+| database |
++----------+
+| public   |
++----------+
