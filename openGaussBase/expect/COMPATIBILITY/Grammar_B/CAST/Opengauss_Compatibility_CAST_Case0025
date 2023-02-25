@@ -1,0 +1,31 @@
+-- @testpoint: cast用例,部分用例合理报错
+-- as前为expr，后为自定义type
+--定义数据类型
+drop type if exists type_Opengauss_CAST_Case0025_1;
+SQL SUCCESS
+create type type_Opengauss_CAST_Case0025_1 as (t_Opengauss_CAST_Case0025_1 int, t2 text);
+SQL SUCCESS
+--新建表
+create table t_Opengauss_CAST_Case0025_1(a int,c money,b timestamp);
+SQL SUCCESS
+--插入数据
+insert into t_Opengauss_CAST_Case0025_1 values(1,2,now());
+SQL SUCCESS
+insert into t_Opengauss_CAST_Case0025_1 values(2,'$33',now());
+SQL SUCCESS
+-- 转换存在表的某个存在字段
+select cast(c as type_Opengauss_CAST_Case0025_1) from t_Opengauss_CAST_Case0025_1;
+?.*ERROR: cannot cast type money to type_opengauss_cast_case0025_1
+?.*
+  Where: referenced column: c
+select cast(b as type_Opengauss_CAST_Case0025_1) from t_Opengauss_CAST_Case0025_1;
+?.*ERROR: cannot cast type timestamp with time zone to type_opengauss_cast_case0025_1
+?.*
+  Where: referenced column: b
+select cast(a as type_Opengauss_CAST_Case0025_1) from t_Opengauss_CAST_Case0025_1;
+?.*ERROR: cannot cast type integer to type_opengauss_cast_case0025_1
+?.*
+  Where: referenced column: a
+-- 清理环境
+drop table t_Opengauss_CAST_Case0025_1;
+SQL SUCCESS

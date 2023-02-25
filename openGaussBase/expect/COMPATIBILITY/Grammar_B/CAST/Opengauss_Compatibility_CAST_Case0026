@@ -1,0 +1,45 @@
+-- @testpoint: cast用例,部分用例合理报错
+--设置时区
+set time zone 'uct';
+SQL SUCCESS
+-- 转换后的值参与运算或函数中
+select cast('2022-11-10 18:03:20'::timestamp as unsigned);
++----------------+
+| uint8          |
++----------------+
+| 20221110180320 |
++----------------+
+select cast('2022-11-10 18:03:20'::timestamp as unsigned);
++----------------+
+| uint8          |
++----------------+
+| 20221110180320 |
++----------------+
+select cast('2022-11-10 18:03:20'::timestamp as unsigned);
++----------------+
+| uint8          |
++----------------+
+| 20221110180320 |
++----------------+
+select cast('$2'-'$5'::money as unsigned);
++----------------------+
+| uint8                |
++----------------------+
+| 18446744073709551613 |
++----------------------+
+select cast('$2'-'$2'::money as unsigned);
++-------+
+| uint8 |
++-------+
+| 0     |
++-------+
+select cast('$6'-'$2'::money as unsigned);
++-------+
+| uint8 |
++-------+
+| 4     |
++-------+
+select cast('2022-11-10 18:03:20'-'2022-11-10 18:03:01'::timestamp as unsigned);
+?.*ERROR: cannot cast type interval to uint8
+?.*
+  Where: referenced column: uint8
