@@ -1,0 +1,73 @@
+-- @testpoint:bits位输入字母或其他或null时make_set的运算,部分测试用例合理报错
+select make_set(null,'a','b','c','d');
++----------+
+| make_set |
++----------+
+|          |
++----------+
+select make_set(null,'a','b');
++----------+
+| make_set |
++----------+
+|          |
++----------+
+select make_set(null,'a','b','c',null);
++----------+
+| make_set |
++----------+
+|          |
++----------+
+select make_set(null,null,'b');
++----------+
+| make_set |
++----------+
+|          |
++----------+
+select make_set(null,'a',null);
++----------+
+| make_set |
++----------+
+|          |
++----------+
+select make_set(a,'a','b','c',null);
+?.*ERROR: column "a" does not exist
+?.*
+  Where: referenced column: make_set
+select make_set(c,null,'b');
+?.*ERROR: column "c" does not exist
+?.*
+  Where: referenced column: make_set
+select make_set(h,'a',null);
+?.*ERROR: column "h" does not exist
+?.*
+  Where: referenced column: make_set
+select make_set(j,'a','b');
+?.*ERROR: column "j" does not exist
+?.*
+  Where: referenced column: make_set
+select make_set(l,'a','b');
+?.*ERROR: column "l" does not exist
+?.*
+  Where: referenced column: make_set
+select make_set(我,'a','b');
+?.*ERROR: column "我" does not exist
+?.*
+  Where: referenced column: make_set
+select make_set(天,'a','b','e','f');
+?.*ERROR: column "天" does not exist
+?.*
+  Where: referenced column: make_set
+select make_set(wa,'a','b');
+?.*ERROR: column "wa" does not exist
+?.*
+  Where: referenced column: make_set
+select make_set(.,'a','b');
+?.*ERROR: syntax error at or near "."
+?.*
+select make_set(&,'a','b');
+?.*ERROR: syntax error at or near ","
+?.*
+select make_set(！,'a','b','e','f');
+?.*ERROR: column "！" does not exist
+?.*
+  Where: referenced column: make_set
