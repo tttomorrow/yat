@@ -1,0 +1,55 @@
+-- @testpoint: cast用例
+set time zone 'uct';
+SQL SUCCESS
+-- 转换数据后查看原始数据
+--新建表
+create table t_Opengauss_CAST_Case0017_1(a int,c money,b timestamp);
+SQL SUCCESS
+--插入数据
+insert into t_Opengauss_CAST_Case0017_1 values(1,2,'12-11-09');
+SQL SUCCESS
+insert into t_Opengauss_CAST_Case0017_1 values(2,'$33','12-11-09');
+SQL SUCCESS
+--查询当前数据
+select * from t_Opengauss_CAST_Case0017_1;
++---+------+-------------------------------+
+| a | c    | b                             |
++---+------+-------------------------------+
+| 1 | 2.0  | 2012-11-09 08:00:00.000000000 |
+| 2 | 33.0 | 2012-11-09 08:00:00.000000000 |
++---+------+-------------------------------+
+-- 转换存在表的某个存在字段
+select cast(c as unsigned) from t_Opengauss_CAST_Case0017_1;
++----+
+| c  |
++----+
+| 2  |
+| 33 |
++----+
+set time zone 'uct';
+SQL SUCCESS
+select cast(b as unsigned) from t_Opengauss_CAST_Case0017_1;
++----------------+
+| b              |
++----------------+
+| 20121109000000 |
+| 20121109000000 |
++----------------+
+select cast(a as unsigned) from t_Opengauss_CAST_Case0017_1;
++---+
+| a |
++---+
+| 1 |
+| 2 |
++---+
+-- 转换数据后查看原始数据
+select * from t_Opengauss_CAST_Case0017_1;
++---+------+-------------------------------+
+| a | c    | b                             |
++---+------+-------------------------------+
+| 1 | 2.0  | 2012-11-09 08:00:00.000000000 |
+| 2 | 33.0 | 2012-11-09 08:00:00.000000000 |
++---+------+-------------------------------+
+-- 清理环境
+drop table t_Opengauss_CAST_Case0017_1;
+SQL SUCCESS
