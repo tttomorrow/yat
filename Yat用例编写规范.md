@@ -16,11 +16,22 @@
   - 表名：t\_[特性\_]用例名\_1、t\_[特性\_]用例名\_2
   - 索引名：i\_[特性\_]用例名\_1、i\_[特性\_]用例名\_2
   - 用户名：u\_[特性\_]用例名
+  - audit policy: ap_[特性_]用例名_1
+  - aggregate: agg_[特性_]用例名_1
+  - column encryption key: cek_[特性_]用例名_1
+  - client master key: cmk_[特性_]用例名_
+  - cursor: cur_[特性_]用例名_1
+  - data source: ds_[特性_]用例名_1
+  - database: db_[特性_]用例名_1
+  - directory: dir_[特性_]用例名_1
+  - group: group_[特性_]用例名_1
+  - index: i_[特性_]用例名_1
   - language：l_[特性_]用例名_1
   - masking policy：mp_[特性_]用例名_1
   - materialized view：mv_[特性_]用例名_1
   - model：m_[特性_]用例名_1
   - operator：o_[特性_]用例名_1
+  - prepare: pp_[特性_]用例名_1 
   - package：pac_[特性_]用例名_1
   - procedure：pro_[特性_]用例名_1
   - publication：pub_[特性_]用例名_1
@@ -35,16 +46,21 @@
   - subscription：ss_[特性_]用例名_1
   - subtype：st_[特性_]用例名_1
   - synonym：syn_[特性_]用例名_1
+  - savepoint: sp_[特性_]用例名_1
   - table partition：tp_[特性_]用例名_1
   - table subpartition：tsp_[特性_]用例名_1
   - text search configuration：tsc_[特性_]用例名_1
   - text search dictionary：tsd_[特性_]用例名_1
   - trigger：tri_[特性_]用例名_1
   - type：type_[特性_]用例名_1
+  - tablespace: ts_[特性_]用例名_1
+  - table: t_[特性_]用例名_1
+  - user: u_[特性_]用例名_1
   - user mapping：um_[特性_]用例名_1
   - view：v_[特性_]用例名_1
   - weak password dictionary：wpd_[特性_]用例名_1
   - function：f_[特性_]用例名_1
+  - foreign table: ft_[特性_]用例名_1
 
 2）保证用例的独立性，除特殊情况外（如兼容性用例增加整体setup和teardown文件）， 每个用例都需要能单独执行
 
