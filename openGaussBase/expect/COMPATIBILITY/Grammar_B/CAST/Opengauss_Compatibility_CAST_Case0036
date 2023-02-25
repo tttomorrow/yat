@@ -1,0 +1,16 @@
+-- @testpoint: cast用例,部分用例合理报错
+-- cast函数输入参数,timestamp转换为unsigned
+select cast('2022-11-10 18:03:20'::timestamp as unsigned);
++----------------+
+| uint8          |
++----------------+
+| 20221110100320 |
++----------------+
+select cast('2022-11-10 183:03:20'::timestamp as unsigned);
+?.*ERROR: date/time field value out of range: "2022-11-10 183:03:20"
+?.*
+  Where: referenced column: uint8
+select cast('2022-11-10 83:03:20'::timestamp as unsigned);
+?.*ERROR: date/time field value out of range: "2022-11-10 83:03:20"
+?.*
+  Where: referenced column: uint8

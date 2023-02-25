@@ -1,0 +1,36 @@
+-- @testpoint: cast用例,部分用例合理报错
+-- 不符合规则money类型参与转换
+select cast('$2'::money as unsigned);
++-------+
+| uint8 |
++-------+
+| 2     |
++-------+
+select cast('$2' money as unsigned);
+?.*ERROR: syntax error at or near "money"
+?.*
+select cast('$2':money as unsigned);
+?.*ERROR: syntax error at or near ":money"
+?.*
+select cast('$2' as unsigned);
+?.*ERROR: invalid input syntax for type bigint unsigned:.*
+?.*
+  Where: referenced column: uint8
+select cast('&2'::money as unsigned);
+?.*ERROR: invalid input syntax for type money:.*
+?.*
+  Where: referenced column: uint8
+select cast('$2-$1'::money as unsigned);
+?.*ERROR: invalid input syntax for type money:.*
+?.*
+  Where: referenced column: uint8
+select cast($2::money as unsigned);
+?.*ERROR: could not determine data type of paramete.*
+select cast('2$2'::money as unsigned);
+?.*ERROR: invalid input syntax for type money:.*
+?.*
+  Where: referenced column: uint8
+select cast('2019-20-03'::money as unsigned);
+?.*ERROR: invalid input syntax for type money:.*
+?.*
+  Where: referenced column: uint8

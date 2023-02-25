@@ -1,0 +1,51 @@
+-- @testpoint: cast用例,部分用例合理报错,部分用例合理报错
+-- 设置时区
+set time zone 'uct';
+SQL SUCCESS
+-- 不符合规则的timestamp类型参与转换
+select cast('2022-11-10 18:03:20'::timestamp as unsigned);
++----------------+
+| uint8          |
++----------------+
+| 20221110180320 |
++----------------+
+select cast('2022-11-10'::timestamp as unsigned);
++----------------+
+| uint8          |
++----------------+
+| 20221110000000 |
++----------------+
+select cast('18:03:20'::timestamp as unsigned);
++----------------+
+| uint8          |
++----------------+
+| 20180320000000 |
++----------------+
+select cast('2022-11-10 18:03:20' timestamp as unsigned);
+?.*ERROR: syntax error at or near "timestamp"
+?.*
+select cast('2022-11-10 18:03:20':timestamp as unsigned);
+?.*ERROR: syntax error at or near ":timestamp"
+?.*
+select cast('20221219'::timestamp as unsigned);
++----------------+
+| uint8          |
++----------------+
+| 20221219000000 |
++----------------+
+select cast('20221219-02-09'::timestamp as unsigned);
+?.*ERROR: timestamp out of range:.*
+?.*
+  Where: referenced column: uint8
+select cast('20221219-02+09'::timestamp as unsigned);
+?.*ERROR: invalid input syntax for type timestamp:.*
+?.*
+  Where: referenced column: uint8
+select cast('2022-11-10 18:03:20' as unsigned);
+?.*ERROR: invalid input syntax for type bigint unsigned:.*
+?.*
+  Where: referenced column: uint8
+select cast('$34'::timestamp as unsigned);
+?.*ERROR: invalid input syntax for type timestamp:.*
+?.*
+  Where: referenced column: uint8
