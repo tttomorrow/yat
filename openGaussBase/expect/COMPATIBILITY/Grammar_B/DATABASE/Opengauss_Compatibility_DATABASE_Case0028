@@ -1,0 +1,17 @@
+-- @testpoint:选择不存在的数据库，部分用例合理报错
+use schmea_Opengauss_DATABASE_Case0028_1;
+?.*ERROR: Unknown database 'schmea_opengauss_database_case0028_1'
+select database();
++----------+
+| database |
++----------+
+| public   |
++----------+
+use schmea_Opengauss_DATABASE_Case0028_2;
+?.*ERROR: Unknown database 'schmea_opengauss_database_case0028_2'
+select database();
++----------+
+| database |
++----------+
+| public   |
++----------+
