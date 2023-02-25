@@ -1,0 +1,30 @@
+-- @testpoint: cast用例,部分用例合理报错
+-- 转换后的值参与运算或函数中
+select cast('2022-11-10 :03:20'::timestamp as unsigned);
++----------------+
+| uint8          |
++----------------+
+| 20221109192000 |
++----------------+
+select cast('2022-11 18:03:20'::timestamp as unsigned);
+?.*ERROR: invalid input syntax for type timestamp: "2022-11 18:03:20"
+?.*
+  Where: referenced column: uint8
+select cast('2022-11-10 18:03'::timestamp as unsigned);
++----------------+
+| uint8          |
++----------------+
+| 20221110100300 |
++----------------+
+select cast('$2'-'$5'::money as unsigned);
++----------------------+
+| uint8                |
++----------------------+
+| 18446744073709551613 |
++----------------------+
+select cast('$2'-'$2'::money as unsigned);
++-------+
+| uint8 |
++-------+
+| 0     |
++-------+
