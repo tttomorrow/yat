@@ -1,0 +1,41 @@
+-- @testpoint: cast用例,部分用例合理报错,部分用例合理报错
+set time zone 'uct';
+SQL SUCCESS
+-- cast函数输入参数，as前后边是expr
+select cast(0 as 1);
+?.*ERROR: syntax error at or near "1"
+?.*
+select cast(cast(0 as money) as money);
++-------+
+| money |
++-------+
+| 0.0   |
++-------+
+select cast(cast(true as money) as money);
+?.*ERROR: cannot cast type boolean to money
+?.*
+  Where: referenced column: money
+select cast('2022-11-10 18:03:20'::timestamp as unsigned);
++----------------+
+| uint8          |
++----------------+
+| 20221110180320 |
++----------------+
+select cast('2022-11-10 18:03:20'::timestamp as true);
+?.*ERROR: syntax error at or near "true"
+?.*
+select cast('2022-11-10 18:03:20'::timestamp as 0);
+?.*ERROR: syntax error at or near "0"
+?.*
+select cast(-1 as timestamp);
+?.*ERROR: timestamp out of range
+  Where: referenced column: timestamptz
+select cast(-111 as timestamp);
+?.*ERROR: timestamp out of range
+  Where: referenced column: timestamptz
+select cast(221 as timestamp);
++-------------------------------+
+| timestamptz                   |
++-------------------------------+
+| 2000-02-21 08:00:00.000000000 |
++-------------------------------+

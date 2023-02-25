@@ -1,0 +1,20 @@
+-- @testpoint: cast用例,部分用例合理报错,部分用例合理报错
+-- cast函数输入参数，as后为不存在的type
+select cast('$2'::money as unsigne);
+?.*ERROR: type "unsigne" does not exist
+  Where: referenced column: unsigne
+select cast(cast('$2'::money as unsigned) as $);
+?.*ERROR: syntax error at or near.*
+?.*
+select cast('2022-11-10 18:03:20'::timestamp as unsign);
+?.*ERROR: type "unsign" does not exist
+  Where: referenced column: unsign
+select cast(current_timestamp::timestamp as unsigned1);
+?.*ERROR: type "unsigned1" does not exist
+  Where: referenced column: current_timestamp
+select cast(cast('2022-11-10 18:03:20'::timestamp as unsigned) as time stamp);
+?.*ERROR: syntax error at or near "stamp"
+?.*
+select cast(cast('2022-11-10 18:03:20'::timestamp as unsigned) as timestamp1);
+?.*ERROR: type "timestamp1" does not exist
+  Where: referenced column: timestamp1

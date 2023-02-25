@@ -1,0 +1,31 @@
+-- @testpoint: cast用例
+-- 设置时区
+set time zone 'uct';
+SQL SUCCESS
+-- cast函数输入参数，as前为expr，后为type
+select cast('$2'::money as unsigned);
++-------+
+| uint8 |
++-------+
+| 2     |
++-------+
+select cast(cast('$2'::money as unsigned) as money);
++-------+
+| money |
++-------+
+| 2.0   |
++-------+
+select cast('2022-11-10 18:03:20'::timestamp as unsigned);
++----------------+
+| uint8          |
++----------------+
+| 20221110180320 |
++----------------+
+set time zone 'uct';
+SQL SUCCESS
+select cast('2022-11-10 18:03:20'::timestamp as unsigned);
++----------------+
+| uint8          |
++----------------+
+| 20221110180320 |
++----------------+

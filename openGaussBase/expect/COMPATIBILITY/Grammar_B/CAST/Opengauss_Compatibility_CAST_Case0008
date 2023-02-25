@@ -1,0 +1,14 @@
+-- @testpoint: cast用例,部分用例合理报错
+-- cast函数输入参数，as前为其他类型的expr
+select cast(select current_timestamp as unsigned);
+?.*ERROR: syntax error at or near "select"
+?.*
+select cast(unsigned as select current_timestamp);
+?.*ERROR: syntax error at or near "select"
+?.*
+select cast(unsigned as select now());
+?.*ERROR: syntax error at or near "select"
+?.*
+select cast(select now() as unsigned);
+?.*ERROR: syntax error at or near "select"
+?.*

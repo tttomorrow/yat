@@ -1,0 +1,4 @@
+-- @testpoint: cast用例,部分用例合理报错,部分用例合理报错
+-- cast函数输入参数，as用逗号代替
+select cast('$2'::money , unsigned);
+select cast('2022-11-10 18:03:20'::timestamp , unsigned);
