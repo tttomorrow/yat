@@ -1,0 +1,25 @@
+-- @testpoint:选择数据库并且使用参数,部分用例合理报错
+select database(public);
+?.*ERROR: column "public" does not exist
+?.*
+  Where: referenced column: database
+use sch_Opengauss_DATABASE_Case0017_1;
+?.*ERROR: Unknown database 'sch_opengauss_database_case0017_1'
+select database(null);
+?.*ERROR: function database.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: database
+use sch_Opengauss_DATABASE_Case0017_2;
+?.*ERROR: Unknown database 'sch_opengauss_database_case0017_2'
+select database('sch_Opengauss_DATABASE_Case0017_2');
+?.*ERROR: function database.*
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+?.*
+  Where: referenced column: database
+use sch_Opengauss_DATABASE_Case0017_3;
+?.*ERROR: Unknown database 'sch_opengauss_database_case0017_3'
+select database(sch_Opengauss_DATABASE_Case0017_3);
+?.*ERROR: column "sch_opengauss_database_case0017_3" does not exist
+?.*
+  Where: referenced column: database
