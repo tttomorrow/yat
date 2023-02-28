@@ -1,0 +1,141 @@
+-- @testpoint: 验证range分区表analyze分区语法(主表指定非默认tablespace)，部分场景合理报错
+drop tablespace if exists ts_b_analyze_par_0014;
+SQL SUCCESS
+create tablespace ts_b_analyze_par_0014 relative location 'ts_b_analyze_par_0014';
+SQL SUCCESS
+drop table if exists t_b_analyze_par_0014;
+SQL SUCCESS
+create table t_b_analyze_par_0014(c1 int primary key,c2 int)
+tablespace ts_b_analyze_par_0014
+partition by range(c1) (
+  partition p1 values less than(100),
+  partition p2 values less than(200),
+  partition p3 values less than(300),
+  partition p4 values less than(400),
+  partition p5 values less than(500),
+  partition p6 values less than(600),
+  partition p7 values less than(700),
+  partition p8 values less than(800),
+  partition p9 values less than(900),
+  partition p10 values less than(1000)
+  );
+SQL SUCCESS
+create index i_b_analyze_par_0014_1 on t_b_analyze_par_0014 (c2) global;
+SQL SUCCESS
+create index i_b_analyze_par_0014_2 on t_b_analyze_par_0014 (c1) local;
+SQL SUCCESS
+insert into t_b_analyze_par_0014 values
+  (101,101),
+  (201,201),
+  (301,301),
+  (401,401),
+  (501,501);
+SQL SUCCESS
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_analyze_par_0014') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_analyze_par_0014')) order by relname;
++----------------------+------------+----------+
+| relname              | boundaries | parttype |
++----------------------+------------+----------+
+| p1                   | {100}      | p        |
+| p10                  | {1000}     | p        |
+| p2                   | {200}      | p        |
+| p3                   | {300}      | p        |
+| p4                   | {400}      | p        |
+| p5                   | {500}      | p        |
+| p6                   | {600}      | p        |
+| p7                   | {700}      | p        |
+| p8                   | {800}      | p        |
+| p9                   | {900}      | p        |
+| t_b_analyze_par_0014 |            | r        |
++----------------------+------------+----------+
+-- analyze一个分区，验证成功
+alter table t_b_analyze_par_0014 analyze partition p2;
++----------------------+
+| analyze_partition    |
++----------------------+
+| t_b_analyze_par_0014 |
++----------------------+
+select * from t_b_analyze_par_0014 partition(p2) order by c1;
++-----+-----+
+| c1  | c2  |
++-----+-----+
+| 101 | 101 |
++-----+-----+
+-- analyze多个分区，验证成功
+alter table t_b_analyze_par_0014 analyze partition p3,p4;
++----------------------+
+| analyze_partition    |
++----------------------+
+| t_b_analyze_par_0014 |
++----------------------+
+select * from t_b_analyze_par_0014 partition(p3) order by c1;
++-----+-----+
+| c1  | c2  |
++-----+-----+
+| 201 | 201 |
++-----+-----+
+select * from t_b_analyze_par_0014 partition(p4) order by c1;
++-----+-----+
+| c1  | c2  |
++-----+-----+
+| 301 | 301 |
++-----+-----+
+-- analyze所有分区，验证成功
+alter table t_b_analyze_par_0014 analyze partition all;
+SQL SUCCESS
+select * from t_b_analyze_par_0014 order by c1;
++-----+-----+
+| c1  | c2  |
++-----+-----+
+| 101 | 101 |
+| 201 | 201 |
+| 301 | 301 |
+| 401 | 401 |
+| 501 | 501 |
++-----+-----+
+-- analyze无数据分区，验证成功
+alter table t_b_analyze_par_0014 analyze partition p10;
++----------------------+
+| analyze_partition    |
++----------------------+
+| t_b_analyze_par_0014 |
++----------------------+
+select * from t_b_analyze_par_0014 partition(p10) order by c1;
++----+----+
+| c1 | c2 |
++----+----+
++----+----+
+-- analyze不存在分区，合理报错
+alter table t_b_analyze_par_0014 analyze partition pnull;
+?.*ERROR: partition "pnull" of relation "t_b_analyze_par_0014" does not exist
+  Where: referenced column: analyze_partition
+select * from t_b_analyze_par_0014 order by c1;
++-----+-----+
+| c1  | c2  |
++-----+-----+
+| 101 | 101 |
+| 201 | 201 |
+| 301 | 301 |
+| 401 | 401 |
+| 501 | 501 |
++-----+-----+
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_analyze_par_0014') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_analyze_par_0014')) order by relname;
++----------------------+------------+----------+
+| relname              | boundaries | parttype |
++----------------------+------------+----------+
+| p1                   | {100}      | p        |
+| p10                  | {1000}     | p        |
+| p2                   | {200}      | p        |
+| p3                   | {300}      | p        |
+| p4                   | {400}      | p        |
+| p5                   | {500}      | p        |
+| p6                   | {600}      | p        |
+| p7                   | {700}      | p        |
+| p8                   | {800}      | p        |
+| p9                   | {900}      | p        |
+| t_b_analyze_par_0014 |            | r        |
++----------------------+------------+----------+
+-- 清理环境
+drop table t_b_analyze_par_0014;
+SQL SUCCESS
+drop tablespace ts_b_analyze_par_0014;
+SQL SUCCESS
