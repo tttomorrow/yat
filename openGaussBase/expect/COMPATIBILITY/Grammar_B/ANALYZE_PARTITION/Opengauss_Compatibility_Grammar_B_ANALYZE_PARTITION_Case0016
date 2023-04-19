@@ -1,0 +1,135 @@
+-- @testpoint: 验证list分区表analyze分区语法(ustore)，部分场景合理报错
+drop table if exists t_b_analyze_par_0016;
+SQL SUCCESS
+create table t_b_analyze_par_0016(c1 int primary key,c2 int,c3 int)
+with (storage_type=ustore)
+partition by list(c1) (
+  partition p1 values(1),
+  partition p2 values(2),
+  partition p3 values(3),
+  partition p4 values(4),
+  partition p5 values(5),
+  partition p6 values(6),
+  partition p7 values(7),
+  partition p8 values(8),
+  partition p9 values(9),
+  partition p10 values(10)
+  );
+SQL SUCCESS
+create index i_b_analyze_par_0016_1 ON t_b_analyze_par_0016 (c1) global;
+?.*ERROR: Global and local partition index should not be on same column
+create index i_b_analyze_par_0016_2 ON t_b_analyze_par_0016 (c2) local;
+SQL SUCCESS
+insert into t_b_analyze_par_0016 values
+  (2,2),
+  (3,3),
+  (4,4),
+  (5,5),
+  (6,6);
+SQL SUCCESS
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_analyze_par_0016') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_analyze_par_0016')) order by relname;
++----------------------+------------+----------+
+| relname              | boundaries | parttype |
++----------------------+------------+----------+
+| p1                   | {1}        | p        |
+| p10                  | {10}       | p        |
+| p2                   | {2}        | p        |
+| p3                   | {3}        | p        |
+| p4                   | {4}        | p        |
+| p5                   | {5}        | p        |
+| p6                   | {6}        | p        |
+| p7                   | {7}        | p        |
+| p8                   | {8}        | p        |
+| p9                   | {9}        | p        |
+| t_b_analyze_par_0016 |            | r        |
++----------------------+------------+----------+
+-- analyze一个分区，验证成功
+alter table t_b_analyze_par_0016 analyze partition p2;
++----------------------+
+| analyze_partition    |
++----------------------+
+| t_b_analyze_par_0016 |
++----------------------+
+select * from t_b_analyze_par_0016 partition(p2) order by c1;
++----+----+----+
+| c1 | c2 | c3 |
++----+----+----+
+| 2  | 2  |    |
++----+----+----+
+-- analyze多个分区，验证成功
+alter table t_b_analyze_par_0016 analyze partition p3,p4;
++----------------------+
+| analyze_partition    |
++----------------------+
+| t_b_analyze_par_0016 |
++----------------------+
+select * from t_b_analyze_par_0016 partition(p3) order by c1;
++----+----+----+
+| c1 | c2 | c3 |
++----+----+----+
+| 3  | 3  |    |
++----+----+----+
+select * from t_b_analyze_par_0016 partition(p4) order by c1;
++----+----+----+
+| c1 | c2 | c3 |
++----+----+----+
+| 4  | 4  |    |
++----+----+----+
+-- analyze所有分区，验证成功
+alter table t_b_analyze_par_0016 analyze partition all;
+SQL SUCCESS
+select * from t_b_analyze_par_0016 order by c1;
++----+----+----+
+| c1 | c2 | c3 |
++----+----+----+
+| 2  | 2  |    |
+| 3  | 3  |    |
+| 4  | 4  |    |
+| 5  | 5  |    |
+| 6  | 6  |    |
++----+----+----+
+-- analyze无数据分区，验证成功
+alter table t_b_analyze_par_0016 analyze partition p10;
++----------------------+
+| analyze_partition    |
++----------------------+
+| t_b_analyze_par_0016 |
++----------------------+
+select * from t_b_analyze_par_0016 partition(p10) order by c1;
++----+----+----+
+| c1 | c2 | c3 |
++----+----+----+
++----+----+----+
+-- analyze不存在分区，合理报错
+alter table t_b_analyze_par_0016 analyze partition pnull;
+?.*ERROR: partition "pnull" of relation "t_b_analyze_par_0016" does not exist
+  Where: referenced column: analyze_partition
+select * from t_b_analyze_par_0016 order by c1;
++----+----+----+
+| c1 | c2 | c3 |
++----+----+----+
+| 2  | 2  |    |
+| 3  | 3  |    |
+| 4  | 4  |    |
+| 5  | 5  |    |
+| 6  | 6  |    |
++----+----+----+
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_analyze_par_0016') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_analyze_par_0016')) order by relname;
++----------------------+------------+----------+
+| relname              | boundaries | parttype |
++----------------------+------------+----------+
+| p1                   | {1}        | p        |
+| p10                  | {10}       | p        |
+| p2                   | {2}        | p        |
+| p3                   | {3}        | p        |
+| p4                   | {4}        | p        |
+| p5                   | {5}        | p        |
+| p6                   | {6}        | p        |
+| p7                   | {7}        | p        |
+| p8                   | {8}        | p        |
+| p9                   | {9}        | p        |
+| t_b_analyze_par_0016 |            | r        |
++----------------------+------------+----------+
+-- 清理环境
+drop table t_b_analyze_par_0016;
+SQL SUCCESS
