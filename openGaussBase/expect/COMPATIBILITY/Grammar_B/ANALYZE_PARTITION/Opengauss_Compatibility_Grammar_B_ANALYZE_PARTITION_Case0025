@@ -1,0 +1,152 @@
+-- @testpoint: 验证range-range分区表analyze分区语法(segment=on)，部分场景合理报错
+drop table if exists t_b_analyze_par_0025;
+SQL SUCCESS
+create table t_b_analyze_par_0025(c1 int primary key,c2 int,c3 int)
+with (segment=on)
+partition by range(c1) subpartition by range(c2) 
+(
+  partition p1 values less than (100)
+  (
+    subpartition p1_1 values less than (50),
+    subpartition p1_2 values less than (100)
+  ),
+  partition p2 values less than (200)
+  (
+    subpartition p2_1 values less than (150),
+    subpartition p2_2 values less than (200)
+  ),
+  partition p3 values less than (300)
+  (
+    subpartition p3_1 values less than (250),
+    subpartition p3_2 values less than (300)
+  )
+);
+SQL SUCCESS
+create index i_b_analyze_par_0025_1 on t_b_analyze_par_0025 (c1) global;
+SQL SUCCESS
+create index i_b_analyze_par_0025_2 on t_b_analyze_par_0025 (c2) local;
+SQL SUCCESS
+insert into t_b_analyze_par_0025 values
+  (1,1,1),
+  (2,60,2),
+  (101,101,3),
+  (102,160,4);
+SQL SUCCESS
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_analyze_par_0025') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_analyze_par_0025')) order by relname;
++----------------------+------------+----------+
+| relname              | boundaries | parttype |
++----------------------+------------+----------+
+| p1                   | {100}      | p        |
+| p1_1                 | {50}       | s        |
+| p1_2                 | {100}      | s        |
+| p2                   | {200}      | p        |
+| p2_1                 | {150}      | s        |
+| p2_2                 | {200}      | s        |
+| p3                   | {300}      | p        |
+| p3_1                 | {250}      | s        |
+| p3_2                 | {300}      | s        |
+| t_b_analyze_par_0025 |            | r        |
++----------------------+------------+----------+
+-- analyze一个分区，验证成功
+alter table t_b_analyze_par_0025 analyze partition p1;
++----------------------+
+| analyze_partition    |
++----------------------+
+| t_b_analyze_par_0025 |
++----------------------+
+select * from t_b_analyze_par_0025 partition(p1) order by c1;
++----+----+----+
+| c1 | c2 | c3 |
++----+----+----+
+| 1  | 1  | 1  |
+| 2  | 60 | 2  |
++----+----+----+
+-- analyze多个分区，验证成功
+alter table t_b_analyze_par_0025 analyze partition p1,p2;
++----------------------+
+| analyze_partition    |
++----------------------+
+| t_b_analyze_par_0025 |
++----------------------+
+select * from t_b_analyze_par_0025 partition(p1) order by c1;
++----+----+----+
+| c1 | c2 | c3 |
++----+----+----+
+| 1  | 1  | 1  |
+| 2  | 60 | 2  |
++----+----+----+
+select * from t_b_analyze_par_0025 partition(p2) order by c1;
++-----+-----+----+
+| c1  | c2  | c3 |
++-----+-----+----+
+| 101 | 101 | 3  |
+| 102 | 160 | 4  |
++-----+-----+----+
+-- analyze所有分区，验证成功
+alter table t_b_analyze_par_0025 analyze partition all;
+SQL SUCCESS
+select * from t_b_analyze_par_0025 order by c1;
++-----+-----+----+
+| c1  | c2  | c3 |
++-----+-----+----+
+| 1   | 1   | 1  |
+| 2   | 60  | 2  |
+| 101 | 101 | 3  |
+| 102 | 160 | 4  |
++-----+-----+----+
+-- analyze无数据分区，验证成功
+alter table t_b_analyze_par_0025 analyze partition p3;
++----------------------+
+| analyze_partition    |
++----------------------+
+| t_b_analyze_par_0025 |
++----------------------+
+select * from t_b_analyze_par_0025 partition(p3) order by c1;
++----+----+----+
+| c1 | c2 | c3 |
++----+----+----+
++----+----+----+
+-- analyze不存在分区，合理报错
+alter table t_b_analyze_par_0025 analyze partition pnull;
+?.*ERROR: The partition pnull can't be found in table t_b_analyze_par_0025
+  Where: referenced column: analyze_partition
+-- analyze二级分区，合理报错
+alter table t_b_analyze_par_0025 analyze partition p1_1;
+?.*ERROR: The partition p1_1 can't be found in table t_b_analyze_par_0025
+  Where: referenced column: analyze_partition
+alter table t_b_analyze_par_0025 analyze subpartition p1_1;
+?.*ERROR: syntax error at or near "subpartition p1_1"
+?.*Position.*
+alter table t_b_analyze_par_0025 analyze subpartition p1_1,p1_2;
+?.*ERROR: syntax error at or near "subpartition p1_1"
+?.*Position.*
+alter table t_b_analyze_par_0025 analyze subpartition all;
+?.*ERROR: syntax error at or near "subpartition all"
+?.*Position.*
+select * from t_b_analyze_par_0025 order by c1;
++-----+-----+----+
+| c1  | c2  | c3 |
++-----+-----+----+
+| 1   | 1   | 1  |
+| 2   | 60  | 2  |
+| 101 | 101 | 3  |
+| 102 | 160 | 4  |
++-----+-----+----+
+select relname,boundaries,parttype from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_analyze_par_0025') or parentid in (select oid from pg_partition where parentid in (select parentid from pg_partition where relname = 't_b_analyze_par_0025')) order by relname;
++----------------------+------------+----------+
+| relname              | boundaries | parttype |
++----------------------+------------+----------+
+| p1                   | {100}      | p        |
+| p1_1                 | {50}       | s        |
+| p1_2                 | {100}      | s        |
+| p2                   | {200}      | p        |
+| p2_1                 | {150}      | s        |
+| p2_2                 | {200}      | s        |
+| p3                   | {300}      | p        |
+| p3_1                 | {250}      | s        |
+| p3_2                 | {300}      | s        |
+| t_b_analyze_par_0025 |            | r        |
++----------------------+------------+----------+
+-- 清理环境
+drop table t_b_analyze_par_0025;
+SQL SUCCESS
